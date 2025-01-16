@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation';
 import { NextUIProvider } from '@nextui-org/react';
 import { SessionProvider } from 'next-auth/react';
 
-interface Props extends PropsWithChildren { }
-
-const GlobalProvider: FunctionComponent<Props> = ({
+const GlobalProvider: FunctionComponent<PropsWithChildren> = ({
   children,
 }): ReactElement => {
   const router = useRouter();

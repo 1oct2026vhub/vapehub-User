@@ -2,20 +2,139 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  :root {
+    --background-white: #ffffff;
+    --foreground-black: #171717;
+    --background-base: rgba(250, 250, 250, 1);
 
-@media (prefers-color-scheme: dark) {
+    /* primary colors */
+    --primary-50: rgba(226, 232, 224, 1);
+    --primary-100: rgba(201, 215, 204, 1);
+    --primary-200: rgba(151, 183, 167, 1);
+    --primary-300: rgba(100, 149, 128, 1);
+    --primary-400: rgba(50, 117, 91, 1);
+    --primary-500: rgba(0, 84, 52, 1);
+
+    --primary2-400: rgba(84, 166, 134, 1);
+    --primary2-500: rgba(43, 145, 106, 1);
+
+    --primary-gradient-100: linear-gradient(180deg, #005434 0%, #2B916A 100%);
+    --primary-gradient-400: linear-gradient(89deg, #005434 3.38%, #2B916A 99.09%);
+    --primary-gradient-500: linear-gradient(270deg, #091410 0%, #2B916A 100%);
+
+    /* neutral colors */
+
+    --neutral-100: rgba(215, 217, 217, 1);
+    --neutral-200: rgba(166, 170, 169, 1);
+    --neutral-300: rgba(107, 114, 112, 1);
+    --neutral-400: rgba(58, 67, 64, 1);
+    --neutral-500: rgba(9, 20, 16, 1);
+
+    /* blue colors */
+
+    --blue-300: rgba(54, 85, 155, 1);
+    --blue-400: rgba(4, 42, 130, 1);
+    --blue-500: rgba(0, 17, 55, 1);
+
+    --blue-gradient: linear-gradient(180deg, #001137 0%, #042A82 100%);
+
+    /* red colors */
+
+    --red-200: rgba(230, 100, 111, 1);
+    --red-300: rgba(251, 103, 103, 1);
+    --red-400: rgba(248, 1, 1, 1);
+    --red-500: rgba(169, 0, 0, 1);
+    --red-600: rgba(94, 17, 19, 1);
+
+    --red-gradient: linear-gradient(180deg, #A90000 0%, #F80101 100%);
+
+    --footer-gradient: linear-gradient(339deg, #02643E 15.74%, #0B3424 88.12%);
+    --notification-banner-gradient: linear-gradient(80deg, #2E9970 2.31%, #0B3424 103.09%);
+
+    --border: rgba(242, 242, 242, 1);
+  }
+
+  /* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+} */
+
+
+  body {
+    font-synthesis: none;
+  }
+
+  input[type='password']::-ms-reveal {
+    display: none;
+  }
+
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+.primary-gradient-100 {
+  @apply bg-primary-gradient-100 bg-clip-text text-transparent;
+}
+
+.primary-gradient-400 {
+  @apply bg-primary-gradient-400 bg-clip-text text-transparent;
+}
+
+.primary-gradient-500 {
+  @apply bg-primary-gradient-500 bg-clip-text text-transparent;
+}
+
+.blue-gradient {
+  @apply bg-blue-gradient bg-clip-text text-transparent;
+}
+
+.red-gradient {
+  @apply bg-red-gradient bg-clip-text text-transparent;
+}
+
+.shadow-input {
+  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.11) !important;
+}
+
+.text-shadow {
+  text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.24);
+}
+
+.auth-form-wrapper {
+  @apply flex flex-col justify-center items-center md:items-start bg-skin-white gap-6 md:gap-8 p-5 md:p-7 w-full max-w-[800px] rounded-2xl md:rounded-[22px]; 
+  box-shadow: 4px 4px 21px 0px rgba(0, 0, 0, 0.12);
+}
+
+.auth-button-wrapper {
+  @apply flex items-center justify-center md:items-start gap-2.5 md:gap-3.5 px-3 md:px-4 py-2 md:py-3 bg-skin-base border border-skin-border rounded-[10px];
+}
+
+.btn {
+  @apply py-2.5 md:py-3.5 font-semibold md:min-w-36 px-5;
+}
+
+.primary-btn {
+  @apply bg-primary-gradient-100 text-skin-white;
+}
+
+.primary-outline-btn {
+  @apply primary-gradient-100 border-skin-primary-300;
+}
+
+/* Styles for webkit-based browsers */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

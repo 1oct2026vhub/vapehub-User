@@ -5,7 +5,6 @@ import Header from "@/components/Header";
 import { Button } from "@nextui-org/button";
 import { NextPage } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { ReactElement } from "react";
 
 const VerifyEmail: NextPage = (): ReactElement => {

@@ -111,7 +111,7 @@
 }
 
 .btn {
-  @apply py-2.5 md:py-3.5 font-semibold md:min-w-36 px-5;
+  @apply py-2.5 md:py-3.5 font-semibold md:min-w-36 px-5 !rounded-[10px];
 }
 
 .primary-btn {

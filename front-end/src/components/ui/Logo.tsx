@@ -19,7 +19,7 @@ const Logo: FunctionComponent<LogoProps> = ({
         <Link href='/home' className='w-fit flex'>
             <Image
                 src='/images/logo.png'
-                alt='Floe'
+                alt='VapeHub'
                 width={width}
                 height={height}
                 className={`${className} max-h-12.5`}

@@ -11,7 +11,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        poppins: ['Poppins', 'sans-serif'],
+        poppins: "var(--font-poppins)",
       },
       colors: {
         skin: {

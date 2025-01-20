@@ -70,7 +70,7 @@ const Login: NextPage = (): ReactElement => {
                                         label: "!text-content-3 md:!text-content-1 text-skin-neutral-300 font-semibold",
                                     }}
                                 >Remember me</Checkbox>
-                                <Link href="#" className="primary-gradient-100 text-content-1 font-bold tracking-tight">Forgot Password</Link>
+                                <Link href="#" className="primary-gradient-100 text-content-1 font-semibold tracking-tight">Forgot Password</Link>
                             </div>
                         </div>
                         <Button

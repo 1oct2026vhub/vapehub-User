@@ -75,14 +75,23 @@
 
 .primary-gradient-100 {
   @apply bg-primary-gradient-100 bg-clip-text text-transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .primary-gradient-400 {
   @apply bg-primary-gradient-400 bg-clip-text text-transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .primary-gradient-500 {
   @apply bg-primary-gradient-500 bg-clip-text text-transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .blue-gradient {
@@ -120,6 +129,10 @@
 
 .primary-outline-btn {
   @apply primary-gradient-100 border-skin-primary-300;
+}
+
+.text-danger {
+  @apply !text-skin-red-400;
 }
 
 /* Styles for webkit-based browsers */

@@ -107,7 +107,7 @@ const Footer = () => {
       {/* Bottom Section */}
       <div className="border-t border-white/15 py-3 text-center">
         <p className="text-content-2 font-bold text-skin-white">
-          © Copyright 2024 VapeHub - All Rights Reserved
+          © Copyright 2025 VapeHub - All Rights Reserved
         </p>
       </div>
     </footer>

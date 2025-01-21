@@ -55,7 +55,7 @@ const Register: NextPage = (): ReactElement => {
                                             size="sm"
                                             variant="light"
                                             isIconOnly
-                                            startContent={<EyeOpenIcon />}
+                                            startContent={<EyeOpenIcon className="z-10" />}
                                             className="!p-0 h-fit hover:!bg-transparent"
                                         />
                                     }
@@ -63,7 +63,7 @@ const Register: NextPage = (): ReactElement => {
                             </div>
                             <div className="text-content-1 text-skin-neutral-300 font-bold">
                                 <p>A link to set a new password will be sent to your email address.</p>
-                                <p>Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our privacy policy.</p>
+                                <p>Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our <a href="#" className="hover:underline">privacy policy.</a></p>
                             </div>
                             <div className="flex justify-start items-center">
                                 <Checkbox

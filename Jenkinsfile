@@ -31,7 +31,7 @@ pipeline {
                     if (branchName == 'develop') {
                         // Use deployment parameters
                         server = params.dev_server
-                        serviceFileCreds = 'bd967abc-ff0b-4c04-b038-9c86aa3fd60b'
+                        serviceFileCreds = 'c18d359d-10fe-41d7-a495-3b84451d1043'
                     } else if (branchName == 'main') {
                         // Use production parameters
                         echo "Branch $branchName not configured for deployment."

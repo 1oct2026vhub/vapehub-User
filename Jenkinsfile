@@ -49,8 +49,7 @@ pipeline {
                         // SSH into the server and run commands
                         sh "ssh ubuntu@${server} \"cd /var/www/vapehub/User/ && git pull\""
                         sh "ssh ubuntu@${server} \"cd /var/www/vapehub/User/front-end/ && source ~/.nvm/nvm.sh && npm install && npm run build\""
-                        sh "ssh ubuntu@${server} \"source ~/.nvm/nvm.sh && pm2 restart 4\"" // id 4 is the current instance number in server, will need to change if needed
-                    
+                        sh "ssh ubuntu@${server} \"source ~/.nvm/nvm.sh && export PM2_HOME=/etc/pm2daemon && pm2 restart 'VapeHub Frontend' \"" 
                     }
 }
             }
@@ -62,7 +61,7 @@ pipeline {
                 subject: "Jenkins Build ${currentBuild.result}",
                 body: """<p>The Jenkins build for ${env.JOB_NAME} has finished.</p>
                         <p>Build result: ${currentBuild.result}</p>""",
-                to: "unnikrishnan@ateamsoftsolutions.com",
+                to: "mahesh@ateamsoftsolutions.com, sreejiths@ateamsoftsolutions.com",
                 attachLog: true,
                 compressLog: true,
                 replyTo: 'noreply@example.com'

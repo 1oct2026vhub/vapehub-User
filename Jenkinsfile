@@ -49,7 +49,7 @@ pipeline {
                         // SSH into the server and run commands
                         sh "ssh ubuntu@${server} \"cd /var/www/vapehub/User/ && git pull\""
                         sh "ssh ubuntu@${server} \"cd /var/www/vapehub/User/front-end/ && source ~/.nvm/nvm.sh && npm install && npm run build\""
-                        sh "ssh ubuntu@${server} \"source ~/.nvm/nvm.sh && pm2 restart 'VapeHub Frontend'\""
+                        sh "ssh ubuntu@${server} \"source ~/.nvm/nvm.sh && pm2 restart 4\"" // id 4 is the current instance number in server, will need to change if needed
                     
                     }
 }

@@ -14,7 +14,7 @@ const Login: NextPage = (): ReactElement => {
     return (
         <>
             <Header />
-            <main className="py-8 md:py-17.5 px-4 md:px-12.5 flex items-center justify-center">
+            <main className="auth-form-container">
                 <div className="auth-form-wrapper">
                     <div className="auth-button-wrapper">
                         <Button

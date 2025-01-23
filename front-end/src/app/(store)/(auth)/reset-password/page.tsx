@@ -12,7 +12,7 @@ const ResetPassword: NextPage = (): ReactElement => {
     return (
         <>
             <Header />
-            <main className="py-8 md:py-17.5 px-4 md:px-12.5 flex items-center justify-center">
+            <main className="auth-form-container">
                 <div className="auth-form-wrapper !max-w-[674px]">
                     <div className="space-y-2">
                         <h1 className="text-22 md:text-h4 font-bold primary-gradient-600">Choose a New Password</h1>

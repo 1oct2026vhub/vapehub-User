@@ -17,6 +17,9 @@ const HeaderTopBar = () => {
                         type="search"
                         placeholder="Search products, brands or anything else!"
                         className="max-w-[650px]"
+                        classNames={{
+                            input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
+                        }}
                         startContent={<SearchIcon />}
                     />
                 </div>
@@ -39,7 +42,9 @@ const HeaderTopBar = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-5 lg:hidden">
+            {/* Responsive screens */}
+
+            <div className="flex flex-col gap-3.5 lg:hidden">
                 <div className="flex items-center justify-between gap-5">
                     <Button
                         isIconOnly
@@ -47,7 +52,7 @@ const HeaderTopBar = () => {
                         variant="light"
                         startContent={<MenuIcon />}
                     />
-                    <Logo className="max-w-[155px] max-h-[25px]" />
+                    <Logo className="max-w-[155px] max-h-[25px] max-sm:ml-6" />
                     <div className="flex items-center gap-1">
                         <Button
                             isIconOnly

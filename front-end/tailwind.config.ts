@@ -32,6 +32,7 @@ export default {
           'primary-gradient-100': "var(--primary-gradient-100)",
           'primary-gradient-400': "var(--primary-gradient-400)",
           'primary-gradient-500': "var(--primary-gradient-500)",
+          'primary-gradient-600': "var(--primary-gradient-600)",
 
           'neutral-100': "var(--neutral-100)",
           'neutral-200': "var(--neutral-200)",
@@ -73,6 +74,7 @@ export default {
         'primary-gradient-100': "var(--primary-gradient-100)",
         'primary-gradient-400': "var(--primary-gradient-400)",
         'primary-gradient-500': "var(--primary-gradient-500)",
+        'primary-gradient-600': "var(--primary-gradient-600)",
         'blue-gradient': "var(--blue-gradient)",
         'red-gradient': "var(--red-gradient)",
         'notification-banner-gradient': "var(--notification-banner-gradient)",

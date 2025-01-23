@@ -1,3 +1,7 @@
+@import 'slick-carousel/slick/slick.css';
+@import 'slick-carousel/slick/slick-theme.css';
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -22,6 +26,7 @@
     --primary-gradient-100: linear-gradient(180deg, #005434 0%, #2B916A 100%);
     --primary-gradient-400: linear-gradient(89deg, #005434 3.38%, #2B916A 99.09%);
     --primary-gradient-500: linear-gradient(270deg, #091410 0%, #2B916A 100%);
+    --primary-gradient-600: linear-gradient(90deg, #2B916A 1.9%, #091410 100%);
 
     /* neutral colors */
 
@@ -94,6 +99,13 @@
   -webkit-text-fill-color: transparent;
 }
 
+.primary-gradient-600 {
+  @apply bg-primary-gradient-600 bg-clip-text text-transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .blue-gradient {
   @apply bg-blue-gradient bg-clip-text text-transparent;
 }
@@ -133,6 +145,14 @@
 
 .text-danger {
   @apply !text-skin-red-400;
+}
+
+.top-\[5\%\] {
+  top: 28%;
+}
+
+input[type='search'] {
+  @apply text-content-3 md:text-title-2 font-normal md:font-bold !important;
 }
 
 /* Styles for webkit-based browsers */

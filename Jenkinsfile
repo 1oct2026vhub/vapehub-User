@@ -61,7 +61,7 @@ pipeline {
                 subject: "Jenkins Build ${currentBuild.result}",
                 body: """<p>The Jenkins build for ${env.JOB_NAME} has finished.</p>
                         <p>Build result: ${currentBuild.result}</p>""",
-                to: "mahesh@ateamsoftsolutions.com, sreejiths@ateamsoftsolutions.com",
+                to: "mahesh@ateamsoftsolutions.com, sreejiths@ateamsoftsolutions.com, sanju.prakash@ateamsoftsolutions.com",
                 attachLog: true,
                 compressLog: true,
                 replyTo: 'noreply@example.com'

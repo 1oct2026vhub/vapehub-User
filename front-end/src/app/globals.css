@@ -147,6 +147,10 @@
   @apply !text-skin-red-400;
 }
 
+.top-\[5\%\] {
+  top: 28%;
+}
+
 input[type='search'] {
   @apply text-content-3 md:text-title-2 font-normal md:font-bold !important;
 }

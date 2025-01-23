@@ -33,7 +33,7 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest"></link>
       </head>
       <body
-        className={`m-0 min-h-screen bg-skin-base text-skin-black font-poppins antialiased ${poppins.variable}`}
+        className={`m-0 min-h-screen bg-skin-white lg:bg-skin-base text-skin-black font-poppins antialiased ${poppins.variable}`}
       >
         <GlobalProvider>
           {children}

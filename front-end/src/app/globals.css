@@ -122,6 +122,10 @@
   text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.24);
 }
 
+.auth-form-container {
+  @apply py-10 md:py-17.5 px-4 md:px-12.5 flex items-center justify-center;
+}
+
 .auth-form-wrapper {
   @apply flex flex-col justify-center items-center md:items-start bg-skin-white gap-6 md:gap-8 p-5 md:p-7 w-full max-w-[800px] rounded-2xl md:rounded-[22px]; 
   box-shadow: 4px 4px 21px 0px rgba(0, 0, 0, 0.12);

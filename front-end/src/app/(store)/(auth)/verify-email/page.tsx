@@ -11,7 +11,7 @@ const VerifyEmail: NextPage = (): ReactElement => {
     return (
         <>
             <Header />
-            <main className="py-8 md:py-40 px-4 md:px-12.5 flex items-center justify-center">
+            <main className="auth-form-container md:!py-40">
                 <div className="auth-form-wrapper !max-w-[600px] !p-5 !gap-5">
                     <div className="space-y-3.5 pb-3.5 border-b border-skin-neutral-100 text-center w-full">
                         <Image

@@ -34,6 +34,7 @@ export default {
           'primary-gradient-500': "var(--primary-gradient-500)",
           'primary-gradient-600': "var(--primary-gradient-600)",
 
+          'neutral-50': "var(--neutral-50)",
           'neutral-100': "var(--neutral-100)",
           'neutral-200': "var(--neutral-200)",
           'neutral-300': "var(--neutral-300)",
@@ -69,6 +70,8 @@ export default {
         'content-2': ["0.75rem", { lineHeight: "140%", },], //12px
         'content-3': ["0.625rem", { lineHeight: "140%", },], //10px
         '22': ["1.375rem", { lineHeight: "120%", },], //22px
+        '28': ["1.75rem", { lineHeight: "120%", },], //28px
+        '55': ["3.4375rem", { lineHeight: "120%", },], //55px
       },
       backgroundImage: {
         'primary-gradient-100': "var(--primary-gradient-100)",
@@ -79,11 +82,22 @@ export default {
         'red-gradient': "var(--red-gradient)",
         'notification-banner-gradient': "var(--notification-banner-gradient)",
         'footer-gradient': "var(--footer-gradient)",
+        'subscription-banner': "url('/images/subscription-banner.jpg')",
+        'subscription-banner-mob': "url('/images/subscription-banner-mob.jpg')"
+      },
+      content: {
+        'left-arrow': "url('/images/arrow-left.svg')",
+        'right-arrow': "url('/images/arrow-right.svg')",
+        'mob-left-arrow': "url('/images/mob-left-arrow.svg')",
+        'mob-right-arrow': "url('/images/mob-arrow-right.svg')",
+        'quantity-badge': "url('/images/quantity-before.svg')",
+        'new-badge': "url('/images/new-before.svg')",
       },
       spacing: {
         '4.5': '1.125rem', //18px
         '5.5': '1.375rem', //18px
         '7.5': '1.875rem', //30px
+        '8.5': '2.125rem', //30px
         '9.5': '2.375rem', //38px
         '10.5': '2.625rem', //42px
         '12.5': '3.125rem', //50px
@@ -94,6 +108,20 @@ export default {
       },
       maxHeight: {
         '12.5': '3.125rem' //50px
+      },
+      borderRadius: {
+        '10': '0.625rem', //10px
+        '20': '1.25rem', //20px
+        '2.5xl': '1.375rem', //22px
+      },
+      boxShadow: {
+        'card': '4px 4px 28px 0px rgba(0, 0, 0, 0.09);',
+        'slider-card': '4px 17px 14px 0px rgba(0, 0, 0, 0.07);',
+        'brand-card': '2px 2px 16px 0px rgba(0, 0, 0, 0.16);',
+        'deal-card': '-1px 4px 24px 0px rgba(0, 0, 0, 0.24);',
+        'deal-card-mob': '-0.75px 3px 18px 0px rgba(0, 0, 0, 0.24);',
+        'subscription': '1px 1px 25px 0px rgba(0, 0, 0, 0.30);',
+        'blog-card': '4px 4px 30px 11px rgba(0, 0, 0, 0.12);',
       }
     },
   },

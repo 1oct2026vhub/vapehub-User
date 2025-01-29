@@ -1,0 +1,31 @@
+import React from "react";
+import SectionHeading from "@/components/ui/SectionHeading";
+import ViewAllLink from "@/components/ui/ViewAllLink";
+import DealsSlider from "@/components/DealsSlider";
+
+interface ShopByDealsProps {
+    title?: string;
+    viewAllHref?: string;
+}
+
+const ShopByDeals: React.FC<ShopByDealsProps> = ({
+    title = "Shop a Deal",
+    viewAllHref = "#",
+}) => {
+    return (
+        <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">
+            <div className="flex items-center justify-between">
+                <div className="space-y-2.5">
+                    <SectionHeading title={title} />
+                    <h4 className="text-content-2 md:text-title-1 text-skin-neutral-300 font-semibold">Fantastic deals, all year round!</h4>
+                </div>
+                <ViewAllLink href={viewAllHref} />
+            </div>
+            <div className="slider-container section-slider deals-slider">
+                <DealsSlider />
+            </div>
+        </section>
+    );
+};
+
+export default ShopByDeals;

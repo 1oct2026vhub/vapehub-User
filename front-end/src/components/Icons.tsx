@@ -259,34 +259,187 @@ export const EyeClosedIcon = (
 ) => {
   return (
     <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    fill="none"
-    viewBox="0 0 24 24"
-    {...props}
-  >
-    <path
-      stroke="#3A4340"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      d="m14.53 9.472-5.06 5.06a3.576 3.576 0 1 1 5.06-5.06"
-    ></path>
-    <path
-      stroke="#292D32"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      d="M17.82 5.767c-1.75-1.32-3.75-2.04-5.82-2.04-3.53 0-6.82 2.08-9.11 5.68-.9 1.41-.9 3.78 0 5.19.79 1.24 1.71 2.31 2.71 3.17M8.42 19.53c1.14.48 2.35.74 3.58.74 3.53 0 6.82-2.08 9.11-5.68.9-1.41.9-3.78 0-5.19-.33-.52-.69-1.01-1.06-1.47"
-    ></path>
-    <path
-      stroke="#292D32"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      d="M15.51 12.703a3.565 3.565 0 0 1-2.82 2.82M9.47 14.531 2 22.001M22 2l-7.47 7.47"
-    ></path>
-  </svg>
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        stroke="#3A4340"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="m14.53 9.472-5.06 5.06a3.576 3.576 0 1 1 5.06-5.06"
+      ></path>
+      <path
+        stroke="#292D32"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M17.82 5.767c-1.75-1.32-3.75-2.04-5.82-2.04-3.53 0-6.82 2.08-9.11 5.68-.9 1.41-.9 3.78 0 5.19.79 1.24 1.71 2.31 2.71 3.17M8.42 19.53c1.14.48 2.35.74 3.58.74 3.53 0 6.82-2.08 9.11-5.68.9-1.41.9-3.78 0-5.19-.33-.52-.69-1.01-1.06-1.47"
+      ></path>
+      <path
+        stroke="#292D32"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M15.51 12.703a3.565 3.565 0 0 1-2.82 2.82M9.47 14.531 2 22.001M22 2l-7.47 7.47"
+      ></path>
+    </svg>
+  )
+};
+
+export const ArrowRightIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="23"
+      height="22"
+      fill="none"
+      viewBox="0 0 23 22"
+      {...props}
+    >
+      <path
+        stroke="#091410"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit="10"
+        strokeWidth="1.375"
+        d="m8.704 3.738 5.977 5.976a1.82 1.82 0 0 1 0 2.567l-5.977 5.977"
+      ></path>
+    </svg>
+  )
+};
+
+export const ArrowLeftIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="23"
+      height="22"
+      fill="none"
+      viewBox="0 0 23 22"
+      {...props}
+    >
+      <path
+        stroke="#091410"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit="10"
+        strokeWidth="1.375"
+        d="m14.296 18.262-5.977-5.976a1.82 1.82 0 0 1 0-2.567l5.977-5.977"
+      ></path>
+    </svg>
+  )
+};
+
+export const RatingStarFilled = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="25"
+      height="25"
+      fill="none"
+      viewBox="0 0 25 25"
+      {...props}
+    >
+      <g clipPath="url(#clip0_1352_3572)">
+        <path
+          fill="#005434"
+          d="m12.67 17.489 6.18 3.73-1.64-7.03 5.46-4.73-7.19-.61-2.81-6.63-2.81 6.63-7.19.61 5.46 4.73-1.64 7.03z"
+        ></path>
+      </g>
+      <defs>
+        <clipPath id="clip0_1352_3572">
+          <path fill="#fff" d="M.67.219h24v24h-24z"></path>
+        </clipPath>
+      </defs>
+    </svg>
+  )
+};
+
+export const RatingStarPartial = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="25"
+      height="25"
+      fill="none"
+      viewBox="0 0 25 25"
+      {...props}
+    >
+      <g clipPath="url(#clip0_1352_3581)">
+        <path
+          fill="#005434"
+          d="m22.67 9.459-7.19-.62-2.81-6.62-2.81 6.63-7.19.61 5.46 4.73-1.64 7.03 6.18-3.73 6.18 3.73-1.63-7.03zm-10 6.16v-9.3l1.71 4.04 4.38.38-3.32 2.88 1 4.28z"
+        ></path>
+      </g>
+      <defs>
+        <clipPath id="clip0_1352_3581">
+          <path fill="#fff" d="M.67.219h24v24h-24z"></path>
+        </clipPath>
+      </defs>
+    </svg>
+  )
+};
+
+export const RatingStarEmpty = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="25"
+      height="25"
+      fill="none"
+      viewBox="0 0 25 25"
+      {...props}
+    >
+      <g clipPath="url(#clip0_1352_3584)">
+        <path
+          fill="#005434"
+          d="m22.67 9.459-7.19-.62-2.81-6.62-2.81 6.63-7.19.61 5.46 4.73-1.64 7.03 6.18-3.73 6.18 3.73-1.63-7.03zm-10 6.16-3.76 2.27 1-4.28-3.32-2.88 4.38-.38 1.7-4.03 1.71 4.04 4.38.38-3.32 2.88 1 4.28z"
+        ></path>
+      </g>
+      <defs>
+        <clipPath id="clip0_1352_3584">
+          <path fill="#fff" d="M.67.219h24v24h-24z"></path>
+        </clipPath>
+      </defs>
+    </svg>
+  )
+};
+
+export const RightArrowIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="25"
+      fill="none"
+      viewBox="0 0 24 25"
+      {...props}
+    >
+      <path
+        stroke="#fff"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit="10"
+        strokeWidth="2"
+        d="m14.43 6.43 6.07 6.07-6.07 6.07M3.5 12.5h16.83"
+      ></path>
+    </svg>
   )
 };

@@ -52,7 +52,7 @@ const HeaderTopBar = () => {
                         variant="light"
                         startContent={<MenuIcon />}
                     />
-                    <Logo className="max-w-[174px] max-h-[28px] max-sm:ml-6" />
+                    <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     <div className="flex items-center gap-1">
                         <Button
                             isIconOnly

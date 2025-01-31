@@ -13,7 +13,7 @@ const BlogsSection: React.FC<BlogsSectionProps> = ({
   viewAllHref = "#",
 }) => {
   return (
-    <section className="space-y-4.5 md:space-y-7.5">
+    <section className="space-y-4.5 md:space-y-7.5 mb-10">
       <div className="flex items-center justify-between">
         <SectionHeading title={title} />
         <ViewAllLink href={viewAllHref} />

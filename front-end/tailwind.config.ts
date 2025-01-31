@@ -111,6 +111,7 @@ export default {
       },
       borderRadius: {
         '10': '0.625rem', //10px
+        '14': '0.875rem', //14px
         '20': '1.25rem', //20px
         '2.5xl': '1.375rem', //22px
       },

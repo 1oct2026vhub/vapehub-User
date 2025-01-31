@@ -443,3 +443,79 @@ export const RightArrowIcon = (
     </svg>
   )
 };
+
+export const CloseIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="none"
+      viewBox="0 0 16 16"
+      {...props}
+    >
+      <path
+        fill="#091410"
+        d="m8.94 8 4.2-4.193a.67.67 0 0 0-.946-.947L8 7.06l-4.193-4.2a.67.67 0 0 0-.947.947L7.06 8l-4.2 4.194a.666.666 0 0 0 0 .946.67.67 0 0 0 .947 0L8 8.94l4.194 4.2a.667.667 0 0 0 1.092-.217.67.67 0 0 0-.146-.73z"
+      ></path>
+    </svg>
+  )
+};
+
+export const DownArrowIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="22"
+      height="22"
+      fill="none"
+      viewBox="0 0 22 22"
+      {...props}
+    >
+      <path
+        stroke="#091410"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit="10"
+        strokeWidth="2"
+        d="m18.26 8.203-5.977 5.977a1.82 1.82 0 0 1-2.566 0L3.74 8.203"
+      ></path>
+    </svg>
+  )
+};
+
+export const FilterIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="22"
+    height="22"
+    fill="none"
+    viewBox="0 0 22 22"
+    {...props}
+  >
+    <path
+      stroke="#091410"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeMiterlimit="10"
+      strokeWidth="2"
+      d="M20.167 5.96h-5.5M5.5 5.96H1.833"
+    ></path>
+    <path
+      stroke="#292D32"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeMiterlimit="10"
+      strokeWidth="1.5"
+      d="M9.167 9.167a3.208 3.208 0 1 0 0-6.417 3.208 3.208 0 0 0 0 6.417M20.167 16.04H16.5M7.333 16.04h-5.5M12.833 19.253a3.208 3.208 0 1 0 0-6.417 3.208 3.208 0 0 0 0 6.417"
+    ></path>
+  </svg>
+  )
+};

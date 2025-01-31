@@ -4,11 +4,6 @@ import SectionHeading from "./ui/SectionHeading";
 import ViewAllLink from "./ui/ViewAllLink";
 
 
-interface FAQItem {
-    question: string;
-    answer: React.ReactNode;
-}
-
 interface FAQProps {
     title?: string;
     viewAllHref?: string;

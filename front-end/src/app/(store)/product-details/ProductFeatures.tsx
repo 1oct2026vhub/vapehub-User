@@ -67,7 +67,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
 
 
 const ProductFeatures: React.FC = () => (
-    <section className="bg-skin-white p-10 rounded-2xl shadow-card space-y-7.5">
+    <section className="bg-skin-white p-4 md:p-7.5 xl:p-10 rounded-2xl shadow-card space-y-7.5">
         <SectionHeading title="Product Features" className="w-fit" />
         <div className="flex flex-wrap items-center gap-x-5 gap-y-10 justify-center">
             {features.map((feature, index) => (

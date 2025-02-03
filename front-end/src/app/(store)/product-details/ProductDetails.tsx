@@ -13,10 +13,10 @@ const flavours = [
 
 const ProductDetails: React.FC = () => {
     return (
-        <section className='bg-skin-white p-7.5 rounded-2xl shadow-card space-y-4'>
-            <div className='flex items-start gap-11'>
+        <section className='bg-skin-white p-6 xl:p-7.5 rounded-2xl shadow-card space-y-4'>
+            <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 <div className='space-y-4'>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-[550px] shadow-image-box pt-5 px-1.5 pb-2'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-96 xl:w-[550px] shadow-image-box pt-5 px-1.5 pb-2'>
                         <Image
                             src='/images/product.png'
                             alt='Product'
@@ -56,27 +56,27 @@ const ProductDetails: React.FC = () => {
                 </div>
                 <div className='flex flex-col gap-5'>
                     <div className='space-y-3.5'>
-                        <h1 className='text-h4 text-skin-neutral-500 font-bold mr-8'>HAWCOS x Lost Mary Pro Max 7000 Disposable Kit</h1>
+                        <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>HAWCOS x Lost Mary Pro Max 7000 Disposable Kit</h1>
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                             Brand: <a href="#" className='inline-block font-bold text-skin-primary2-500 underline'>Hayati</a>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex gap-1">
                                 {Array.from({ length: 5 }, (_, i) => (
-                                    <ReviewStarFilled key={i} className='w-[22px] h-[22px]' />
+                                    <ReviewStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />
                                 ))}
                             </div>
-                            <p className="text-lg text-black font-bold">(10 Reviews)</p>
+                            <p className="text-title-2 xl:text-lg text-black font-bold mt-1 xl:mt-0">(10 Reviews)</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
-                        <p className='text-h4'>£12.99</p>
+                        <p className='text-3xl xl:text-h4'>£12.99</p>
                         <p className='text-title-2'>or Mix & Match</p>
                         <Button
                             size="sm"
                             radius="md"
                             color="primary"
-                            className="btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !leading-none !h-9 !px-4 !py-2"
+                            className="btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !leading-none !tap-highlight-transparent !h-8 xl:!h-9 !px-4 !py-2"
                         >
                             3 for £30
                         </Button>
@@ -151,7 +151,7 @@ const ProductDetails: React.FC = () => {
                         </div>
                         <p className='text-title-2 font-bold primary-gradient-100'>In stock</p>
                     </div>
-                    <div className='flex gap-11 items-center'>
+                    <div className='flex gap-6 xl:gap-11 items-center'>
                         <div
                             className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 space-x-4.5 !font-bold h-[60px]"
                         >

@@ -54,6 +54,8 @@ export default {
           'red-600': "var(--red-600)",
 
           'red-gradient': "var(--red-gradient)",
+          'red-gradient-100': "var(--red-gradient-100)",
+          'red-gradient-200': "var(--red-gradient-200)",
 
           'border': "var(--border)",
         },
@@ -80,6 +82,8 @@ export default {
         'primary-gradient-600': "var(--primary-gradient-600)",
         'blue-gradient': "var(--blue-gradient)",
         'red-gradient': "var(--red-gradient)",
+        'red-gradient-100': "var(--red-gradient-100)",
+        'red-gradient-200': "var(--red-gradient-200)",
         'notification-banner-gradient': "var(--notification-banner-gradient)",
         'footer-gradient': "var(--footer-gradient)",
         'subscription-banner': "url('/images/subscription-banner.jpg')",
@@ -123,6 +127,9 @@ export default {
         'deal-card-mob': '-0.75px 3px 18px 0px rgba(0, 0, 0, 0.24);',
         'subscription': '1px 1px 25px 0px rgba(0, 0, 0, 0.30);',
         'blog-card': '4px 4px 30px 11px rgba(0, 0, 0, 0.12);',
+        'image-box': ' 2px 0px 23px 0px rgba(0, 0, 0, 0.23);',
+        'product-offer': '4px -3px 12px 0px rgba(0, 0, 0, 0.04)',
+        'base': '0px 2px 4px 0px rgba(0, 0, 0, 0.25)',
       }
     },
   },

@@ -10,8 +10,8 @@ const flavours = [
 
 const BundleProductCard: React.FC = () => {
     return (
-        <div className='bg-skin-white p-4 rounded-14 shadow-card flex items-center justify-between'>
-            <div className='flex items-center gap-7'>
+        <div className='bg-skin-white p-4 rounded-14 shadow-card flex items-center justify-between gap-8'>
+            <div className='flex items-center gap-5 xl:gap-7'>
                 <div className='bg-skin-white p-2 rounded-10 shadow-deal-card'>
                     <div className='bg-skin-base border border-skin-neutral-100 rounded p-3 shadow'>
                         <Image
@@ -22,8 +22,8 @@ const BundleProductCard: React.FC = () => {
                         />
                     </div>
                 </div>
-                <div className='space-y-8'>
-                    <h4 className='text-title-1 font-semibold text-skin-neutral-400 mr-10'>RandM Tornado 9000 Puff Disposable Vape - Watermelon
+                <div className='space-y-8 max-w-lg'>
+                    <h4 className='text-lg xl:text-title-1 font-semibold text-skin-neutral-400 mr-10'>RandM Tornado 9000 Puff Disposable Vape - Watermelon
                         Skittles</h4>
                     <Select
                         size='sm'
@@ -44,8 +44,8 @@ const BundleProductCard: React.FC = () => {
             </div>
             <div className='space-y-7 text-right'>
                 <div>
-                    <p className='primary-gradient-100 text-h5 font-bold'>£12.99</p>
-                    <p className='text-skin-neutral-300 text-title-1 line-through font-bold'>£12.99</p>
+                    <p className='primary-gradient-100 text-title-1 xl:text-h5 font-bold'>£12.99</p>
+                    <p className='text-skin-neutral-300 text-title-2 xl:text-title-1 line-through font-bold'>£12.99</p>
                 </div>
                 <Button
                     size="sm"

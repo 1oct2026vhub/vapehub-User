@@ -353,6 +353,11 @@ input[type='search'] {
   @apply px-4 lg:px-12.5 py-4.5 lg:py-10 flex gap-4.5 lg:gap-10
 }
 
+.section-slider.related-products .slick-prev,
+.section-slider.related-products .slick-next {
+  @apply top-auto bottom-[-11%] xl:bottom-[-10%] !important;
+}
+
 .filter-drawer button[aria-label="Close"] {
   display: none;
 }

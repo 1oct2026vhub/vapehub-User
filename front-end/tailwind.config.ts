@@ -73,6 +73,7 @@ export default {
         'content-3': ["0.625rem", { lineHeight: "140%", },], //10px
         '22': ["1.375rem", { lineHeight: "120%", },], //22px
         '28': ["1.75rem", { lineHeight: "120%", },], //28px
+        '38': ["2.375rem", { lineHeight: "120%", },], //38px
         '55': ["3.4375rem", { lineHeight: "120%", },], //55px
       },
       backgroundImage: {
@@ -130,6 +131,7 @@ export default {
         'image-box': ' 2px 0px 23px 0px rgba(0, 0, 0, 0.23);',
         'product-offer': '4px -3px 12px 0px rgba(0, 0, 0, 0.04)',
         'base': '0px 2px 4px 0px rgba(0, 0, 0, 0.25)',
+        'delivery-card': '0px 4px 41px 0px rgba(0, 0, 0, 0.16);'
       }
     },
   },

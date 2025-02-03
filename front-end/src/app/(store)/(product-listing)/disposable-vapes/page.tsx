@@ -6,10 +6,10 @@ import FilterCheckboxGroup from "@/components/FilterCheckboxGroup";
 import FilterSidebar from "@/components/FilterSidebar";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { DownArrowIcon, FilterIcon } from "@/components/Icons";
+import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
+import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import ProductListingContent from "@/components/ProductListingContent";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Pagination } from "@nextui-org/react";
 import { NextPage } from "next";
 import { ReactElement } from "react";
 
@@ -137,42 +137,12 @@ const ProductListing: NextPage = (): ReactElement => {
           <BreadCrumbs items={breadcrumbs} />
           <ProductListingContent />
         </section>
-        <section className="product-listing-container border-t border-skin-neutral-200 flex flex-row items-start gap-12">
+        <section className="product-listing-container border-t border-skin-neutral-200 flex flex-row items-start !gap-5 xl:!gap-12">
           <FilterSidebar appliedFilters={appliedFilters} onRemoveFilter={handleRemoveFilter} filterOptions={filterOptions} />
-          <div className="space-y-9 w-full">
-            <div className="bg-skin-white border border-skin-base rounded-xl flex items-center gap-3 py-3 px-3.5 ml-auto w-fit">
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button
-                    variant="bordered"
-                    size="lg"
-                    radius="md"
-                    endContent={<DownArrowIcon />}
-                    className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
-                  >
-                    Sort By
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Static Actions">
-                  <DropdownItem key="new">Latest</DropdownItem>
-                  <DropdownItem key="copy">Oldest</DropdownItem>
-                  <DropdownItem key="edit">Edit file</DropdownItem>
-                  <DropdownItem key="delete" className="text-danger" color="danger">
-                    Delete file
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-              <Button
-                variant="bordered"
-                size="lg"
-                radius="md"
-                endContent={<FilterIcon />}
-                className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
-              >
-                Hide Filter
-              </Button>
-            </div>
-            <div className="grid grid-cols-3 gap-10 products-slider">
+          <div className="flex flex-col gap-7.5 md:gap-9 w-full">
+            <ProductListingActionsWeb/>
+            <ProductListingActionsMob />
+            <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5 xl:gap-10 products-slider">
               {products.map((product, index) => (
                 <ProductCard
                   key={index}
@@ -185,9 +155,10 @@ const ProductListing: NextPage = (): ReactElement => {
                 />
               ))}
             </div>
-            <div className="flex items-center justify-between pl-5">
+            <div className="flex items-center justify-between pl-5 max-md:hidden">
               <p className="text-content-2 text-skin-neutral-300 font-bold">Showing 1-10 of 100 results</p>
-              <Pagination showControls initialPage={1} total={100} />
+              {/* <Pagination showControls initialPage={1} total={100} /> */}
+              <Pagination />
             </div>
           </div>
         </section>

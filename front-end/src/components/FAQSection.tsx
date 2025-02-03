@@ -24,14 +24,14 @@ const FAQSection: React.FC<FAQProps> = ({
 
     const itemClasses = {
         base: "w-full rounded-lg shadow-input border border-skin-neutral-100",
-        title: "text-title-1 font-bold",
+        title: "text-title-2 font-bold",
         trigger: '',
         indicator: "text-medium text-skin-neutral-500 -rotate-90 data-[open=true]:rotate-90",
-        content: "text-content-1 font-bold text-skin-neutral-300",
+        content: "font-bold text-skin-neutral-300 !text-content-1",
     };
 
     return (
-        <div className="w-full space-y-7.5">
+        <div className="w-full space-y-3 md:space-y-5 xl:space-y-7.5">
             {/* FAQ Heading & View All */}
             <div className="flex items-center justify-between w-full">
                 <SectionHeading title={title} />
@@ -39,7 +39,7 @@ const FAQSection: React.FC<FAQProps> = ({
             </div>
 
             {/* Accordion for FAQs */}
-            <Accordion variant="splitted" itemClasses={itemClasses}>
+            <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
                 {faqs.map((faq, index) => (
                     <AccordionItem key={index} aria-label={faq.question} title={faq.question}>
                         {faq.answer}

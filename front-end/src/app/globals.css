@@ -54,6 +54,8 @@
     --red-600: rgba(94, 17, 19, 1);
 
     --red-gradient: linear-gradient(180deg, #A90000 0%, #F80101 100%);
+    --red-gradient-100: linear-gradient(270deg, #E6646F 0.04%, #5E1113 98.93%);
+    --red-gradient-200: linear-gradient(183deg, #E6646F 3.01%, #5E1113 98.69%);
 
     --footer-gradient: linear-gradient(339deg, #02643E 15.74%, #0B3424 88.12%);
     --notification-banner-gradient: linear-gradient(80deg, #2E9970 2.31%, #0B3424 103.09%);
@@ -102,6 +104,13 @@
 
 .primary-gradient-600 {
   @apply bg-primary-gradient-600 bg-clip-text text-transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.red-gradient-100 {
+  @apply bg-red-gradient-100 bg-clip-text text-transparent;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -308,7 +317,7 @@ input[type='search'] {
   @apply content-quantity-badge relative block -left-1 -bottom-3.5 md:-left-2 md:-bottom-[15.5px]; 
 }
 
-.products-slider .new-product {
+.new-product {
   @apply w-9 h-4 md:w-14 md:h-6 text-[8px] md:text-content-2 font-semibold text-skin-white flex justify-center items-center pl-2;
   flex-shrink: 0;
   border-radius: 10px 10px 0px 10px;
@@ -319,7 +328,7 @@ input[type='search'] {
   line-height: normal;
 }
 
-.products-slider .new-product::after {
+.new-product::after {
   @apply content-new-badge relative block -right-[2px] -bottom-3.5 md:-right-2 md:-bottom-[15.5px]; 
 }
 
@@ -341,7 +350,11 @@ input[type='search'] {
 }
 
 .product-listing-container {
-  @apply px-4 lg:px-12.5 py-4.5 lg:py-10 flex gap-4.5 md:gap-10
+  @apply px-4 lg:px-12.5 py-4.5 lg:py-10 flex gap-4.5 lg:gap-10
+}
+
+.filter-drawer button[aria-label="Close"] {
+  display: none;
 }
 
 /* Styles for webkit-based browsers */

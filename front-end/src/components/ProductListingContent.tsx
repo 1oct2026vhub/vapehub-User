@@ -2,6 +2,12 @@ import React from 'react'
 import SectionHeading from './ui/SectionHeading'
 import Image from 'next/image'
 
+const banners = [
+    { src: '/images/product-banner-1.jpg', alt: 'Elf Bar Disposable Vape' },
+    { src: '/images/product-banner-2.jpg', alt: 'Elux Disposable Vape' },
+    { src: '/images/product-banner-3.jpg', alt: 'Hayati Disposable Vape' },
+];
+
 const ProductListingContent: React.FC = () => {
     return (
         <div className="space-y-6">
@@ -17,33 +23,18 @@ const ProductListingContent: React.FC = () => {
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                <a href="#">
-                    <Image
-                        src='/images/product-banner-1.jpg'
-                        alt="Product Banner 1"
-                        width={437}
-                        height={162}
-                        className="rounded-xl"
-                    />
-                </a>
-                <a href="#">
-                    <Image
-                        src='/images/product-banner-2.jpg'
-                        alt="Product Banner 1"
-                        width={437}
-                        height={162}
-                        className="rounded-xl"
-                    />
-                </a>
-                <a href="#">
-                    <Image
-                        src='/images/product-banner-3.jpg'
-                        alt="Product Banner 1"
-                        width={437}
-                        height={162}
-                        className="rounded-xl"
-                    />
-                </a>
+            {banners.map((banner, index) => (
+                    <a href="#" key={index} aria-label={`View details of ${banner.alt}`}>
+                        <Image
+                            src={banner.src}
+                            alt={banner.alt}
+                            width={437}
+                            height={162}
+                            className="rounded-xl w-full max-h-[118px] md:max-h-40"
+                            loading="lazy"
+                        />
+                    </a>
+                ))}
             </div>
         </div>
     )

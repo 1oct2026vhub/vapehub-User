@@ -554,6 +554,7 @@ export const MoreHorizontalIcon = (
       height="19"
       fill="none"
       viewBox="0 0 18 19"
+      {...props}
     >
       <path
         stroke="#787B80"

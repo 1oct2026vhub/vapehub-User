@@ -1,0 +1,189 @@
+import React from 'react'
+import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, ReviewStarFilled } from '@/components/Icons'
+import { Button } from '@nextui-org/button'
+import { Divider, Select, SelectItem } from '@nextui-org/react'
+import Image from 'next/image'
+import BundleProductCard from '@/components/BundleProductCard'
+
+const flavours = [
+    { key: "Orange", label: "Orange" },
+    { key: "Water Melon", label: "Water Melon" },
+    { key: "Blue berry", label: "Blue berry" },
+];
+
+const ProductDetails: React.FC = () => {
+    return (
+        <section className='bg-skin-white p-7.5 rounded-2xl shadow-card space-y-4'>
+            <div className='flex items-start gap-11'>
+                <div className='space-y-4'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-[550px] shadow-image-box pt-5 px-1.5 pb-2'>
+                        <Image
+                            src='/images/product.png'
+                            alt='Product'
+                            width={280}
+                            height={396}
+                        />
+                        <div className='new-product'>
+                            <span>New</span>
+                        </div>
+                    </div>
+                    <div className='flex items-center gap-4'>
+                        <div className='px-0.5 py-1.5 bg-skin-base rounded-lg shadow-brand-card flex items-center justify-center shrink border border-neutral-100'>
+                            <Image
+                                src='/images/small-product.png'
+                                alt='Product'
+                                width={118}
+                                height={111}
+                            />
+                        </div>
+                        <div className='px-0.5 py-1.5 bg-skin-base rounded-lg shadow-brand-card flex items-center justify-center shrink border border-neutral-100'>
+                            <Image
+                                src='/images/small-product.png'
+                                alt='Product'
+                                width={118}
+                                height={111}
+                            />
+                        </div>
+                        <div className='px-0.5 py-1.5 bg-skin-base rounded-lg border border-neutral-100 shadow-brand-card flex items-center justify-center shrink'>
+                            <Image
+                                src='/images/small-product.png'
+                                alt='Product'
+                                width={118}
+                                height={111}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className='flex flex-col gap-5'>
+                    <div className='space-y-3.5'>
+                        <h1 className='text-h4 text-skin-neutral-500 font-bold mr-8'>HAWCOS x Lost Mary Pro Max 7000 Disposable Kit</h1>
+                        <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
+                            Brand: <a href="#" className='inline-block font-bold text-skin-primary2-500 underline'>Hayati</a>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="flex gap-1">
+                                {Array.from({ length: 5 }, (_, i) => (
+                                    <ReviewStarFilled key={i} className='w-[22px] h-[22px]' />
+                                ))}
+                            </div>
+                            <p className="text-lg text-black font-bold">(10 Reviews)</p>
+                        </div>
+                    </div>
+                    <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
+                        <p className='text-h4'>£12.99</p>
+                        <p className='text-title-2'>or Mix & Match</p>
+                        <Button
+                            size="sm"
+                            radius="md"
+                            color="primary"
+                            className="btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !leading-none !h-9 !px-4 !py-2"
+                        >
+                            3 for £30
+                        </Button>
+                    </div>
+                    <div className='space-y-4'>
+                        <div className='bg-skin-white border border-skin-neutral-100 rounded-xl shadow-product-offer p-3.5 space-y-2.5'>
+                            <div className='flex gap-1 items-center'>
+                                <DispatchIcon />
+                                <p className='text-content-1 font-bold red-gradient-100'>Same day dispatch for orders before 3pm!</p>
+                            </div>
+                            <div className='flex gap-1 items-center'>
+                                <BenefitIcon />
+                                <p className='text-content-1 font-bold text-skin-neutral-500'>Earn at least 12 loyalty points with this purchase!</p>
+                            </div>
+                            <div className='flex gap-1 items-center'>
+                                <DealsIcon />
+                                <p className='text-content-1 font-bold text-skin-neutral-500'>Choose 2 for £25 - Multibuy Deal!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <Divider />
+                    <div className='space-y-3.5'>
+                        <div>
+                            <p className='text-title-1 font-semibold text-black'>Flavours</p>
+                            <p className='primary-gradient-100 font-bold text-content-1'>20 available</p>
+                        </div>
+                        <Select
+                            size='sm'
+                            className="w-full"
+                            variant='bordered'
+                            label="Choose your flavour"
+                            classNames={{
+                                label: "!text-content-1 !text-skin-neutral-500 font-bold",
+                                trigger: "shadow-base border-skin-neutral-100",
+                                listboxWrapper: "max-h-[400px]",
+                            }}
+                        >
+                            {flavours.map((flavour) => (
+                                <SelectItem key={flavour.key}>{flavour.label}</SelectItem>
+                            ))}
+                        </Select>
+                    </div>
+                    <div className='space-y-3.5'>
+                        <p className='text-title-1 font-semibold text-skin-neutral-500'>Nicotine Strength</p>
+                        <div className='flex gap-3.5 items-center'>
+                            <Button
+                                size="sm"
+                                radius="md"
+                                color="primary"
+                                className="btn primary-btn w-full shadow-base text-content-1 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
+                            >
+                                10 mg
+                            </Button>
+                            <Button
+                                size="sm"
+                                radius="md"
+                                color="default"
+                                variant='bordered'
+                                className="btn bg-skin-white w-full shadow-base text-content-1 border-skin-neutral-200 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
+                            >
+                                20 mg
+                            </Button>
+                            <Button
+                                size="sm"
+                                radius="md"
+                                color="default"
+                                variant='bordered'
+                                className="btn bg-skin-white w-full shadow-base text-content-1 border-skin-neutral-200 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
+                            >
+                                30 mg
+                            </Button>
+                        </div>
+                        <p className='text-title-2 font-bold primary-gradient-100'>In stock</p>
+                    </div>
+                    <div className='flex gap-11 items-center'>
+                        <div
+                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 space-x-4.5 !font-bold h-[60px]"
+                        >
+                            <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-skin-neutral-50 !px-0 !min-w-fit !w-8 !h-[60px]'>
+                                <PlusIcon />
+                            </Button>
+                            <span>1</span>
+                            <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-skin-neutral-50 !px-0 !min-w-fit !w-8 !h-[60px]'>
+                                <MinusIcon />
+                            </Button>
+                        </div>
+                        <Button
+                            size="lg"
+                            radius="md"
+                            color="primary"
+                            className="btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-[60px]"
+                        >
+                            Add to Cart
+                        </Button>
+                    </div>
+                </div>
+            </div>
+            <Divider />
+            <div className='space-y-7 mt-2'>
+                <h2 className='text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
+                <div className='space-y-5.5'>
+                    <BundleProductCard />
+                    <BundleProductCard />
+                </div>
+            </div>
+        </section>
+    )
+}
+
+export default ProductDetails

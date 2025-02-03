@@ -16,7 +16,7 @@ const Logo: FunctionComponent<LogoProps> = ({
     className,
 }): ReactElement => {
     return (
-        <Link href='/home' className='w-fit flex'>
+        <Link href='/' className='w-fit flex'>
             <Image
                 src='/images/vapehub-logo.png'
                 alt='VapeHub'

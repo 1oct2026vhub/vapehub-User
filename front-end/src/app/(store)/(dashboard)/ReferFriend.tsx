@@ -17,7 +17,7 @@ const ReferFriend: React.FC = () => {
                         radius="sm"
                         color="primary"
                         className="btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !px-4 !py-2 !rounded-10 mt-4 xl:mt-8"
-                        endContent={<RightArrowIcon className='ml-1' />}
+                        endContent={<RightArrowIcon stroke='#fff' className='ml-1' />}
                     >
                         Refer Now
                     </Button>

@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
 import { Button } from '@nextui-org/button';
-import { ReviewStarFilled } from './Icons';
 
 interface ProductCardProps {
   title: string;

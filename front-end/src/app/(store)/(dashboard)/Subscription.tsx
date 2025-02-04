@@ -4,7 +4,7 @@ import React from 'react'
 
 const Subscription: React.FC = () => {
     return (
-        <section className='bg-subscription-banner-mob md:bg-subscription-banner bg-no-repeat bg-center bg-cover shadow-subscription rounded-3xl py-12 px-9 mt-5 md:mt-10'>
+        <section className='bg-subscription-banner-mob lg:bg-subscription-banner bg-no-repeat bg-center bg-cover shadow-subscription rounded-3xl py-12 px-9 mt-5 md:mt-10'>
             <div className='lg:max-w-[50%] space-y-10'>
                 <h1 className='text-skin-white text-title-2 md:text-h4 font-semibold'>
                     <span className='text-[3.875rem] md:text-[7rem] leading-none'>10%</span><span> off, especially for you</span>

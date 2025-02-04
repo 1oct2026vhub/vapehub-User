@@ -13,15 +13,39 @@ const flavours = [
 
 const ProductDetails: React.FC = () => {
     return (
-        <section className='bg-skin-white p-6 xl:p-7.5 rounded-2xl shadow-card space-y-4'>
+        <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
-                <div className='space-y-4'>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-96 xl:w-[550px] shadow-image-box pt-5 px-1.5 pb-2'>
+                {/* Title section mobile */}
+                <div className='space-y-2 lg:hidden'>
+                    <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold mr-8'>HAWCOS x Lost Mary Pro Max 7000 Disposable Kit</h1>
+                    <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
+                        Brand: <a href="#" className='inline-block font-bold text-skin-primary2-500 underline'>Hayati</a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                            {Array.from({ length: 5 }, (_, i) => (
+                                <Image
+                                    key={i}
+                                    src='/images/review-star.svg'
+                                    alt='Review star'
+                                    width={16}
+                                    height={16}
+                                    className='md:w-5 md:h-5' />
+                            ))}
+                        </div>
+                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1 xl:mt-0">(10 Reviews)</p>
+                    </div>
+                </div>
+                {/* Title section mobile ends */}
+
+                <div className='space-y-4 w-full'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full xl:w-[550px] shadow-image-box pt-5 px-1.5 pb-2'>
                         <Image
                             src='/images/product.png'
                             alt='Product'
                             width={280}
                             height={396}
+                            className='max-lg:max-w-40 max-sm:max-h-[207px] max-lg:max-h-64'
                         />
                         <div className='new-product'>
                             <span>New</span>
@@ -34,6 +58,7 @@ const ProductDetails: React.FC = () => {
                                 alt='Product'
                                 width={118}
                                 height={111}
+                                className='max-w-[80px] lg:max-w-max'
                             />
                         </div>
                         <div className='px-0.5 py-1.5 bg-skin-base rounded-lg shadow-brand-card flex items-center justify-center shrink border border-neutral-100'>
@@ -42,6 +67,7 @@ const ProductDetails: React.FC = () => {
                                 alt='Product'
                                 width={118}
                                 height={111}
+                                className='max-w-[80px] lg:max-w-max'
                             />
                         </div>
                         <div className='px-0.5 py-1.5 bg-skin-base rounded-lg border border-neutral-100 shadow-brand-card flex items-center justify-center shrink'>
@@ -50,12 +76,13 @@ const ProductDetails: React.FC = () => {
                                 alt='Product'
                                 width={118}
                                 height={111}
+                                className='max-w-[80px] lg:max-w-max'
                             />
                         </div>
                     </div>
                 </div>
-                <div className='flex flex-col gap-5'>
-                    <div className='space-y-3.5'>
+                <div className='flex flex-col gap-4.5 lg:gap-5 w-full'>   
+                    <div className='space-y-3.5 hidden lg:block'>
                         <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>HAWCOS x Lost Mary Pro Max 7000 Disposable Kit</h1>
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                             Brand: <a href="#" className='inline-block font-bold text-skin-primary2-500 underline'>Hayati</a>
@@ -70,38 +97,38 @@ const ProductDetails: React.FC = () => {
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
-                        <p className='text-3xl xl:text-h4'>£12.99</p>
-                        <p className='text-title-2'>or Mix & Match</p>
+                        <p className='text-title-1 md:text-h5 xl:text-h4'>£12.99</p>
+                        <p className='text-content-2 md:text-title-2'>or Mix & Match</p>
                         <Button
                             size="sm"
                             radius="md"
                             color="primary"
-                            className="btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !leading-none !tap-highlight-transparent !h-8 xl:!h-9 !px-4 !py-2"
+                            className="btn primary-btn shadow-input w-fit !min-w-fit text-content-2 md:text-content-1 !leading-none !tap-highlight-transparent !h-5 md:!h-8 xl:!h-9 !px-1.5 !py-1 md:!px-4 md:!py-2"
                         >
                             3 for £30
                         </Button>
                     </div>
-                    <div className='space-y-4'>
+                    <div className='space-y-4 max-md:order-4'>
                         <div className='bg-skin-white border border-skin-neutral-100 rounded-xl shadow-product-offer p-3.5 space-y-2.5'>
                             <div className='flex gap-1 items-center'>
                                 <DispatchIcon />
-                                <p className='text-content-1 font-bold red-gradient-100'>Same day dispatch for orders before 3pm!</p>
+                                <p className='text-content-2 md:text-content-1 font-bold red-gradient-100'>Same day dispatch for orders before 3pm!</p>
                             </div>
                             <div className='flex gap-1 items-center'>
                                 <BenefitIcon />
-                                <p className='text-content-1 font-bold text-skin-neutral-500'>Earn at least 12 loyalty points with this purchase!</p>
+                                <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-500'>Earn at least 12 loyalty points with this purchase!</p>
                             </div>
                             <div className='flex gap-1 items-center'>
                                 <DealsIcon />
-                                <p className='text-content-1 font-bold text-skin-neutral-500'>Choose 2 for £25 - Multibuy Deal!</p>
+                                <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-500'>Choose 2 for £25 - Multibuy Deal!</p>
                             </div>
                         </div>
                     </div>
-                    <Divider />
-                    <div className='space-y-3.5'>
+                    <Divider className='max-lg:hidden'/>
+                    <div className='space-y-2 lg:space-y-3.5'>
                         <div>
-                            <p className='text-title-1 font-semibold text-black'>Flavours</p>
-                            <p className='primary-gradient-100 font-bold text-content-1'>20 available</p>
+                            <p className='text-content-1 sm:text-title-2 lg:text-title-1 font-semibold text-black'>Flavours</p>
+                            <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>20 available</p>
                         </div>
                         <Select
                             size='sm'
@@ -119,8 +146,8 @@ const ProductDetails: React.FC = () => {
                             ))}
                         </Select>
                     </div>
-                    <div className='space-y-3.5'>
-                        <p className='text-title-1 font-semibold text-skin-neutral-500'>Nicotine Strength</p>
+                    <div className='space-y-2 lg:space-y-3.5'>
+                        <p className='text-content-1 md:text-title-1 font-semibold text-skin-neutral-500'>Nicotine Strength</p>
                         <div className='flex gap-3.5 items-center'>
                             <Button
                                 size="sm"
@@ -151,9 +178,9 @@ const ProductDetails: React.FC = () => {
                         </div>
                         <p className='text-title-2 font-bold primary-gradient-100'>In stock</p>
                     </div>
-                    <div className='flex gap-6 xl:gap-11 items-center'>
+                    <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
                         <div
-                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 space-x-4.5 !font-bold h-[60px]"
+                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 space-x-4.5 !font-bold h-12 md:h-[60px]"
                         >
                             <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-skin-neutral-50 !px-0 !min-w-fit !w-8 !h-[60px]'>
                                 <PlusIcon />
@@ -167,7 +194,7 @@ const ProductDetails: React.FC = () => {
                             size="lg"
                             radius="md"
                             color="primary"
-                            className="btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-[60px]"
+                            className="btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px]"
                         >
                             Add to Cart
                         </Button>
@@ -175,9 +202,9 @@ const ProductDetails: React.FC = () => {
                 </div>
             </div>
             <Divider />
-            <div className='space-y-7 mt-2'>
-                <h2 className='text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
-                <div className='space-y-5.5'>
+            <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
+                <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
+                <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
                     <BundleProductCard />
                     <BundleProductCard />
                 </div>

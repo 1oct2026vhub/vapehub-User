@@ -50,7 +50,7 @@ const features: FeatureCardProps[] = [
 
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, subtitle }) => (
-    <div className="feature-card w-full flex basis-[1/6] max-w-xs">
+    <div className="feature-card w-full flex basis-[1/6] min-h-24 md:max-w-xs">
         <Image
             src={imageSrc}
             alt={altText}
@@ -67,9 +67,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
 
 
 const ProductFeatures: React.FC = () => (
-    <section className="bg-skin-white p-4 md:p-7.5 xl:p-10 rounded-2xl shadow-card space-y-7.5">
+    <section className="bg-skin-white p-4 md:p-6 xl:p-10 rounded-2xl shadow-card space-y-2 lg:space-y-7.5">
         <SectionHeading title="Product Features" className="w-fit" />
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-10 justify-center">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex flex-wrap items-center gap-3 lg:gap-x-5 lg:gap-y-10 justify-center">
             {features.map((feature, index) => (
                 <FeatureCard
                     key={index}

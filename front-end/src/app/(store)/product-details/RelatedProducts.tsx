@@ -18,7 +18,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
         <SectionHeading title={title} />
         <ViewAllLink href={viewAllHref} />
       </div>
-      <div className="slider-container section-slider related-products">
+      <div className="slider-container section-slider products-slider">
         <ProductsSlider />
       </div>
     </section>

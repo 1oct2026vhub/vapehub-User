@@ -223,7 +223,7 @@ input[type='search'] {
 }
 
 .feature-card {
-  @apply flex flex-col gap-2 md:gap-3.5 px-1.5 md:px-2.5 py-3.5 md:py-6 items-center bg-skin-white border border-skin-neutral-100 shadow-card rounded-xl md:rounded-20;
+  @apply flex flex-col gap-2 md:gap-3.5 px-1.5 md:px-2.5 py-3.5 md:py-6 items-center bg-skin-white border border-skin-neutral-100 shadow-card rounded-xl lg:rounded-20;
 }
 
 .section-slider .slick-slide {
@@ -294,15 +294,15 @@ input[type='search'] {
 
 .section-slider.deals-slider .slick-prev,
 .section-slider.deals-slider .slick-next {
-  @apply top-auto bottom-[-11.5%] xl:bottom-[-13.5%] !important;
+  @apply top-auto bottom-[-12.5%] xl:bottom-[-13.5%] !important;
 }
 
 .section-slider.products-slider .slick-prev,
 .section-slider.products-slider .slick-next {
-  @apply top-auto bottom-[-8.5%] xl:bottom-[-10%] !important;
+  @apply top-auto bottom-[-9%] xl:bottom-[-10%] !important;
 }
 
-.products-slider .quantity {
+.quantity {
   @apply w-16 h-4 md:w-24 md:h-6 text-[8px] md:text-content-2 font-semibold text-skin-white flex justify-start items-center pl-1 md:pl-2 ;
   flex-shrink: 0;
   border-radius: 10px 10px 10px 0px;
@@ -313,7 +313,7 @@ input[type='search'] {
   line-height: normal;
 }
 
-.products-slider .quantity::before {
+.quantity::before {
   @apply content-quantity-badge relative block -left-1 -bottom-3.5 md:-left-2 md:-bottom-[15.5px]; 
 }
 
@@ -353,10 +353,6 @@ input[type='search'] {
   @apply px-4 lg:px-12.5 py-4.5 lg:py-10 flex gap-4.5 lg:gap-10
 }
 
-.section-slider.related-products .slick-prev,
-.section-slider.related-products .slick-next {
-  @apply top-auto bottom-[-11%] xl:bottom-[-10%] !important;
-}
 
 .filter-drawer button[aria-label="Close"] {
   display: none;

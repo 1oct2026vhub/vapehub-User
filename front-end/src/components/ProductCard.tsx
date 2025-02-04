@@ -38,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-center gap-1">
               <div className="flex">
                 {Array.from({ length: 5 }, (_, i) => (
-                  <ReviewStarFilled key={i} className='w-3 md:w-4' />
+                  <Image  key={i} src='/images/review-star.svg' alt='review star' width={12} height={12} className='w-3 md:w-4' />
                 ))}
               </div>
               <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-1">({reviews} Reviews)</p>

@@ -21,7 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   return (
     <a href="#" className="block">
-      <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card p-3 md:p-4.5">
+      <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-neutral-50 rounded-10">
           <Image src={imageSrc} alt={title} width={245} height={234} className='w-full' />
           <div className='quantity'>
@@ -31,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <span>New</span>
           </div>
         </div>
-        <div className="space-y-2 md:space-y-3.5">
+        <div className="flex flex-col gap-2.5 md:gap-3.5">
           <div className="flex flex-col justify-between xl:min-h-[77px]">
             <h4 className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</h4>
             <div className="flex items-center gap-1">
@@ -40,7 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   <Image  key={i} src='/images/review-star.svg' alt='review star' width={12} height={12} className='w-3 md:w-4' />
                 ))}
               </div>
-              <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-1">({reviews} Reviews)</p>
+              <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5 md:mt-1">({reviews} Reviews)</p>
             </div>
           </div>
           {flavors && <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p>}

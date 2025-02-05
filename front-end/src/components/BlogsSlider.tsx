@@ -42,7 +42,7 @@ const BlogsSlider: React.FC = () => {
     <Slider {...settings}>
       {blogData.map((blog) => (
         <div key={blog.id} className="px-1 md:px-2 xl:px-5 py-4">
-          <Image src={blog.imageSrc} alt={blog.altText} width={322} height={512} className="rounded-3xl shadow-xl" />
+          <Image src={blog.imageSrc} alt={blog.altText} width={322} height={512} className="rounded-3xl shadow-xl cursor-pointer hover:shadow-slider-card" />
         </div>
       ))}
     </Slider>

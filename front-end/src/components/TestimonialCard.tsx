@@ -32,7 +32,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
                     alt={altText}
                     width={width}
                     height={height}
-                    className="max-w-8 min-w-8 md:min-w-[60px] md:max-w-max"
+                    className="max-w-8 min-w-8 md:min-w-[60px] md:max-w-max aspect-square"
                 />
                 <div className="flex items-center gap-1">
                     <RatingStarFilled className="max-w-3.5 md:max-w-max"/>

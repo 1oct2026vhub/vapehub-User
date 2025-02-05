@@ -33,19 +33,19 @@ const ProductDetails: React.FC = () => {
                                     className='md:w-5 md:h-5' />
                             ))}
                         </div>
-                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1 xl:mt-0">(10 Reviews)</p>
+                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">(10 Reviews)</p>
                     </div>
                 </div>
                 {/* Title section mobile ends */}
 
-                <div className='space-y-4 w-full'>
+                <div className='space-y-4 w-full lg:w-fit'>
                     <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full xl:w-[550px] shadow-image-box pt-5 px-1.5 pb-2'>
                         <Image
                             src='/images/product.png'
                             alt='Product'
                             width={280}
                             height={396}
-                            className='max-lg:max-w-40 max-sm:max-h-[207px] max-lg:max-h-64'
+                            className='max-lg:max-w-40 max-sm:max-h-[207px] max-lg:max-h-64 cursor-pointer'
                         />
                         <div className='new-product'>
                             <span>New</span>
@@ -58,7 +58,7 @@ const ProductDetails: React.FC = () => {
                                 alt='Product'
                                 width={118}
                                 height={111}
-                                className='max-w-[80px] lg:max-w-max'
+                                className='max-w-[80px] lg:max-w-max cursor-pointer'
                             />
                         </div>
                         <div className='px-0.5 py-1.5 bg-skin-base rounded-lg shadow-brand-card flex items-center justify-center shrink border border-neutral-100'>
@@ -67,7 +67,7 @@ const ProductDetails: React.FC = () => {
                                 alt='Product'
                                 width={118}
                                 height={111}
-                                className='max-w-[80px] lg:max-w-max'
+                                className='max-w-[80px] lg:max-w-max cursor-pointer'
                             />
                         </div>
                         <div className='px-0.5 py-1.5 bg-skin-base rounded-lg border border-neutral-100 shadow-brand-card flex items-center justify-center shrink'>
@@ -76,7 +76,7 @@ const ProductDetails: React.FC = () => {
                                 alt='Product'
                                 width={118}
                                 height={111}
-                                className='max-w-[80px] lg:max-w-max'
+                                className='max-w-[80px] lg:max-w-max cursor-pointer'
                             />
                         </div>
                     </div>
@@ -93,7 +93,7 @@ const ProductDetails: React.FC = () => {
                                     <ReviewStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />
                                 ))}
                             </div>
-                            <p className="text-title-2 xl:text-lg text-black font-bold mt-1 xl:mt-0">(10 Reviews)</p>
+                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">(10 Reviews)</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
@@ -153,7 +153,7 @@ const ProductDetails: React.FC = () => {
                                 size="sm"
                                 radius="md"
                                 color="primary"
-                                className="btn primary-btn w-full shadow-base text-content-1 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
+                                className="btn primary-btn w-full shadow-base !text-content-1 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
                             >
                                 10 mg
                             </Button>
@@ -162,7 +162,7 @@ const ProductDetails: React.FC = () => {
                                 radius="md"
                                 color="default"
                                 variant='bordered'
-                                className="btn bg-skin-white w-full shadow-base text-content-1 border-skin-neutral-200 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
+                                className="btn bg-skin-white w-full shadow-base !text-content-1 border-skin-neutral-200 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
                             >
                                 20 mg
                             </Button>
@@ -171,7 +171,7 @@ const ProductDetails: React.FC = () => {
                                 radius="md"
                                 color="default"
                                 variant='bordered'
-                                className="btn bg-skin-white w-full shadow-base text-content-1 border-skin-neutral-200 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
+                                className="btn bg-skin-white w-full shadow-base !text-content-1 border-skin-neutral-200 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold"
                             >
                                 30 mg
                             </Button>

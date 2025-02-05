@@ -31,14 +31,14 @@ const ProductContent: React.FC = () => {
                                     <Divider />
                                     <div className='space-y-3.5'>
                                         <h2 className='text-title-2 md:text-h5 xl:text-h4 font-semibold text-black'>Package Contains</h2>
-                                        <ul className='list-disc list-inside text-skin-neutral-400 text-content-2 md:text-content-1 font-bold pl-3'>
+                                        <ul className='list-disc text-skin-neutral-400 text-content-2 md:text-content-1 font-bold pl-5'>
                                             <li>1 x Hayati Pro Max 4000 Disposable Vape Device</li>
                                         </ul>
                                     </div>
                                     <Divider />
                                     <div className='space-y-3.5'>
                                         <h2 className='text-title-2 md:text-h5 xl:text-h4 font-semibold text-black'>Key Features</h2>
-                                        <ul className='list-disc list-inside text-skin-neutral-400 text-content-2 md:text-content-1 font-bold pl-3'>
+                                        <ul className='list-disc text-skin-neutral-400 text-content-2 md:text-content-1 font-bold pl-5'>
                                             <li>Draw activated</li>
                                             <li>Ideal for both new and seasoned vapers</li>
                                             <li>Dual 1.2 Ohm Mesh Coil</li>
@@ -94,7 +94,7 @@ const ProductContent: React.FC = () => {
                                                 />
                                             </div>
                                         </div>
-                                        <ul className='list-disc list-inside text-skin-neutral-400 text-content-2 md:text-content-1 font-bold pl-3'>
+                                        <ul className='list-disc text-skin-neutral-400 text-content-2 md:text-content-1 font-bold pl-5'>
                                             <li>Atomic Fireballs: A fiery, cinnamon-flavoured delight that packs a punch with every bite, leaving a warm and spicy sensation.</li>
                                             <li>Banana Ice: Smooth banana flavour with an icy finish, offering a refreshing twist to the classic banana taste.</li>
                                             <li>Blackcurrant Mango: A sweet and tangy fusion of blackcurrant and mango, creating a unique and vibrant flavour profile.</li>
@@ -207,7 +207,7 @@ const ProductContent: React.FC = () => {
                                     <div className='bg-skin-primary-200 px-7.5 py-4.5 rounded-xl text-center text-title-2 text-skin-neutral-500 font-semibold'>
                                         ***Free Delivery on all orders over$30***
                                     </div>
-                                    <ul className='list-disc list-inside text-skin-neutral-500 text-title-2 font-bold pl-3 space-y-6'>
+                                    <ul className='list-disc text-skin-neutral-500 text-title-2 font-bold pl-5 space-y-4 md:space-y-6'>
                                         <li>Royal Mail Tracked 48 - 2 to 4 working days</li>
                                         <li>Royal Mail Tracked 24 - 1 to 2 working days</li>
                                         <li>Royal Mail Next Day Guaranteed</li>

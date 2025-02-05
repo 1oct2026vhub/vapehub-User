@@ -47,7 +47,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             </div>
 
             {/* Accordion Filters */}
-            <Accordion variant="splitted" className="!p-0" defaultExpandedKeys={["0"]} itemClasses={itemClasses}>
+            <Accordion variant="splitted" className="!p-0" defaultExpandedKeys={["0"]} itemClasses={itemClasses} selectionMode="multiple">
                 {filterOptions.map(({ title, content }, index) => (
                     <AccordionItem key={index} aria-label={title} title={title}>
                         {content}

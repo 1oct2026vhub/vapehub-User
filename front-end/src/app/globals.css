@@ -233,7 +233,7 @@ input[type='search'] {
 
 .section-slider .slick-prev,
 .section-slider .slick-next {
-  @apply top-auto max-[390px]:-bottom-[7.3%] -bottom-[6.5%] sm:-bottom-[16%] md:-bottom-[14%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;
+  @apply top-auto max-[390px]:-bottom-[7.3%] -bottom-[6.5%] sm:-bottom-[17%] md:-bottom-[15.5%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;
 }
 
 .section-slider .slick-prev {
@@ -245,7 +245,7 @@ input[type='search'] {
 }
 
 .section-slider .slick-list {
-  @apply pb-6 sm:pb-12.5;
+  @apply pb-6 md:pb-8 xl:pb-12.5;
 }
 
 .section-slider .slick-dots li {
@@ -295,12 +295,12 @@ input[type='search'] {
 
 .section-slider.deals-slider .slick-prev,
 .section-slider.deals-slider .slick-next {
-  @apply top-auto bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-12.8%] !important;
+  @apply top-auto bottom-[-12.5%] sm:bottom-[-15.5%] md:bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-12.8%] !important;
 }
 
 .section-slider.products-slider .slick-prev,
 .section-slider.products-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-6.6%] bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-9.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-6.6%] bottom-[-9%] sm:bottom-[-11.5%] md:bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-9.6%] !important;
 }
 
 
@@ -354,7 +354,7 @@ input[type='search'] {
 
 .section-slider.testimonial-slider .slick-prev,
 .section-slider.testimonial-slider .slick-next {
-  @apply top-auto bottom-[-13.5%] md:bottom-[-12.5%] lg:bottom-[-16.5%] xl:bottom-[-13.9%] !important;
+  @apply top-auto bottom-[-13.5%] sm:bottom-[-19%] md:bottom-[-12.5%] lg:bottom-[-16.5%] xl:bottom-[-13.9%] !important;
 }
 
 .section-slider.testimonial-slider .slick-list {
@@ -375,7 +375,7 @@ input[type='search'] {
 
 .section-slider.blogs-slider .slick-prev,
 .section-slider.blogs-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-10%] bottom-[-9%]  sm:bottom-[-10%] lg:bottom-[-10.6%] xl:bottom-[-9.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-10%] bottom-[-9%]  sm:bottom-[-11.7%] md:bottom-[-10%] lg:bottom-[-10.6%] xl:bottom-[-9.6%] !important;
 }
 
 

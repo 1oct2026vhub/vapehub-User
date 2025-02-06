@@ -233,15 +233,15 @@ input[type='search'] {
 
 .section-slider .slick-prev,
 .section-slider .slick-next {
-  @apply top-auto -bottom-[6.5%] sm:-bottom-[16%] md:-bottom-[14%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;
+  @apply top-auto max-[390px]:-bottom-[7.3%] -bottom-[6.5%] sm:-bottom-[16%] md:-bottom-[14%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;
 }
 
 .section-slider .slick-prev {
-  @apply left-[31%] md:left-[35%] lg:left-[36%] xl:left-[42%];
+  @apply left-[30%] md:left-[35%] lg:left-[36%] xl:left-[42%];
 }
 
 .section-slider .slick-next {
-  @apply right-[31%] md:right-[35%] lg:right-[36%] xl:right-[42%];
+  @apply right-[30%] md:right-[35%] lg:right-[36%] xl:right-[42%];
 }
 
 .section-slider .slick-list {
@@ -300,8 +300,19 @@ input[type='search'] {
 
 .section-slider.products-slider .slick-prev,
 .section-slider.products-slider .slick-next {
-  @apply top-auto bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-9.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-6.6%] bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-9.6%] !important;
 }
+
+
+.section-slider.products-slider .slick-prev {
+  @apply max-[390px]:left-[18%]
+}
+
+.section-slider.products-slider .slick-next {
+  @apply max-[390px]:right-[18%]
+}
+
+
 
 .quantity {
   @apply w-16 h-4 md:w-24 md:h-6 text-[8px] md:text-content-2 font-semibold text-skin-white flex justify-start items-center pl-1 md:pl-2;
@@ -350,8 +361,30 @@ input[type='search'] {
   @apply pb-3 md:pb-8 xl:pb-12.5;
 }
 
+.section-slider.testimonial-slider .slick-prev {
+  @apply max-[390px]:left-[25%]
+}
+
+.section-slider.testimonial-slider .slick-next {
+  @apply max-[390px]:right-[25%]
+}
+
 .product-listing-container {
   @apply px-4 lg:px-12.5 py-4.5 lg:py-10 flex gap-4.5 lg:gap-10
+}
+
+.section-slider.blogs-slider .slick-prev,
+.section-slider.blogs-slider .slick-next {
+  @apply top-auto max-[390px]:bottom-[-10%] bottom-[-9%]  sm:bottom-[-10%] lg:bottom-[-10.6%] xl:bottom-[-9.6%] !important;
+}
+
+
+.section-slider.blogs-slider .slick-prev {
+  @apply max-[390px]:left-[28%]
+}
+
+.section-slider.blogs-slider .slick-next {
+  @apply max-[390px]:right-[28%]
 }
 
 

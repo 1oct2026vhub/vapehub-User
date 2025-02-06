@@ -18,7 +18,7 @@ const BlogsSection: React.FC<BlogsSectionProps> = ({
         <SectionHeading title={title} />
         <ViewAllLink href={viewAllHref} />
       </div>
-      <div className="slider-container section-slider products-slider">
+      <div className="slider-container section-slider products-slider blogs-slider">
         <BlogsSlider />
       </div>
     </section>

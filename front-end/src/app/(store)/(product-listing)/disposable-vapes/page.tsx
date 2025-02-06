@@ -155,8 +155,8 @@ const ProductListing: NextPage = (): ReactElement => {
                 />
               ))}
             </div>
-            <div className="flex items-center justify-between pl-5 max-md:hidden">
-              <p className="text-content-2 text-skin-neutral-300 font-bold">Showing 1-10 of 100 results</p>
+            <div className="flex items-center gap-3 justify-between pl-5 max-md:hidden">
+              <p className="text-content-1 text-skin-neutral-300 font-bold">Showing 1-10 of 100 results</p>
               {/* <Pagination showControls initialPage={1} total={100} /> */}
               <Pagination />
             </div>

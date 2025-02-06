@@ -37,6 +37,15 @@ const ProductsSlider: React.FC = () => {
           dots: true,
         },
       },
+      {
+        breakpoint: 390,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
     ],
   };
 

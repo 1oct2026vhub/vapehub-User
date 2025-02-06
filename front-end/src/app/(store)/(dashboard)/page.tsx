@@ -23,7 +23,7 @@ const Dashboard: NextPage = (): ReactElement => {
   return (
     <>
       <Header />
-      <main className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 md:gap-10">
+      <main className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
         <section className="banner-carousel hidden lg:block">
           <BannerSlider />
         </section>

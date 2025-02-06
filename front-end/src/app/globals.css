@@ -231,7 +231,7 @@ input[type='search'] {
   @apply max-sm:space-y-5;
 }
 
-.section-slider .slick-slide > div {
+.section-slider .slick-slide div {
   @apply !h-fit !max-h-fit
 }
 
@@ -366,11 +366,11 @@ input[type='search'] {
 }
 
 .section-slider.testimonial-slider .slick-prev {
-  @apply max-[390px]:left-[25%]
+  @apply max-[390px]:left-[23%]
 }
 
 .section-slider.testimonial-slider .slick-next {
-  @apply max-[390px]:right-[25%]
+  @apply max-[390px]:right-[23%]
 }
 
 .product-listing-container {

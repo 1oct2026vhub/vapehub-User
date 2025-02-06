@@ -44,13 +44,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
           {flavors && <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p>}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <h5 className="text-ttitle-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{price}</h5>
             <Button
               size="md"
               radius="md"
               color="primary"
-              className="btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !leading-none max-sm:h-6 sm:max-h-max !px-4 !py-2"
+              className="btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !leading-none max-sm:h-6 sm:max-h-max !px-2 sm:!px-4 !py-2"
             >
               {buttonText}
             </Button>

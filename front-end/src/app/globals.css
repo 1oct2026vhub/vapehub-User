@@ -233,7 +233,7 @@ input[type='search'] {
 
 .section-slider .slick-prev,
 .section-slider .slick-next {
-  @apply top-auto -bottom-[6.5%] sm:-bottom-[16%] md:-bottom-[14%] lg:-bottom-[16%] xl:-bottom-[15%] !important;
+  @apply top-auto -bottom-[6.5%] sm:-bottom-[16%] md:-bottom-[14%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;
 }
 
 .section-slider .slick-prev {
@@ -295,12 +295,12 @@ input[type='search'] {
 
 .section-slider.deals-slider .slick-prev,
 .section-slider.deals-slider .slick-next {
-  @apply top-auto bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-13.5%] !important;
+  @apply top-auto bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-12.8%] !important;
 }
 
 .section-slider.products-slider .slick-prev,
 .section-slider.products-slider .slick-next {
-  @apply top-auto bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-10%] !important;
+  @apply top-auto bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-9.6%] !important;
 }
 
 .quantity {
@@ -343,7 +343,7 @@ input[type='search'] {
 
 .section-slider.testimonial-slider .slick-prev,
 .section-slider.testimonial-slider .slick-next {
-  @apply top-auto bottom-[-13.5%] md:bottom-[-12.5%] lg:bottom-[-16.5%] xl:bottom-[-13.5%] !important;
+  @apply top-auto bottom-[-13.5%] md:bottom-[-12.5%] lg:bottom-[-16.5%] xl:bottom-[-13.9%] !important;
 }
 
 .section-slider.testimonial-slider .slick-list {

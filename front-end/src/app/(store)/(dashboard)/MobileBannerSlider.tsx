@@ -6,18 +6,17 @@ const MobileBannerSlider: React.FC = () => {
   const settings: Settings = {
     dots: true,
     infinite: true,
-    fade: true,
-    speed: 500,
+    speed: 700,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 5000,
   };
 
   const banners = [
-    { src: "/images/banner-1.png", alt: "Banner 1" },
-    { src: "/images/banner-2.png", alt: "Banner 2" },
-    { src: "/images/banner-3.png", alt: "Banner 3" },
+    { src: "/images/mob-banner-1.jpg", alt: "Banner 1" },
+    { src: "/images/mob-banner-1.jpg", alt: "Banner 2" },
+    { src: "/images/mob-banner-1.jpg", alt: "Banner 3" },
   ];
 
   return (

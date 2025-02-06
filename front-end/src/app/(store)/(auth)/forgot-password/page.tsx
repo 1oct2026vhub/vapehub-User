@@ -17,7 +17,7 @@ const ForgotPassword: NextPage = (): ReactElement => {
                         <h1 className="text-22 md:text-h4 font-bold primary-gradient-600">Forgot Password</h1>
                         <p className="text-content-2 md:text-content-1 text-skin-neutral-300 font-bold">Enter your email and we will send a link to reset your password</p>
                     </div>
-                    <form className="flex flex-col gap-6 md:gap-8 w-full">
+                    <form className="flex flex-col space-y-6 md:space-y-8 w-full">
                         <div className="flex w-full justify-center items-center">
                             <InputField
                                 type="email"

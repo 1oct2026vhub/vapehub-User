@@ -44,7 +44,7 @@ const HeaderTopBar = () => {
 
             {/* Responsive screens */}
 
-            <div className="flex flex-col gap-3.5 lg:hidden">
+            <div className="flex flex-col space-y-3.5 lg:hidden">
                 <div className="flex items-center justify-between gap-5">
                     <Button
                         isIconOnly

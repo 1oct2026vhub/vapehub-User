@@ -137,7 +137,7 @@
 }
 
 .auth-form-wrapper {
-  @apply flex flex-col justify-center items-center md:items-start bg-skin-white gap-6 md:gap-8 p-5 md:p-7 w-full max-w-[800px] rounded-2xl md:rounded-[22px];
+  @apply flex flex-col justify-center items-center md:items-start bg-skin-white space-y-6 md:space-y-8 p-5 md:p-7 w-full max-w-[800px] rounded-2xl md:rounded-[22px];
   box-shadow: 4px 4px 21px 0px rgba(0, 0, 0, 0.12);
 }
 

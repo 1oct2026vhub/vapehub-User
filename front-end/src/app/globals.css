@@ -83,6 +83,7 @@
 
 .primary-gradient-100 {
   @apply bg-primary-gradient-100 bg-clip-text text-transparent;
+  background-color: var(--primary-500);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -90,6 +91,7 @@
 
 .primary-gradient-400 {
   @apply bg-primary-gradient-400 bg-clip-text text-transparent;
+  background-color: var(--primary-500);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -97,6 +99,7 @@
 
 .primary-gradient-500 {
   @apply bg-primary-gradient-500 bg-clip-text text-transparent;
+  background-color: var(--primary-500);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -104,6 +107,7 @@
 
 .primary-gradient-600 {
   @apply bg-primary-gradient-600 bg-clip-text text-transparent;
+  background-color: var(--primary-500);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -111,6 +115,7 @@
 
 .red-gradient-100 {
   @apply bg-red-gradient-100 bg-clip-text text-transparent;
+  background-color: var(--red-500);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -299,7 +304,7 @@ input[type='search'] {
 
 .section-slider.deals-slider .slick-prev,
 .section-slider.deals-slider .slick-next {
-  @apply top-auto bottom-[-12.5%] sm:bottom-[-15.5%] md:bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-12.8%] !important;
+  @apply top-auto max-[390px]:bottom-[-12.5%] bottom-[-11.5%] sm:bottom-[-15.5%] md:bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-12.8%] !important;
 }
 
 .section-slider.products-slider .slick-prev,
@@ -315,8 +320,6 @@ input[type='search'] {
 .section-slider.products-slider .slick-next {
   @apply max-[390px]:right-[18%]
 }
-
-
 
 .quantity {
   @apply w-16 h-4 md:w-24 md:h-6 text-[8px] md:text-content-2 font-semibold text-skin-white flex justify-start items-center pl-1 md:pl-2;

@@ -142,7 +142,7 @@ const ProductListing: NextPage = (): ReactElement => {
           <div className="flex flex-col gap-7.5 md:gap-9 w-full">
             <ProductListingActionsWeb/>
             <ProductListingActionsMob />
-            <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5 xl:gap-10 products-slider">
+            <div className="grid max-[390px]:!grid-cols-1 grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5 xl:gap-10 products-slider">
               {products.map((product, index) => (
                 <ProductCard
                   key={index}

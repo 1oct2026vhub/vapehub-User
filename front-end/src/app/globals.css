@@ -233,15 +233,22 @@ input[type='search'] {
 }
 
 .section-slider .slick-slide {
-  @apply max-sm:space-y-5;
+  @apply max-sm:space-y-5 !h-fit !max-h-fit;
 }
 
 .section-slider .slick-slide div {
-  @apply !h-fit !max-h-fit
+  @apply !h-fit !max-h-fit;
 }
 
-.section-slider .slick-slide {
-  @apply !h-fit !max-h-fit
+.section-slider.testimonial-slider .slick-slide div {
+  @apply h-fit max-[430px]:max-h-[190px] !important;
+}
+
+.section-slider .slick-list {
+  height: auto !important;
+}
+.section-slider .slick-track {
+  height: auto !important;
 }
 
 .section-slider .slick-prev,

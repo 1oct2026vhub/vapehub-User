@@ -240,6 +240,10 @@ input[type='search'] {
   @apply !h-fit !max-h-fit
 }
 
+.section-slider .slick-slide {
+  @apply !h-fit !max-h-fit
+}
+
 .section-slider .slick-prev,
 .section-slider .slick-next {
   @apply top-auto max-[390px]:-bottom-[7.3%] -bottom-[6.5%] sm:-bottom-[17%] md:-bottom-[15.5%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;

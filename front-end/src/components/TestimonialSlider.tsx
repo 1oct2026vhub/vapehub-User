@@ -120,7 +120,7 @@ const TestimonialSlider: React.FC = () => {
     return (
         <Slider {...settings}>
             {testimonials.map((testimonial, index) => (
-                <div key={index} className="px-1 md:px-2 xl:px-5 py-3">
+                <div key={index} className="px-1 md:px-2 xl:px-5 py-3 h-auto min-h-0">
                     <TestimonialCard {...testimonial} />
                 </div>
             ))}

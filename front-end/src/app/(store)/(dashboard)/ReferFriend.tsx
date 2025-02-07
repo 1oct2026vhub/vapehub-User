@@ -8,9 +8,9 @@ const ReferFriend: React.FC = () => {
         <section className='xl:pt-24 xl:pb-12.5 xl:px-5'>
             <div className='bg-skin-white border border-skin-neutral-50 xl:pl-11 pt-7 flex flex-col xl:flex-row h-fit gap-2 shadow-card rounded-[36px] md:rounded-[50px] xl:max-h-[309px]'>
                 <div className='text-center xl:text-left'>
-                    <div className='primary-gradient-100 text-h4 md:text-h3 xl:text-55 font-bold'>
-                        <h1 className=''>Refer a Friend &</h1>
-                        <h1 className=''>We will reward you both!</h1>
+                    <div className='text-h4 md:text-h3 xl:text-55 font-bold'>
+                        <h1 className='primary-gradient-100'>Refer a Friend &</h1>
+                        <h1 className='primary-gradient-100'>We will reward you both!</h1>
                     </div>
                     <Button
                         size="lg"

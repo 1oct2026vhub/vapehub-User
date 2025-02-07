@@ -241,7 +241,7 @@ input[type='search'] {
 }
 
 .section-slider.testimonial-slider .slick-slide div {
-  @apply h-fit max-[430px]:max-h-[215px] !important;
+  @apply h-fit max-[430px]:max-h-[215px] max-h-[360px] !important;
 }
 
 .section-slider .slick-list {

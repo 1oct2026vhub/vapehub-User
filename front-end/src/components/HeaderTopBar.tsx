@@ -1,11 +1,12 @@
 'use client'
 
 import React from 'react'
-import { MenuIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
-import InputField from "@/components/InputField";
+import { MenuIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
+// import InputField from "@/components/InputField";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@nextui-org/button";
 import { Badge } from "@nextui-org/react";
+import Link from 'next/link';
 
 const HeaderTopBar = () => {
     return (
@@ -13,7 +14,7 @@ const HeaderTopBar = () => {
             <div className="hidden lg:flex items-center justify-between gap-10">
                 <Logo className='max-xl:max-w-64' />
                 <div className="flex flex-1 flex-shrink justify-center items-center">
-                    <InputField
+                    {/* <InputField
                         type="search"
                         placeholder="Search products, brands or anything else!"
                         className="max-w-[650px]"
@@ -21,7 +22,7 @@ const HeaderTopBar = () => {
                             input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
                         }}
                         startContent={<SearchIcon />}
-                    />
+                    /> */}
                 </div>
 
                 <div className="flex items-center gap-6">
@@ -32,13 +33,13 @@ const HeaderTopBar = () => {
                             <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">£ 3.99</h6>
                         </div>
                     </a>
-                    <a href='#' className="flex items-center gap-0.5">
+                    <Link href='/my-account' className="flex items-center gap-0.5">
                         <UserIcon />
                         <div>
                             <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">welcome</h6>
                             <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">my account</h6>
                         </div>
-                    </a>
+                    </Link>
                 </div>
             </div>
 
@@ -71,13 +72,13 @@ const HeaderTopBar = () => {
                     </div>
                 </div>
                 <div className="flex flex-1 flex-shrink justify-center items-center">
-                    <InputField
+                    {/* <InputField
                         type="search"
                         placeholder="Search products, brands or anything else!"
                         required
                         className="w-full"
                         startContent={<SearchIcon />}
-                    />
+                    /> */}
                 </div>
             </div>
         </>

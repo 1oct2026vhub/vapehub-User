@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import HeaderTopBar from "@/components/HeaderTopBar";
 import NavigationMenu from "@/components/NavigationMenu";

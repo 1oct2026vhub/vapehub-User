@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import Slider, { Settings } from "react-slick";
 import CategoryCard from "./CategoryCard";

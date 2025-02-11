@@ -4,8 +4,6 @@ import BreadCrumbs from "@/components/BreadCrumbs";
 import FAQSection from "@/components/FAQSection";
 import FilterCheckboxGroup from "@/components/FilterCheckboxGroup";
 import FilterSidebar from "@/components/FilterSidebar";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
@@ -130,9 +128,8 @@ const ProductListing: NextPage = (): ReactElement => {
   ];
 
   return (
-    <>
-      <Header />
-      <main>
+     
+      <div>
         <section className="product-listing-container flex-col">
           <BreadCrumbs items={breadcrumbs} />
           <ProductListingContent />
@@ -165,9 +162,7 @@ const ProductListing: NextPage = (): ReactElement => {
         <section className="product-listing-container">
           <FAQSection />
         </section>
-      </main>
-      <Footer />
-    </>
+      </div> 
   );
 };
 

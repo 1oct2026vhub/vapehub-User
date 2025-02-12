@@ -416,6 +416,32 @@ input[type='search'] {
   border: 1px solid red;
 }
 
+/* blog details */
+
+.blog-details h2 {
+  @apply primary-gradient-600 text-h5 md:text-h3 font-bold lg:max-w-[60%];
+}
+
+.blog-details p {
+  @apply text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
+}
+
+.blog-details ol {
+  @apply list-decimal pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
+}
+
+.blog-details ul {
+  @apply list-disc pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
+}
+
+.blog-details h3 {
+  @apply text-h5 md:text-h4 font-semibold text-skin-neutral-500;
+}
+
+.blog-details h4 {
+  @apply text-title-2 md:text-title-1 text-skin-neutral-500 font-semibold;
+}
+
 /* Styles for webkit-based browsers */
 ::-webkit-scrollbar {
   width: 5px;

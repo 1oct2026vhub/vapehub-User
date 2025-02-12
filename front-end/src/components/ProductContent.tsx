@@ -15,7 +15,7 @@ const ProductContent: React.FC = () => {
                         tabList: "gap-3 px-5 py-4 mx-auto border border-skin-neutral-100 rounded-xl !bg-skin-base",
                         cursor: "bg-primary-gradient-100 border-none text-skin-white rounded-lg shadow-md",
                         tab: "rounded-lg min-w-[124px] h-10 border border-skin-primary2-500 text-skin-primary2-500 group-data-[selected=true]:!border-none",
-                        tabContent: "group-data-[selected=true]:!text-skin-white  text-title-2 font-semibold",
+                        tabContent: "group-data-[selected=true]:!text-skin-white text-title-2 leading-none font-semibold",
                     }}
                 >
                     <Tab key="Description" title="Description">

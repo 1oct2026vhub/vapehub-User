@@ -22,7 +22,7 @@ const Subscription: FunctionComponent = (): ReactElement => {
                 <h1 className='text-skin-white text-title-2 md:text-h4 font-semibold'>
                     <span className='text-[3.875rem] md:text-[7rem] leading-none'>10%</span><span> off, especially for you</span>
                 </h1>
-                <p className='text-content-2 md:text-title-1 text-skin-white font-bold'>Sign up to receive your exclusive Vapehub discount, and keep up to date on our latest products & offers!</p>
+                <p className='!text-content-2 md:!text-title-1 !text-skin-white font-bold'>Sign up to receive your exclusive Vapehub discount, and keep up to date on our latest products & offers!</p>
                 <Form {...subscribeFromConfig}>
                     <form className='space-y-7.5 subscription-form'
                         onSubmit={subscribeFromConfig.handleSubmit(handleFormSubmit)}

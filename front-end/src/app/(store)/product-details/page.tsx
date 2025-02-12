@@ -21,18 +21,16 @@ const ProductDetailsPage: NextPage = (): ReactElement => {
     ];
 
     return (
-        <> 
-            <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
-                <BreadCrumbs items={breadcrumbs} />
-                <ProductDetails />
-                <OrderCard />
-                <ProductFeatures />
-                <ProductContent />
-                <FAQSection />
-                <RelatedProducts />
-                <Subscription />
-            </main> 
-        </>
+        <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
+            <BreadCrumbs items={breadcrumbs} />
+            <ProductDetails />
+            <OrderCard />
+            <ProductFeatures />
+            <ProductContent />
+            <FAQSection />
+            <RelatedProducts />
+            <Subscription />
+        </main>
     )
 }
 

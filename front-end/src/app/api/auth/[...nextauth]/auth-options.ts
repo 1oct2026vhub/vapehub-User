@@ -18,14 +18,9 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
        
         if(!credentials) return null
         const userDetails = await signInAction(credentials.email, credentials.password, false);
-        
+         
         if (userDetails.status === ServerActionStatus.ERROR) {
-          return {
-            error:
-              userDetails.message ??
-              'Oops! Something went wrong. Please try again later.',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any;
+          return Promise.reject(new Error(userDetails.message ?? 'Oops! Something went wrong. Please try again later.'));
         }
         const userProfile = userDetails.data; 
          
@@ -35,6 +30,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           email: userProfile.email, 
           sub: userProfile.accessToken,
           image:  userProfile.profile_pic_url,
+          userId: userProfile.id
         };
       },
     }),
@@ -49,13 +45,18 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     session: async ({ session, token }: { session: any; token: JWT  }) => {
-      
+       
       if(session.user) {
         session.user.accessToken = token.sub as string;
+        session.user.id = token.userId;
       }
       return session;
     },
-    jwt: async ({ token }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    jwt: async ({ token, user }: {token:any; user:any; }) => {
+      if(user)  {
+        token.userId = user.userId
+      }
       return token;
     }
   }

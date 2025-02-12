@@ -1,28 +1,42 @@
 'use client'
 
 import React from 'react'
-import { MenuIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
-// import InputField from "@/components/InputField";
+import { MenuIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
+import InputField from "@/components/InputField";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@nextui-org/button";
 import { Badge } from "@nextui-org/react";
 import Link from 'next/link';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/config/header.config';
+import { useForm } from 'react-hook-form';
+import { Form } from '@/components/ui/Form';
 
 const HeaderTopBar = () => {
+     const searchFromConfig = useForm<HeaderFormSchema>({
+            resolver: zodResolver(HEADER_IN_SCHEMA),
+            mode: 'onBlur',
+        });
     return (
         <>
             <div className="hidden lg:flex items-center justify-between gap-10">
                 <Logo className='max-xl:max-w-64' />
                 <div className="flex flex-1 flex-shrink justify-center items-center">
-                    {/* <InputField
-                        type="search"
-                        placeholder="Search products, brands or anything else!"
+                <Form {...searchFromConfig}>
+                <form noValidate className="w-full max-w-[650px] ">
+                    <InputField
+                        control={searchFromConfig.control}
+                        name="search"
+                        type={Header_FORM_CONFIG.SEARCH.TYPE}
+                        placeholder={Header_FORM_CONFIG.SEARCH.PH}
                         className="max-w-[650px]"
                         classNames={{
                             input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
                         }}
                         startContent={<SearchIcon />}
-                    /> */}
+                    />
+                    </form>
+                    </Form>
                 </div>
 
                 <div className="flex items-center gap-6">
@@ -72,13 +86,19 @@ const HeaderTopBar = () => {
                     </div>
                 </div>
                 <div className="flex flex-1 flex-shrink justify-center items-center">
-                    {/* <InputField
-                        type="search"
-                        placeholder="Search products, brands or anything else!"
-                        required
-                        className="w-full"
+                    
+                    <Form {...searchFromConfig}>
+                <form noValidate className="w-full">
+                    <InputField
+                        control={searchFromConfig.control}
+                        name="search"
+                        type={Header_FORM_CONFIG.SEARCH.TYPE}
+                        placeholder={Header_FORM_CONFIG.SEARCH.PH}
+                        className="w-full"                        
                         startContent={<SearchIcon />}
-                    /> */}
+                    />
+                    </form>
+                    </Form>
                 </div>
             </div>
         </>

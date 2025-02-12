@@ -8,7 +8,7 @@ const StoreRootLayout = ({
   return (
     <>
       <Header />
-      {children}
+        {children}
       <Footer />
     </>
   )

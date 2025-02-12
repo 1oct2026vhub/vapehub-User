@@ -33,17 +33,17 @@ export const getServerSessionData = async (): Promise<any | null> =>
     await getServerSession(NEXT_AUTH_OPTIONS);
   
 export const redirectIfAuthenticated = async (
-  redirectUrl: keyof typeof ROUTES
+  redirectUrl?: keyof typeof ROUTES
 ): Promise<void> => {
   const session = await getServerSessionData();
 
   if (session?.user) {
     const user = session.user;
     if (!user.name) {
-      return permanentRedirect(ROUTES.WELCOME, RedirectType.replace);
+      return permanentRedirect(ROUTES.MY_ACCOUNT, RedirectType.replace);
     }
     return permanentRedirect(
-      ROUTES[redirectUrl ?? 'HOME'],
+      ROUTES[redirectUrl ?? 'MY_ACCOUNT'],
       RedirectType.replace
     );
   }

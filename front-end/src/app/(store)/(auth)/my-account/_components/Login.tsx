@@ -1,5 +1,5 @@
 "use client";
-import { FunctionComponent, ReactElement, useState } from "react"
+import { FunctionComponent, ReactElement, useEffect, useState } from "react"
 import { EyeClosedIcon, EyeOpenIcon } from "@/components/Icons";
 import InputField from "@/components/InputField";
 import { Button } from "@nextui-org/button";
@@ -12,8 +12,13 @@ import { Form } from "@/components/ui/Form";
 import { signIn } from "next-auth/react";
 import { toast } from 'sonner';
 import { ROUTES } from "@/lib/routes";
+import { useRememberMe } from "@/lib/hooks/useRememberMe";
 
 const Login: FunctionComponent = (): ReactElement => {
+    const [rememberMeValue, setRememberMe] = useState(false);
+    const { rememberMe, forgetMe, getRememberedCredentials } = useRememberMe()
+    const [pwdVisibility, setPwdVisibility] = useState(false);
+    const rememberRef = getRememberedCredentials();
 
     const signInFromConfig = useForm<SignInFormSchema>({
         resolver: zodResolver(SIGN_IN_SCHEMA),
@@ -24,15 +29,34 @@ const Login: FunctionComponent = (): ReactElement => {
 
         const response = await signIn('credentials', {
             email,
-            password
+            password,
+            rememberMeValue,
+            redirect: false
         });
-
+ 
         if (!response || response?.error) {
             return toast.error(response?.error ?? 'Error while trying to login, please try again');
         }
+        
+        if (rememberMeValue) {
+            rememberMe(email, password);
+        } else {
+            forgetMe();
+        }
     }
 
-    const [pwdVisibility, setPwdVisibility] = useState(false);
+
+    useEffect(() => {
+        
+        if (!rememberRef) return;
+        signInFromConfig.reset({
+            email: rememberRef?.email,
+            password: rememberRef?.password,
+        });
+        setRememberMe(true)
+
+    }, []);
+
 
     return (
         <Form {...signInFromConfig}>
@@ -73,6 +97,8 @@ const Login: FunctionComponent = (): ReactElement => {
                                 wrapper: "after:bg-primary-gradient-100",
                                 label: "!text-content-3 md:!text-content-1 text-skin-neutral-300 font-semibold",
                             }}
+                             isSelected={rememberMeValue}
+                            onValueChange={setRememberMe} 
                         >Remember me</Checkbox>
                         <Link href={ROUTES.FORGOT} className="primary-gradient-100 text-content-1 font-semibold tracking-tight">Forgot Password?</Link>
                     </div>

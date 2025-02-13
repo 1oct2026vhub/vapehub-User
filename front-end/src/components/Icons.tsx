@@ -820,3 +820,108 @@ export const MinusIcon = (
     </svg>
   )
 };
+
+export const TrashIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="22"
+      height="29"
+      fill="none"
+      viewBox="0 0 22 29"
+      {...props}
+    >
+      <path
+        fill="url(#paint0_linear_1683_20866)"
+        d="M15.392.555a1.54 1.54 0 0 1 1.539 1.539h3.078a1.539 1.539 0 1 1 0 3.078H1.539a1.54 1.54 0 0 1 0-3.078h3.078a1.54 1.54 0 0 1 1.54-1.54z"
+      ></path>
+      <path
+        fill="url(#paint1_linear_1683_20866)"
+        fillRule="evenodd"
+        d="M1.54 6.71h18.469v18.47a3.08 3.08 0 0 1-3.078 3.08H4.617a3.08 3.08 0 0 1-3.078-3.08zm5.386 3.08a.77.77 0 0 0-.77.769V24.41a.77.77 0 0 0 1.54 0V10.56a.77.77 0 0 0-.77-.77m7.696 0a.77.77 0 0 0-.77.769V24.41a.77.77 0 0 0 1.54 0V10.56a.77.77 0 0 0-.77-.77"
+        clipRule="evenodd"
+      ></path>
+      <defs>
+        <linearGradient
+          id="paint0_linear_1683_20866"
+          x1="10.774"
+          x2="10.774"
+          y1="0.555"
+          y2="5.172"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#A90000"></stop>
+          <stop offset="1" stopColor="#F80101"></stop>
+        </linearGradient>
+        <linearGradient
+          id="paint1_linear_1683_20866"
+          x1="10.774"
+          x2="10.774"
+          y1="6.711"
+          y2="28.259"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#A90000"></stop>
+          <stop offset="1" stopColor="#F80101"></stop>
+        </linearGradient>
+      </defs>
+    </svg>
+  )
+};
+
+export const EditIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="28"
+      height="28"
+      fill="none"
+      viewBox="0 0 28 28"
+      {...props}
+    >
+      <g fill="#091410" clipPath="url(#clip0_1683_20870)">
+        <path d="m11.348 11.016-1.576 5.255a1.269 1.269 0 0 0 1.58 1.58l5.255-1.576c.202-.06.385-.17.533-.318l9.635-9.635a1.27 1.27 0 0 0 0-1.794l-3.68-3.68a1.27 1.27 0 0 0-1.794 0l-9.635 9.635a1.3 1.3 0 0 0-.318.533m2.34 1.035 8.51-8.511 1.885 1.885-8.51 8.512-2.693.807z"></path>
+        <path d="M25.878 12.32c-.7 0-1.269.568-1.269 1.269v8.46a2.117 2.117 0 0 1-2.115 2.114H5.576a2.117 2.117 0 0 1-2.115-2.115V5.13c0-1.166.948-2.115 2.115-2.115h8.459a1.269 1.269 0 0 0 0-2.537h-8.46A4.66 4.66 0 0 0 .924 5.129v16.92A4.66 4.66 0 0 0 5.576 26.7h16.919a4.66 4.66 0 0 0 4.652-4.653v-8.46c0-.7-.568-1.268-1.269-1.268"></path>
+      </g>
+      <defs>
+        <clipPath id="clip0_1683_20870">
+          <path fill="#fff" d="M.5.055h27.07v27.07H.5z"></path>
+        </clipPath>
+      </defs>
+    </svg>
+  )
+};
+
+export const DangerIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="30"
+      height="31"
+      fill="none"
+      viewBox="0 0 30 31"
+      {...props}
+    >
+      <path
+        stroke="#F80101"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M15 11.469v6.25M15 26.983H7.425c-4.337 0-6.15-3.1-4.05-6.888l3.9-7.025 3.675-6.6c2.225-4.012 5.875-4.012 8.1 0l3.675 6.613 3.9 7.025c2.1 3.787.275 6.887-4.05 6.887H15z"
+      ></path>
+      <path
+        stroke="#F80101"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.5"
+        d="M14.993 21.469h.01"
+      ></path>
+    </svg>
+  )
+};

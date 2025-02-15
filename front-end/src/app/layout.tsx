@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import GlobalProvider from "@/providers/GlobalProvider";
+import { Toaster } from "sonner";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -36,6 +37,13 @@ export default function RootLayout({
         className={`m-0 min-h-screen bg-skin-white lg:bg-skin-base text-skin-black font-poppins antialiased ${poppins.variable}`}
       >
         <GlobalProvider>
+        <Toaster
+            richColors
+            position='top-center'
+            toastOptions={{
+              className: '!w-fit max-w-[300px] sm:max-w-md mx-auto',
+            }}
+          />
           {children}
         </GlobalProvider>
       </body>

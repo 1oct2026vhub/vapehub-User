@@ -14,6 +14,9 @@ import { toast } from 'sonner';
 
 const Register: FunctionComponent = (): ReactElement => {
     const [pwdVisibility, setPwdVisibility] = useState(false);
+    const [cPwdVisibility, setCPwdVisibility] = useState(false);
+
+    
     const signUpFormConfig = useForm<SignUpFormSchema>({
         mode: 'onBlur',
         reValidateMode: 'onChange',
@@ -75,10 +78,21 @@ const Register: FunctionComponent = (): ReactElement => {
                         <InputField
                             control={signUpFormConfig.control}
                             isRequired
-                            name="confirmPassword"
-                            type={SIGN_UP_FORM_CONFIG.CONFIRM_PASSWORD.TYPE}
+                            name="confirmPassword" 
+                            type={cPwdVisibility ? "text" : SIGN_UP_FORM_CONFIG.CONFIRM_PASSWORD.TYPE}
                             label={SIGN_UP_FORM_CONFIG.CONFIRM_PASSWORD.LABEL}
                             className="w-full"
+                            endContent={
+                                <Button
+                                    size="sm"
+                                    variant="light"
+                                    isIconOnly
+                                    type="button"
+                                    onPress={() => setCPwdVisibility(prev => !prev)}
+                                    startContent={cPwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
+                                    className="!p-0 h-fit hover:!bg-transparent"
+                                />
+                            }
                         />
                     </div>
 

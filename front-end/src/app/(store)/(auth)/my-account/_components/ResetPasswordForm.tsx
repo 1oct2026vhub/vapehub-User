@@ -29,6 +29,8 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
     });
     const router = useRouter();
     const [pwdVisibility, setPwdVisibility] = useState(false);
+    const [cPwdVisibility, setCPwdVisibility] = useState(false);
+
     const handleFormSubmit = async ({
         password,
     }: ChangePasswordFormSchema) => {
@@ -78,10 +80,21 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                         <InputField
                             control={changePasswordFormConfig.control}
                             isRequired
-                            name="confirmNewPassword"
-                            type={CHANGE_PASSWORD_FORM_CONFIG.CHANGE_PASSWORD.TYPE}
+                            name="confirmNewPassword" 
+                            type={cPwdVisibility ? "text" : CHANGE_PASSWORD_FORM_CONFIG.CHANGE_PASSWORD.TYPE}
                             label={CHANGE_PASSWORD_FORM_CONFIG.CHANGE_PASSWORD.LABEL}
                             className="w-full"
+                            endContent={
+                                <Button
+                                    size="sm"
+                                    variant="light"
+                                    isIconOnly
+                                    type="button"
+                                    onPress={() => setCPwdVisibility(prev => !prev)}
+                                    startContent={cPwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
+                                    className="!p-0 h-fit hover:!bg-transparent"
+                                />
+                            }
                         />
                         </div>
                         <div className="space-y-2.5">

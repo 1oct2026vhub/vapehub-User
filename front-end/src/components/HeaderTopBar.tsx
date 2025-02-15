@@ -69,12 +69,14 @@ const HeaderTopBar = () => {
                     />
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     <div className="flex items-center gap-1">
+                    <Link href='/my-account'>
                         <Button
                             isIconOnly
                             size="sm"
                             variant="light"
                             startContent={<UserIcon />}
                         />
+                        </Link>
                         <Badge content="1" size="md" className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
                             <Button
                                 isIconOnly

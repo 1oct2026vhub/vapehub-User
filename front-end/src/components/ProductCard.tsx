@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 import { Button } from '@nextui-org/button';
+import Link from 'next/link';
 
 interface ProductCardProps {
   title: string;
@@ -8,7 +9,10 @@ interface ProductCardProps {
   price: string;
   buttonText: string;
   reviews: number;
-  flavors?: string;
+  flavors?: number;
+  totalPuffs?: string;
+  link: string;
+  isNew?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -18,18 +22,26 @@ const ProductCard: React.FC<ProductCardProps> = ({
   buttonText,
   reviews,
   flavors,
+  totalPuffs,
+  link,
+  isNew
 }) => {
   return (
-    <a href="#" className="block">
+    <Link href={link} className="block">
       <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-neutral-50 rounded-10">
           <Image src={imageSrc} alt={title} width={245} height={234} className='w-full' />
           <div className='quantity'>
-            <span>15000 Puffs</span>
+            <span>{totalPuffs}</span>
           </div>
-          <div className='new-product'>
-            <span>New</span>
-          </div>
+          {
+            isNew && (
+              <div className='new-product'>
+                <span>{isNew}</span>
+              </div>
+            )
+          }
+          
         </div>
         <div className="flex flex-col gap-2.5 md:gap-3.5">
           <div className="flex flex-col justify-between xl:min-h-[77px]">
@@ -57,7 +69,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 };
 

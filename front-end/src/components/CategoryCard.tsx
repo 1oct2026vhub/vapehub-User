@@ -1,17 +1,18 @@
 import Image from "next/image";
 import React from "react";
 import { Button } from "@nextui-org/react";
+import Link from "next/link";
 
 interface CategoryCardProps {
   title: string;
   imageSrc: string;
-  onButtonClick?: () => void; // Optional callback for the button
+  link: string;
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({
   title,
   imageSrc,
-  onButtonClick,
+  link
 }) => {
   return (
     <div className="w-full relative text-center pt-2 px-1.5 md:px-5">
@@ -31,15 +32,17 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           height={204}
           className=""
         />
+        <Link href={link}>
         <Button
           size="lg"
           radius="sm"
           color="primary"
           className="btn primary-btn shadow-input w-fit !min-w-fit !text-content-2 md:!text-title-2 xl:!text-[22px] h-7.5 md:h-10 xl:h-12.5 !px-3.5 md:!px-6"
-          onPress={onButtonClick}
+          
         >
           Shop Now
         </Button>
+        </Link>
       </div>
     </div>
   );

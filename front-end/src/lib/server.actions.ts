@@ -1,8 +1,11 @@
 import { ServerActionResponse } from "./config/app.config";
 import { SignInResponse } from "./config/auth.config";
+import { BrandConfig } from "./config/brand.config";
+import { Category } from "./config/category.config";
+import { ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
-import { API_ROUTES } from '@/lib/api-routes';
+import { API_ROUTES, PRODUCT_PAYLOAD } from '@/lib/api-routes';
 
 export const signInAction = async (
     email: string,
@@ -74,3 +77,27 @@ export const resetPasswordAction = async (
   });
 };
  
+// category list api 
+export const getCategoryList = async (): Promise<ServerActionResponse<Category[]>> => {
+  return await handleRequest<Category[], unknown>({
+    endpoint: API_ROUTES.GET_CATEGORY_LIST,
+    method: 'GET',
+  });
+};
+// brand list api 
+export const getBrandList = async (): Promise<ServerActionResponse<BrandConfig[]>> => {
+  return await handleRequest<BrandConfig[], unknown>({
+    endpoint: API_ROUTES.GET_BRAND_LIST,
+    method: 'GET',
+  });
+};
+
+// product list api
+export const getProductList = async (
+  params: PRODUCT_PAYLOAD
+): Promise<ServerActionResponse<ProductResponseData>> => {
+  return await handleRequest<ProductResponseData, unknown>({
+    endpoint: API_ROUTES.GET_PRODUCTS(params),
+    method: 'GET',
+  });
+};

@@ -1,18 +1,17 @@
 "use client"
 
-import BreadCrumbs from '@/components/BreadCrumbs';
-import { NextPage } from 'next'
-import React, { ReactElement } from 'react'
-import ProductDetails from './ProductDetails'
-import OrderCard from '@/components/OrderCard'
-import ProductFeatures from './ProductFeatures'
+import BreadCrumbs from '@/components/BreadCrumbs'; 
+import React, { ReactElement } from 'react'; 
+import OrderCard from '@/components/OrderCard' 
 import ProductContent from '@/components/ProductContent'
-import FAQSection from '@/components/FAQSection'
-import Subscription from '../(dashboard)/_components/Subscription'
-import RelatedProducts from './RelatedProducts'
+import FAQSection from '@/components/FAQSection' 
+import ProductDetails from './_components/ProductDetails';
+import ProductFeatures from './_components/ProductFeatures';
+import RelatedProducts from './_components/RelatedProducts';
+import Subscription from '../(dashboard)/_components/Subscription';
 
 
-const ProductDetailsPage: NextPage = (): ReactElement => {
+const ProductView: React.FC = (): ReactElement => {
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
@@ -36,4 +35,4 @@ const ProductDetailsPage: NextPage = (): ReactElement => {
     )
 }
 
-export default ProductDetailsPage
+export default ProductView

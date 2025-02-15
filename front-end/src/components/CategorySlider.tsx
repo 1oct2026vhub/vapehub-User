@@ -1,13 +1,16 @@
 "use client"
-import React from "react";
+import React, { ReactElement } from "react";
 import Slider, { Settings } from "react-slick";
 import CategoryCard from "./CategoryCard";
+import { Category } from "@/lib/config/category.config";
 
-const CategorySlider: React.FC = () => {
-    const handleShopNowClick = (category: string) => {
-        console.log(`${category} Shop Now clicked!`);
-    };
+type props = {
+    categories: Category[];
+};
 
+const CategorySlider: React.FC<props> = ({ categories }): ReactElement => {
+    
+     
     const settings: Settings = {
         dots: true,
         infinite: true,
@@ -39,81 +42,15 @@ const CategorySlider: React.FC = () => {
         ]
     };
 
-    const categories = [
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-        {
-            title: "Disposables",
-            imageSrc: "/images/category-image.png",
-        },
-    ];
 
     return (
         <Slider {...settings}>
             {categories.map((category, index) => (
                 <div key={index}>
                     <CategoryCard
-                        title={category.title}
-                        imageSrc={category.imageSrc}
-                        onButtonClick={() => handleShopNowClick(category.title)}
+                        title={category.name}
+                        imageSrc={category.logo_url}
+                        link={category.slug}
                     />
                 </div>
             ))}

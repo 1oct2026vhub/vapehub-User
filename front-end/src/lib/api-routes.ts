@@ -1,5 +1,5 @@
 
-const BASE_URL =  process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL ?? 'http://localhost:3000/api/'; 
+const BASE_URL =  process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL ?? 'https://api.vapehub.devateam.com/'; 
 
 
 export const API_ROUTES = {

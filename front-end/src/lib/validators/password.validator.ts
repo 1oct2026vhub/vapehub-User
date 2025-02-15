@@ -31,7 +31,7 @@ export function zodPasswordValidator() {
         );
       },
       {
-        message: ' ',
+        message: DEFAULT_REQUIRED_ERROR,
       }
     );
 }

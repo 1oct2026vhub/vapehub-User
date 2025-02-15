@@ -33,7 +33,7 @@ export const CHANGE_PASSWORD_SCHEMA = z
     .min(1, DEFAULT_REQUIRED_ERROR),
 })
 .refine((data) => data.password === data.confirmNewPassword, {
-  message: 'Password does not match',
+  message: 'Passwords does not match',
   path: ['confirmNewPassword'],
 });
 

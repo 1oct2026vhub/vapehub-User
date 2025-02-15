@@ -42,7 +42,7 @@ const ValidateEmail: FunctionComponent<Props> = async ({ token }): Promise<React
                         <h2 className="mx-auto text-title-2 md:text-title-1 text-skin-neutral-300 font-bold ">You’re All Set to Blow Clouds!</h2>
                         <p className="text-content-2 md:text-content-1 text-center font-normal text-skin-neutral-300 mx-auto max-w-[406px]">Your email is verified. Get ready to explore and elevate your vaping journey!</p>
                     </div>
-                    <Link href={ROUTES.MY_ACCOUNT} >
+                    <Link href={ROUTES.MY_ACCOUNT} className="mx-auto">
                         <Button
                             size="lg"
                             radius="md"

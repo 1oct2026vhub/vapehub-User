@@ -18,8 +18,7 @@ const Register: FunctionComponent = (): ReactElement => {
 
     
     const signUpFormConfig = useForm<SignUpFormSchema>({
-        mode: 'onBlur',
-        reValidateMode: 'onChange',
+        mode: 'all',
         resolver: zodResolver(SIGN_UP_SCHEMA),
         defaultValues: {
             email: "", password:""

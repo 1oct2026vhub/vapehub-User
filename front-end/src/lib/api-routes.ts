@@ -7,7 +7,7 @@ export const API_ROUTES = {
     REGISTER: buildRequestUrl('/api/auth/register'), 
     GET_VERIFY_EMAIL: (token: string | string[]) => buildRequestUrl(`/api/auth/verify-email?token=${token}`),
     FORGOT_PASSWORD: buildRequestUrl("/api/auth/forgot-password"),
-    RESET_PASSWORD: buildRequestUrl('api/auth/reset-password')
+    RESET_PASSWORD: buildRequestUrl('api/auth/reset-password'),
 }
 
 // * Helper functions

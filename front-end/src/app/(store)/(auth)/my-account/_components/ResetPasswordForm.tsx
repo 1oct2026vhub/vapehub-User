@@ -23,8 +23,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
 }): ReactElement => {
 
     const changePasswordFormConfig = useForm<ChangePasswordFormSchema>({
-        mode: 'onBlur',
-        reValidateMode: 'onChange',
+        mode: 'all', 
         resolver: zodResolver(CHANGE_PASSWORD_SCHEMA),
     });
     const router = useRouter();

@@ -1,23 +1,17 @@
+import InputForm from '@/components/InputForm'
 import ShippingProgress from '@/components/ShippingProgress'
-import { Button, Divider, Input, Progress } from '@nextui-org/react'
+import { Button, Divider } from '@nextui-org/react'
 import React from 'react'
 
 const CartDetails: React.FC = () => {
     return (
         <div className='flex flex-col p-3 md:p-5 gap-3 bg-white border border-skin-neutral-100 rounded-14 w-full lg:w-4/6 xl:w-full xl:max-w-[584px]'>
             <div className='flex items-center gap-3'>
-                <Input
+                <InputForm
                     type='text'
                     label="Coupon Code"
                     isRequired
                     className='xl:min-w-[366px]'
-                    classNames={{
-                        label: "!text-skin-neutral-400 !font-bold text-content-2 md:!text-title-2",
-                        input: "!bg-skin-white !text-skin-neutral-400 font-bold !text-content-2 md:!text-title-2 placeholder:!text-skin-neutral-400 truncate",
-                        innerWrapper: "!bg-skin-white gap-2 hover:!bg-skin-white",
-                        inputWrapper:
-                            "pl-5 pr-3 h-[42px] lg:h-12 shadow-input rounded-lg lg:rounded-[10px] !bg-skin-white border border-skin-neutral-100 hover:border-skin-primary-500 data-[hover=true]:!bg-skin-white group-data-[focus=true]:border-skin-primary-300 group-data-[focus=true]:!bg-skin-white !cursor-text",
-                    }}
                 />
                 <Button
                     size="lg"

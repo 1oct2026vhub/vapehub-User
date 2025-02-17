@@ -133,7 +133,8 @@ export default {
         'product-offer': '4px -3px 12px 0px rgba(0, 0, 0, 0.04)',
         'base': '0px 2px 4px 0px rgba(0, 0, 0, 0.25)',
         'delivery-card': '0px 4px 41px 0px rgba(0, 0, 0, 0.16);',
-        'button': '0px 0px 8px 0px rgba(0, 0, 0, 0.11);'
+        'button': '0px 0px 8px 0px rgba(0, 0, 0, 0.11);',
+        'checkout': '0px -1px 17px 0px rgba(0, 0, 0, 0.07);'
       }
     },
   },

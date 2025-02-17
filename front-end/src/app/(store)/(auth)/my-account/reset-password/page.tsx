@@ -1,6 +1,7 @@
 import { Metadata, NextPage } from "next";
 import { AsyncReactElement, RouteParams } from "@/lib/config/app.config";
 import ResetPasswordForm from "../_components/ResetPasswordForm";
+import { redirectIfAuthenticated } from "@/lib/config/auth.config";
 
 export const metadata: Metadata = {
     title: "My account | Reset Password",
@@ -15,6 +16,8 @@ interface Props {
 const ResetPassword: NextPage<Props> = async ({
   searchParams
 }): AsyncReactElement => {
+  await redirectIfAuthenticated();
+  
   const {token} = await searchParams 
 
   if (!token) {

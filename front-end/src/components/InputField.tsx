@@ -15,6 +15,7 @@ interface InputFieldProps<T extends FieldValues> extends InputProps {
 }
 
 const InputField = <T extends FieldValues>({ control, name,showStatus = false, ...props }: InputFieldProps<T>) => {
+   
   return (
     <Controller
       name={name}
@@ -35,7 +36,7 @@ const InputField = <T extends FieldValues>({ control, name,showStatus = false, .
           }}
           
         />
-        {showStatus && <ShowPasswordValidityStatus name={name as string} />}
+        {(showStatus && error?.message) && <ShowPasswordValidityStatus name={name as string} />}
         </>
       )}
     />

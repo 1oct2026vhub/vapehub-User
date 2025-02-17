@@ -19,7 +19,7 @@ export const SIGN_UP_SCHEMA = z
       .min(1, DEFAULT_REQUIRED_ERROR) 
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Password does not match',
+    message: 'Passwords does not match',
     path: ['confirmPassword'],
   });
 

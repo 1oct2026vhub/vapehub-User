@@ -119,6 +119,7 @@ export default {
         '14': '0.875rem', //14px
         '20': '1.25rem', //20px
         '2.5xl': '1.375rem', //22px
+        '32': '2rem' //32px
       },
       boxShadow: {
         'card': '4px 4px 28px 0px rgba(0, 0, 0, 0.09);',
@@ -131,7 +132,9 @@ export default {
         'image-box': ' 2px 0px 23px 0px rgba(0, 0, 0, 0.23);',
         'product-offer': '4px -3px 12px 0px rgba(0, 0, 0, 0.04)',
         'base': '0px 2px 4px 0px rgba(0, 0, 0, 0.25)',
-        'delivery-card': '0px 4px 41px 0px rgba(0, 0, 0, 0.16);'
+        'delivery-card': '0px 4px 41px 0px rgba(0, 0, 0, 0.16);',
+        'button': '0px 0px 8px 0px rgba(0, 0, 0, 0.11);',
+        'checkout': '0px -1px 17px 0px rgba(0, 0, 0, 0.07);'
       }
     },
   },

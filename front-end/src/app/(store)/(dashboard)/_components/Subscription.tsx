@@ -7,7 +7,11 @@ import { Button } from '@nextui-org/button'
 import { FunctionComponent, ReactElement } from 'react'
 import { useForm } from 'react-hook-form';
 
-const Subscription: FunctionComponent = (): ReactElement => {
+interface SubscriptionProps {
+    className?: string;
+}
+
+const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): ReactElement => {
     const subscribeFromConfig = useForm<SubscribeFormSchema>({
         resolver: zodResolver(SUBSCRIBE_IN_SCHEMA),
         mode: 'onSubmit',
@@ -17,12 +21,12 @@ const Subscription: FunctionComponent = (): ReactElement => {
         
     }
     return (
-        <section className='bg-subscription-banner-mob lg:bg-subscription-banner bg-no-repeat bg-center lg:bg-right-bottom bg-cover shadow-subscription rounded-3xl px-5.5 pt-14 pb-7 md:py-12 md:px-9 mt-5 md:mt-10'>
+        <section className={`bg-subscription-banner-mob lg:bg-subscription-banner bg-no-repeat bg-center lg:bg-right-bottom bg-cover shadow-subscription rounded-3xl px-5.5 pt-14 pb-7 md:py-12 md:px-9 ${className}`}>
             <div className='lg:max-w-[50%] space-y-5.5 lg:space-y-10'>
                 <h1 className='text-skin-white text-title-2 md:text-h4 font-semibold'>
                     <span className='text-[3.875rem] md:text-[7rem] leading-none'>10%</span><span> off, especially for you</span>
                 </h1>
-                <p className='text-content-2 md:text-title-1 text-skin-white font-bold'>Sign up to receive your exclusive Vapehub discount, and keep up to date on our latest products & offers!</p>
+                <p className='!text-content-2 md:!text-title-1 !text-skin-white font-bold'>Sign up to receive your exclusive Vapehub discount, and keep up to date on our latest products & offers!</p>
                 <Form {...subscribeFromConfig}>
                     <form className='space-y-7.5 subscription-form'
                         onSubmit={subscribeFromConfig.handleSubmit(handleFormSubmit)}

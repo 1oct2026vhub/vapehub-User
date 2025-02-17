@@ -9,8 +9,6 @@ import { Badge, Divider, Drawer, DrawerBody, DrawerContent, DrawerFooter, Drawer
 import Link from 'next/link';
 import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
 import ShippingProgress from './ShippingProgress';
-
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/config/header.config';
 import { useForm } from 'react-hook-form';
@@ -148,6 +146,7 @@ const HeaderTopBar = () => {
                                             radius="md"
                                             color="primary"
                                             className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                            onPress={onClose}
                                         >
                                             Continue Shopping
                                         </Button>
@@ -156,6 +155,7 @@ const HeaderTopBar = () => {
                                             radius="md"
                                             color="primary"
                                             className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                            onPress={onClose}
                                         >
                                             View Cart
                                         </Button>

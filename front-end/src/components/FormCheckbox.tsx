@@ -3,10 +3,9 @@ import { ReactNode } from "react";
 
 interface CustomCheckboxProps {
   label: ReactNode;
-  className?: string;
 }
 
-const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ label, className }) => {
+const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ label }) => {
   return (
     <Checkbox
       classNames={{

@@ -1,4 +1,4 @@
-import { EditIcon, EditIcon2 } from '@/components/Icons'
+import { EditIcon2 } from '@/components/Icons'
 import InputForm from '@/components/InputForm'
 import ShippingProgress from '@/components/ShippingProgress'
 import { Button, Divider } from '@nextui-org/react'

@@ -1,11 +1,10 @@
 import { cn } from "@/lib/utils";
-import { Radio } from "@nextui-org/react";
+import { Radio, RadioProps } from "@nextui-org/react";
 import { ReactNode } from "react";
 
-interface CustomRadioProps {
+interface CustomRadioProps extends Omit<RadioProps, "classNames"> {
   children: ReactNode;
   className?: string;
-  [key: string]: any;
 }
 
 export const CustomRadio: React.FC<CustomRadioProps> = ({ children, className, ...otherProps }) => {

@@ -32,9 +32,9 @@ export const DEFAULT_PASSWORD_STATUS = {
 export const DEFAULT_REQUIRED_ERROR = 'Required';
 
 export enum ValidationMessage {
-  EMAIL = 'Email is Required',
-  PASSWORD = 'Password is Required',
-  CONFIRM_PASSWORD = 'Confirm Password is Required',
+  EMAIL = 'Email is required',
+  PASSWORD = 'Password is required',
+  CONFIRM_PASSWORD = 'Confirm Password is required',
 }
 
 // * Helper methods

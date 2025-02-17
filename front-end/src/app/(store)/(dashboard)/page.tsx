@@ -40,7 +40,7 @@ const Dashboard: NextPage = (): ReactElement => {
         <PromotionalBanners />
         <ReferFriend />
         <Testimonials />
-        <Subscription /> 
+        <Subscription className="mt-5 md:mt-10" /> 
         <BlogsSection />
       </div>  
   );

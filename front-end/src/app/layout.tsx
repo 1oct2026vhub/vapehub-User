@@ -40,9 +40,6 @@ export default function RootLayout({
         <Toaster
             richColors
             position='top-center'
-            toastOptions={{
-              className: '!w-fit max-w-[300px] sm:max-w-md mx-auto',
-            }}
           />
           {children}
         </GlobalProvider>

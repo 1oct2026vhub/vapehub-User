@@ -21,13 +21,14 @@ const Register: FunctionComponent = (): ReactElement => {
         mode: 'all',
         resolver: zodResolver(SIGN_UP_SCHEMA),
         defaultValues: {
-            email: "", password:""
+            email: "", password:"", confirmPassword:""
         },
     });
     const handleFormSubmit = async (fieldValue: SignUpFormSchema) => {
         const response = await signUpAction(fieldValue);
           
         if (response.status === ServerActionStatus.SUCCESS) {
+            signUpFormConfig.reset({ email: "", password:"", confirmPassword:"" });
             return toast.success(response?.data?.message ?? 'Registration Success'); 
           }
         if (response.status === ServerActionStatus.ERROR) {

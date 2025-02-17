@@ -31,6 +31,12 @@ export const DEFAULT_PASSWORD_STATUS = {
 
 export const DEFAULT_REQUIRED_ERROR = 'Required';
 
+export enum ValidationMessage {
+  EMAIL = 'Email is Required',
+  PASSWORD = 'Password is Required',
+  CONFIRM_PASSWORD = 'Confirm Password is Required',
+}
+
 // * Helper methods
 /**
  * Function to restrict input to numeric characters.

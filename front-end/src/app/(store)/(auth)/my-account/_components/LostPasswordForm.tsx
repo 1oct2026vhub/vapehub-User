@@ -63,6 +63,8 @@ const LostPasswordForm: FunctionComponent = (): ReactElement => {
                                 color="primary"
                                 type="submit"
                                 className="btn primary-btn shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
+                                isLoading={resetPasswordFromConfig.formState.isSubmitting}
+                                disabled={resetPasswordFromConfig.formState.isSubmitting}
                             >
                                 Login
                             </Button>
@@ -72,9 +74,7 @@ const LostPasswordForm: FunctionComponent = (): ReactElement => {
                                     radius="sm"
                                     color="primary"
                                     variant="light"
-                                    type="button"
-                                    disabled={resetPasswordFromConfig.formState.isSubmitting}
-                                    isLoading={resetPasswordFromConfig.formState.isSubmitting}
+                                    type="button" 
                                     className="btn primary-gradient-100 hover:shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
                                 >
                                     Back

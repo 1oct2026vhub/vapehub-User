@@ -24,8 +24,8 @@ const BundleProductCard: React.FC = () => {
                         </div>
                     </div>
                     <div className='space-y-8 max-w-lg'>
-                        <h4 className='text-lg xl:text-title-1 font-semibold text-skin-neutral-400 mr-10'>RandM Tornado 9000 Puff Disposable Vape - Watermelon
-                            Skittles</h4>
+                        <h3 className='text-lg xl:text-title-1 font-semibold text-skin-neutral-400 mr-10'>RandM Tornado 9000 Puff Disposable Vape - Watermelon
+                            Skittles</h3>
                         <Select
                             size='sm'
                             className="w-full"

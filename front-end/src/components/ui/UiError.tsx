@@ -29,7 +29,7 @@ const UiError: FunctionComponent<Props> = ({
     >
       <div
         className={cn(
-          'flex w-full flex-col items-center justify-center bg-slate-300/65 backdrop-blur-sm',
+          'flex w-full flex-col items-center justify-center bg-skin-base backdrop-blur-sm',
           variant !== 'default' && 'bg-transparent backdrop-blur-0'
         )}
       >
@@ -43,7 +43,7 @@ const UiError: FunctionComponent<Props> = ({
           <div className='flex flex-col gap-1'>
             <p
               className={cn(
-                'text-center text-xl font-bold text-blue-600 md:text-3xl',
+                'text-center text-xl font-bold text-skin-primary-500 md:text-3xl',
                 variant === 'avatar-player' && 'text-white'
               )}
             >
@@ -51,7 +51,7 @@ const UiError: FunctionComponent<Props> = ({
             </p>
             <p
               className={cn(
-                'text-center text-lg text-blue-400',
+                'text-center text-lg text-skin-neutral-400',
                 variant === 'avatar-player' && 'text-white'
               )}
             >
@@ -60,11 +60,11 @@ const UiError: FunctionComponent<Props> = ({
           </div>
           {redirect && (
             <div className='inline-flex justify-center gap-1'>
-              <p className='text-gray-600'>Back to</p>
+              <p className='text-skin-neutral-500 text-title-2'>Back to</p>
               <Link
                 href={redirect.link}
                 replace
-                className='text-base font-semibold text-blue-600'
+                className='text-title-2 font-semibold text-skin-primary-500'
               >
                 {redirect.name}
               </Link>

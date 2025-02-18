@@ -1,5 +1,4 @@
 import React from 'react'
-import SectionHeading from './ui/SectionHeading'
 import Image from 'next/image'
 
 const banners = [
@@ -12,7 +11,7 @@ const ProductListingContent: React.FC = () => {
     return (
         <div className="space-y-6">
             <div>
-                <SectionHeading title="Disposable Vapes" className="w-fit max-md:!text-h5" />
+                <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Disposable Vapes</h1>
                 <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">
                     <p>
                         There’s nothing quite like the convenience of disposable vapes. Perfect for those on the go, Disposable vape kits offer a hassle-free vaping experience that can be enjoyed without having to worry about recharging batteries or refilling tanks with e-liquid. The Disposable Vape market is immense and we stock all the top brands such as Elf Bar, Elux, Hayati, IVG, SKE and more! So whether you’re looking for a quick and convenient way to vape on the go, or you’re simply trying out vaping for the first time, disposable vape devices are the perfect solution! Browse our range of disposables today and find your perfect match.

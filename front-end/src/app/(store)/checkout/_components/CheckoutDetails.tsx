@@ -33,6 +33,7 @@ const CheckoutDetails: React.FC = () => {
                                     </div>
                                 }
                                 className='w-full'
+                                pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
                             />
                         </div>
                     </div>

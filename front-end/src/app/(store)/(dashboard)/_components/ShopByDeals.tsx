@@ -17,7 +17,7 @@ const ShopByDeals: React.FC<ShopByDealsProps> = ({
             <div className="flex items-center justify-between">
                 <div className="space-y-2.5">
                     <SectionHeading title={title} />
-                    <h4 className="text-content-2 md:text-title-1 text-skin-neutral-300 font-semibold">Fantastic deals, all year round!</h4>
+                    <h2 className="text-content-2 md:text-title-1 text-skin-neutral-300 font-semibold">Fantastic deals, all year round!</h2>
                 </div>
                 <ViewAllLink href={viewAllHref} />
             </div>

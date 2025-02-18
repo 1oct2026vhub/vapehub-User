@@ -24,7 +24,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
             </h4>
 
             {/* Quantity Selector */}
-            <div className="flex items-center border bg-skin-white w-fit shadow-base text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10 mt-auto md:space-x-2">
+            <div className="flex items-center border bg-skin-white w-fit shadow-base text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10 mt-auto">
               <Button
                 isIconOnly
                 size="lg"
@@ -34,7 +34,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
               >
                 <MinusIcon className='w-3 md:w-6'/>
               </Button>
-              <span className="min-w-6 text-center text-content-2 md:text-lg">1</span>
+              <input type="tel" name="" id="" placeholder='1' className='w-fit max-w-7 !border-none !outline-none placeholder:text-skin-neutral-500 ml-4' />
               <Button
                 isIconOnly
                 size="lg"

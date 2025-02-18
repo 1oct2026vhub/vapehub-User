@@ -30,7 +30,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <Link href={link} className="block">
       <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-neutral-50 rounded-10">
-          <Image src={imageSrc} alt={title} width={245} height={234} className='w-full' />
+          {imageSrc && imageSrc.startsWith('http') ? (
+                  <Image
+                    src={imageSrc} alt={title} width={245} height={234} className='w-full'
+                  />
+                ) : <p>Image not found</p>}
+
+          
           <div className='quantity'>
             <span>{totalPuffs}</span>
           </div>

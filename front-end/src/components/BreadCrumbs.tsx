@@ -25,7 +25,7 @@ const BreadCrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
           href={crumb.href}
           classNames={{
             item: crumb.isActive
-              ? "text-skin-neutral-500 text-content-1 md:text-title-2 font-bold"
+              ? "text-skin-neutral-500 text-content-1 md:text-title-2 font-bold text-wrap max-w-full"
               : "primary-gradient-100 text-content-1 md:text-title-2 font-bold",
           }}
         >

@@ -5,48 +5,53 @@ import { MenuIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/I
 import InputField from "@/components/InputField";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@nextui-org/button";
-import { Badge } from "@nextui-org/react";
+import { Badge, Divider, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, useDisclosure } from "@nextui-org/react";
 import Link from 'next/link';
+import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
+import ShippingProgress from './ShippingProgress';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/config/header.config';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/Form';
 
 const HeaderTopBar = () => {
-     const searchFromConfig = useForm<HeaderFormSchema>({
-            resolver: zodResolver(HEADER_IN_SCHEMA),
-            mode: 'onBlur',
-        });
+    const searchFromConfig = useForm<HeaderFormSchema>({
+        resolver: zodResolver(HEADER_IN_SCHEMA),
+        mode: 'onBlur',
+    });
+
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
     return (
         <>
             <div className="hidden lg:flex items-center justify-between gap-10">
                 <Logo className='max-xl:max-w-64' />
                 <div className="flex flex-1 flex-shrink justify-center items-center">
-                <Form {...searchFromConfig}>
-                <form noValidate className="w-full max-w-[650px] ">
-                    <InputField
-                        control={searchFromConfig.control}
-                        name="search"
-                        type={Header_FORM_CONFIG.SEARCH.TYPE}
-                        placeholder={Header_FORM_CONFIG.SEARCH.PH}
-                        className="max-w-[650px]"
-                        classNames={{
-                            input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
-                        }}
-                        startContent={<SearchIcon />}
-                    />
-                    </form>
+                    <Form {...searchFromConfig}>
+                        <form noValidate className="w-full max-w-[650px] ">
+                            <InputField
+                                control={searchFromConfig.control}
+                                name="search"
+                                type={Header_FORM_CONFIG.SEARCH.TYPE}
+                                placeholder={Header_FORM_CONFIG.SEARCH.PH}
+                                className="max-w-[650px]"
+                                classNames={{
+                                    input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
+                                }}
+                                startContent={<SearchIcon />}
+                            />
+                        </form>
                     </Form>
                 </div>
 
                 <div className="flex items-center gap-6">
-                    <a href='#' className="flex items-center gap-0.5">
+                    <Button onPress={onOpen} variant='light' className="flex items-center gap-0.5 hover:!bg-transparent">
                         <ShoppingCartIcon />
                         <div>
                             <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">1 item</h6>
                             <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">£ 3.99</h6>
                         </div>
-                    </a>
+                    </Button>
                     <Link href='/my-account' className="flex items-center gap-0.5">
                         <UserIcon />
                         <div>
@@ -69,38 +74,99 @@ const HeaderTopBar = () => {
                     />
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     <div className="flex items-center gap-1">
-                        <Button
-                            isIconOnly
-                            size="sm"
-                            variant="light"
-                            startContent={<UserIcon />}
-                        />
+                        <Link href='/my-account'>
+                            <Button
+                                isIconOnly
+                                size="sm"
+                                variant="light"
+                                startContent={<UserIcon />}
+                            />
+                        </Link>
                         <Badge content="1" size="md" className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
                             <Button
                                 isIconOnly
                                 size="sm"
                                 variant="light"
                                 startContent={<ShoppingCartIcon />}
+                                onPress={onOpen}
                             />
                         </Badge>
                     </div>
                 </div>
                 <div className="flex flex-1 flex-shrink justify-center items-center">
-                    
+
                     <Form {...searchFromConfig}>
-                <form noValidate className="w-full">
-                    <InputField
-                        control={searchFromConfig.control}
-                        name="search"
-                        type={Header_FORM_CONFIG.SEARCH.TYPE}
-                        placeholder={Header_FORM_CONFIG.SEARCH.PH}
-                        className="w-full"                        
-                        startContent={<SearchIcon />}
-                    />
-                    </form>
+                        <form noValidate className="w-full">
+                            <InputField
+                                control={searchFromConfig.control}
+                                name="search"
+                                type={Header_FORM_CONFIG.SEARCH.TYPE}
+                                placeholder={Header_FORM_CONFIG.SEARCH.PH}
+                                className="w-full"
+                                startContent={<SearchIcon />}
+                            />
+                        </form>
                     </Form>
                 </div>
             </div>
+            <Drawer isOpen={isOpen} onOpenChange={onOpenChange} className='filter-drawer rounded-l-32 md:!w-[637px] md:!max-w-[637px]'>
+                <DrawerContent>
+                    {(onClose) => (
+                        <>
+                            <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
+                                <h4 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h4>
+                            </DrawerHeader>
+                            <DrawerBody>
+                                <div className='space-y-5 my-3'>
+                                    <ShoppingCartCardDrawer showAddMoreItem />
+                                    <ShoppingCartCardDrawer showAddMoreItem />
+                                    <ShoppingCartCardDrawer />
+                                    <ShoppingCartCardDrawer />
+                                </div>
+                            </DrawerBody>
+                            <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100s'>
+                                <Divider />
+                                <ShippingProgress />
+                                <div className='space-y-3'>
+                                    <div className='flex items-center justify-between text-black font-semibold'>
+                                        <p className='text-content-2 md:text-title-1'>Total</p>
+                                        <p className='text-title-2 md:text-h5'>£ 65.58</p>
+                                    </div>
+                                    <Button
+                                        size="lg"
+                                        radius="md"
+                                        color="primary"
+                                        className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                    >
+                                        Checkout Now
+                                    </Button>
+                                    <div className='flex items-center gap-3'>
+                                        <Button
+                                            size="lg"
+                                            radius="md"
+                                            color="primary"
+                                            className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                            onPress={onClose}
+                                        >
+                                            Continue Shopping
+                                        </Button>
+                                        <Button
+                                            size="lg"
+                                            radius="md"
+                                            color="primary"
+                                            className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                            onPress={onClose}
+                                        >
+                                            View Cart
+                                        </Button>
+                                    </div>
+                                </div>
+
+                            </DrawerFooter>
+                        </>
+                    )}
+                </DrawerContent>
+            </Drawer>
         </>
     )
 }

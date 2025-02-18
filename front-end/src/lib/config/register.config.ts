@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DEFAULT_REQUIRED_ERROR } from '@/lib/config/form.config';
+import { ValidationMessage } from '@/lib/config/form.config';
 import { zodPasswordValidator } from '@/lib/validators/password.validator';
 
 // * Zod Form Schemas
@@ -7,19 +7,21 @@ export const SIGN_UP_SCHEMA = z
   .object({
     email: z
       .string({
-        required_error: DEFAULT_REQUIRED_ERROR,
+        required_error: ValidationMessage.EMAIL,
       })
-      .min(1, DEFAULT_REQUIRED_ERROR)
+      .min(1, ValidationMessage.EMAIL)
+      .max(100, "Email must be less than 100 characters")
       .email('Please enter a valid email address'),
     password: zodPasswordValidator(),
     confirmPassword: z
       .string({
-        required_error: DEFAULT_REQUIRED_ERROR,
+        required_error: ValidationMessage.CONFIRM_PASSWORD,
       })
-      .min(1, DEFAULT_REQUIRED_ERROR) 
+      .min(1, ValidationMessage.CONFIRM_PASSWORD)
+      .max(16, "Confirm Password must be less than 16 characters"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Password does not match',
+    message: 'Passwords does not match',
     path: ['confirmPassword'],
   });
 

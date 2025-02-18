@@ -23,21 +23,22 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
 }): ReactElement => {
 
     const changePasswordFormConfig = useForm<ChangePasswordFormSchema>({
-        mode: 'onBlur',
-        reValidateMode: 'onChange',
+        mode: 'all',
         resolver: zodResolver(CHANGE_PASSWORD_SCHEMA),
     });
     const router = useRouter();
     const [pwdVisibility, setPwdVisibility] = useState(false);
+    const [cPwdVisibility, setCPwdVisibility] = useState(false);
+
     const handleFormSubmit = async ({
         password,
     }: ChangePasswordFormSchema) => {
         const response = await resetPasswordAction(token, password);
-        
+
         if (response.status === ServerActionStatus.ERROR) {
             return toast.error(response.message);
         }
-        toast.success(response.data?.message); 
+        toast.success(response.data?.message);
         router.replace(ROUTES.MY_ACCOUNT);
     };
     return (
@@ -72,17 +73,28 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                                     />
                                 }
                             />
-                           
+
                         </div>
                         <div className="flex w-full justify-center items-center">
-                        <InputField
-                            control={changePasswordFormConfig.control}
-                            isRequired
-                            name="confirmNewPassword"
-                            type={CHANGE_PASSWORD_FORM_CONFIG.CHANGE_PASSWORD.TYPE}
-                            label={CHANGE_PASSWORD_FORM_CONFIG.CHANGE_PASSWORD.LABEL}
-                            className="w-full"
-                        />
+                            <InputField
+                                control={changePasswordFormConfig.control}
+                                isRequired
+                                name="confirmNewPassword"
+                                type={cPwdVisibility ? "text" : CHANGE_PASSWORD_FORM_CONFIG.CHANGE_PASSWORD.TYPE}
+                                label={CHANGE_PASSWORD_FORM_CONFIG.CHANGE_PASSWORD.LABEL}
+                                className="w-full"
+                                endContent={
+                                    <Button
+                                        size="sm"
+                                        variant="light"
+                                        isIconOnly
+                                        type="button"
+                                        onPress={() => setCPwdVisibility(prev => !prev)}
+                                        startContent={cPwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
+                                        className="!p-0 h-fit hover:!bg-transparent"
+                                    />
+                                }
+                            />
                         </div>
                         <div className="space-y-2.5">
                             <Button
@@ -96,8 +108,10 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                             >
                                 Reset Password
                             </Button>
-                            <Link href={ROUTES.MY_ACCOUNT}>
+
                             <Button
+                                as={Link}
+                                href={ROUTES.MY_ACCOUNT}
                                 size="lg"
                                 radius="sm"
                                 color="primary"
@@ -107,7 +121,6 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                             >
                                 Back
                             </Button>
-                            </Link>
                         </div>
                     </form>
                 </Form>

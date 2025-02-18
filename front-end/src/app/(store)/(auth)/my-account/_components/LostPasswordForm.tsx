@@ -7,7 +7,7 @@ import { RESET_PASSWORD_FORM_CONFIG, RESET_PASSWORD_SCHEMA, ResetPasswordFormSch
 import { ROUTES } from "@/lib/routes";
 import { forgotPasswordAction } from "@/lib/server.actions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@nextui-org/button"; 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FunctionComponent, ReactElement } from "react";
@@ -63,23 +63,24 @@ const LostPasswordForm: FunctionComponent = (): ReactElement => {
                                 color="primary"
                                 type="submit"
                                 className="btn primary-btn shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
+                                isLoading={resetPasswordFromConfig.formState.isSubmitting}
+                                disabled={resetPasswordFromConfig.formState.isSubmitting}
                             >
                                 Login
                             </Button>
-                            <Link href={ROUTES.MY_ACCOUNT}>
-                                <Button
+                             
+                                <Button 
+                                    as={Link}
+                                    href={ROUTES.MY_ACCOUNT}
                                     size="lg"
                                     radius="sm"
                                     color="primary"
                                     variant="light"
-                                    type="button"
-                                    disabled={resetPasswordFromConfig.formState.isSubmitting}
-                                    isLoading={resetPasswordFromConfig.formState.isSubmitting}
+                                    type="button" 
                                     className="btn primary-gradient-100 hover:shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
                                 >
                                     Back
-                                </Button>
-                            </Link>
+                                </Button> 
                         </div>
                     </form>
                 </Form>

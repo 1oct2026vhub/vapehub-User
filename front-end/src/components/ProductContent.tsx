@@ -25,7 +25,7 @@ const ProductContent: React.FC = () => {
                             <CardBody className='p-0'>
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
-                                        <h1 className='text-title-1 md:text-h5 xl:text-38 font-semibold text-black'>Description</h1>
+                                        <h2 className='text-title-1 md:text-h5 xl:text-38 font-semibold text-black'>Description</h2>
                                         <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-400'>The Hayati Pro Max 4000 puff disposable vape boasts over 50 unique flavours, there’s something to satisfy all of your cravings. Manufactured by Hayati and equipped with a dual 1.2 ohm mesh coil and a super-efficient 1500 mAh battery means the quality and enjoyment provided by the Hayati Crystal disposable vape range is unrivalled; don’t miss out on this one-of-a-kind vaping experience. The Hayati Pro Max 4000 disposable vape, a re-branded version of the Crystal Pro Max 4000, hails from the same brand that gave us the Hayati Pro Ultra, the Hayati Duo Mesh, the Hayati Twist and the ever-popular Hayati Pro Max Nic Salts. With this pedigree, both quality and satisfaction are assured!</p>
                                     </div>
                                     <Divider />
@@ -158,7 +158,7 @@ const ProductContent: React.FC = () => {
                                             height={132}
                                             className='w-full min-h-[132px]'
                                         />
-                                        <h3 className='text-content-2 md:text-content-1 md:text-title-1 xl:text-h5 font-bold text-skin-neutral-500'>A dual 1.1 ohm mesh coil ensures brilliant flavour delivery combined with consistently satisfying throat hits with each draw.</h3>
+                                        <h3 className='text-content-2 md:text-title-1 xl:text-h5 font-bold text-skin-neutral-500'>A dual 1.1 ohm mesh coil ensures brilliant flavour delivery combined with consistently satisfying throat hits with each draw.</h3>
                                         <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-400'>Whether you’re seeking exotic fruits or desserts or simply a burst of berries in your e-cigarette flavours, the Hayati Pro Max has a flavour guaranteed to tantalise and captivate your taste buds! There are currently over 50 mouth-watering flavours in the Hayati Pro Max range, although this could further increase due to Hayati’s constant upgrades to the flavour range!</p>
 
                                     </div>
@@ -223,7 +223,7 @@ const ProductContent: React.FC = () => {
                         }}>
                             <CardBody className='p-0'>
                                 <div className='flex flex-col gap-7.5 pb-2'>
-                                    <h1 className='text-h5 lg:text-h3 primary-gradient-100 font-bold'>Reviews</h1>
+                                    <h2 className='text-h5 lg:text-h3 primary-gradient-100 font-bold'>Reviews</h2>
                                     <ReviewCard />
                                     <ReviewCard />
                                 </div>

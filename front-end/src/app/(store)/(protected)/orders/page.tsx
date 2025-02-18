@@ -1,6 +1,5 @@
 import { FilterIcon2, SearchIcon } from '@/components/Icons'
 import InputForm from '@/components/InputForm'
-import SectionHeading from '@/components/ui/SectionHeading'
 import { Button } from '@nextui-org/button'
 import { NextPage } from 'next'
 import React, { ReactElement } from 'react'
@@ -32,7 +31,7 @@ const OrdersListingPage: NextPage = (): ReactElement => {
   return (
     <main className='px-4 lg:px-9 xl:px-12.5 pt-5 pb-10 flex flex-col gap-6 lg:gap-10'>
       <section className='flex items-center flex-wrap justify-between gap-6'>
-        <SectionHeading title='My Orders' className='w-fit max-md:!text-h5' />
+        <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>My Orders</h1>
         <div className='flex items-center gap-5'>
           <InputForm
             type='text'

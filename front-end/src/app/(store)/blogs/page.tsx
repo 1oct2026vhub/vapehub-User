@@ -2,7 +2,6 @@
 
 import BlogCard from '@/components/BlogCard';
 import BreadCrumbs from '@/components/BreadCrumbs';
-import SectionHeading from '@/components/ui/SectionHeading';
 import { Card, CardBody, Tab, Tabs } from '@nextui-org/react';
 import { NextPage } from 'next'
 import React, { ReactElement } from 'react'
@@ -18,7 +17,7 @@ const BlogsListingPage: NextPage = (): ReactElement => {
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
             <section className="w-full">
-                <SectionHeading title="Blogs" className='w-fit max-md:!text-h5' />
+                <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Blogs</h1>
                 <div className='w-full mt-2.5 lg:-mt-16'>
                     <Tabs aria-label="Options"
                         variant='bordered'
@@ -36,7 +35,7 @@ const BlogsListingPage: NextPage = (): ReactElement => {
                             <Card classNames={{
                                 base: "!bg-transparent border-none shadow-none p-0"
                             }}>
-                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5'>
+                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
                                     <BlogCard />
                                     <BlogCard />
                                     <BlogCard />
@@ -50,7 +49,7 @@ const BlogsListingPage: NextPage = (): ReactElement => {
                             <Card classNames={{
                                 base: "!bg-transparent border-none shadow-none p-0"
                             }}>
-                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5'>
+                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
                                     <BlogCard />
                                     <BlogCard />
                                     <BlogCard />
@@ -64,7 +63,7 @@ const BlogsListingPage: NextPage = (): ReactElement => {
                             <Card classNames={{
                                 base: "!bg-transparent border-none shadow-none p-0"
                             }}>
-                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5'>
+                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
                                     <BlogCard />
                                     <BlogCard />
                                     <BlogCard />

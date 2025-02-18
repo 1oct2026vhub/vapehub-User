@@ -989,3 +989,20 @@ export const FilterIcon2 = (
     </svg>
   )
 };
+
+export const DownArrowFilledIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="11"
+      fill="none"
+      viewBox="0 0 14 11"
+      {...props}
+    >
+      <path fill="#fff" d="M7 10.5.938 0h12.124z"></path>
+    </svg>
+  )
+};

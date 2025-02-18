@@ -965,3 +965,27 @@ export const DangerIcon = (
     </svg>
   )
 };
+
+export const FilterIcon2 = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      fill="none"
+      viewBox="0 0 18 18"
+      {...props}
+    >
+      <path
+        stroke="#fff"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit="10"
+        strokeWidth="1.445"
+        d="M4.56 1.852h9.536c.794 0 1.444.65 1.444 1.444v1.59c0 .578-.36 1.3-.722 1.661l-3.106 2.745c-.434.361-.723 1.084-.723 1.662v3.106c0 .433-.289 1.011-.65 1.228l-1.011.65c-.94.578-2.24-.072-2.24-1.228v-3.828c0-.506-.289-1.156-.578-1.518l-2.745-2.89c-.36-.36-.65-1.01-.65-1.444V3.37c0-.867.65-1.517 1.445-1.517M8.554 1.852 4.992 7.558"
+      ></path>
+    </svg>
+  )
+};

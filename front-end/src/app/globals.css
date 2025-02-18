@@ -130,6 +130,10 @@
 
 .blue-gradient {
   @apply bg-blue-gradient bg-clip-text text-transparent;
+  background-color: var(--blue-500);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .red-gradient {

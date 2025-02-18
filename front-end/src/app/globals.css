@@ -473,14 +473,9 @@ input[type="radio"] + span + div {
   @apply w-full;
 }
 
-/* .is-filled {
-  @apply !bg-skin-neutral-50 rounded-10;
+.bg-divider {
+  background-color: var(--neutral-200);
 }
-
-.is-filled div[data-slot="inner-wrapper"] {
-  @apply !bg-skin-neutral-50 hover:!bg-skin-white
-} */
-
 
 /* Styles for webkit-based browsers */
 ::-webkit-scrollbar {

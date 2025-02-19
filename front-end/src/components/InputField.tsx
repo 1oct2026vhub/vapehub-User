@@ -64,8 +64,8 @@ const ShowPasswordValidityStatus: FunctionComponent<StatusProps> = ({
                 key={_key}
                 className={`mt-1 text-sm font-medium ${
                   passwordStatus[_key as PasswordStrengthTypes]
-                    ? 'text-blue-400 text-opacity-85'
-                    : 'text-destructive'
+                    ? 'text-skin-primary-400 text-opacity-85'
+                    : 'text-danger'
                 }`}
               >
                 {_value}

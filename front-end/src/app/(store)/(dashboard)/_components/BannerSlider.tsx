@@ -7,6 +7,7 @@ const BannerSlider: React.FC = () => {
   const settings: Settings = {
     dots: false,
     infinite: true,
+    fade: true,
     speed: 700,
     slidesToShow: 1,
     slidesToScroll: 1,

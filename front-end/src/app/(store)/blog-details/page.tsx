@@ -28,7 +28,7 @@ const BlogsDetailsPage: NextPage = (): ReactElement => {
                     className='rounded-10 w-full max-h-80 min-h-80'
                 />
                 <div className='space-y-3.5 md:space-y-6'>
-                    <h2 className=''>Mastering MTL: A Comprehensive Guide to Mouth to Lung Vaping</h2>
+                    <h2 className='primary-gradient-600 text-h5 md:text-38 font-bold lg:max-w-[60%]'>Mastering MTL: A Comprehensive Guide to Mouth to Lung Vaping</h2>
                     <p>Among the myriad vaping styles and techniques, Mouth to Lung (MTL) vaping stands out as a beloved classic in the vaping community. It’s the technique that mimics the action of smoking the closest, leading many ex-smokers toward this method when transitioning to vaping. Whether you are a vaper looking to explore the nuances of MTL vaping or a smoker searching for an effective gateway to quitting, understanding MTL vaping is a valuable step in your smoke-free journey.</p>
                 </div>
                 <div className='space-y-3.5 md:space-y-6'>
@@ -74,16 +74,16 @@ const BlogsDetailsPage: NextPage = (): ReactElement => {
                         alt='Blog Card'
                         width={785}
                         height={307}
-                        className='rounded-10 w-full max-h-[307px] min-h-[307px]'
+                        className='rounded-10 w-full max-h-[307px] min-h-[307px] lg:max-w-[60%] xl:max-w-max'
                     />
                 </div>
-                <div className='flex flex-col lg:flex-row items-start gap-7'>
+                <div className='flex flex-col-reverse lg:flex-row items-start gap-7'>
                     <Image
                         src='/images/blog-details-4.jpg'
                         alt='Blog Card'
                         width={785}
                         height={307}
-                        className='rounded-10 w-full max-h-[307px] min-h-[307px]'
+                        className='rounded-10 w-full max-h-[307px] min-h-[307px] lg:max-w-[60%] xl:max-w-max'
                     />
                     <div className='space-y-3.5'>
                         <h4>Over 40 unique flavours. Something for everyone!</h4>
@@ -104,16 +104,16 @@ const BlogsDetailsPage: NextPage = (): ReactElement => {
                         alt='Blog Card'
                         width={785}
                         height={307}
-                        className='rounded-10 w-full max-h-[307px] min-h-[307px]'
+                        className='rounded-10 w-full max-h-[307px] min-h-[307px] lg:max-w-[60%] xl:max-w-max'
                     />
                 </div>
-                <div className='flex flex-col lg:flex-row items-start gap-7'>
+                <div className='flex flex-col-reverse lg:flex-row items-start gap-7'>
                     <Image
                         src='/images/blog-details-6.jpg'
                         alt='Blog Card'
                         width={785}
                         height={307}
-                        className='rounded-10 w-full max-h-[307px] min-h-[307px]'
+                        className='rounded-10 w-full max-h-[307px] min-h-[307px] lg:max-w-[60%] xl:max-w-max'
                     />
                     <div className='space-y-3.5'>
                         <h4>The Hayati Pro 15000 has a Visual Display Screen which shows how much battery life is left.</h4>

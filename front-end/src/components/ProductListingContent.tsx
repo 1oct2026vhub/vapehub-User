@@ -10,7 +10,7 @@ const banners = [
 const ProductListingContent: React.FC = () => {
     return (
         <div className="space-y-6">
-            <div>
+            <div className='space-y-4'>
                 <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Disposable Vapes</h1>
                 <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">
                     <p>

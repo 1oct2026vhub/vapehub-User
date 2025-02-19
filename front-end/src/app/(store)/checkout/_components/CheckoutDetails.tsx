@@ -126,7 +126,7 @@ const CheckoutDetails: React.FC = () => {
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Royal Mail Tracked 48 - <span className='font-bold'>2 to 4 working days</span></h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£10.02</p>
                                     </div>
-                                    <p className='text-skin-neutral-300 text-content-1 font-bold'>&bull; Free for orders over £30</p>
+                                    <p className='text-skin-neutral-300 text-content-3 md:text-content-1 font-bold'>&bull; Free for orders over £30</p>
                                 </div>
                             </CustomRadio>
                             <CustomRadio value="2">
@@ -151,7 +151,7 @@ const CheckoutDetails: React.FC = () => {
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>DPD Next Day Delivery</h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£16.85</p>
                                     </div>
-                                    <p className='text-skin-neutral-300 text-content-1 font-bold'>&bull; This is not a guaranteed service</p>
+                                    <p className='text-skin-neutral-300 text-content-3 md:text-content-1 font-bold'>&bull; This is not a guaranteed service</p>
                                 </div>
                             </CustomRadio>
                         </RadioGroup>

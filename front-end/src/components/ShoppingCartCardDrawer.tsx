@@ -9,7 +9,7 @@ type CartCardProps = {
 const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = false }) => {
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5">
-      <div className="flex items-center gap-3 md:gap-6">
+      <div className="flex items-start gap-3 md:gap-6">
         {/* Product Image */}
         <div className="bg-skin-white p-1.5 rounded-10 shadow-brand-card min-w-[84px]">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">

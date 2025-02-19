@@ -177,6 +177,7 @@
 
 .primary-outline-btn {
   @apply primary-gradient-100 border-skin-primary-300;
+  border-width: 2px;
 }
 
 .text-danger {

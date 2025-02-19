@@ -7,6 +7,7 @@ const MobileBannerSlider: React.FC = () => {
   const settings: Settings = {
     dots: true,
     infinite: true,
+    fade: true,
     speed: 700,
     slidesToShow: 1,
     slidesToScroll: 1,

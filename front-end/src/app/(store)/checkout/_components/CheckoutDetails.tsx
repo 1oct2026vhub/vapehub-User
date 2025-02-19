@@ -24,12 +24,11 @@ const CheckoutDetails: React.FC = () => {
                                 type='tel'
                                 label={
                                     <div className='flex items-center gap-4'>
-                                        <Flag />
+                                        <Flag className="group-data-[focus=true]:w-4"/>
                                         <div>
                                             Phone Number
                                             <span className='text-skin-red-400'> *</span>
                                         </div>
-
                                     </div>
                                 }
                                 className='w-full'
@@ -65,13 +64,13 @@ const CheckoutDetails: React.FC = () => {
                             />
                             <InputForm
                                 type='text'
-                                label='Address Line 1'
+                                label='Address Line 2'
                                 isRequired
                                 className='w-full'
                             />
                             <InputForm
                                 type='text'
-                                label='Address Line 2'
+                                label='Address Line 3'
                                 className='w-full'
                             />
                             <div className='grid grid-cols-2 gap-2.5 md:gap-4'>
@@ -82,7 +81,7 @@ const CheckoutDetails: React.FC = () => {
                                     className='w-full'
                                 />
                                 <InputForm
-                                    type='text'
+                                    type='tel'
                                     label='Pincode'
                                     isRequired
                                     className='w-full'
@@ -180,19 +179,20 @@ const CheckoutDetails: React.FC = () => {
                                     </div>
                                     <div className='space-y-4'>
                                         <InputForm
-                                            type='text'
+                                            type='tel'
                                             label='Card Number'
+                                            isRequired
                                             className='w-full'
                                         />
                                         <div className='grid grid-cols-2 gap-2.5 md:gap-4'>
                                             <InputForm
-                                                type='text'
+                                                type='tel'
                                                 label='Expiry (MM/YY)'
                                                 isRequired
                                                 className='w-full'
                                             />
                                             <InputForm
-                                                type='text'
+                                                type='tel'
                                                 label='CVC'
                                                 isRequired
                                                 className='w-full'

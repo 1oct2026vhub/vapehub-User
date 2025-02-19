@@ -1,7 +1,7 @@
 import React from "react";
 
 const NavigationMenu = () => {
-  const menuItems = ["New", "Disposables", "Pod Kits", "Vape Kits", "Nic Salts", 
+  const menuItems = ["New In", "Disposables", "Pod Kits", "Vape Kits", "Nic Salts", 
     "E-liquids", "Pouches & Strips", "Hardware", "Brands", "Blogs", "Deals"];
 
   return (

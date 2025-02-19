@@ -43,7 +43,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
                     {/* Order ID */}
                     <div>
                         <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Quantity : 2</p>
-                        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Flavor : Watermelon</p>
+                        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Flavour : Watermelon</p>
                     </div>
                 </div>
                 <div className="space-y-2 text-right">

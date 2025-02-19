@@ -34,7 +34,7 @@ const ProductListing: NextPage = (): ReactElement => {
     { title: "Price Range", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Product Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Brands", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Flavors", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
+    { title: "Flavours", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Bottle Size", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Nicotine Strength", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Nicotine Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
@@ -58,7 +58,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
     {
       title: "VG Pro 6000 Prefilled Pods",
@@ -66,7 +66,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
     {
       title: "VG Pro 6000 Prefilled Pods",
@@ -74,7 +74,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
     {
       title: "VG Pro 6000 Prefilled Pods",
@@ -82,7 +82,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
     {
       title: "VG Pro 6000 Prefilled Pods",
@@ -90,7 +90,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
     {
       title: "VG Pro 6000 Prefilled Pods",
@@ -98,7 +98,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
     {
       title: "VG Pro 6000 Prefilled Pods",
@@ -106,7 +106,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
     {
       title: "VG Pro 6000 Prefilled Pods",
@@ -114,7 +114,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
     {
       title: "VG Pro 6000 Prefilled Pods",
@@ -122,7 +122,7 @@ const ProductListing: NextPage = (): ReactElement => {
       price: "£12.99",
       buttonText: "3 for £30",
       reviews: 10,
-      flavors: "20",
+      flavours: "20",
     },
 
   ];
@@ -148,7 +148,7 @@ const ProductListing: NextPage = (): ReactElement => {
                   price={product.price}
                   buttonText={product.buttonText}
                   reviews={product.reviews}
-                  flavors={product.flavors}
+                  flavors={product.flavours}
                 />
               ))}
             </div>

@@ -1,7 +1,6 @@
 'use client'
 
 import BreadCrumbs from '@/components/BreadCrumbs';
-import SectionHeading from '@/components/ui/SectionHeading';
 import { NextPage } from 'next'
 import Image from 'next/image';
 import React, { ReactElement } from 'react'
@@ -19,7 +18,7 @@ const BlogsDetailsPage: NextPage = (): ReactElement => {
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
-            <SectionHeading title="Blog" className='w-fit max-md:!text-h5' />
+            <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Blog</h1>
             <section className="w-full flex flex-col gap-6 md:gap-8.5 blog-details">
                 <Image
                     src='/images/blog-details-1.jpg'

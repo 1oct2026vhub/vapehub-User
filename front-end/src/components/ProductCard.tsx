@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <div className="flex flex-col gap-2.5 md:gap-3.5">
           <div className="flex flex-col justify-between xl:min-h-[77px]">
-            <h4 className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</h4>
+            <h3 className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</h3>
             <div className="flex items-center gap-1">
               <div className="flex">
                 {Array.from({ length: 5 }, (_, i) => (

@@ -17,7 +17,7 @@ const CartDetails: React.FC = () => {
                     size="lg"
                     radius="md"
                     color="primary"
-                    className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-9.5 md:h-max"
+                    className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-12"
                 >
                     Apply Code
                 </Button>

@@ -23,7 +23,7 @@ const UiError: FunctionComponent<Props> = ({
   return (
     <div
       className={cn(
-        'flex h-dvh overflow-auto bg-background-heart bg-cover bg-right-bottom bg-no-repeat',
+        'flex py-20 overflow-auto bg-background-heart bg-cover bg-right-bottom bg-no-repeat',
         variant !== 'default' && 'h-full bg-transparent'
       )}
     >
@@ -34,12 +34,12 @@ const UiError: FunctionComponent<Props> = ({
         )}
       >
         <div className='flex flex-col items-center gap-5 rounded-3xl p-8'>
-          <span
+          {/* <span
             className={cn(
               'h-16 w-32 bg-empty-state bg-contain bg-center bg-no-repeat md:h-28 md:w-56',
               variant === 'avatar-player' && 'brightness-0 grayscale invert'
             )}
-          ></span>
+          ></span> */}
           <div className='flex flex-col gap-1'>
             <p
               className={cn(
@@ -64,7 +64,7 @@ const UiError: FunctionComponent<Props> = ({
               <Link
                 href={redirect.link}
                 replace
-                className='text-title-2 font-semibold text-skin-primary-500'
+                className='text-title-2 font-semibold text-skin-primary-500 capitalize'
               >
                 {redirect.name}
               </Link>

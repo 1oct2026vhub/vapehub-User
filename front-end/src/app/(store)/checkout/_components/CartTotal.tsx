@@ -26,7 +26,7 @@ const CartTotal: React.FC = () => {
                         startContent={<EditIcon2 />}
                     />
                 </div>
-                <Divider />
+                <Divider className='border-2' />
                 <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
                     <p>Extra 10% Off</p>
                     <p>-£ 6.58</p>
@@ -45,9 +45,9 @@ const CartTotal: React.FC = () => {
                         <p className='text-skin-neutral-300'>£ 65.58</p>
                     </div>
                 </div>
-                <Divider />
+                <Divider className='border-2'/>
                 <ShippingProgress />
-                <Divider />
+                <Divider className='border-2'/>
                 <div className='flex items-center justify-between text-black font-semibold'>
                     <p className='text-content-2 md:text-title-1'>Total</p>
                     <p className='text-title-2 md:text-h5'>£ 65.58</p>

@@ -497,7 +497,7 @@ input[type="radio"] + span + div {
 }
 
 .bg-divider {
-  background-color: var(--neutral-200);
+  background-color: var(--neutral-50);
 }
 
 .\[--cursor-hit-x\:8px\] {

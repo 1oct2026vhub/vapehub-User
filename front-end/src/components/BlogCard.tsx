@@ -19,7 +19,7 @@ const BlogCard: React.FC = () => {
                 <RightArrowIcon stroke='#091410' className='-rotate-45 w-6 h-6 min-w-5 md:min-w-6' />
             </div>
             <p className='text-skin-neutral-300 text-content-1 md:text-title-2 font-bold line-clamp-3'>Among the myriad vaping styles and techniques, Mouth to Lung (MTL) vaping stands out as a beloved classic in the vaping... </p>
-            <div>
+            <div className='mt-3.5'>
                 <p className='primary-gradient-100 text-content-3 md:text-content-1 font-semibold'>Geek Zone</p>
                 <p className='text-content-3 md:text-content-1 font-semibold text-skin-primary-300'>Jan 10, 2022</p>
             </div>

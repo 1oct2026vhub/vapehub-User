@@ -33,7 +33,7 @@ const BannerSlider: React.FC = () => {
             alt={banner.alt}
             width={1340}
             height={671}
-            className="w-full rounded-2.5xl min-h-[671px]"
+            className="w-full rounded-2.5xl min-h-[671px] outline-none"
             priority
           />
         </div>

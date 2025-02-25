@@ -17,7 +17,7 @@ const BannerSlider: React.FC = () => {
 
   const banners = [
     { src: "/images/banner-1.png", alt: "Banner 1" },
-    { src: "/images/banner-1.png", alt: "Banner 2" },
+    { src: "/images/banner-2.png", alt: "Banner 2" },
     { src: "/images/banner-1.png", alt: "Banner 3" },
   ];
 

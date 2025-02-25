@@ -17,7 +17,7 @@ const MobileBannerSlider: React.FC = () => {
 
   const banners = [
     { src: "/images/mob-banner-1.jpg", alt: "Banner 1" },
-    { src: "/images/mob-banner-1.jpg", alt: "Banner 2" },
+    { src: "/images/banner-4.png", alt: "Banner 2" },
     { src: "/images/mob-banner-1.jpg", alt: "Banner 3" },
   ];
 

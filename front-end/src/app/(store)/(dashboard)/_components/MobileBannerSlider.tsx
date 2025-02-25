@@ -33,7 +33,7 @@ const MobileBannerSlider: React.FC = () => {
             alt={banner.alt}
             width={361}
             height={382}
-            className="w-full rounded-lg min-h-96 !outline-none"
+            className="w-full rounded-lg min-h-96 !outline-none focus-visible:!outline-none"
             priority
           />
         </div>

@@ -27,7 +27,7 @@ const BlogsListingPage: NextPage = (): ReactElement => {
                             tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 lg:ml-auto border border-skin-neutral-100 rounded-xl !bg-skin-base",
                             cursor: "bg-primary-gradient-100 border-none text-skin-white rounded-lg shadow-md",
                             tab: "rounded-lg min-w-[124px] h-10 border border-skin-primary2-500 text-skin-primary2-500 group-data-[selected=true]:!border-none",
-                            tabContent: "group-data-[selected=true]:!text-skin-white text-title-2 font-semibold leading-none",
+                            tabContent: "group-data-[selected=true]:!text-skin-white text-content-2 md:text-title-2 font-semibold leading-none",
                             panel: "!px-0"
                         }}
                     >

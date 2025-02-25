@@ -452,10 +452,6 @@ input[type='search'] {
 
 /* blog details */
 
-.blog-details h2 {
-  @apply primary-gradient-600 text-h5 md:text-38 font-bold lg:max-w-[60%];
-}
-
 .blog-details p {
   @apply text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
 }
@@ -488,8 +484,12 @@ input[type='search'] {
   @apply !bg-primary-gradient-100;
 }
 
+input[type="radio"] + span {
+  @apply max-sm:w-4 max-sm:h-4 aspect-square 
+}
+
 input[type="radio"] + span > span {
-  @apply !w-3 !h-3 aspect-square;
+  @apply w-2.5 h-2.5 sm:!w-3 sm:!h-3 aspect-square;
 }
 
 input[type="radio"] + span + div {
@@ -502,6 +502,10 @@ input[type="radio"] + span + div {
 
 .\[--cursor-hit-x\:8px\] {
   --cursor-hit-x: 0;
+}
+
+input[type="checkbox"] + span {
+  @apply min-w-5
 }
 
 /* Styles for webkit-based browsers */

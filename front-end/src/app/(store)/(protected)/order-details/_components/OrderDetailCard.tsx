@@ -14,7 +14,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
 
 }) => {
     const statusColor = cn(
-        "p-1.5 md:p-2 w-fit rounded-md md:rounded-lg border !text-content-3 md:text-content-1 font-bold",
+        "p-1.5 md:p-2 w-fit rounded-md md:rounded-lg border !text-content-3 md:!text-content-1 font-bold",
         {
             "bg-skin-white border-skin-blue-500 blue-gradient": status === "Order Confirmed",
             "bg-skin-primary-50 border-skin-primary2-500 text-skin-primary2-500": status === "Delivered",

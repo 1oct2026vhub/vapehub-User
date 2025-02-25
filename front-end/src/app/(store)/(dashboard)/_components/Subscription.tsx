@@ -21,9 +21,9 @@ const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): Reac
         
     }
     return (
-        <section className={`bg-subscription-banner-mob lg:bg-subscription-banner bg-no-repeat bg-center lg:bg-right-bottom bg-cover shadow-subscription rounded-3xl px-5.5 pt-14 pb-7 md:py-12 md:px-9 ${className}`}>
+        <section className={`bg-subscription-banner-mob xl:bg-subscription-banner bg-no-repeat bg-top xl:bg-right-bottom bg-cover shadow-subscription rounded-3xl px-5.5 pt-14 pb-7 md:py-12 md:px-9 ${className}`}>
             <div className='lg:max-w-[50%] space-y-5.5 lg:space-y-10'>
-                <h2 className='text-skin-white text-title-2 md:text-h4 font-semibold'>
+                <h2 className='!text-skin-white text-title-2 md:text-h4 font-semibold'>
                     <span className='text-[3.875rem] md:text-[7rem] leading-none'>10%</span><span> off, especially for you</span>
                 </h2>
                 <p className='!text-content-2 md:!text-title-1 !text-skin-white font-bold'>Sign up to receive your exclusive Vapehub discount, and keep up to date on our latest products & offers!</p>

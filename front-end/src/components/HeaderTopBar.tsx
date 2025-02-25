@@ -109,7 +109,7 @@ const HeaderTopBar = () => {
                     </Form>
                 </div>
             </div>
-            <Drawer isOpen={isOpen} onOpenChange={onOpenChange} className='filter-drawer rounded-l-32 md:!w-[637px] md:!max-w-[637px]'>
+            <Drawer isOpen={isOpen} onOpenChange={onOpenChange} className='filter-drawer rounded-l-32 md:!w-[637px] max-w-[90%] md:!max-w-[637px]'>
                 <DrawerContent>
                     {(onClose) => (
                         <>

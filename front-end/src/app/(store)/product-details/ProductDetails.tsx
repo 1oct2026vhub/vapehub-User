@@ -185,7 +185,7 @@ const ProductDetails: React.FC = () => {
                             <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'>
                                 <MinusIcon />
                             </Button>
-                            <input type="tel" name="" id="" placeholder='1' className='w-fit max-w-7 !border-none !outline-none placeholder:text-skin-neutral-500 ml-4' />
+                            <input type="tel" name="" id="" placeholder='1' className='w-fit max-w-7 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4' />
                             <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'>
                                 <PlusIcon />
                             </Button>

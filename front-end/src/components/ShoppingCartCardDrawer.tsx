@@ -34,7 +34,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
               >
                 <MinusIcon className='w-3 md:w-6'/>
               </Button>
-              <input type="tel" name="" id="" placeholder='1' className='w-fit max-w-6 md:max-w-7 !border-none !outline-none placeholder:text-skin-neutral-500 ml-4' />
+              <input type="tel" name="" id="" placeholder='1' className='w-fit max-w-6 md:max-w-7 max-sm:h-3 !border-none !outline-none placeholder:text-skin-neutral-500 ml-4' />
               <Button
                 isIconOnly
                 size="lg"

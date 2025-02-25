@@ -450,6 +450,10 @@ input[type='search'] {
   border: 1px solid red;
 }
 
+.slick-slide > div > div {
+  @apply focus-visible:!outline-none focus-visible:!border-none;
+}
+
 /* blog details */
 
 .blog-details p {

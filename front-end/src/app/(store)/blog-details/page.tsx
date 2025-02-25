@@ -10,7 +10,7 @@ const BlogsDetailsPage: NextPage = (): ReactElement => {
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
-        { label: "Blogs", href: "/blogs", isActive: true },
+        { label: "Blogs", href: "/blogs" },
         { label: "Mastering MTL: A Comprehensive Guide to Mouth to Lung Vaping", href: "/", isActive: true },
 
     ];

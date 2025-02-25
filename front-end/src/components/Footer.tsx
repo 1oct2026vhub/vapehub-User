@@ -67,7 +67,7 @@ const Footer = () => {
                   <li key={idx}>
                     <a
                       href="#"
-                      className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:ml-1 transition-all duration-300"
+                      className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 transition-all duration-300"
                     >
                       {link}
                     </a>

@@ -24,7 +24,7 @@ const CheckoutDetails: React.FC = () => {
                                 type='tel'
                                 label={
                                     <div className='flex items-center gap-4'>
-                                        <Flag className="group-data-[focus=true]:w-4"/>
+                                        <Flag className="group-data-[focus=true]:w-4" />
                                         <div>
                                             Phone Number
                                             <span className='text-skin-red-400'> *</span>
@@ -121,7 +121,7 @@ const CheckoutDetails: React.FC = () => {
                         </div>
                         <RadioGroup defaultValue="3">
                             <CustomRadio value="1">
-                                <div className='space-y-2 -mt-1'>
+                                <div className='space-y-2 md:-mt-1'>
                                     <div className='flex items-center justify-between gap-4'>
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Royal Mail Tracked 48 - <span className='font-bold'>2 to 4 working days</span></h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£10.02</p>
@@ -130,7 +130,7 @@ const CheckoutDetails: React.FC = () => {
                                 </div>
                             </CustomRadio>
                             <CustomRadio value="2">
-                                <div className='space-y-2 -mt-1'>
+                                <div className='space-y-2 md:-mt-1'>
                                     <div className='flex items-center justify-between gap-4'>
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Royal Mail Tracked 24 - <span className='font-bold'>1 to 2 working days</span></h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£12.22</p>
@@ -138,7 +138,7 @@ const CheckoutDetails: React.FC = () => {
                                 </div>
                             </CustomRadio>
                             <CustomRadio value="3">
-                                <div className='space-y-2 -mt-1'>
+                                <div className='space-y-2 md:-mt-1'>
                                     <div className='flex items-center justify-between gap-4'>
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Royal Mail Next Day Guaranteed</h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£15.59</p>
@@ -146,7 +146,7 @@ const CheckoutDetails: React.FC = () => {
                                 </div>
                             </CustomRadio>
                             <CustomRadio value="4">
-                                <div className='space-y-2 -mt-1'>
+                                <div className='space-y-2 md:-mt-1'>
                                     <div className='flex items-center justify-between gap-4'>
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>DPD Next Day Delivery</h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£16.85</p>
@@ -212,8 +212,11 @@ const CheckoutDetails: React.FC = () => {
                     </div>
 
                     <div className='space-y-5'>
-                        <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-bold'>Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.</p>
-                        <CustomCheckbox label='I have read and agree to the website terms and conditions *' />
+                        <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-bold'>Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our <a href="#">privacy policy.</a></p>
+                        <div className='flex items-center'>
+                            <CustomCheckbox label="" />
+                            <a href="#" className='inline-block !text-content-2 md:!text-title-2 text-skin-neutral-300 font-bold'> <span>I have read and agree to the website  </span>terms and conditions *</a>
+                        </div>
                         <Button
                             size="lg"
                             radius="md"

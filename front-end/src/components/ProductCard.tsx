@@ -2,6 +2,7 @@ import Image from 'next/image';
 import React from 'react';
 import { Button } from '@nextui-org/button';
 import Link from 'next/link';
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 
 interface ProductCardProps {
   title: string;
@@ -63,7 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           {flavors && <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p>}
           <div className="flex items-center justify-between gap-2">
-            <h5 className="text-ttitle-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{price}</h5>
+            <h5 className="text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</h5>
             <Button
               size="md"
               radius="md"

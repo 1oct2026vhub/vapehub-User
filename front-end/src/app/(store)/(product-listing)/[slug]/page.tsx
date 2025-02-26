@@ -1,14 +1,17 @@
-import { NextPage } from "next";
-import { ReactElement } from "react"; 
+ 
 import CategoryProducts from "../CategoryProducts";
 
- 
-const Page: NextPage = (): ReactElement => {
-  
-
-  return ( 
-    <CategoryProducts/>
-  );
+type PageProps = {
+  slug: string;
 };
+ const Page = async ({
+  params,
+}: {
+  params: Promise<PageProps>
+}) => {
+  const slug = (await params).slug;
+  console.log(slug);
+  return <CategoryProducts  />
+}
 
 export default Page;

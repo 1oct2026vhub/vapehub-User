@@ -1,8 +1,10 @@
 import { ServerActionResponse } from "./config/app.config";
 import { SignInResponse } from "./config/auth.config";
 import { BrandConfig } from "./config/brand.config";
+import { CarouselConfig } from "./config/carousel.config";
 import { Category } from "./config/category.config";
-import { ProductResponseData } from "./config/product.config";
+import { mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { CategoryResponseData, ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
 import { API_ROUTES, PRODUCT_PAYLOAD } from '@/lib/api-routes';
@@ -99,5 +101,40 @@ export const getProductList = async (
   return await handleRequest<ProductResponseData, unknown>({
     endpoint: API_ROUTES.GET_PRODUCTS(params),
     method: 'GET',
+  });
+};
+// most popular vapes product list api
+export const getProductByCategory = async (
+  slug: string,
+  params: PRODUCT_PAYLOAD
+): Promise<ServerActionResponse<CategoryResponseData>> => {
+  return await handleRequest<CategoryResponseData, unknown>({
+    endpoint: API_ROUTES.GET_CATEGORY_PRODUCTS_BY_SLUG(slug, params),
+    method: 'GET',
+  });
+};
+
+// carousel list api
+export const getCarouselList = async (): Promise<ServerActionResponse<CarouselConfig[]>> => {
+  return await handleRequest<CarouselConfig[], unknown>({
+    endpoint: API_ROUTES.GET_CAROUSEL,
+    method: 'GET',
+  });
+}; 
+
+// get testimonials list api
+export const getTestimonialsList = async (): Promise<ServerActionResponse<TestimonialResponse[]>> => {
+  return await handleRequest<TestimonialResponse[], unknown>({
+    endpoint: API_ROUTES.GET_TESTIMONIALS,
+    method: 'GET',
+  });
+};
+
+// mail subscription api
+export const subscribeMail = async (email: string): Promise<ServerActionResponse<mailSubscriptionResponse>> => {
+  return await handleRequest<mailSubscriptionResponse, { email: string }>({
+    endpoint: API_ROUTES.SUBSCRIBE_MAIL,
+    payload: { email },
+    method: 'POST',
   });
 };

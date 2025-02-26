@@ -10,8 +10,11 @@ export const API_ROUTES = {
     RESET_PASSWORD: buildRequestUrl('api/auth/reset-password'),
     GET_CATEGORY_LIST: buildRequestUrl('/api/category'),
     GET_BRAND_LIST: buildRequestUrl('/api/brands'), 
-    GET_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product?${new URLSearchParams(payload as never).toString()}`) 
-
+    GET_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product?${new URLSearchParams(payload as never).toString()}`),
+    GET_CATEGORY_PRODUCTS_BY_SLUG: (slug:string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/category/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
+    GET_CAROUSEL: buildRequestUrl('/api/home/carousel'),
+    GET_TESTIMONIALS: buildRequestUrl('/api/testimonials'),
+    SUBSCRIBE_MAIL: buildRequestUrl('/api/mailSubscription'),
 }
 
 // * Helper functions

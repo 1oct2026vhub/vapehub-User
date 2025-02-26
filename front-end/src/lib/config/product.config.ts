@@ -15,7 +15,7 @@ export type ProductResponseData = {
     products: Product[];
     pagination: Pagination;
 }
-
+ 
 export interface ProductFlavor {
     product_id: number;
     flavor_id: number;
@@ -63,4 +63,9 @@ export interface Product {
     Brand: BrandConfig;
     ProductImages: [];
     Flavors: Flavor[];
-}
+} 
+ 
+export interface CategoryResponseData extends Category {
+    products: Product[];
+    pagination: Pagination;
+  }

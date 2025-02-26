@@ -30,9 +30,9 @@ const InputField = <T extends FieldValues>({ control, name,showStatus = false, .
           classNames={{
             label: "!text-skin-neutral-400 !font-bold text-content-2 md:!text-title-2",
             input: "!bg-skin-white !text-skin-neutral-400 font-bold !text-content-2 md:!text-title-2 placeholder:!text-skin-neutral-400 truncate",
-            innerWrapper: "!bg-skin-white gap-2 hover:!bg-skin-white",
+            innerWrapper: "!bg-skin-white gap-2 hover:!bg-skin-white group-data-[has-label=true]:pt-9",
             inputWrapper:
-              "pl-5 pr-3 h-[42px] lg:h-12 shadow-input rounded-lg lg:rounded-[10px] !bg-skin-white border border-skin-neutral-100 hover:border-skin-primary-500 data-[hover=true]:!bg-skin-white group-data-[focus=true]:border-skin-primary-300 group-data-[focus=true]:!bg-skin-white !cursor-text",
+              "pl-5 pr-3 h-11 md:h-12 shadow-input rounded-lg lg:rounded-[10px] !bg-skin-white border border-skin-neutral-100 hover:border-skin-primary-500 data-[hover=true]:!bg-skin-white group-data-[focus=true]:border-skin-primary-300 group-data-[focus=true]:!bg-skin-white !cursor-text",
           }}
           
         />
@@ -64,8 +64,8 @@ const ShowPasswordValidityStatus: FunctionComponent<StatusProps> = ({
                 key={_key}
                 className={`mt-1 text-sm font-medium ${
                   passwordStatus[_key as PasswordStrengthTypes]
-                    ? 'text-blue-400 text-opacity-85'
-                    : 'text-destructive'
+                    ? 'text-skin-primary-400 text-opacity-85'
+                    : 'text-danger'
                 }`}
               >
                 {_value}

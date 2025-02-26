@@ -7,10 +7,10 @@ const ProductList: React.FC = () => {
 
     return (
         <div 
-            className='bg-skin-white px-3.5 py-2 md:p-5 rounded-10 md:rounded-14 border border-skin-neutral-100 cursor-pointer flex flex-col gap-6'
-            onClick={() => setIsExpanded(!isExpanded)}
+            className='bg-skin-white px-3.5 py-2 md:p-5 rounded-10 md:rounded-14 border border-skin-neutral-100 flex flex-col gap-6'
+            
         >
-            <div className='flex items-center justify-between'>
+            <div className='flex items-center justify-between cursor-pointer' onClick={() => setIsExpanded(!isExpanded)}>
                 <h2 className='primary-gradient-600 text-title-2 md:text-h5 font-bold'>Product List</h2>
                 <DownArrowIcon className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
             </div>

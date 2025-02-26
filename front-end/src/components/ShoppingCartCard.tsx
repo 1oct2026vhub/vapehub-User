@@ -9,7 +9,7 @@ type CartCardProps = {
 const ShoppingCartCard: React.FC<CartCardProps> = ({ showAddMoreItem = false }) => {
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5">
-      <div className="flex items-center gap-3 md:gap-6">
+      <div className="flex items-start gap-3 md:gap-6">
         {/* Product Image */}
         <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
@@ -24,7 +24,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ showAddMoreItem = false }) 
             </h4>
 
             {/* Quantity Selector */}
-            <div className="flex items-center border bg-skin-white w-fit shadow-base text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10 mt-auto md:space-x-2">
+            <div className="flex items-center border bg-skin-white w-fit shadow-base text-content-2 md:text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10 mt-auto">
               <Button
                 isIconOnly
                 size="lg"
@@ -34,7 +34,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ showAddMoreItem = false }) 
               >
                 <MinusIcon className='w-3 md:w-6'/>
               </Button>
-              <span className="min-w-6 text-center text-content-2 md:text-lg">1</span>
+              <input type="tel" name="" id="" placeholder='1' className='w-fit max-w-6 md:max-w-7 !border-none !outline-none !bg-transparent max-sm:h-3 placeholder:text-skin-neutral-500 ml-4' />
               <Button
                 isIconOnly
                 size="lg"

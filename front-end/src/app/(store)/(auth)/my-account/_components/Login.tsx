@@ -93,7 +93,7 @@ const Login: FunctionComponent = (): ReactElement => {
                     <div className="flex justify-between items-center">
                         <Checkbox
                             classNames={{
-                                base: "",
+                                base: "w-fit pr-0",
                                 wrapper: "after:bg-primary-gradient-100",
                                 label: "!text-content-3 md:!text-content-1 text-skin-neutral-300 font-semibold",
                             }}

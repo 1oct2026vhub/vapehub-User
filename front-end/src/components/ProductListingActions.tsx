@@ -14,7 +14,7 @@ const filterOptions = [
     { title: "Price Range", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Product Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Brands", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Flavors", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
+    { title: "Flavours", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Bottle Size", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Nicotine Strength", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Nicotine Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },

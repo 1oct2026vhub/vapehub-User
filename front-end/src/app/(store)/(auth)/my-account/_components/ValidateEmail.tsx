@@ -22,7 +22,7 @@ const ValidateEmail: FunctionComponent<Props> = async ({ token }): Promise<React
             description={response.message}
             redirect={{
                 link: ROUTES.MY_ACCOUNT,
-                name: 'login',
+                name: 'Login',
             }}
         />
     }

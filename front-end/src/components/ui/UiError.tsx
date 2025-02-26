@@ -23,27 +23,28 @@ const UiError: FunctionComponent<Props> = ({
   return (
     <div
       className={cn(
-        'flex h-dvh overflow-auto bg-background-heart bg-cover bg-right-bottom bg-no-repeat',
+        'flex py-20 overflow-auto bg-background-heart bg-cover bg-right-bottom bg-no-repeat',
+
         variant !== 'default' && 'h-full bg-transparent'
       )}
     >
       <div
         className={cn(
-          'flex w-full flex-col items-center justify-center bg-slate-300/65 backdrop-blur-sm',
+          'flex w-full flex-col items-center justify-center bg-skin-base backdrop-blur-sm',
           variant !== 'default' && 'bg-transparent backdrop-blur-0'
         )}
       >
         <div className='flex flex-col items-center gap-5 rounded-3xl p-8'>
-          <span
+          {/* <span
             className={cn(
-              'h-16 w-32 bg-empty-state bg-contain bg-center bg-no-repeat md:h-28 md:w-56',
+              'h-12 w-32 bg-empty-state bg-contain bg-center bg-no-repeat md:h-18 md:w-56',
               variant === 'avatar-player' && 'brightness-0 grayscale invert'
             )}
-          ></span>
+          ></span> */}
           <div className='flex flex-col gap-1'>
             <p
               className={cn(
-                'text-center text-xl font-bold text-blue-600 md:text-3xl',
+                'text-center text-xl font-bold text-skin-primary-500 md:text-3xl',
                 variant === 'avatar-player' && 'text-white'
               )}
             >
@@ -51,7 +52,7 @@ const UiError: FunctionComponent<Props> = ({
             </p>
             <p
               className={cn(
-                'text-center text-lg text-blue-400',
+                'text-center text-lg text-skin-neutral-400',
                 variant === 'avatar-player' && 'text-white'
               )}
             >
@@ -59,12 +60,12 @@ const UiError: FunctionComponent<Props> = ({
             </p>
           </div>
           {redirect && (
-            <div className='inline-flex justify-center gap-1'>
-              <p className='text-gray-600'>Back to</p>
+            <div className='inline-flex justify-center gap-1 md:h-28'>
+              <p className='text-skin-neutral-500 text-title-2'>Back to</p>
               <Link
                 href={redirect.link}
                 replace
-                className='text-base font-semibold text-blue-600'
+                className='text-title-2 font-semibold text-skin-primary-500 capitalize'
               >
                 {redirect.name}
               </Link>

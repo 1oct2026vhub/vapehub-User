@@ -17,7 +17,7 @@ const CartDetails: React.FC = () => {
                     size="lg"
                     radius="md"
                     color="primary"
-                    className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-9.5 md:h-max"
+                    className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-11 md:h-12"
                 >
                     Apply Code
                 </Button>
@@ -28,11 +28,11 @@ const CartDetails: React.FC = () => {
                 <p>-£ 6.58</p>
             </div>
             <div className='space-y-1.5'>
-                <div className='flex items-center justify-between text-content-2 md:text-content-1 font-semibold'>
+                <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
                     <p className='text-skin-neutral-500'>Number of Items</p>
                     <p className='text-skin-neutral-300'>15</p>
                 </div>
-                <div className='flex items-center justify-between text-content-2 md:text-content-1 font-semibold'>
+                <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
                     <p className='text-skin-neutral-500'>Subtotal</p>
                     <p className='text-skin-neutral-300'>£ 65.58</p>
                 </div>

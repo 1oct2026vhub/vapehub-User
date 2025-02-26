@@ -13,7 +13,7 @@ const flavours = [
 
 const ProductDetails: React.FC = () => {
     return (
-        <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl shadow-card flex flex-col gap-4'>
+        <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 {/* Title section mobile */}
                 <div className='space-y-2 lg:hidden'>
@@ -39,7 +39,7 @@ const ProductDetails: React.FC = () => {
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit'>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full xl:w-[550px] shadow-image-box pt-5 px-1.5 pb-2'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2'>
                         <Image
                             src='/images/product.png'
                             alt='Product'
@@ -180,14 +180,14 @@ const ProductDetails: React.FC = () => {
                     </div>
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
                         <div
-                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 space-x-4.5 !font-bold h-12 md:h-[60px]"
+                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 !font-bold h-12 md:h-[60px]"
                         >
-                            <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-skin-neutral-50 !px-0 !min-w-fit !w-8 !h-[60px]'>
-                                <PlusIcon />
-                            </Button>
-                            <span>1</span>
-                            <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-skin-neutral-50 !px-0 !min-w-fit !w-8 !h-[60px]'>
+                            <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'>
                                 <MinusIcon />
+                            </Button>
+                            <input type="tel" name="" id="" placeholder='1' className='w-fit max-w-7 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4' />
+                            <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'>
+                                <PlusIcon />
                             </Button>
                         </div>
                         <Button

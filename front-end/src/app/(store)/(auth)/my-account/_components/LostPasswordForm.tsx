@@ -66,7 +66,7 @@ const LostPasswordForm: FunctionComponent = (): ReactElement => {
                                 isLoading={resetPasswordFromConfig.formState.isSubmitting}
                                 disabled={resetPasswordFromConfig.formState.isSubmitting}
                             >
-                                Login
+                                Send Reset Link
                             </Button>
                              
                                 <Button 

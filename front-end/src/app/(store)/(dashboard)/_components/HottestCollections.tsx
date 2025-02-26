@@ -20,7 +20,7 @@ const HottestCollections: React.FC = async ():Promise<AsyncReactElement> => {
         <section className='bg-skin-white border border-skin-neutral-100 py-7.5 md:py-14 lg:mx-16 rounded-[32px] mt-5 md:mt-10 space-y-5 md:space-y-11 text-center'>
             <div className='space-y-2 text-center px-10'>
                 <SectionHeading title='The Hottest COLLECTIONS' className='text-h4 md:text-h3' />
-                <h2 className='text-content-2 md:text-lg text-skin-neutral-300 font-bold'>The leading brands delivering exceptional products</h2>
+                <p className='text-content-2 md:text-lg text-skin-neutral-300 font-bold'>The leading brands delivering exceptional products</p>
             </div>
             <div className='flex flex-wrap items-center justify-center gap-6 md:gap-8.5 px-8'>
                 {brands.map((brand, index) => (

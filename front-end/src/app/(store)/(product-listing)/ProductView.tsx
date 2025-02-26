@@ -28,7 +28,7 @@ const ProductView: React.FC = (): ReactElement => {
             <ProductContent />
             <FAQSection />
             <RelatedProducts />
-            <Subscription />
+            <Subscription className="mt-5 md:mt-10"/>
         </main>
     )
 }

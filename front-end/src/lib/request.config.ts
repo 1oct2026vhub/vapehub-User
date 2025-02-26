@@ -53,7 +53,7 @@ export const handleRequest = async <T, G>(
             status: ServerActionStatus.ERROR,
             errorData: responseJson?.data ?? undefined,
             message:
-            responseJson.error.message ?? responseJson.message ??
+            responseJson.error?.message ?? responseJson.message ??
               'Oops! Something went wrong. Please try again later.',
           };
     } catch (err: unknown) {

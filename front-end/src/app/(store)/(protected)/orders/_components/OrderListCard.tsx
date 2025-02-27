@@ -33,7 +33,7 @@ const OrderListCard: React.FC<OrderListCardProps> = ({ status, imageSrc, title, 
         <div className={statusColor}>{status}</div>
 
         {/* Order Title */}
-        <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 font-semibold">
+        <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 line-clamp-2 font-semibold">
           {title}
         </h2>
 

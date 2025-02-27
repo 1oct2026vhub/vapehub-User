@@ -29,8 +29,6 @@ const BrandsListing: NextPage = (): ReactElement => {
     ];
 
     return (
-        <>
-            <Header />
             <main>
                 <section className="product-listing-container flex-col">
                     <BreadCrumbs items={breadcrumbs} />
@@ -56,8 +54,6 @@ const BrandsListing: NextPage = (): ReactElement => {
                     </div>
                 </section>
             </main>
-            <Footer />
-        </>
     )
 }
 

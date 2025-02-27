@@ -1006,3 +1006,33 @@ export const DownArrowFilledIcon = (
     </svg>
   )
 };
+
+export const TrashIcon2 = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      fill="none"
+      viewBox="0 0 18 18"
+      {...props}
+    >
+      <path
+        stroke="#fff"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M15.75 4.484a76 76 0 0 0-7.515-.375q-2.228 0-4.455.225l-1.53.15M6.375 3.728l.165-.983c.12-.712.21-1.245 1.478-1.245h1.964c1.268 0 1.366.563 1.478 1.253l.165.974"
+      ></path>
+      <path
+        stroke="#fff"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="m14.138 6.852-.487 7.552c-.083 1.178-.15 2.093-2.243 2.093H6.593c-2.092 0-2.16-.915-2.242-2.093l-.488-7.552M7.748 12.375h2.497M7.125 9.375h3.75"
+      ></path>
+    </svg>
+  )
+};

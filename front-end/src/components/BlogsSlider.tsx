@@ -3,11 +3,11 @@ import { BlogResponse } from "@/lib/config/global.config";
 import Image from "next/image";
 import { FunctionComponent } from "react";
 import Slider, { Settings } from "react-slick";
- 
+
 interface BlogProps {
   data: BlogResponse[];
 };
-const BlogsSlider: FunctionComponent<BlogProps> = ({data}) => {
+const BlogsSlider: FunctionComponent<BlogProps> = ({ data }) => {
   const settings: Settings = {
     dots: true,
     infinite: false,
@@ -25,16 +25,18 @@ const BlogsSlider: FunctionComponent<BlogProps> = ({data}) => {
       },
     ],
   };
-   
+
   return (
     <Slider {...settings}>
       {data.map((blog) => (
-        <div key={blog.id} className="px-1 md:px-2 xl:px-5 py-4">
+        <div key={blog.id} className="px-1 md:px-2 xl:px-5 py-4 relative">
           <Image src={"/images/blog-card.jpg"}
-           alt={blog.title} width={322} height={512} 
-           className="rounded-3xl shadow-xl cursor-pointer hover:shadow-slider-card" />
-           <p>{blog.title}</p>
-           <p>{blog.content}</p>
+            alt={blog.title} width={322} height={512}
+            className="rounded-3xl shadow-xl cursor-pointer hover:shadow-slider-card" />
+          <div className="space-y-4 absolute left-0 bottom-0 p-6">
+            <div className="bg-white/50 py-1 px-2.5 font-semibold text-content-3 sm:text-content-1 text-black">{blog.title}</div>
+            <h4 className="text-content-1 md:text-title-1 font-semibold text-skin-white">{blog.content}</h4>
+          </div>
         </div>
       ))}
     </Slider>

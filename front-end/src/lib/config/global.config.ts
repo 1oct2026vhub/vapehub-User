@@ -20,3 +20,15 @@ export interface mailSubscriptionResponse {
     createdAt: string;
 }
 
+export interface BlogResponse {
+    id: number;
+    user_id: number;
+    blog_group: string;
+    title: string;
+    content: string;
+    slug: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+    User: User;
+}

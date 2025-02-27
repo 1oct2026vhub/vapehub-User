@@ -5,10 +5,10 @@ import ProductCard from "./ProductCard";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import { isLessThanOneMonth } from "@/lib/config/app.config";
  
-interface ProductList {
+interface ProductProps {
   data: ProductResponseData;
 }
-const ProductsSlider: React.FC<ProductList> = ({data}) => {
+const ProductsSlider: React.FC<ProductProps> = ({data}) => {
   
   const products:Product[] = data?.products ?? [];
   

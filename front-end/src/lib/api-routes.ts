@@ -15,6 +15,7 @@ export const API_ROUTES = {
     GET_CAROUSEL: buildRequestUrl('/api/home/carousel'),
     GET_TESTIMONIALS: buildRequestUrl('/api/testimonials'),
     SUBSCRIBE_MAIL: buildRequestUrl('/api/mailSubscription'),
+    GET_BLOGS: buildRequestUrl('/api/blogs'),
 }
 
 // * Helper functions

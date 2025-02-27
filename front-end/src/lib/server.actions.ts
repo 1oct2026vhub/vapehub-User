@@ -3,7 +3,7 @@ import { SignInResponse } from "./config/auth.config";
 import { BrandConfig } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { Category } from "./config/category.config";
-import { mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { BlogResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
 import { CategoryResponseData, ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
@@ -138,3 +138,11 @@ export const subscribeMail = async (email: string): Promise<ServerActionResponse
     method: 'POST',
   });
 };
+
+// blog list api
+export const getBlogList = async (): Promise<ServerActionResponse<BlogResponse[]>> => {
+  return await handleRequest<BlogResponse[], unknown>({
+    endpoint: API_ROUTES.GET_BLOGS,
+    method: 'GET',
+  });
+}

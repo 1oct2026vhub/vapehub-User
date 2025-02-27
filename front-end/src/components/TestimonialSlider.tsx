@@ -1,96 +1,16 @@
 "use client"
-import React from "react";
+import React, { FunctionComponent } from "react";
 import Slider, { Settings } from "react-slick";
 import TestimonialCard from "./TestimonialCard";
-
-
-const testimonials = [
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 1",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 2",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 3",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 1",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 2",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 3",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 1",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 2",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-    {
-        imageSrc: "/images/avatar.png",
-        altText: "User 3",
-        href: "#",
-        name: "Savannah Nguyen",
-        review:
-            "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        rating: 5,
-    },
-];
+import { TestimonialResponse } from "@/lib/config/global.config";
+interface TestimonialProps {
+  data: TestimonialResponse[];
+}
+ 
 
 const settings: Settings = {
     dots: true,
-    infinite: true,
+    infinite: false,
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 3,
@@ -116,13 +36,20 @@ const settings: Settings = {
     ]
 };
 
-const TestimonialSlider: React.FC = () => {
-
+const TestimonialSlider: FunctionComponent<TestimonialProps> = ({data}) => {
+     if(!data.length) return <p>No Testimonials Available</p>;
     return (
         <Slider {...settings}>
-            {testimonials.map((testimonial, index) => (
+            {data.map((testimonial, index) => (
                 <div key={index} className="px-1 md:px-2 xl:px-5 py-3 h-auto min-h-0">
-                    <TestimonialCard {...testimonial} />
+                    <TestimonialCard 
+                     imageSrc = {"/images/avatar.png"}
+                     altText = {testimonial?.User?.first_name || ""}
+                     href = "#"
+                     name = {testimonial?.User?.first_name || ""}
+                     review = {testimonial.content}
+                     ratingCount = {testimonial.rating}
+                     />
                 </div>
             ))}
         </Slider>

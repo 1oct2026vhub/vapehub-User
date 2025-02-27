@@ -35,8 +35,8 @@ const Dashboard: NextPage = (): ReactElement => {
         <HottestCollections />
         <NewProducts />
         <ShopByDeals />
-        <MostPopularVapes />
-        <MostPopularSalts />
+        <MostPopularVapes viewAllHref="disposables"/>
+        <MostPopularSalts viewAllHref="pod-kit"/>
         <PromotionalBanners />
         <ReferFriend />
         <Testimonials />

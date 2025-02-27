@@ -7,12 +7,16 @@ import { permanentRedirect, RedirectType } from 'next/navigation';
 // import { ROUTES } from '@/lib/routes';
 // import { permanentRedirect, RedirectType } from 'next/navigation';
 
+export interface User {
+  id: number;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+}
+
 // * Interface
-export interface SignInResponse {
-    id: number;
-    first_name: string | null;
-    last_name: string | null;
-    email: string;
+export interface SignInResponse extends User {
+     
     phone: string;
     profile_pic_url: string;
     gender: string;

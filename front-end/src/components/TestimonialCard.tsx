@@ -10,6 +10,7 @@ interface TestimonialCardProps {
     review: string;
     width?: number;
     height?: number;
+    ratingCount?: number;
 }
 
 const TestimonialCard: React.FC<TestimonialCardProps> = ({
@@ -18,6 +19,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
     href,
     name,
     review,
+    ratingCount = 0,
     width = 60,
     height = 60
 }) => {
@@ -35,11 +37,16 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
                     className="max-w-8 min-w-8 md:min-w-[60px] md:max-w-max aspect-square"
                 />
                 <div className="flex items-center gap-1">
-                    <RatingStarFilled className="max-w-3.5 md:max-w-max"/>
-                    <RatingStarFilled className="max-w-3.5 md:max-w-max"/>
-                    <RatingStarFilled className="max-w-3.5 md:max-w-max"/>
-                    <RatingStarPartial className="max-w-3.5 md:max-w-max"/>
-                    <RatingStarEmpty className="max-w-3.5 md:max-w-max"/>
+                {[...Array(5)].map((_, index) => {
+                    if (index < Math.floor(ratingCount)) {
+                        return <RatingStarFilled key={index} className="max-w-3.5 md:max-w-max" />;
+                    } else if (index < ratingCount) {
+                        return <RatingStarPartial key={index} className="max-w-3.5 md:max-w-max" />;
+                    } else {
+                        return <RatingStarEmpty key={index} className="max-w-3.5 md:max-w-max" />;
+                    }
+                })}
+                     
                 </div>
             </div>
             <h5 className="text-content-1 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-semibold">

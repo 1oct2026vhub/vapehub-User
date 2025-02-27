@@ -57,3 +57,13 @@ export const getQueryParamValue = <T extends string | number>(
       ? defaultValue
       : (Number(qParams) as T);
   };
+
+  export const DEFAULT_CURRENCY_SYMBOL: string = '£';
+
+  // export the function for date is less than one month 
+  export const isLessThanOneMonth = (date: string): boolean => {
+    if (!date) {
+      throw new Error("Date is required");
+    }
+    return new Date(date) > new Date(new Date().setMonth(new Date().getMonth() - 1));
+  };

@@ -1,5 +1,4 @@
-import BannerSlider from "./_components/BannerSlider"; 
-import MobileBannerSlider from "./_components/MobileBannerSlider";
+
 import { NextPage } from "next";
 import { ReactElement } from "react";
 import TrustPilotRatingCard from "./_components/TrustPilotRatingCard";
@@ -14,16 +13,13 @@ import ReferFriend from "./_components/ReferFriend";
 import Testimonials from "./_components/Testimonials";
 import Subscription from "./_components/Subscription";
 import BlogsSection from "./_components/BlogsSection";
+import HomeCarousel from "./_components/HomeCarousel";
+import { ROUTES } from "@/lib/routes";
 
 const Dashboard: NextPage = (): ReactElement => {
   return ( 
       <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
-        <section className="banner-carousel hidden lg:block">
-          <BannerSlider />
-        </section>
-        <section className="mobile-banner-carousel lg:hidden">
-          <MobileBannerSlider />
-        </section>
+        <HomeCarousel/>
         <section className="flex flex-col gap-4.5 md:gap-10 max-md:mt-4.5">
           <TrustPilotRatingCard
             title="Trustpilot has rated Vapehub as Excellent!"
@@ -41,7 +37,7 @@ const Dashboard: NextPage = (): ReactElement => {
         <ReferFriend />
         <Testimonials />
         <Subscription className="mt-5 md:mt-10" /> 
-        <BlogsSection />
+        <BlogsSection viewAllHref={ROUTES.BLOGS} />
       </div>  
   );
 };

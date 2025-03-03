@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5 md:mt-1">({reviews} Reviews)</p>
             </div>
           </div>
-          {flavors && <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p>}
+          {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p>: null}
           <div className="flex items-center justify-between gap-2">
             <h5 className="text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</h5>
             <Button

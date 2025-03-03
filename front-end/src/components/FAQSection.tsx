@@ -14,6 +14,7 @@ const FAQSection: React.FC<FAQProps> = ({
     viewAllHref = "#",
 }) => {
 
+    
     const faqs = [
         { question: "What are disposable vape kits?", answer: "Disposable vape kits (also known as disposable vapes/disposable e-cigarettes/disposable vape pens) are complete vaping devices that are ready to use straight out of the box. They contain everything you need to start vaping, including a built-in battery, coil and e-liquid chamber. They are pre-filled with e-liquid and are inhale activated therefore completely hassle-free. The e-liquid can be nicotine free or it can contain nicotine salt. Nicotine strength can differ between different disposable vapes." },
         { question: "What are disposable vape kits?", answer: "Disposable vape kits (also known as disposable vapes/disposable e-cigarettes/disposable vape pens) are complete vaping devices that are ready to use straight out of the box. They contain everything you need to start vaping, including a built-in battery, coil and e-liquid chamber. They are pre-filled with e-liquid and are inhale activated therefore completely hassle-free. The e-liquid can be nicotine free or it can contain nicotine salt. Nicotine strength can differ between different disposable vapes." },

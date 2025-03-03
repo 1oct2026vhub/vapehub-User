@@ -24,7 +24,11 @@ export interface SignInResponse extends User {
     accessToken: string;
     refreshToken: string;
   }
-
+ 
+  export interface VerifyUserEmailResponse {
+    message: string;
+    signInResponse: SignInResponse;
+  }
 // * Helper functions
 
 /*

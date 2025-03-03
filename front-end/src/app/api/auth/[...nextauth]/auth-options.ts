@@ -4,7 +4,7 @@ import { signInAction } from "@/lib/server.actions";
 import { NextAuthOptions } from "next-auth"
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
- 
+
 export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
@@ -12,24 +12,45 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
       name: 'VapeHub Authentication',
       credentials: {
         email: {},
-        password: {}
+        password: {},
+        id: {},
+        first_name: {},
+        last_name: {},
+        phone: {},
+        profile_pic_url: {},
+        gender: {},
+        dob: {},
+        accessToken: {},
+        refreshToken: {},
+
       },
       authorize: async (credentials) => {
-       
-        if(!credentials) return null
+
+        if (!credentials) return null;
+        if (credentials?.accessToken) {
+          return {
+            id: credentials.accessToken,
+            name: `${credentials.first_name} ${credentials.last_name}`,
+            email: credentials.email,
+            sub: credentials.accessToken,
+            image: credentials.profile_pic_url,
+            userId: credentials.id
+          };
+        }
+
         const userDetails = await signInAction(credentials.email, credentials.password, false);
-         
+
         if (userDetails.status === ServerActionStatus.ERROR) {
           return Promise.reject(new Error(userDetails.message ?? 'Oops! Something went wrong. Please try again later.'));
         }
-        const userProfile = userDetails.data; 
-         
+        const userProfile = userDetails.data;
+
         return {
           id: userProfile.accessToken,
           name: `${userProfile.first_name} ${userProfile.last_name}`,
-          email: userProfile.email, 
+          email: userProfile.email,
           sub: userProfile.accessToken,
-          image:  userProfile.profile_pic_url,
+          image: userProfile.profile_pic_url,
           userId: userProfile.id
         };
       },
@@ -40,25 +61,24 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 3600, 
+    maxAge: 3600,
   },
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    session: async ({ session, token }: { session: any; token: JWT  }) => {
-       
-      if(session.user) {
+    session: async ({ session, token }: { session: any; token: JWT }) => {
+
+      if (session.user) {
         session.user.accessToken = token.sub as string;
         session.user.id = token.userId;
       }
       return session;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jwt: async ({ token, user }: {token:any; user:any; }) => {
-      if(user)  {
+    jwt: async ({ token, user }: { token: any; user: any; }) => {
+      if (user) {
         token.userId = user.userId
       }
       return token;
     }
   }
 }
- 

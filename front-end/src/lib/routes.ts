@@ -10,3 +10,5 @@ BRANDS: '/brands',
 BRAND: '/brand/:slug',
  
 }
+
+ 

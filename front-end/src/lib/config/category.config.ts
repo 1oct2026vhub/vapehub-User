@@ -6,6 +6,10 @@ export interface Category extends SubCategory {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+    name: string;
+    description: string;
+    slug: string;
+    
 }
 export interface SubCategory {
     name: string;

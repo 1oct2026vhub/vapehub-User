@@ -1,10 +1,10 @@
 import { ServerActionResponse } from "./config/app.config";
-import { SignInResponse } from "./config/auth.config";
+import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
 import { BrandConfig } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { Category } from "./config/category.config";
 import { BlogResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
-import { CategoryResponseData, ProductResponseData } from "./config/product.config";
+import { CategoryResponseData, Product, ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
 import { API_ROUTES, PRODUCT_PAYLOAD } from '@/lib/api-routes';
@@ -46,8 +46,9 @@ export const signInAction = async (
  
   export const verifyUserEmailAction = async (
     token: string
-  ): Promise<ServerActionResponse<{ message: string }>> => {
-    return await handleRequest<{ message: string }, unknown>({
+  ): Promise<ServerActionResponse<VerifyUserEmailResponse>> => {
+    
+    return await handleRequest<VerifyUserEmailResponse, unknown>({
       endpoint: API_ROUTES.GET_VERIFY_EMAIL(token),
       method: 'GET',
     });
@@ -114,6 +115,16 @@ export const getProductByCategory = async (
   });
 };
 
+// get product by slug api
+export const getProductBySlug = async (
+  slug: string,
+  params: PRODUCT_PAYLOAD): Promise<ServerActionResponse<Product>> => {
+  return await handleRequest<Product, unknown>({
+    endpoint: API_ROUTES.GET_PRODUCTS_BY_SLUG(slug, params),
+    method: 'GET',
+  });
+};
+
 // carousel list api
 export const getCarouselList = async (): Promise<ServerActionResponse<CarouselConfig[]>> => {
   return await handleRequest<CarouselConfig[], unknown>({
@@ -146,3 +157,4 @@ export const getBlogList = async (): Promise<ServerActionResponse<BlogResponse[]
     method: 'GET',
   });
 }
+ 

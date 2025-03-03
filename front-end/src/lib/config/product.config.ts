@@ -31,6 +31,16 @@ export interface Flavor {
     ProductFlavor: ProductFlavor;
 }
 
+export interface ProductImage {
+    id: number;
+    updated_by: number | null;
+    product_id: number;
+    image_url: string;
+    is_primary: boolean;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+}
 export interface Product {
     id: number;
     updated_by: number | null;
@@ -61,7 +71,7 @@ export interface Product {
     deletedAt: string | null;
     Category: Category;
     Brand: BrandConfig;
-    ProductImages: [];
+    ProductImages: ProductImage[];
     Flavors: Flavor[];
 } 
  

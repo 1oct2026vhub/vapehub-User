@@ -8,12 +8,12 @@ import { useForm } from 'react-hook-form';
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { toast } from "sonner";
 import { ROUTES } from "@/lib/routes";
-import { useRouter } from "next/navigation";
 import { Form } from "@/components/ui/Form";
 import InputField from "@/components/InputField";
 import { EyeClosedIcon, EyeOpenIcon } from "@/components/Icons";
 import { resetPasswordAction } from "@/lib/server.actions";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 interface Props {
     token: string;
@@ -26,7 +26,6 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
         mode: 'all',
         resolver: zodResolver(CHANGE_PASSWORD_SCHEMA),
     });
-    const router = useRouter();
     const [pwdVisibility, setPwdVisibility] = useState(false);
     const [cPwdVisibility, setCPwdVisibility] = useState(false);
 
@@ -39,7 +38,10 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
             return toast.error(response.message);
         }
         toast.success(response.data?.message);
-        router.replace(ROUTES.MY_ACCOUNT);
+         await signIn('credentials', {
+                    ...response.data,
+                    redirect: true
+                });
     };
     return (
         <div className="auth-form-container">

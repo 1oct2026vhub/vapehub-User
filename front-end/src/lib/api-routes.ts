@@ -12,10 +12,12 @@ export const API_ROUTES = {
     GET_BRAND_LIST: buildRequestUrl('/api/brands'), 
     GET_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product?${new URLSearchParams(payload as never).toString()}`),
     GET_CATEGORY_PRODUCTS_BY_SLUG: (slug:string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/category/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
+    GET_PRODUCTS_BY_SLUG: (slug:string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
     GET_CAROUSEL: buildRequestUrl('/api/home/carousel'),
     GET_TESTIMONIALS: buildRequestUrl('/api/testimonials'),
     SUBSCRIBE_MAIL: buildRequestUrl('/api/mailSubscription'),
     GET_BLOGS: buildRequestUrl('/api/blogs'),
+    
 }
 
 // * Helper functions

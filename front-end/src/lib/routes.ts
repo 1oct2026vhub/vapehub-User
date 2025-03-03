@@ -8,7 +8,8 @@ WELCOME: '/',
 FORGOT: '/my-account/lost-password',
 BRANDS: '/brands',
 BRAND: '/brand/:slug',
- 
+BLOGS: '/blogs',
+DEALS: '/deals',
 }
 
  

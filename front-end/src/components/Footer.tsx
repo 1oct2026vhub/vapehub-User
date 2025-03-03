@@ -4,6 +4,11 @@ import React from 'react';
 import Logo from './ui/Logo';
 import { DownArrowFilledIcon, FacebookIcon, InstagramIcon, TwitterIcon } from './Icons';
 import { Accordion, AccordionItem } from '@nextui-org/react';
+import { useEffect, useState } from 'react';
+import { getCategoryList } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
+import { Category } from '@/lib/config/category.config';
+import Link from 'next/link';
 
 const Footer = () => {
   const footerSections = [
@@ -26,18 +31,7 @@ const Footer = () => {
         'Refer A Friend',
       ],
     },
-    {
-      title: 'shop',
-      links: [
-        'New in',
-        'Disposables',
-        'Nicotine Pouches',
-        'Nicotine Salts',
-        'Nicotine Strips',
-        'Pod Kits',
-        'Shortfills',
-      ],
-    },
+
   ];
 
   const socialMediaLinks = [
@@ -53,6 +47,24 @@ const Footer = () => {
     indicator: "text-medium text-skin-neutral-50 data-[open=true]:rotate-180",
     content: "",
   };
+
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategoryList();
+        if (response.status !== ServerActionStatus.SUCCESS) {
+          return;
+        }
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <footer className="bg-footer-gradient space-y-6 mt-auto">
@@ -76,27 +88,63 @@ const Footer = () => {
               </ul>
             </div>
           ))}
+          <div className="space-y-4 text-skin-white flex flex-col">
+            <h6 className="text-title-2 lg:text-title-1 font-semibold uppercase">Shop</h6>
+            <ul className="space-y-2.5">
+              {categories.length > 0 ? categories.slice(0, 8).map((category, idx) => (
+                <li key={idx}>
+                  <Link
+                    href={`/${category.slug}`}
+                    passHref
+                    className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 transition-all duration-300"
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              )) : null}
+            </ul>
+          </div>
         </div>
 
         {/* Mobile Section */}
         <div className='w-full md:hidden'>
           <Accordion variant='light' className="!px-0" itemClasses={itemClasses} selectionMode='multiple'>
-            {footerSections.map((section, index) => (
-              <AccordionItem key={index} aria-label={section.title} title={section.title} indicator={<DownArrowFilledIcon />}>
-                <ul className="space-y-2.5">
-                  {section.links.map((link, idx) => (
-                    <li key={idx}>
-                      <a
-                        href="#"
-                        className="text-content-1 font-normal text-skin-white"
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </AccordionItem>
-            ))}
+            <>
+              {footerSections.map((section, index) => (
+                <AccordionItem key={index} aria-label={section.title} title={section.title} indicator={<DownArrowFilledIcon />}>
+                  <ul className="space-y-2.5">
+                    {section.links.map((link, idx) => (
+                      <li key={idx}>
+                        <a
+                          href="#"
+                          className="text-content-1 font-normal text-skin-white"
+                        >
+                          {link}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionItem>
+              ))}
+            </>
+            <AccordionItem aria-label="shop" title="shop" indicator={<DownArrowFilledIcon />}>
+              <ul className="space-y-2.5">
+                {categories.length > 0 && categories.slice(0, 8).map((category, idx) => (
+                  <li key={idx}>
+                    <Link
+                      href={`/${category.slug}`}
+                      passHref
+                      className="text-content-1 font-normal text-skin-white"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                ))}
+
+              </ul>
+            </AccordionItem>
+
+
           </Accordion>
         </div>
 

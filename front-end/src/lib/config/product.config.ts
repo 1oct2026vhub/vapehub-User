@@ -79,3 +79,8 @@ export interface CategoryResponseData extends Category {
     products: Product[];
     pagination: Pagination;
   }
+
+export interface BrandByProductResponse extends BrandConfig {
+    products: Product[];
+    pagination: Pagination;
+}

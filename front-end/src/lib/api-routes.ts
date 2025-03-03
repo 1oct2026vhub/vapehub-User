@@ -17,6 +17,9 @@ export const API_ROUTES = {
     GET_TESTIMONIALS: buildRequestUrl('/api/testimonials'),
     SUBSCRIBE_MAIL: buildRequestUrl('/api/mailSubscription'),
     GET_BLOGS: buildRequestUrl('/api/blogs'),
+    GET_PROMOTION_BANNER: buildRequestUrl('/api/home/banner-images'),
+    GET_BRAND_PRODUCTS_BY_SLUG: (slug:string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/brands/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
+
     
 }
 

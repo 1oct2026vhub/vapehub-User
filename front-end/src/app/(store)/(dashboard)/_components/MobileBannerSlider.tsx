@@ -1,10 +1,14 @@
 "use client"
+import { CarouselConfig } from "@/lib/config/carousel.config";
 import Image from "next/image";
-import React from "react";
+import { FunctionComponent } from "react";
 import Slider, { Settings } from "react-slick";
 
-const MobileBannerSlider: React.FC = () => {
-  const settings: Settings = {
+type BannerSliderProps = {
+  banners: CarouselConfig[];
+};
+
+ const settings: Settings = {
     dots: true,
     infinite: true,
     fade: true,
@@ -14,13 +18,14 @@ const MobileBannerSlider: React.FC = () => {
     autoplay: true,
     autoplaySpeed: 5000,
   };
+   
 
-  const banners = [
-    { src: "/images/mob-banner-1.jpg", alt: "Banner 1" },
-    { src: "/images/banner-4.png", alt: "Banner 2" },
-    { src: "/images/mob-banner-1.jpg", alt: "Banner 3" },
-  ];
-
+const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
+ 
+  if(banners.length === 0) {
+    return null;    
+  }
+  
   return (
     <Slider {...settings}>
       {banners.map((banner, index) => (
@@ -29,8 +34,8 @@ const MobileBannerSlider: React.FC = () => {
           className="overflow-hidden rounded-lg"
         >
           <Image
-            src={banner.src}
-            alt={banner.alt}
+            src={banner?.image_url}
+            alt={banner.title}
             width={361}
             height={382}
             className="w-full rounded-lg min-h-96 !outline-none focus-visible:!outline-none"

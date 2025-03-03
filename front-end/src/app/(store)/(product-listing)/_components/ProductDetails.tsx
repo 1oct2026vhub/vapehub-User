@@ -193,7 +193,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                     </div>
                     <div className='space-y-2 lg:space-y-3.5'>
                         <p className='text-content-1 md:text-title-1 font-semibold text-skin-neutral-500'>Nicotine Strength</p>
-
                         <div className='flex gap-3.5 items-center'>
                             <Button
                                 size="sm"

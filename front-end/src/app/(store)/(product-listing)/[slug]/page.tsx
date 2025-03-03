@@ -11,20 +11,27 @@ type PageProps = {
 
  const Page = async ({
   params,
+  searchParams,
 }: {
-  params: Promise<PageProps>
+  params: Promise<PageProps>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  searchParams: any
 }) => {
+    
   const slug = (await params).slug;
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
+  const combinedParams = { ...defaultParams, ...await searchParams };
   // If product doesn't exist, try category
-  const category = await fetchCategory(slug);
+ 
+  const category = await fetchCategory(slug, combinedParams);
   if (category) {
     return (
-      <CategoryProducts  />
+      <CategoryProducts data={category}/>
     );
   }
 
   // If category doesn't exist, try product
-  const product = await fetchProduct(slug);
+  const product = await fetchProduct(slug, combinedParams);
   if (product) {
     return (
       <ProductView data={product} />
@@ -37,16 +44,18 @@ type PageProps = {
 
 export default Page;
 
-const fetchCategory = async (slug: string) => {
-  const response = await getProductByCategory(slug, { sort_by: "id", order: "ASC", limit: 20, offset: 0 });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fetchCategory = async (slug: string, params: any) => {
+  const response = await getProductByCategory(slug, params);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
   return response.data;
 };
 
-const fetchProduct = async (slug: string) => {
-  const response = await getProductBySlug(slug, { sort_by: "id", order: "ASC", limit: 20, offset: 0 });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fetchProduct = async (slug: string, params: any) => {
+  const response = await getProductBySlug(slug, params);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -54,19 +63,23 @@ const fetchProduct = async (slug: string) => {
 };
  
 
-export async function generateMetadata({ params }: {
-  params: Promise<PageProps>
+export async function generateMetadata({ params, searchParams }: {
+  params: Promise<PageProps>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  searchParams: any
 }) {
   const slug = (await params).slug;
-  
-  const category = await fetchCategory(slug);
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
+  const combinedParams = { ...defaultParams, ...await searchParams };
+
+  const category = await fetchCategory(slug, combinedParams);
   if (category) {
     return {
-      title: `${category.name} | VapeHub UK`,
-      description: category.description || `Browse our selection of ${category.name} products.`,
+      title: category.name,
+      description: category.description,
       openGraph: {
-        title: `${category.name} | VapeHub UK`,
-        description: category.description || `Browse our selection of ${category.name} products.`,
+        title: category.name,
+        description: category.description,
         images: category.logo_url ? [{
           url: category.logo_url,
           width: 1200,
@@ -77,14 +90,14 @@ export async function generateMetadata({ params }: {
   }
 
   // If category doesn't exist, try product
-  const product = await fetchProduct(slug);
+  const product = await fetchProduct(slug, combinedParams);
   if (product) {
     return {
-      title: `${product.name} | VapeHub UK`,
-      description: product.description || `Buy ${product.name} vape products at VapeHub UK.`,
+      title: `${product.name}`,
+      description: product.description,
       openGraph: {
-        title: `${product.name} | VapeHub UK`,
-        description: product.description || `Buy ${product.name} vape products at VapeHub UK.`,
+        title: product.name,
+        description: product.description,
         images: product.ProductImages.length > 0 ? [{
           url: product.ProductImages[0].image_url,
           width: 1200,

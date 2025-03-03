@@ -3,8 +3,8 @@ import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
 import { BrandConfig } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { Category } from "./config/category.config";
-import { BlogResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
-import { CategoryResponseData, Product, ProductResponseData } from "./config/product.config";
+import { BannerResponse, BlogResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
 import { API_ROUTES, PRODUCT_PAYLOAD } from '@/lib/api-routes';
@@ -157,4 +157,21 @@ export const getBlogList = async (): Promise<ServerActionResponse<BlogResponse[]
     method: 'GET',
   });
 }
- 
+
+// get promotion banner
+export const getPromotionBanner = async (): Promise<ServerActionResponse<BannerResponse[]>> => {
+  return await handleRequest<BannerResponse[], unknown>({
+    endpoint: API_ROUTES.GET_PROMOTION_BANNER,
+    method: 'GET',
+  });
+};
+// Get product by brand slug
+export const getProductByBrand = async (
+  slug: string,
+  params: PRODUCT_PAYLOAD
+): Promise<ServerActionResponse<BrandByProductResponse>> => {
+  return await handleRequest<BrandByProductResponse, unknown>({
+    endpoint: API_ROUTES.GET_BRAND_PRODUCTS_BY_SLUG(slug, params),
+    method: 'GET',
+  });
+};

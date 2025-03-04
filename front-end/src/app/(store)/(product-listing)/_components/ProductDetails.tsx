@@ -1,36 +1,80 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
 import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, ReviewStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider, Select, SelectItem } from '@nextui-org/react'
 import Image from 'next/image'
 import BundleProductCard from '@/components/BundleProductCard'
+import { Product } from '@/lib/config/product.config'
+import { ROUTES } from '@/lib/routes'
+import { DEFAULT_CURRENCY_SYMBOL, isLessThanOneMonth } from '@/lib/config/app.config'
+import Slider, { Settings } from 'react-slick'
 
-const flavours = [
-    { key: "Orange", label: "Orange" },
-    { key: "Water Melon", label: "Water Melon" },
-    { key: "Blue berry", label: "Blue berry" },
-];
+type ProductViewProps = {
+    product: Product;
+}
+const settings: Settings = {
+    slidesToShow: 4, // Change to 4 if needed
+    slidesToScroll: 1,
+    infinite: false,
+    arrows: true,
+    initialSlide: 0,
+    responsive: [
+        {
+            breakpoint: 1280,
+            settings: {
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                infinite: false,
+            },
+        },
+        {
+            breakpoint: 640,
+            settings: {
+                slidesToShow: 3,
+                slidesToScroll: 1,
+                infinite: false,
+            },
+        },
+        {
+            breakpoint: 390,
+            settings: {
+                slidesToShow: 2,
+                slidesToScroll: 1,
+                infinite: false,
+            },
+        },
+    ],
 
-const ProductDetails: React.FC = () => {
+};
+const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
+    const [mainImage, setMainImage] = useState(product?.ProductImages[0]);
+
+
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 {/* Title section mobile */}
                 <div className='space-y-2 lg:hidden'>
-                    <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold mr-8'>HAWCOS x Lost Mary Pro Max 7000 Disposable Kit</h1>
+                    <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold mr-8'>{product?.name}</h1>
                     <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
-                        Brand: <a href="#" className='inline-block font-bold text-skin-primary2-500 underline'>Hayati</a>
+                        Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.name)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex gap-1">
-                            {Array.from({ length: 5 }, (_, i) => (
-                                <Image
-                                    key={i}
-                                    src='/images/review-star.svg'
-                                    alt='Review star'
-                                    width={16}
-                                    height={16}
-                                    className='md:w-5 md:h-5' />
+                            {product?.ProductImages.slice(1, 4).map((image) => (
+                                <>
+                                    {image && image?.image_url.startsWith('http') ? (
+
+                                        <Image
+                                            key={image.id}
+                                            src={image.image_url}
+                                            alt='Review star'
+                                            width={16}
+                                            height={16}
+                                            className='md:w-5 md:h-5' />
+                                    ) : <p>Image not found</p>}
+                                </>
                             ))}
                         </div>
                         <p className="text-title-2 xl:text-lg text-black font-bold mt-1">(10 Reviews)</p>
@@ -38,54 +82,55 @@ const ProductDetails: React.FC = () => {
                 </div>
                 {/* Title section mobile ends */}
 
-                <div className='space-y-4 w-full lg:w-fit'>
+                <div className='space-y-4 w-full lg:w-fit '>
                     <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2'>
-                        <Image
-                            src='/images/product.png'
-                            alt='Product'
-                            width={280}
-                            height={396}
-                            className='max-lg:max-w-40 max-sm:max-h-[207px] max-lg:max-h-64 cursor-pointer'
-                        />
-                        <div className='new-product'>
-                            <span>New</span>
-                        </div>
+                        {mainImage && mainImage?.image_url.startsWith('http') ? (
+                            <Image
+                                src={mainImage?.image_url}
+                                alt={product?.name}
+                                width={280}
+                                height={396}
+                                className='max-lg:max-w-40 max-sm:max-h-[207px] max-lg:max-h-64 cursor-pointer'
+                            />
+                        ) : <p>Image not found</p>}
+                        {
+                            isLessThanOneMonth(product?.createdAt) &&
+                            <div className='new-product'>
+                                <span>New</span>
+                            </div>
+                        }
+
                     </div>
-                    <div className='flex items-center gap-4'>
-                        <div className='px-0.5 py-1.5 bg-skin-base rounded-lg shadow-brand-card flex items-center justify-center shrink border border-neutral-100'>
-                            <Image
-                                src='/images/small-product.png'
-                                alt='Product'
-                                width={118}
-                                height={111}
-                                className='max-w-[80px] lg:max-w-max cursor-pointer'
-                            />
-                        </div>
-                        <div className='px-0.5 py-1.5 bg-skin-base rounded-lg shadow-brand-card flex items-center justify-center shrink border border-neutral-100'>
-                            <Image
-                                src='/images/small-product.png'
-                                alt='Product'
-                                width={118}
-                                height={111}
-                                className='max-w-[80px] lg:max-w-max cursor-pointer'
-                            />
-                        </div>
-                        <div className='px-0.5 py-1.5 bg-skin-base rounded-lg border border-neutral-100 shadow-brand-card flex items-center justify-center shrink'>
-                            <Image
-                                src='/images/small-product.png'
-                                alt='Product'
-                                width={118}
-                                height={111}
-                                className='max-w-[80px] lg:max-w-max cursor-pointer'
-                            />
-                        </div>
-                    </div>
+
+                    <Slider {...settings} className='grid items-center gap-4'>
+                        {
+                            product?.ProductImages.map((image, index) => (
+                                <div key={index}>
+                                    <div className='px-0.5 py-1.5 bg-skin-base flex items-center justify-center '>
+                                        {image && image?.image_url.startsWith('http') ? (
+                                            <Image
+                                                src={image.image_url}
+                                                alt={`product ${index}`}
+                                                width={118}
+                                                height={111}
+                                                className={`lg:max-w-max cursor-pointer  rounded-lg shadow-brand-card shrink border border-neutral-100 ${mainImage === image ? "border-blue-500" : "border-gray-300"
+                                                    }`}
+                                                onClick={() => setMainImage(image)}
+                                            />
+                                        ) : <p>Image not found</p>}
+                                    </div>
+                                </div>
+                            ))
+                        }
+
+                    </Slider>
+
                 </div>
-                <div className='flex flex-col gap-4.5 lg:gap-5 w-full'>   
+                <div className='flex flex-col gap-4.5 lg:gap-5 w-full'>
                     <div className='space-y-3.5 hidden lg:block'>
-                        <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>HAWCOS x Lost Mary Pro Max 7000 Disposable Kit</h1>
+                        <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>{product?.name}</h1>
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
-                            Brand: <a href="#" className='inline-block font-bold text-skin-primary2-500 underline'>Hayati</a>
+                            Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.name)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex gap-1">
@@ -97,7 +142,7 @@ const ProductDetails: React.FC = () => {
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
-                        <p className='text-title-1 md:text-h5 xl:text-h4'>£12.99</p>
+                        <p className='text-title-1 md:text-h5 xl:text-h4'>{DEFAULT_CURRENCY_SYMBOL}{product.price}</p>
                         <p className='text-content-2 md:text-title-2'>or Mix & Match</p>
                         <Button
                             size="sm"
@@ -124,11 +169,11 @@ const ProductDetails: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    <Divider className='max-lg:hidden'/>
+                    <Divider className='max-lg:hidden' />
                     <div className='space-y-2 lg:space-y-3.5'>
                         <div>
                             <p className='text-content-1 sm:text-title-2 lg:text-title-1 font-semibold text-black'>Flavours</p>
-                            <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>20 available</p>
+                            <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>{product?.Flavors.length} available</p>
                         </div>
                         <Select
                             size='sm'
@@ -141,8 +186,8 @@ const ProductDetails: React.FC = () => {
                                 listboxWrapper: "max-h-[400px]",
                             }}
                         >
-                            {flavours.map((flavour) => (
-                                <SelectItem key={flavour.key}>{flavour.label}</SelectItem>
+                            {product?.Flavors.map((flavour) => (
+                                <SelectItem key={flavour.id}>{flavour.name}</SelectItem>
                             ))}
                         </Select>
                     </div>
@@ -176,7 +221,12 @@ const ProductDetails: React.FC = () => {
                                 30 mg
                             </Button>
                         </div>
-                        <p className='text-title-2 font-bold primary-gradient-100'>In stock</p>
+                        {
+                            product?.stock_quantity > 0 ?
+                                <p className='text-title-2 font-bold primary-gradient-100'>In stock</p> :
+                                <p className='text-title-2 font-bold text-red-500'>Out of stock</p>
+                        }
+
                     </div>
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
                         <div

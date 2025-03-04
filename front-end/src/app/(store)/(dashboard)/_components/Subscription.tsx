@@ -1,11 +1,14 @@
 "use client"
 import InputField from '@/components/InputField'
 import { Form } from '@/components/ui/Form';
+import { ServerActionStatus } from '@/lib/config/app.config';
 import { SUBSCRIBE_FORM_CONFIG, SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
+import { subscribeMail } from '@/lib/server.actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@nextui-org/button'
 import { FunctionComponent, ReactElement } from 'react'
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 interface SubscriptionProps {
     className?: string;
@@ -17,8 +20,13 @@ const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): Reac
         mode: 'onSubmit',
     });
     const handleFormSubmit = async ({ email }: SubscribeFormSchema) => {
-        console.log(email);
-        
+        const response = await subscribeMail(email);
+        if(response.status === ServerActionStatus.ERROR) {
+            toast.error(response.message);
+            return;
+        }
+        toast.success("You have successfully subscribed");
+        subscribeFromConfig.reset({ email: '' });
     }
     return (
         <section className={`bg-subscription-banner-mob xl:bg-subscription-banner bg-no-repeat bg-top xl:bg-right-bottom bg-cover shadow-subscription rounded-3xl px-5.5 pt-14 pb-7 md:py-12 md:px-9 ${className}`}>

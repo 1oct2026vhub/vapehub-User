@@ -512,6 +512,14 @@ input[type="checkbox"] + span {
   @apply min-w-5
 }
 
+.disabled-input div[data-slot="input-wrapper"] {
+  @apply bg-skin-neutral-50 hover:border-skin-neutral-100 !important;
+}
+
+.disabled-input div[data-slot="inner-wrapper"] {
+  @apply bg-skin-neutral-50 !important;
+}
+
 /* Styles for webkit-based browsers */
 ::-webkit-scrollbar {
   width: 5px;

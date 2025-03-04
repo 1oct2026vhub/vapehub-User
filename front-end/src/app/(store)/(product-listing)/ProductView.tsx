@@ -1,0 +1,42 @@
+"use client"
+
+import BreadCrumbs from '@/components/BreadCrumbs'; 
+import React, { FunctionComponent, ReactElement } from 'react'; 
+import OrderCard from '@/components/OrderCard' 
+import ProductContent from '@/components/ProductContent'
+import FAQSection from '@/components/FAQSection' 
+import ProductDetails from './_components/ProductDetails';
+import ProductFeatures from './_components/ProductFeatures';
+import RelatedProducts from './_components/RelatedProducts';
+import Subscription from '../(dashboard)/_components/Subscription';
+import { Product } from '@/lib/config/product.config';
+import { ROUTES } from '@/lib/routes';
+
+type ProductViewProps = {
+    data: Product;
+}
+
+const ProductView: FunctionComponent<ProductViewProps> = ({data}): ReactElement => {
+    
+     
+    const breadcrumbs = [
+        { label: "Home", href: ROUTES.WELCOME },
+        { label: data.Category.name, href: `/${data.Category.slug}` },
+        { label: data.name, href: data.slug, isActive: true },
+    ];
+
+    return (
+        <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
+            <BreadCrumbs items={breadcrumbs} />
+            <ProductDetails product={data}/>
+            <OrderCard />
+            <ProductFeatures />
+            <ProductContent />
+            <FAQSection />
+            <RelatedProducts />
+            <Subscription className="mt-5 md:mt-10"/>
+        </main>
+    )
+}
+
+export default ProductView

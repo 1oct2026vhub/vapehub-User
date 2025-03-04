@@ -19,7 +19,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
         <ViewAllLink href={viewAllHref} />
       </div>
       <div className="slider-container section-slider products-slider">
-        <ProductsSlider />
+        <ProductsSlider data={{products: [], pagination: {total_count: 3, current_page: 34, limit: 10, offset: 0, total_pages: 3}}}/>
       </div>
     </section>
   );

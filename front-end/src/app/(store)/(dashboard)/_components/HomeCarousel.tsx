@@ -3,13 +3,11 @@ import BannerSlider from './BannerSlider';
 import MobileBannerSlider from './MobileBannerSlider';
 import { getCarouselList } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
-import { toast } from 'sonner'; 
 
 const HomeCarousel: React.FC = async () => {
     const response = await getCarouselList();
     if(response.status === ServerActionStatus.ERROR) {
-      toast.error(response.message); 
-      return;
+      return <p>{response.message}</p>
     }
         
     return (

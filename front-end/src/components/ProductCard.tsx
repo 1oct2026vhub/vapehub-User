@@ -37,10 +37,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   />
                 ) : 
                 
-                // <p>Image not found</p>
-                <Image
-                    src={imageSrc} alt={title} width={245} height={234} className='w-full'
-                  />
+                <p>Image not found</p>
+                
           }
 
           

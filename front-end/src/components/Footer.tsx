@@ -4,13 +4,10 @@ import React from 'react';
 import Logo from './ui/Logo';
 import { DownArrowFilledIcon, FacebookIcon, InstagramIcon, TwitterIcon } from './Icons';
 import { Accordion, AccordionItem } from '@nextui-org/react';
-import { useEffect, useState } from 'react';
-import { getCategoryList } from '@/lib/server.actions';
-import { ServerActionStatus } from '@/lib/config/app.config';
-import { Category } from '@/lib/config/category.config';
 import Link from 'next/link';
+import { Category } from '@/lib/config/category.config';
 
-const Footer = () => {
+const Footer = ({ categories }: { categories: Category[] }) => {
   const footerSections = [
     {
       title: 'help',
@@ -47,24 +44,7 @@ const Footer = () => {
     indicator: "text-medium text-skin-neutral-50 data-[open=true]:rotate-180",
     content: "",
   };
-
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getCategoryList();
-        if (response.status !== ServerActionStatus.SUCCESS) {
-          return;
-        }
-        setCategories(response.data);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+ 
 
   return (
     <footer className="bg-footer-gradient space-y-6 mt-auto">

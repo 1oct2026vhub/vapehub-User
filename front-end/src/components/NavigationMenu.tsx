@@ -1,16 +1,11 @@
-import { AsyncReactElement, ServerActionStatus } from "@/lib/config/app.config";
 import { Category, defaultNavLinks, SubCategory } from "@/lib/config/category.config";
-import { getCategoryList } from "@/lib/server.actions";
 import Link from "next/link";
-import React, { FunctionComponent } from "react";
+import React, { ReactElement } from "react";
 
-const NavigationMenu:FunctionComponent = async (): AsyncReactElement => {
-  // get category list from api
-  const response = await getCategoryList();
-  if(response.status !== ServerActionStatus.SUCCESS) {
-    return <div>Failed to load categories</div>;
-  }
-  const categories: Category[] = response.data;
+type Props = {
+  categories: Category[]
+}
+const NavigationMenu:React.FC<Props> = ({ categories }): ReactElement => {
  
   return (
     <div className="hidden lg:block">

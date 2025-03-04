@@ -9,8 +9,8 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
     if (response.status == ServerActionStatus.ERROR) {
         return (<p> No Manners Available</p>);
     }
-    const banners: BannerResponse[] = response?.data.splice(0, 3) ?? []
-
+    const banners: BannerResponse[] = response?.data ?? []
+   
     return (
         <>
             <section className='grid-cols-1 md:grid-cols-2 gap-7 mt-10 hidden md:grid'>

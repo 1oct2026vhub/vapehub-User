@@ -5,6 +5,7 @@ import { getCarouselList } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 
 const HomeCarousel: React.FC = async () => {
+  
     const response = await getCarouselList();
     if(response.status === ServerActionStatus.ERROR) {
       return <p>{response.message}</p>

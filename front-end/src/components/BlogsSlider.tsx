@@ -25,7 +25,9 @@ const BlogsSlider: FunctionComponent<BlogProps> = ({ data }) => {
       },
     ],
   };
-
+  if (!data.length) {
+    return <p>No Blogs Available</p>
+  }
   return (
     <Slider {...settings}>
       {data.map((blog) => (

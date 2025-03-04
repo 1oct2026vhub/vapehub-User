@@ -8,7 +8,7 @@ const ReferralCard: React.FC = () => {
                 <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold capitalize">
                     Neerajdev R
                 </h3>
-                <p className="text-content-1 font-bold primary-gradient-100">neerajmundoli@gmail.com</p>
+                <p className="text-content-2 md:text-content-1 font-bold primary-gradient-100">neerajmundoli@gmail.com</p>
             </div>
             <div className="space-y-2.5 text-right">
                 <h4 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">

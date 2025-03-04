@@ -1,4 +1,3 @@
-"use client"
 
 import BreadCrumbs from '@/components/BreadCrumbs'; 
 import React, { FunctionComponent, ReactElement } from 'react'; 
@@ -31,9 +30,9 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data}): ReactElement 
             <ProductDetails product={data}/>
             <OrderCard />
             <ProductFeatures />
-            <ProductContent />
+            <ProductContent /> 
             <FAQSection />
-            <RelatedProducts />
+            <RelatedProducts viewAllHref={data.Category.slug} currentProductId={data.id}/>
             <Subscription className="mt-5 md:mt-10"/>
         </main>
     )

@@ -34,7 +34,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
             height={204}
             className=""
           />
-        ) : <p>Image not found</p>}
+        ) : <Image
+        src={"/images/category-image.png"}
+        alt={`${title} Image`}
+        width={230}
+        height={204}
+        className=""
+      />}
        
         <Link href={link}>
         <Button

@@ -151,9 +151,9 @@ export const subscribeMail = async (email: string): Promise<ServerActionResponse
 };
 
 // blog list api
-export const getBlogList = async (): Promise<ServerActionResponse<BlogResponse[]>> => {
+export const getBlogList = async (group?: string | number): Promise<ServerActionResponse<BlogResponse[]>> => {
   return await handleRequest<BlogResponse[], unknown>({
-    endpoint: API_ROUTES.GET_BLOGS,
+    endpoint: API_ROUTES.GET_BLOGS(group),
     method: 'GET',
   });
 }

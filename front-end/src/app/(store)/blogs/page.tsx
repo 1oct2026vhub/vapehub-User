@@ -2,16 +2,61 @@
 
 import BlogCard from '@/components/BlogCard';
 import BreadCrumbs from '@/components/BreadCrumbs';
-import { Card, CardBody, Tab, Tabs } from '@nextui-org/react';
+import { ServerActionStatus } from '@/lib/config/app.config';
+import { BlogResponse } from '@/lib/config/global.config';
+import { getBlogList } from '@/lib/server.actions';
+import { Card, CardBody, Tab, TabItemProps, Tabs } from '@nextui-org/react';
 import { NextPage } from 'next'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
+import { Key } from '@react-types/shared';
+import { ROUTES } from '@/lib/routes';
 
 const BlogsListingPage: NextPage = (): ReactElement => {
 
     const breadcrumbs = [
-        { label: "Home", href: "/" },
-        { label: "Blogs", href: "/blogs", isActive: true },
+        { label: "Home", href: ROUTES.WELCOME },
+        { label: "Blogs", href: ROUTES.BLOGS, isActive: true },
     ];
+    const tabs: TabItemProps[] = [
+        {
+            key: "",
+            title: "All",
+            
+        },
+        {
+            key: "Geek Zone",
+            title: "Geek Zone",
+        },
+        {
+            key: "Product Reviews",
+            title: "Product Reviews",
+        },
+    ]
+    const [blogs, setBlogs] = useState<BlogResponse[]>([]);
+    const [selectedTab, setSelectedTab] = useState<Key>("");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchBlogs = async () => {
+            setLoading(true);
+            const response = await getBlogList(selectedTab);
+            if (response.status === ServerActionStatus.ERROR) {
+                setBlogs([]);
+            } else {
+                setBlogs(response.data);
+            }
+            setLoading(false);
+        };
+
+
+        fetchBlogs();
+    }, [selectedTab]);
+
+    const handleTabChange = (tabKey: Key) => {
+        setSelectedTab(tabKey);
+    };
+
+    
 
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
@@ -19,7 +64,7 @@ const BlogsListingPage: NextPage = (): ReactElement => {
             <section className="w-full">
                 <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Blogs</h1>
                 <div className='w-full mt-2.5 lg:-mt-16'>
-                    <Tabs aria-label="Options"
+                    <Tabs aria-label="Options" onSelectionChange={(e) => handleTabChange(e)}
                         variant='bordered'
                         color='primary'
                         classNames={{
@@ -31,48 +76,24 @@ const BlogsListingPage: NextPage = (): ReactElement => {
                             panel: "!px-0"
                         }}
                     >
-                        <Tab key="All" title="All">
-                            <Card classNames={{
-                                base: "!bg-transparent border-none shadow-none p-0"
-                            }}>
-                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                </CardBody>
-                            </Card>
-                        </Tab>
-                        <Tab key="Category 01" title="Category 01">
-                            <Card classNames={{
-                                base: "!bg-transparent border-none shadow-none p-0"
-                            }}>
-                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                </CardBody>
-                            </Card>
-                        </Tab>
-                        <Tab key="Category 02" title="Category 02">
-                            <Card classNames={{
-                                base: "!bg-transparent border-none shadow-none p-0"
-                            }}>
-                                <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                    <BlogCard />
-                                </CardBody>
-                            </Card>
-                        </Tab>
+                        
+                        {tabs.map((tab) => (
+                            <Tab key={tab.key} title={tab.title} >
+                                <Card classNames={{
+                                    base: "!bg-transparent border-none shadow-none p-0"
+                                }}>
+                                    <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
+                                        {
+                                           loading? <p>Loading..</p>: !blogs.length ?<p>No Blogs Available</p>: blogs.map((blog: BlogResponse, idx: number) => (
+                                                <BlogCard key={idx} blog={blog}/>
+                                            ))
+                                        }
+
+
+                                    </CardBody>
+                                </Card>
+                            </Tab>
+                        ))}
                     </Tabs>
                 </div>
 

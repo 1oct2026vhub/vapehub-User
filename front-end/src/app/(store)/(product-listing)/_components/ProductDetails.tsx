@@ -58,24 +58,20 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                 <div className='space-y-2 lg:hidden'>
                     <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold mr-8'>{product?.name}</h1>
                     <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
-                        Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.name)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
+                        Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.slug)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex gap-1">
-                            {product?.ProductImages.slice(1, 4).map((image) => (
-                                <>
-                                    {image && image?.image_url.startsWith('http') ? (
-
-                                        <Image
-                                            key={image.id}
-                                            src={image.image_url}
-                                            alt='Review star'
-                                            width={16}
-                                            height={16}
-                                            className='md:w-5 md:h-5' />
-                                    ) : <p>Image not found</p>}
-                                </>
+                        {Array.from({ length: 5 }, (_, i) => (
+                                <Image
+                                    key={i}
+                                    src='/images/review-star.svg'
+                                    alt='Review star'
+                                    width={16}
+                                    height={16}
+                                    className='md:w-5 md:h-5' />
                             ))}
+
                         </div>
                         <p className="text-title-2 xl:text-lg text-black font-bold mt-1">(10 Reviews)</p>
                     </div>
@@ -130,7 +126,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                     <div className='space-y-3.5 hidden lg:block'>
                         <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>{product?.name}</h1>
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
-                            Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.name)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
+                            Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.slug)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex gap-1">
@@ -186,8 +182,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                                 listboxWrapper: "max-h-[400px]",
                             }}
                         >
-                            {product?.Flavors.map((flavour) => (
-                                <SelectItem key={flavour.id}>{flavour.name}</SelectItem>
+                            {product?.Flavors.map((flavour, idx) => (
+                                <SelectItem key={idx}>{flavour.name}</SelectItem>
                             ))}
                         </Select>
                     </div>

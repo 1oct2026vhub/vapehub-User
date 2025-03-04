@@ -31,17 +31,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <Link href={link} className="block">
       <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-neutral-50 rounded-10">
-          {imageSrc && imageSrc.startsWith('http') ? (
-                  <Image
-                    src={imageSrc} alt={title} width={245} height={234} className='w-full'
-                  />
-                ) : 
-                
-                <p>Image not found</p>
-                
+          {imageSrc || imageSrc.startsWith('http') ? (
+            <Image
+              src={imageSrc} alt={title} width={245} height={234} className='w-full'
+            />
+          ) :
+
+            <p>Image not found</p>
+
           }
 
-          
+
           <div className='quantity'>
             <span>{totalPuffs}</span>
           </div>
@@ -52,7 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </div>
             )
           }
-          
+
         </div>
         <div className="flex flex-col gap-2.5 md:gap-3.5">
           <div className="flex flex-col justify-between xl:min-h-[77px]">
@@ -60,13 +60,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-center gap-1">
               <div className="flex">
                 {Array.from({ length: 5 }, (_, i) => (
-                  <Image  key={i} src='/images/review-star.svg' alt='review star' width={12} height={12} className='w-3 md:w-4' />
+                  <Image key={i} src='/images/review-star.svg' alt='review star' width={12} height={12} className='w-3 md:w-4' />
                 ))}
               </div>
               <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5 md:mt-1">({reviews} Reviews)</p>
             </div>
           </div>
-          {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p>: null}
+          {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p> : null}
           <div className="flex items-center justify-between gap-2">
             <h5 className="text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</h5>
             <Button

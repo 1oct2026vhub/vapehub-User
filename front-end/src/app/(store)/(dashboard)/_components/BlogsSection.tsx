@@ -12,7 +12,7 @@ interface BlogsSectionProps {
 
 const BlogsSection: React.FC<BlogsSectionProps> = async ({
   title = "New to Vaping",
-  viewAllHref = "#",
+  viewAllHref = "/blogs",
 }): AsyncReactElement => {
   const response = await getBlogList();
       if (response.status == ServerActionStatus.ERROR) {

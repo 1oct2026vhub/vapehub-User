@@ -1,3 +1,5 @@
+import { ROUTES } from "../routes";
+
 export interface Category extends SubCategory {
     id: number;
     updated_by: string | null;    
@@ -6,6 +8,10 @@ export interface Category extends SubCategory {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+    name: string;
+    description: string;
+    slug: string;
+    
 }
 export interface SubCategory {
     name: string;
@@ -15,15 +21,15 @@ export interface SubCategory {
 export const defaultNavLinks:SubCategory[] = [
     {
         name: "Brands",
-        slug: "/brands",
+        slug: ROUTES.BRANDS,
     },
     {
         name: "Blogs",
-        slug: "/blogs",
+        slug: ROUTES.BLOGS,
     },
     {
         name: "Deals",
-        slug: "/deals",
+        slug: ROUTES.DEALS,
     }
 
 ];

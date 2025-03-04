@@ -8,6 +8,12 @@ import { signOut, useSession } from "next-auth/react";
 const MyAccountTab: FunctionComponent = (): ReactElement => {
     const [isLogin, setLogin] = useState(true);
     const { data: sessionData, status } = useSession();
+
+    if (status == 'loading') return (
+        <div className="auth-form-wrapper">
+            <p>Loading...</p>
+        </div>
+    );
      
     if (status == 'authenticated') return (
         <div className="auth-form-wrapper">

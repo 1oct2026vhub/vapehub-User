@@ -1,5 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
+import { Category } from '@/lib/config/category.config';
+import { BrandConfig } from '@/lib/config/brand.config';
 
 const banners = [
     { src: '/images/product-banner-1.jpg', alt: 'Elf Bar Disposable Vape' },
@@ -7,14 +9,18 @@ const banners = [
     { src: '/images/product-banner-3.jpg', alt: 'Hayati Disposable Vape' },
 ];
 
-const ProductListingContent: React.FC = () => {
+type CategoryProps = {
+    data: Category | BrandConfig;
+}
+
+const ProductListingContent: React.FC<CategoryProps> = ({data}) => {
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
-                <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Disposable Vapes</h1>
+                <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>{data.name}</h1>
                 <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">
                     <p>
-                        There’s nothing quite like the convenience of disposable vapes. Perfect for those on the go, Disposable vape kits offer a hassle-free vaping experience that can be enjoyed without having to worry about recharging batteries or refilling tanks with e-liquid. The Disposable Vape market is immense and we stock all the top brands such as Elf Bar, Elux, Hayati, IVG, SKE and more! So whether you’re looking for a quick and convenient way to vape on the go, or you’re simply trying out vaping for the first time, disposable vape devices are the perfect solution! Browse our range of disposables today and find your perfect match.
+                        {'description' in data ? data.description : ''}
                     </p>
                     <p>
                         Get the most for your money with our amazing 3 for £10 deal and 3 for £30 offer on disposable vapes from leading brands! Mix & Match to find the perfect combination of devices, or just stock up on great deals. They’re not our only multibuy deals, we have plenty more!

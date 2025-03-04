@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "vapehub-dev.s3.eu-central-1.amazonaws.com",
+        port: '',
+        pathname: '/**',
+      },
     ]
   }
 };

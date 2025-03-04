@@ -194,9 +194,9 @@ input[type='search'] {
 
 .slick-prev,
 .slick-next {
-  @apply w-6 h-6 sm:w-9 sm:h-9 lg:w-[50px] lg:h-[50px] border-solid border-2 md:border-3 border-skin-neutral-200 hover:bg-skin-neutral-100;
+  @apply w-6 h-6 sm:w-9 sm:h-9 lg:w-[50px] lg:h-[50px] border-solid border-2 md:border-3 border-skin-neutral-200 hover:!bg-skin-neutral-100;
   z-index: 10;
-  background: var(--neutral-50);
+  background: var(--neutral-50) !important;
   border-radius: 50%;
   display: flex;
   align-items: center;

@@ -8,7 +8,6 @@ const menuItems = [
   { label: "Your Orders", path: "/my-account/orders" },
   { label: "Personal Information", path: "/my-account/personal-info" },
   { label: "Manage Addresses", path: "/my-account/addresses" },
-  { label: "Payment Methods", path: "/my-account/payment-methods" },
   { label: "Security", path: "/my-account/security" },
   { label: "Referrals", path: "/my-account/referrals" },
 ];

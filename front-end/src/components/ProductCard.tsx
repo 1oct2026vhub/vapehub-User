@@ -43,7 +43,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 
           }
 
-          
+
           <div className='quantity'>
             <span>{totalPuffs}</span>
           </div>
@@ -54,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </div>
             )
           }
-          
+
         </div>
         <div className="flex flex-col gap-2.5 md:gap-3.5">
           <div className="flex flex-col justify-between xl:min-h-[77px]">
@@ -62,13 +62,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-center gap-1">
               <div className="flex">
                 {Array.from({ length: 5 }, (_, i) => (
-                  <Image  key={i} src='/images/review-star.svg' alt='review star' width={12} height={12} className='w-3 md:w-4' />
+                  <Image key={i} src='/images/review-star.svg' alt='review star' width={12} height={12} className='w-3 md:w-4' />
                 ))}
               </div>
               <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5 md:mt-1">({reviews} Reviews)</p>
             </div>
           </div>
-          {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p>: null}
+          {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p> : null}
           <div className="flex items-center justify-between gap-2">
             <h5 className="text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</h5>
             <Button

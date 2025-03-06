@@ -42,7 +42,9 @@ const CategorySlider: React.FC<props> = ({ categories }): ReactElement => {
         ]
     };
 
-
+    if (categories.length === 0) {
+        return <p>No categories available</p>;
+    }
     return (
         <Slider {...settings}>
             {categories.map((category, index) => (

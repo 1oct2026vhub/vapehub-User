@@ -194,7 +194,7 @@ const ShortFills: React.FC = () => {
                                 reviews={10}
                                 flavors={product.Flavors}
                                 link={`/${product.slug}`}
-                                totalPuffs={`${product.puff_count} Puffs`}
+                                totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}
                                 isNew={isLessThanOneMonth(product.createdAt) ? "New" : ""}
                             />
                         </div>

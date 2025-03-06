@@ -14,10 +14,10 @@ export const MostPopularVapes: React.FC<MostPopularProps> = async ({
   title = "Most Popular Disposable Vapes",
   viewAllHref = "#",
 }):AsyncReactElement => {
-  const response = await getProductByCategory(viewAllHref, {sort_by:"id",order:"ASC",limit:20,offset:0});
+  const response = await getProductByCategory(viewAllHref, {sort_by:"id",order:"ASC",limit:10,offset:0});
   
     if(response.status == ServerActionStatus.ERROR) {
-      return (<p> No Products Available</p>);
+      return (<p>{response.message}</p>);
     }
     
   return (
@@ -37,9 +37,9 @@ export const MostPopularSalts: React.FC<MostPopularProps> = async ({
     title = "Most Popular Nic Salts",
     viewAllHref = "#",
   }): AsyncReactElement => {
-    const response = await getProductByCategory(viewAllHref, {sort_by:"id",order:"ASC",limit:20,offset:0});
+    const response = await getProductByCategory(viewAllHref, {sort_by:"id",order:"ASC",limit:10,offset:0});
     if(response.status == ServerActionStatus.ERROR) {
-      return (<p> No Products Available</p>);
+      return (<p>{response.message}</p>);
     }
     
     return (

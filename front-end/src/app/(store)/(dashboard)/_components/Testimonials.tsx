@@ -14,7 +14,7 @@ const Testimonials: FunctionComponent<TestimonialsProps> = async ({
 }): AsyncReactElement => {
     const response = await getTestimonialsList();
     if (response.status == ServerActionStatus.ERROR) {
-        return (<p> No Testimonial Available</p>);
+        return (<p>{response.message}</p>);
     }
     return (
         <section className="space-y-4.5 md:space-y-7.5">

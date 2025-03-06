@@ -169,7 +169,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                     <div className='space-y-2 lg:space-y-3.5'>
                         <div>
                             <p className='text-content-1 sm:text-title-2 lg:text-title-1 font-semibold text-black'>Flavours</p>
-                            <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>{product?.Flavors.length} available</p>
+                            <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>{product?.Flavors?.length} available</p>
                         </div>
                         <Select
                             size='sm'

@@ -32,7 +32,7 @@ const Dashboard: NextPage = (): ReactElement => {
         <NewProducts />
         <ShopByDeals />
         <MostPopularVapes viewAllHref="disposables"/>
-        <MostPopularSalts viewAllHref="pod-kit"/>
+        <MostPopularSalts viewAllHref="nic-salts"/>
         <PromotionalBanners />
         <ReferFriend />
         <Testimonials />

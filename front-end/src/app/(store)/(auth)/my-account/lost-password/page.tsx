@@ -4,7 +4,7 @@ import { Metadata, NextPage } from "next";
 import { redirectIfAuthenticated } from "@/lib/config/auth.config";
 
 export const metadata: Metadata = {
-    title: "My account | Lost Password",
+    title: "My account | Forgot Password",
     description: "",
   };
 

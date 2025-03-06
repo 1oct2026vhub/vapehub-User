@@ -36,7 +36,6 @@ const Footer = async (): AsyncReactElement => {
         'Refer A Friend',
       ],
     },
-
   ];
 
   const socialMediaLinks = [

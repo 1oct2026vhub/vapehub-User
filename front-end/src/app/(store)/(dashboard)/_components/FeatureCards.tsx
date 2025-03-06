@@ -28,7 +28,7 @@ const features: FeatureCardProps[] = [
     subtitle: "Orders-3pm",
   },
   {
-    imageSrc: "/images/price.svg",
+    imageSrc: "/images/deals.svg",
     altText: "Multibuy Deals",
     title: "Multibuy Deals",
     subtitle: "Huge Savings",

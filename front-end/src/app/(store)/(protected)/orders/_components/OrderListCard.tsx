@@ -19,10 +19,10 @@ const OrderListCard: React.FC<OrderListCardProps> = ({ status, imageSrc, title, 
   );
 
   return (
-    <a href="" className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
+    <a href="" className="bg-white rounded-14 shadow-card hover:shadow-brand-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
       {/* Product Image Section */}
-      <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
-        <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
+      <div className="bg-skin-white p-1 md:p-2 rounded-md md:rounded-10 shadow-brand-card min-w-16 md:min-w-36">
+        <div className="bg-skin-base border border-skin-neutral-100 rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
           <Image src={imageSrc} alt={title} width={104} height={100} />
         </div>
       </div>

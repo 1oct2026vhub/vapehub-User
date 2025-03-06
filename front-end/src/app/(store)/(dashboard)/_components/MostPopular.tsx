@@ -22,7 +22,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = async ({
     
   return (
     <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <SectionHeading title={title} />
         <ViewAllLink href={viewAllHref} />
       </div>
@@ -44,7 +44,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = async ({
     
     return (
       <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <SectionHeading title={title} />
           <ViewAllLink href={viewAllHref} />
         </div>

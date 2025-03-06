@@ -9,7 +9,9 @@ const ViewAllLink: React.FC<ViewAllLinkProps> = ({
 }) => {
 
   return (
-    <a href={href} className='text-content-2 sm:text-title-2 lg:text-title-1 primary-gradient-100 whitespace-nowrap font-semibold'>View All</a>
+    <div className="hover:underline">
+      <a href={href} className='text-content-2 sm:text-title-2 lg:text-title-1 primary-gradient-100 whitespace-nowrap font-semibold hover:pr-2 transition-all duration-300'>View All</a>
+    </div>
   );
 };
 

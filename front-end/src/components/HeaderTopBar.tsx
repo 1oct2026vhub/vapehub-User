@@ -38,7 +38,7 @@ const HeaderTopBar = () => {
                                 classNames={{
                                     input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
                                 }}
-                                startContent={<SearchIcon />}
+                                startContent={<SearchIcon className='w-4 h-4 md:w-max md:h-max' />}
                             />
                         </form>
                     </Form>

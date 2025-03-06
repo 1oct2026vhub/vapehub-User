@@ -8,7 +8,6 @@ import Link from 'next/link'
 import InputForm from '@/components/InputForm'
 import { Button } from '@nextui-org/button'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react'
-import { SearchIcon } from '@/components/Icons'
 
 const PersonalInfo: NextPage = () => {
 

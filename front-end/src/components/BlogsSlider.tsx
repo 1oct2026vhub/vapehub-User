@@ -14,6 +14,7 @@ const BlogsSlider: FunctionComponent<BlogProps> = ({ data }) => {
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 4,
+    lazyLoad:"progressive",
     responsive: [
       {
         breakpoint: 1280,

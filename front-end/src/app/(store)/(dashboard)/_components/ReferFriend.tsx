@@ -27,6 +27,7 @@ const ReferFriend: React.FC = () => {
                     alt='Refer Friend'
                     width={533}
                     height={280}
+                    loading="lazy"
                     className='mx-auto'
                 />
             </div>

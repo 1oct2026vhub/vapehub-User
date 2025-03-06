@@ -15,7 +15,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ]
-  }
+  },
+  trailingSlash: true
 };
 
 export default nextConfig;

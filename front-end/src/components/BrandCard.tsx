@@ -23,7 +23,7 @@ const BrandCard: React.FC<BrandCardProps> = ({
     >
       {imageSrc && imageSrc.startsWith('http') ? (
         <Image
-          src={imageSrc} alt={altText} width={width} height={height}
+          src={imageSrc} alt={altText} width={width} height={height} loading="lazy"
         />
       ) : <p>Image not found</p>}
 

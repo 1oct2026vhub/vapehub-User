@@ -3,8 +3,17 @@ import HeaderTopBar from "@/components/HeaderTopBar";
 import NavigationMenu from "@/components/NavigationMenu";
 import PromotionBanner from "@/components/ui/PromotionBanner";
 import { Category } from '@/lib/config/category.config';
+import { getCategoryList } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
 
-const Header = ({ categories }: { categories: Category[] }) => {
+const Header = async () => {
+     const response = await getCategoryList();
+        if(response.status !== ServerActionStatus.SUCCESS) {
+          return <div>{response.message}</div>;
+        }
+        const categories: Category[] = response.data;
+       
+        
     return (
         <>
             <PromotionBanner message="New! Try the AL-Fakher Hypermax 15000 Puffs!" />

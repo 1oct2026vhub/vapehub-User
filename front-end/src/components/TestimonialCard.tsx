@@ -34,6 +34,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
                     alt={altText}
                     width={width}
                     height={height}
+                    loading="lazy"
                     className="max-w-8 min-w-8 md:min-w-[60px] md:max-w-max aspect-square"
                 />
                 <div className="flex items-center gap-1">

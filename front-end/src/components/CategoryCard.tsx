@@ -33,6 +33,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
             width={230}
             height={204}
             className=""
+            loading="lazy"
           />
         ) : <Image
         src={"/images/category-image.png"}
@@ -40,6 +41,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         width={230}
         height={204}
         className=""
+        loading="lazy"
       />}
        
         <Link href={link}>

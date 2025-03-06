@@ -141,8 +141,8 @@ const Pods: React.FC = () => {
 
     return (
         <div className='space-y-4 mt-7 md:mt-12.5 mb-10'>
-            <div className="flex items-center justify-between">
-                <h2 className='text-h5 md:text-h4 font-bold text-skin-neutral-500'>Pods</h2>
+            <div className="flex items-end md:items-center justify-between">
+                <h2 className='text-h5 md:text-h4 font-bold leading-none text-skin-neutral-500'>Pods</h2>
                 <ViewAllLink href='#' />
             </div>
             <Select
@@ -152,7 +152,7 @@ const Pods: React.FC = () => {
                 label="Deals"
                 classNames={{
                     label: "!text-content-1 !text-skin-neutral-500 font-bold",
-                    trigger: "shadow-base border border-skin-primary-400 max-w-44",
+                    trigger: "shadow-base border !border-skin-primary-400 max-w-44",
                     listboxWrapper: "max-h-[400px]",
                 }}
                 selectionMode="multiple" // Allows multiple selections
@@ -185,7 +185,7 @@ const Pods: React.FC = () => {
             <div className="slider-container section-slider products-slider">
                 <Slider {...settings}>
                     {products.map((product, index) => (
-                        <div key={index} className="px-1 md:px-2 xl:px-5 py-4">
+                        <div key={index} className="px-1 md:px-2 xl:px-5 py-4 first:pl-0">
                             <ProductCard
                                 title={product.name}
                                 imageSrc={product.imageSrc}

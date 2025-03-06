@@ -1,6 +1,6 @@
 import React from "react";
 import SectionHeading from "@/components/ui/SectionHeading";
-import ViewAllLink from "@/components/ui/ViewAllLink";
+// import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
 import { AsyncReactElement, ServerActionStatus } from "@/lib/config/app.config";
 import { getProductList } from "@/lib/server.actions"; 
@@ -11,8 +11,7 @@ interface NewProductsProps {
 }
 
 const NewProducts: React.FC<NewProductsProps> = async ({
-  title = "New Products",
-  viewAllHref = "#",
+  title = "New Products"
 }): AsyncReactElement => {
   const response = await getProductList({sort_by:"id",order:"DESC",limit:10,offset:0});
   if(response.status == ServerActionStatus.ERROR) {
@@ -23,7 +22,7 @@ const NewProducts: React.FC<NewProductsProps> = async ({
     <section className="space-y-4.5 md:space-y-7.5">
       <div className="flex items-center justify-between">
         <SectionHeading title={title} />
-        <ViewAllLink href={viewAllHref} />
+        {/* <ViewAllLink href={viewAllHref} /> */}
       </div>
       <div className="slider-container section-slider products-slider">
         <ProductsSlider data={response.data}/>

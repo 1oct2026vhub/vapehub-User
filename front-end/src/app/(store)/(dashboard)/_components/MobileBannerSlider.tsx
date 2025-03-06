@@ -16,7 +16,7 @@ type BannerSliderProps = {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 5000,
+    autoplaySpeed: 5000,    
   };
    
 
@@ -34,7 +34,7 @@ const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => 
           className="overflow-hidden rounded-lg"
         >
           <Image
-            src={banner?.image_url}
+            src={banner?.image_url_low || banner?.image_url}
             alt={banner.title}
             width={361}
             height={382}

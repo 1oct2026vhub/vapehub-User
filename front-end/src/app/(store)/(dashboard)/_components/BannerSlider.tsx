@@ -32,7 +32,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
           className="overflow-hidden rounded-2.5xl"
         >
           <Image
-            src={banner?.image_url}
+            src={banner?.image_url_mid || banner?.image_url}
             alt={banner?.title}
             width={1340}
             height={671}

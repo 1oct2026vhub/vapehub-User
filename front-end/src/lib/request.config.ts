@@ -20,6 +20,25 @@ type HandleRequest<G> =
       method: 'GET' | 'DELETE';
     };
 
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 1000; // in milliseconds
+
+    const fetchWithRetry = async (input: RequestInfo, init?: RequestInit, retries = MAX_RETRIES): Promise<Response> => {
+      try {
+        const response = await fetch(input, init);
+        if (!response.ok && retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+          return fetchWithRetry(input, init, retries - 1);
+        }
+        return response;
+      } catch (error) {
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+          return fetchWithRetry(input, init, retries - 1);
+        }
+        throw error;
+      }
+    };
 // * API helper functions
 export const handleRequest = async <T, G>(
     requestData: HandleRequest<G>
@@ -28,7 +47,7 @@ export const handleRequest = async <T, G>(
     try {
       const headers = await buildHeaders(requestData);
       
-      const response = await fetch(endpoint, {
+      const response = await fetchWithRetry(endpoint, {
         method,
         headers,
         body: buildRequestBody(requestData),

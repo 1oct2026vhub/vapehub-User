@@ -7,10 +7,12 @@ import React from 'react'
 const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
     const response = await getPromotionBanner();
     if (response.status == ServerActionStatus.ERROR) {
-        return (<p> No Manners Available</p>);
+        return (<p>{response.message}</p>);
     }
     const banners: BannerResponse[] = response?.data ?? []
-   
+   if (!banners.length) {
+    return <p>No Banners Available</p>
+   }
     return (
         <>
             <section className='grid-cols-1 md:grid-cols-2 gap-7 mt-10 hidden md:grid'>

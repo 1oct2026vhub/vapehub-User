@@ -11,7 +11,7 @@ import React from 'react'
 const HottestCollections: React.FC = async ():Promise<AsyncReactElement> => {
      const response = await getBrandList();
     if (response.status == ServerActionStatus.ERROR) {
-        return <div>No Collections</div>;
+        return <div>{response.message}</div>;
     }
     const brands: BrandConfig[] = (response.data ?? []).slice(0, 10);
     
@@ -23,14 +23,15 @@ const HottestCollections: React.FC = async ():Promise<AsyncReactElement> => {
                 <p className='text-content-2 md:text-lg text-skin-neutral-300 font-bold'>The leading brands delivering exceptional products</p>
             </div>
             <div className='flex flex-wrap items-center justify-center gap-6 md:gap-8.5 px-8'>
-                {brands.map((brand, index) => (
+
+                {brands.length ? brands.map((brand, index) => (
                     <BrandCard
                         key={index}
                         imageSrc={brand.logo_url}
                         altText={brand.name}
                         href={ROUTES.BRAND.replace(':slug', brand.slug)}
                     />
-                ))}
+                )): <p>No Brands available</p>}
             </div>
            
             <Button

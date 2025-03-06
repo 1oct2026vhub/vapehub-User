@@ -19,7 +19,6 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
     slidesToShow: 4,
     slidesToScroll: 1,
     initialSlide: 0,
-    lazyLoad: "progressive",
     responsive: [
       {
         breakpoint: 1280,
@@ -63,9 +62,9 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
             price={product?.price}
             buttonText={"3 for £30"}
             reviews={10}
-            flavors={product?.Flavors.length}
+            flavors={product?.Flavors?.length}
             link={`/${product.slug}`}
-            totalPuffs={`${product?.puff_count} Puffs`}
+            totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}
             isNew={isLessThanOneMonth(product?.createdAt) ? "New" : ""} 
           />
         </div>

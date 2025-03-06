@@ -14,9 +14,9 @@ const NewProducts: React.FC<NewProductsProps> = async ({
   title = "New Products",
   viewAllHref = "#",
 }): AsyncReactElement => {
-  const response = await getProductList({sort_by:"id",order:"DESC",limit:20,offset:0});
+  const response = await getProductList({sort_by:"id",order:"DESC",limit:10,offset:0});
   if(response.status == ServerActionStatus.ERROR) {
-    return (<p> No Products Available</p>);
+    return (<p>{response.message}</p>);
   }
  
   return (

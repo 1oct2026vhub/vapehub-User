@@ -19,6 +19,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
     slidesToShow: 4,
     slidesToScroll: 1,
     initialSlide: 0,
+    lazyLoad: "progressive",
     responsive: [
       {
         breakpoint: 1280,

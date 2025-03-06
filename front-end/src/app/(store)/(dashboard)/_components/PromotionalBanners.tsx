@@ -26,6 +26,7 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
                             width={662}
                             height={573}
                             className='w-full h-full'
+                            loading="lazy"
                         />
                     </div>
                 }
@@ -40,6 +41,7 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
                                 width={662}
                                 height={274}
                                 className='w-full'
+                                loading="lazy"
                             />
                         </div>
                     }
@@ -52,6 +54,7 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
                                 width={662}
                                 height={274}
                                 className='w-full'
+                                loading="lazy"
                             />
                         </div>
                     }
@@ -67,6 +70,7 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
                             width={361}
                             height={274}
                             className='w-full max-h-[274px]'
+                            loading="lazy"
                         />
                     </div>
                 }
@@ -79,6 +83,7 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
                             width={361}
                             height={274}
                             className='w-full max-h-[274px]'
+                            loading="lazy"
                         />
                     </div>
                 }

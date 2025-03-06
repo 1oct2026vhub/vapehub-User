@@ -44,6 +44,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
       width={58}
       height={58}
       className="max-w-9 lg:max-w-fit"
+      loading="lazy"
     />
     <div className="text-content-2 md:text-title-2 xl:text-title-1 text-center">
       <h3 className="font-semibold text-skin-neutral-400">{title}</h3>

@@ -1,5 +1,7 @@
 "use client"
+
 import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
+import { SeperatorIcon } from "./Icons";
 
 interface Crumb {
   label: string;
@@ -17,7 +19,7 @@ const BreadCrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
       itemClasses={{
         separator: "px-2 leading-none !text-skin-neutral-200",
       }}
-      separator=">>"
+      separator={<SeperatorIcon />}
     >
       {items.map((crumb, index) => (
         <BreadcrumbItem

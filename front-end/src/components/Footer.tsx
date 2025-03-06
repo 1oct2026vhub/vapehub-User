@@ -89,7 +89,6 @@ const Footer = ({ categories }: { categories: Category[] }) => {
         {/* Mobile Section */}
         <div className='w-full md:hidden'>
           <Accordion variant='light' className="!px-0" itemClasses={itemClasses} selectionMode='multiple'>
-            <>
               {footerSections.map((section, index) => (
                 <AccordionItem key={index} aria-label={section.title} title={section.title} indicator={<DownArrowFilledIcon />}>
                   <ul className="space-y-2.5">
@@ -106,7 +105,6 @@ const Footer = ({ categories }: { categories: Category[] }) => {
                   </ul>
                 </AccordionItem>
               ))}
-            </>
             <AccordionItem aria-label="shop" title="shop" indicator={<DownArrowFilledIcon />}>
               <ul className="space-y-2.5">
                 {categories.length > 0 && categories.slice(0, 8).map((category, idx) => (

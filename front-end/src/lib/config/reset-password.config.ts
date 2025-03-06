@@ -43,18 +43,18 @@ export type ChangePasswordFormSchema = z.infer<typeof CHANGE_PASSWORD_SCHEMA>;
 
 export const CHANGE_PASSWORD_FORM_CONFIG = {
   CURRENT_PASSWORD: {
-    LABEL: 'Current password',
+    LABEL: 'Current Password',
     PH: 'Enter current password',
     TYPE: 'password',
   },
   NEW_PASSWORD: {
-    LABEL: 'New password',
+    LABEL: 'New Password',
     PH: 'Enter new password',
     TYPE: 'password',
   },
   CHANGE_PASSWORD: {
-    LABEL: 'Confirm new password',
-    PH: 'Confirm new password',
+    LABEL: 'Confirm Password',
+    PH: 'Confirm Password',
     TYPE: 'password',
   },
 };

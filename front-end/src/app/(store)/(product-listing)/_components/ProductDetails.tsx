@@ -56,7 +56,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 {/* Title section mobile */}
                 <div className='space-y-2 lg:hidden'>
-                    <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold mr-8'>{product?.name}</h1>
+                    <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold'>{product?.name}</h1>
                     <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                         Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.slug)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
                     </div>
@@ -79,7 +79,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit '>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full lg:w-[400px] xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2 min-h-[250px] lg:min-h-[425px]'>
                         {mainImage && mainImage?.image_url.startsWith('http') ? (
                             <Image
                                 src={mainImage?.image_url}
@@ -219,8 +219,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                         </div>
                         {
                             product?.stock_quantity > 0 ?
-                                <p className='text-title-2 font-bold primary-gradient-100'>In stock</p> :
-                                <p className='text-title-2 font-bold text-red-500'>Out of stock</p>
+                                <p className='text-content-2 md:text-title-2 font-bold primary-gradient-100'>In stock</p> :
+                                <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>
                         }
 
                     </div>

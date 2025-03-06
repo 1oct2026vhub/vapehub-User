@@ -16,7 +16,7 @@ const BlogsSection: React.FC<BlogsSectionProps> = async ({
 }): AsyncReactElement => {
   const response = await getBlogList("");
       if (response.status == ServerActionStatus.ERROR) {
-          return (<p> No Blog Available</p>);
+          return (<p>{response.message}</p>);
       } 
   
   return (

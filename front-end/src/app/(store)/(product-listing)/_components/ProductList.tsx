@@ -84,10 +84,10 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
                 imageSrc={product.ProductImages?.[0]?.image_url}
                 price={product.price}
                 buttonText={"3 for £30"}
-                flavors={product?.Flavors.length}
+                flavors={product?.Flavors?.length}
                 reviews={10}
                 link={`/${product.slug}`}
-                totalPuffs={`${product?.puff_count} Puffs`}
+                totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}
                 isNew={isLessThanOneMonth(product?.createdAt) ? "New" : ""}
               />
             ))}

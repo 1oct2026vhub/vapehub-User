@@ -17,14 +17,24 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ showAddMoreItem = false }) 
           </div>
         </div>
 
-        <div className="flex items-start gap-2.5 md:gap-5">
-          <div className="flex flex-col gap-4 md:gap-8 justify-between">
+        <div className="flex flex-col gap-2.5 md:gap-5">
+          <div className="flex items-start gap-4 md:gap-8 justify-between">
             <h4 className="text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
               RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles
             </h4>
 
-            {/* Quantity Selector */}
-            <div className="flex items-center border bg-skin-white w-fit shadow-base text-content-2 md:text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10 mt-auto">
+            {/* Price Section */}
+            <div className="text-right">
+              <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold">£12.99</p>
+              <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">£12.99</p>
+            </div>
+
+           
+          </div>
+
+          <div className="flex items-center gap-5 justify-between">
+             {/* Quantity Selector */}
+             <div className="flex items-center border bg-skin-white w-fit shadow-base text-content-2 md:text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10 mt-auto">
               <Button
                 isIconOnly
                 size="lg"
@@ -44,14 +54,6 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ showAddMoreItem = false }) 
               >
                 <PlusIcon className='w-3 md:w-6'/>
               </Button>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-5 justify-between">
-            {/* Price Section */}
-            <div className="text-right">
-              <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold">£12.99</p>
-              <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">£12.99</p>
             </div>
 
             {/* Action Buttons */}

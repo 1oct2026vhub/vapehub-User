@@ -46,3 +46,8 @@ export interface BannerResponse {
     updatedAt: string;
     deletedAt: string | null;
 }
+
+export interface FooterConfig {
+    title: string;
+    links: string[]; 
+}

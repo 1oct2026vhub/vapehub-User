@@ -43,10 +43,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 
           }
 
-
-          <div className='quantity'>
+          {totalPuffs && (
+            <div className='quantity'>
             <span>{totalPuffs}</span>
           </div>
+          )}
+          
           {
             isNew && (
               <div className='new-product'>

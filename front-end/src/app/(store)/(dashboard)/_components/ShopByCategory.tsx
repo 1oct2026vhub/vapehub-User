@@ -10,7 +10,7 @@ import { ServerActionStatus } from "@/lib/config/app.config";
 const ShopByCategory: FunctionComponent = async ():Promise<ReactElement> => {
    const response = await getCategoryList();
     if(response.status !== ServerActionStatus.SUCCESS) {
-      return <div>Failed to load categories</div>;
+      return <div>{response.message}</div>;
     }
     const categories:Category[] = response.data ?? [];
    

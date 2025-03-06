@@ -18,7 +18,7 @@ const AccountSecurity: NextPage = () => {
             <section className="flex flex-col md:flex-row items-start justify-between gap-4">
                 <AccountSidebar />
 
-                <form className="p-4 bg-skin-white rounded-14 shadow-card space-y-6 w-full h-full md:min-h-[670px]">
+                <form className="p-4 bg-skin-white rounded-14 shadow-card space-y-6 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
                     <div className="flex items-start flex-col gap-4.5">
                         <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
                             User ID
@@ -32,11 +32,11 @@ const AccountSecurity: NextPage = () => {
                     </div>
                     <div className="flex items-start flex-col gap-4.5">
                         <div className='flex items-center gap-4'>
-                            <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Password</h2>
+                            <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold leading-none">Password</h2>
                             {!showButtons && (
                                 <button
                                     onClick={() => setShowButtons(true)}
-                                    className="pr-4 primary-gradient-100 text-content-1 font-semibold hover:border-b border-skin-primary-500 cursor-pointer"
+                                    className="pr-8 primary-gradient-100 text-content-1 font-semibold hover:border-b border-skin-primary-500 cursor-pointer"
                                 >
                                     Edit
                                 </button>
@@ -78,7 +78,7 @@ const AccountSecurity: NextPage = () => {
                 <div className="flex md:hidden bg-skin-white p-4 rounded-14 shadow-card w-full">
                     <Link
                         href="/logout"
-                        className="mt-auto red-gradient-100 px-4 py-3 text-content-1 font-semibold text-center w-full rounded-lg"
+                        className="mt-auto red-gradient-100 px-4 py-3 text-content-1 font-semibold w-full rounded-lg"
                     >
                         Logout
                     </Link>

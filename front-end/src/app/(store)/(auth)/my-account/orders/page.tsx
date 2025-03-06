@@ -40,8 +40,8 @@ const MyAccountOrders: NextPage = () => {
             <MyAccountHeading />
             <section className="flex flex-col md:flex-row items-start justify-between gap-4">
                 <AccountSidebar />
-                <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-4.5 w-full h-full md:min-h-[670px]">
-                    <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Orders</h2>
+                <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-4.5 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
+                    <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">My Orders</h2>
                     <div className="flex flex-col gap-4.5">
                         {orders.map((order, index) => (
                             <OrderListCard key={index} {...order} />

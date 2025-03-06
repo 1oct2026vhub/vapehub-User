@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 
 const menuItems = [
-  { label: "Your Orders", path: "/my-account/orders" },
+  { label: "My Orders", path: "/my-account/orders" },
   { label: "Personal Information", path: "/my-account/personal-info" },
   { label: "Manage Addresses", path: "/my-account/addresses" },
   { label: "Security", path: "/my-account/security" },
@@ -17,14 +17,14 @@ const AccountSidebar: React.FC = () => {
 
   return (
     <div className="bg-skin-base md:bg-skin-white px-3.5 py-2.5 md:p-5 xl:p-9 rounded-14 shadow-checkout flex flex-col md:min-h-[670px] justify-between overflow-y-auto min-w-fit max-md:w-full max-md:border border-skin-neutral-100">
-      <ul className="w-full grid max-md:grid-cols-2 max-md:gap-2 space-y-1">
+      <ul className="w-full grid max-md:grid-cols-2 max-md:gap-2 md:space-y-1">
         {menuItems.map((item) => (
           <li key={item.path} className="w-full">
             <Link
               href={item.path}
               className={`p-2 md:px-4 md:py-3 text-content-2 md:text-content-1 text-nowrap justify-center md:justify-start font-semibold rounded-lg md:rounded-10 w-full flex transition-colors ${
                 pathname === item.path
-                  ? "bg-primary-gradient-600 text-skin-white"
+                  ? "bg-primary-gradient-600 text-skin-white border border-skin-primary-500"
                   : "text-skin-primary-500 max-md:border border-skin-primary-400 hover:bg-skin-primary-50"
               }`}
             >

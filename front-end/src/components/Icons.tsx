@@ -1036,3 +1036,45 @@ export const TrashIcon2 = (
     </svg>
   )
 };
+
+export const SeperatorIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="21"
+      fill="none"
+      viewBox="0 0 14 21"
+      {...props}
+    >
+      <g clipPath="url(#clip0_2244_15757)">
+        <path
+          stroke="#A6AAA9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+          d="m2 6.5 4 4-4 4"
+        ></path>
+      </g>
+      <g clipPath="url(#clip1_2244_15757)">
+        <path
+          stroke="#A6AAA9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+          d="m8 6.5 4 4-4 4"
+        ></path>
+      </g>
+      <defs>
+        <clipPath id="clip0_2244_15757">
+          <path fill="#fff" d="M0 20.5V.5h8v20z"></path>
+        </clipPath>
+        <clipPath id="clip1_2244_15757">
+          <path fill="#fff" d="M6 20.5V.5h8v20z"></path>
+        </clipPath>
+      </defs>
+    </svg>
+  )
+};

@@ -28,7 +28,6 @@ const Footer = ({ categories }: { categories: Category[] }) => {
         'Refer A Friend',
       ],
     },
-
   ];
 
   const socialMediaLinks = [
@@ -44,7 +43,7 @@ const Footer = ({ categories }: { categories: Category[] }) => {
     indicator: "text-medium text-skin-neutral-50 data-[open=true]:rotate-180",
     content: "",
   };
- 
+
 
   return (
     <footer className="bg-footer-gradient space-y-6 mt-auto">
@@ -89,24 +88,30 @@ const Footer = ({ categories }: { categories: Category[] }) => {
         {/* Mobile Section */}
         <div className='w-full md:hidden'>
           <Accordion variant='light' className="!px-0" itemClasses={itemClasses} selectionMode='multiple'>
-            <>
-              {footerSections.map((section, index) => (
-                <AccordionItem key={index} aria-label={section.title} title={section.title} indicator={<DownArrowFilledIcon />}>
-                  <ul className="space-y-2.5">
-                    {section.links.map((link, idx) => (
-                      <li key={idx}>
-                        <a
-                          href="#"
-                          className="text-content-1 font-normal text-skin-white"
-                        >
-                          {link}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </AccordionItem>
-              ))}
-            </>
+            <AccordionItem title="Help" indicator={<DownArrowFilledIcon />}>
+              <ul className="space-y-2.5">
+                {footerSections[0].links.map((link, idx) => (
+                  <li key={idx}>
+                    <a href="#" className="text-content-1 font-normal text-skin-white">
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </AccordionItem>
+
+            {/* Quick Links Section */}
+            <AccordionItem title="Quick Links" indicator={<DownArrowFilledIcon />}>
+              <ul className="space-y-2.5">
+                {footerSections[1].links.map((link, idx) => (
+                  <li key={idx}>
+                    <a href="#" className="text-content-1 font-normal text-skin-white">
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </AccordionItem>
             <AccordionItem aria-label="shop" title="shop" indicator={<DownArrowFilledIcon />}>
               <ul className="space-y-2.5">
                 {categories.length > 0 && categories.slice(0, 8).map((category, idx) => (

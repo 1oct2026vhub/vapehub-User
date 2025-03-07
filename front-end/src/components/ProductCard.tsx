@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 import { Button } from '@nextui-org/button';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 
 interface ProductCardProps {
@@ -28,17 +28,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isNew
 }) => {
   return (
-    <Link href={link} className="block">
+    <a href={link} className="block">
       <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-neutral-50 rounded-10">
           {imageSrc && imageSrc.startsWith('http') ? (
                   <Image
-                    src={imageSrc} alt={title} width={245} height={234} className='w-full max-h-[234px] min-h-[234px]' loading="lazy"
+                    src={imageSrc} alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[164px] md:max-h-[234px] md:min-h-[234px]' loading="lazy"
                   />
                 ) : 
                 
                 <Image
-                    src="/images/product-1.png" alt={title} width={245} height={234} className='w-full max-h-[234px] min-h-[234px]' loading="lazy"
+                    src="/images/product-1.png" alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[164px] md:max-h-[234px] md:min-h-[234px]' loading="lazy"
                   />
                 
           }
@@ -84,7 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
       </div>
-    </Link>
+    </a>
   );
 };
 

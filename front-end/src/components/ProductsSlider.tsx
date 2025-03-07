@@ -43,9 +43,8 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
         breakpoint: 390,
         settings: {
           slidesToShow: 1,
-          slidesToScroll: 1,
-          infinite: products.length > 1,
-          dots: true,
+          slidesToScroll: 1, 
+          dots: true, 
         },
       },
     ],

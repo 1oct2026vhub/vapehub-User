@@ -25,7 +25,7 @@ const BrandCard: React.FC<BrandCardProps> = ({
         <Image
           src={imageSrc} alt={altText} width={width} height={height} loading="lazy" className="rounded-10 md:rounded-2xl max-w-[110px] md:max-w-[154px] max-h-[79px] md:max-h-[112px] min-h-[79px] md:min-h-[112px]"
         />
-      ) : <p>Image not found</p>}
+      ) : <Image src={"/images/brand-1.png"} alt={altText} width={width} height={height} loading="lazy"/>}
 
     </a>
   );

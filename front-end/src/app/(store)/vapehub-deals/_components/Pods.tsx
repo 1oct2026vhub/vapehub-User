@@ -176,8 +176,8 @@ const Pods: React.FC = () => {
                                     label: "!text-content-2 text-nowrap",
                                 }}
                             />
-                            <span className="text-skin-neutral-400 font-medium text-nowrap">{label}</span>
-                            <span className="text-skin-neutral-500 font-normal">({count})</span>
+                            <span className="text-skin-neutral-300 font-normal text-nowrap">{label}</span>
+                            <span className="text-skin-neutral-500 font-medium">  ({count}) </span>
                         </div>
                     </SelectItem>
                 ))}

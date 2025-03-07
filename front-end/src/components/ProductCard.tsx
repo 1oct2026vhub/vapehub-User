@@ -33,12 +33,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-neutral-50 rounded-10">
           {imageSrc && imageSrc.startsWith('http') ? (
                   <Image
-                    src={imageSrc} alt={title} width={245} height={234} className='w-full' loading="lazy"
+                    src={imageSrc} alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[164px] md:max-h-[234px] md:min-h-[234px]' loading="lazy"
                   />
                 ) : 
                 
                 <Image
-                    src="/images/product-1.png" alt={title} width={245} height={234} className='w-full' loading="lazy"
+                    src="/images/product-1.png" alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[164px] md:max-h-[234px] md:min-h-[234px]' loading="lazy"
                   />
                 
           }
@@ -62,12 +62,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex flex-col justify-between xl:min-h-[77px]">
             <h3 className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</h3>
             <div className="flex items-center gap-1">
-              <div className="flex">
+              <div className="flex items-center">
                 {Array.from({ length: 5 }, (_, i) => (
                   <Image key={i} src='/images/review-star.svg' alt='review star' width={12} height={12} className='w-3 md:w-4' />
                 ))}
               </div>
-              <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5 md:mt-1">({reviews} Reviews)</p>
+              <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5">({reviews} Reviews)</p>
             </div>
           </div>
           {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p> : null}

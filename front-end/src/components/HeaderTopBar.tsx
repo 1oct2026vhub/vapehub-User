@@ -75,12 +75,7 @@ const HeaderTopBar = () => {
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     <div className="flex items-center gap-1">
                         <Link href='/my-account'>
-                            <Button
-                                isIconOnly
-                                size="sm"
-                                variant="light"
-                                startContent={<UserIcon />}
-                            />
+                            <UserIcon />
                         </Link>
                         <Badge content="1" size="md" className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
                             <Button
@@ -148,7 +143,7 @@ const HeaderTopBar = () => {
                                             className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
                                             onPress={onClose}
                                         >
-                                            Continue Shopping
+                                            Keep Shopping
                                         </Button>
                                         <Button
                                             size="lg"

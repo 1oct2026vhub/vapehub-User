@@ -32,7 +32,7 @@ const BlogsSlider: FunctionComponent<BlogProps> = ({ data }) => {
   return (
     <Slider {...settings}>
       {data.map((blog) => (
-        <div key={blog.id} className="px-1 md:px-2 xl:px-5 py-4 relative">
+        <div key={blog.id} className="px-1 md:px-2 xl:px-5 py-4 relative first:pl-0">
           <div dangerouslySetInnerHTML={{ __html: blog.content }} />
           {/* <Image src={"/images/blog-card.jpg"}
             alt={blog.title} width={322} height={512}

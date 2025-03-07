@@ -9,7 +9,7 @@ const NavigationMenu:React.FC<Props> = ({ categories }): ReactElement => {
  
   return (
     <div className="hidden lg:block">
-      <ul className="inline-flex flex-wrap items-center justify-center xl:justify-between w-full">
+      <ul className="inline-flex flex-wrap items-center justify-center w-full">
         {categories.slice(0, 8).map((item: Category, index: number) => (
           <li key={index}>
             <Link href={`/${item?.slug}`} passHref className="px-3 rounded-md text-shadow text-lg text-skin-neutral-400 uppercase font-extrabold hover:opacity-70 transition-all duration-200 ease-in">

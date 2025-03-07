@@ -12,8 +12,8 @@ const OrderActions: React.FC = () => {
                         <Image
                             src="/images/pdfthumb.svg"
                             alt="pdf thumb"
-                            width={18}
-                            height={18}
+                            width={30}
+                            height={30}
                         />
                         <p className='text-skin-neutral-300 text-title-2 font-bold'>Download Invoice</p>
                     </div>

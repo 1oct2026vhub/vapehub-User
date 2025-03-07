@@ -19,7 +19,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
 
         <div className="flex flex-col items-start gap-2.5 md:gap-5">
           <div className="flex items-start gap-4 justify-between">
-            <h4 className="text-content-2 md:text-title-2 font-semibold text-skin-neutral-400 mr-5">
+            <h4 className="text-content-2 md:text-title-2 font-semibold text-skin-neutral-400 md:mr-5">
               RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles
             </h4>
 
@@ -32,7 +32,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
 
           <div className="flex items-center gap-4 justify-between w-full">
             {/* Quantity Selector */}
-            <div className="flex items-center border bg-skin-white w-fit shadow-base text-content-2 md:text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10 mt-auto">
+            <div className="flex items-center border bg-skin-white w-fit shadow-base text-content-2 md:text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10">
               <Button
                 isIconOnly
                 size="lg"
@@ -42,7 +42,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
               >
                 <MinusIcon className='w-3 md:w-6'/>
               </Button>
-              <input type="tel" name="" id="" placeholder='1' className='w-9 max-w-9 max-sm:h-3 !border-none !outline-none placeholder:text-skin-neutral-500 ml-4' />
+              <input type="tel" name="" id="" placeholder='1' className='w-9 max-w-9 max-sm:h-3 text-center !border-none !outline-none placeholder:text-skin-neutral-500' />
               <Button
                 isIconOnly
                 size="lg"
@@ -55,11 +55,11 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-2">
-              <Button size="sm" isIconOnly variant="light" className="hover:!bg-transparent">
+            <div className="flex items-center gap-3 md:gap-5">
+              <Button size="sm" isIconOnly variant="light" className="hover:!bg-transparent !min-w-fit !w-fit">
                 <TrashIcon className='w-4 h-4.5 md:w-5.5 md:h-6' />
               </Button>
-              <Button size="sm" isIconOnly variant="light" className="hover:!bg-transparent">
+              <Button size="sm" isIconOnly variant="light" className="hover:!bg-transparent !min-w-fit !w-fit">
                 <EditIcon className='w-4 h-4.5 md:w-5.5 md:h-6' />
               </Button>
             </div>

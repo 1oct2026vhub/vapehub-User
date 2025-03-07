@@ -7,12 +7,12 @@ import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import { isLessThanOneMonth } from "@/lib/config/app.config";
-import { BrandByProductResponse, CategoryResponseData } from "@/lib/config/product.config";
+import { BrandByProductResponse, CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
 import { useRouter } from "next/navigation";
 import { FunctionComponent, ReactElement } from "react";
 
 type ProductListProps = {
-  data: CategoryResponseData | BrandByProductResponse
+  data: CategoryResponseData | BrandByProductResponse | ProductResponseData
 }
 
 const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElement => {
@@ -57,6 +57,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const totalPage = data?.pagination?.total_pages ?? 0;
   const totalCount = data?.pagination?.total_count ?? 0;
   const activePage = data?.pagination?.current_page ?? 0;
+  const pageLimit = data?.pagination?.limit ?? 0;
   // on pagination change
   const handlePagination = (page: number) => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -94,7 +95,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
             ))}
           </div>
           <div className="flex items-center gap-3 justify-between pl-5 max-md:hidden">
-            <p className="text-content-1 text-skin-neutral-300 font-bold">Showing {activePage}-10 of {totalCount} results</p>
+            <p className="text-content-1 text-skin-neutral-300 font-bold">Showing {activePage}-{pageLimit} of {totalCount} results</p>
             {/* <Pagination showControls initialPage={1} total={100} /> */}
             <Pagination total={totalPage} onPageChange={handlePagination}/>
           </div>

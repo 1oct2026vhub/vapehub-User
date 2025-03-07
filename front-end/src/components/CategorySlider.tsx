@@ -13,8 +13,9 @@ const CategorySlider: React.FC<props> = ({ categories }): ReactElement => {
      
     const settings: Settings = {
         dots: true,
-        infinite: false,
+        infinite: true,
         speed: 500,
+        
         slidesToShow: 4,
         slidesToScroll: 4,
         lazyLoad: "progressive",
@@ -24,7 +25,7 @@ const CategorySlider: React.FC<props> = ({ categories }): ReactElement => {
                 settings: {
                     slidesToShow: 3,
                     slidesToScroll: 3,
-                    infinite: false,
+                    infinite: true,
                     dots: true
                 }
             },
@@ -33,7 +34,7 @@ const CategorySlider: React.FC<props> = ({ categories }): ReactElement => {
                 settings: {
                     slidesToShow: 1,
                     slidesToScroll: 1,
-                    infinite: false,
+                    infinite: true,
                     dots: true,
                     rows: 2,
                     slidesPerRow: 2,

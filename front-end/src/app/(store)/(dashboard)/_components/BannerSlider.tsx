@@ -16,8 +16,7 @@ const settings: Settings = {
   slidesToShow: 1,
   slidesToScroll: 1,
   autoplay: true,
-  autoplaySpeed: 5000,
-  lazyLoad:"progressive",
+  autoplaySpeed: 5000
 };
 
 const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
@@ -30,7 +29,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
       {banners.map((banner, index) => (
         <div
           key={index}
-          className="overflow-hidden rounded-2.5xl"
+          className="overflow-hidden rounded-2.5xl min-h-[671px] bg-gray-100"
         >
           <Image
             src={banner?.image_url_mid || banner?.image_url}
@@ -39,6 +38,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
             height={671}
             className="w-full rounded-2.5xl min-h-[671px] outline-none focus-visible:!outline-none"
             priority
+            loading="eager"
           />
         </div>
       ))}

@@ -29,7 +29,7 @@ const FAQSection: React.FC<FAQProps> = ({
         title: "text-title-2 font-bold",
         trigger: '',
         indicator: "text-medium text-skin-neutral-500 -rotate-90 data-[open=true]:rotate-90",
-        content: "font-bold text-skin-neutral-300 !text-content-1",
+        content: "font-bold text-skin-neutral-300 !text-content-1 !py-0 !pb-4",
     };
 
     return (

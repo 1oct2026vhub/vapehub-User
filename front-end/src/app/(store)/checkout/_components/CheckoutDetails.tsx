@@ -121,8 +121,8 @@ const CheckoutDetails: React.FC = () => {
                         </div>
                         <RadioGroup defaultValue="3">
                             <CustomRadio value="1">
-                                <div className='space-y-2 md:-mt-1'>
-                                    <div className='flex items-center justify-between gap-4'>
+                                <div className='space-y-2'>
+                                    <div className='flex items-start justify-between gap-4'>
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Royal Mail Tracked 48 - <span className='font-bold'>2 to 4 working days</span></h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£10.02</p>
                                     </div>
@@ -130,24 +130,24 @@ const CheckoutDetails: React.FC = () => {
                                 </div>
                             </CustomRadio>
                             <CustomRadio value="2">
-                                <div className='space-y-2 md:-mt-1'>
-                                    <div className='flex items-center justify-between gap-4'>
+                                <div className='space-y-2'>
+                                    <div className='flex items-start justify-between gap-4'>
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Royal Mail Tracked 24 - <span className='font-bold'>1 to 2 working days</span></h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£12.22</p>
                                     </div>
                                 </div>
                             </CustomRadio>
                             <CustomRadio value="3">
-                                <div className='space-y-2 md:-mt-1'>
-                                    <div className='flex items-center justify-between gap-4'>
+                                <div className='space-y-2'>
+                                    <div className='flex items-start justify-between gap-4'>
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Royal Mail Next Day Guaranteed</h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£15.59</p>
                                     </div>
                                 </div>
                             </CustomRadio>
                             <CustomRadio value="4">
-                                <div className='space-y-2 md:-mt-1'>
-                                    <div className='flex items-center justify-between gap-4'>
+                                <div className='space-y-2'>
+                                    <div className='flex items-start justify-between gap-4'>
                                         <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>DPD Next Day Delivery</h4>
                                         <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>£16.85</p>
                                     </div>
@@ -166,7 +166,7 @@ const CheckoutDetails: React.FC = () => {
                     </div>
 
                     {/* shipping methods */}
-                    <div className='space-y-4'>
+                    <div className='space-y-4 pt-3'>
                         <div className='space-y-2'>
                             <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Payment Information</h2>
                             <h3 className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</h3>

@@ -48,7 +48,7 @@ const DealsSlider: React.FC = () => {
     return (
         <Slider {...settings}>
             {deals.map((deal, index) => (
-                <div key={index} className="px-1 md:px-2 xl:px-5 py-3" >
+                <div key={index} className="px-1 md:px-2 xl:px-5 py-3 first:pl-0" >
                     <DealCard
                         key={index}
                         imageSrc={deal.imageSrc}

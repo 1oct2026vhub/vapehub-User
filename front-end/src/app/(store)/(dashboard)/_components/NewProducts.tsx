@@ -13,7 +13,7 @@ interface NewProductsProps {
 const NewProducts: React.FC<NewProductsProps> = async ({
   title = "New Products"
 }): AsyncReactElement => {
-  const response = await getProductList({sort_by:"id",order:"DESC",limit:10,offset:0});
+  const response = await getProductList({sort_by:"id",order:"DESC",limit:8,offset:0});
   if(response.status == ServerActionStatus.ERROR) {
     return (<p>{response.message}</p>);
   }

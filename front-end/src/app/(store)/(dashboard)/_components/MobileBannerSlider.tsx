@@ -16,8 +16,7 @@ type BannerSliderProps = {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 5000,   
-    lazyLoad:"progressive", 
+    autoplaySpeed: 5000 
   };
    
 
@@ -41,6 +40,7 @@ const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => 
             height={382}
             className="w-full rounded-lg min-h-96 !outline-none focus-visible:!outline-none"
             priority
+            loading="eager"
           />
         </div>
       ))}

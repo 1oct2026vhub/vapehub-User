@@ -35,12 +35,14 @@ const HottestCollections: React.FC = async ():Promise<AsyncReactElement> => {
             </div>
            
             <Button
+                as={Link}
+                href={ROUTES.BRANDS}
                 size="lg"
                 radius="sm"
                 color="primary"
                 className="btn primary-btn shadow-input w-fit !min-w-fit rounded-10 !text-content-2 md:!text-title-2 max-md:h-fit !leading-none !px-4 md:!px-5 !py-2 md:!py-4"
             >
-                <Link href={ROUTES.BRANDS} >View All</Link> 
+              View All
             </Button>
            
         </section>

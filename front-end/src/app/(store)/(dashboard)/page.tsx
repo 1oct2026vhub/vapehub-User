@@ -15,9 +15,11 @@ import Subscription from "./_components/Subscription";
 import BlogsSection from "./_components/BlogsSection";
 import HomeCarousel from "./_components/HomeCarousel";
 import { ROUTES } from "@/lib/routes";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const Dashboard: NextPage = (): ReactElement => {
   return ( 
+
       <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
         <HomeCarousel/>
         <section className="flex flex-col gap-4.5 md:gap-10 max-md:mt-4.5">
@@ -29,7 +31,7 @@ const Dashboard: NextPage = (): ReactElement => {
         </section>
         <ShopByCategory />
         <HottestCollections />
-        <NewProducts />
+        <NewProducts viewAllHref={ROUTES.NEW_PRODUCTS}/>
         <ShopByDeals />
         <MostPopularVapes viewAllHref="disposables"/>
         <MostPopularSalts viewAllHref="nic-salts"/>
@@ -38,6 +40,7 @@ const Dashboard: NextPage = (): ReactElement => {
         <Testimonials />
         <Subscription className="mt-5 md:mt-10" /> 
         <BlogsSection viewAllHref={ROUTES.BLOGS} />
+        <ScrollToTop/>
       </div>  
   );
 };

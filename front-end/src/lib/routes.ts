@@ -10,6 +10,7 @@ BRANDS: '/brands',
 BRAND: '/brand/:slug',
 BLOGS: '/blogs',
 DEALS: '/deals',
+NEW_PRODUCTS: '/new-products'
 }
 
  

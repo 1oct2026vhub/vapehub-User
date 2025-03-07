@@ -43,9 +43,10 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         className=""
         loading="lazy"
       />}
-       
-        <Link href={link}>
+        
         <Button
+          as={Link}
+          href={link}
           size="lg"
           radius="sm"
           color="primary"
@@ -53,8 +54,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           
         >
           Shop Now
-        </Button>
-        </Link>
+        </Button> 
       </div>
     </div>
   );

@@ -16,7 +16,9 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-  trailingSlash: true
+   experimental: {
+    scrollRestoration: false
+  }
 };
 
 export default nextConfig;

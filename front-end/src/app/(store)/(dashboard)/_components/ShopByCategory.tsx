@@ -3,16 +3,15 @@ import CategorySlider from "@/components/CategorySlider";
 import SectionHeading from "@/components/ui/SectionHeading";
 // import ViewAllLink from "@/components/ui/ViewAllLink";
 import { Category, CategoryDetails } from "@/lib/config/category.config";
-import { getCategoryList } from "@/lib/server.actions";
-import { ServerActionStatus } from "@/lib/config/app.config";
 
+interface ShopByCategoryProps {
+  categories: Category[];
+}
 
-const ShopByCategory: FunctionComponent = async ():Promise<ReactElement> => {
-   const response = await getCategoryList();
-    if(response.status !== ServerActionStatus.SUCCESS) {
-      return <div>{response.message}</div>;
-    }
-    const categories:Category[] = response.data ?? [];
+const ShopByCategory: FunctionComponent<ShopByCategoryProps> = ({ categories }): ReactElement => {
+  if (!categories?.length) {
+    return <div>No categories available</div>;
+  }
    
   return (
     <section className="space-y-4.5 md:space-y-7.5">

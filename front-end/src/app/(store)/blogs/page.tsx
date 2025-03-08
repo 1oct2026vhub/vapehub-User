@@ -85,7 +85,7 @@ const BlogsListingPage: NextPage = (): ReactElement => {
                                     <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
                                         {
                                            loading? <p>Loading..</p>: !blogs.length ?<p>No Blogs Available</p>: blogs.map((blog: BlogResponse, idx: number) => (
-                                                <BlogCard key={idx} blog={blog}/>
+                                                <BlogCard key={idx} blog={blog} />
                                             ))
                                         }
 

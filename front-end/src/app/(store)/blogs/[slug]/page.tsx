@@ -1,26 +1,42 @@
-'use client'
-
+import { getBlogBySlug } from "@/lib/server.actions";
+import { ServerActionStatus } from "@/lib/config/app.config";
+import { notFound } from 'next/navigation';
+// import Image from 'next/image';
 import BreadCrumbs from '@/components/BreadCrumbs';
-import { NextPage } from 'next'
-import Image from 'next/image';
-import React, { ReactElement } from 'react'
-import Subscription from '../(dashboard)/_components/Subscription';
+import Subscription from '../../(dashboard)/_components/Subscription';
+import { ROUTES } from "@/lib/routes";
 
-const BlogsDetailsPage: NextPage = (): ReactElement => {
+type PageProps = {
+  slug: string;
+};
 
-    const breadcrumbs = [
-        { label: "Home", href: "/" },
-        { label: "Blogs", href: "/blogs" },
-        { label: "Mastering MTL: A Comprehensive Guide to Mouth to Lung Vaping", href: "/", isActive: true },
+const Page = async ({
+  params,
+}: {
+  params: Promise<PageProps>
+}) => {
+  const slug = (await params).slug;
+  const response = await getBlogBySlug(slug);
 
-    ];
+  if (response.status === ServerActionStatus.ERROR || !response.data) {
+    notFound();
+  }
 
-    return (
-        <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
+  const blog = response.data;
+
+  const breadcrumbs = [
+    { label: "Home", href: ROUTES.WELCOME },
+    { label: "Blogs", href: ROUTES.BLOGS },
+    { label: blog.title, href: blog.slug, isActive: true },
+  ];
+
+  return (
+    <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
             <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Blog</h1>
             <section className="w-full flex flex-col gap-6 md:gap-8.5 blog-details">
-                <Image
+            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                {/* <Image
                     src='/images/blog-details-1.jpg'
                     alt='Blog Card'
                     width={1340}
@@ -118,11 +134,41 @@ const BlogsDetailsPage: NextPage = (): ReactElement => {
                     <div className='space-y-3.5'>
                         <h4>The Hayati Pro 15000 has a Visual Display Screen which shows how much battery life is left.</h4>
                     </div>
-                </div>
+                </div> */}
                 <Subscription />
             </section>
         </main>
-    )
-}
+  );
+};
 
-export default BlogsDetailsPage
+export default Page;
+
+export async function generateMetadata({ params }: {
+  params: Promise<PageProps>
+}) {
+  const slug = (await params).slug;
+  const response = await getBlogBySlug(slug);
+
+  if (response.status === ServerActionStatus.ERROR || !response.data) {
+    return {
+      title: 'Blog Not Found',
+      description: 'The requested blog could not be found'
+    };
+  }
+
+  const blog = response.data;
+
+  return {
+    title: blog.title,
+    description: "",
+    // openGraph: {
+    //   title: blog.title,
+    //   description: "",
+    //   images: blog.image_url ? [{
+    //     url: blog.image_url,
+    //     width: 1200,
+    //     height: 630
+    //   }] : undefined
+    // }
+  };
+}

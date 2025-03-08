@@ -8,16 +8,14 @@ import ProductView from "../ProductView";
 type PageProps = {
   slug: string;
 };
-  type SearchParams = {
-    [key: string]: string;
-  };
 
  const Page = async ({
   params,
   searchParams,
 }: {
   params: Promise<PageProps>, 
-  searchParams: SearchParams
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
+ searchParams: any
 }) => {
     
   const slug = (await params).slug;

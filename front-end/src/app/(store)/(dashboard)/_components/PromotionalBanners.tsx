@@ -1,16 +1,13 @@
-import { AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
 import { BannerResponse } from '@/lib/config/global.config';
-import { getPromotionBanner } from '@/lib/server.actions';
 import Image from 'next/image'
 import React from 'react'
 
-const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
-    const response = await getPromotionBanner();
-    if (response.status == ServerActionStatus.ERROR) {
-        return (<p>{response.message}</p>);
-    }
-    const banners: BannerResponse[] = response?.data ?? []
-   if (!banners.length) {
+interface PromotionalBannersProps {
+  banners: BannerResponse[];
+}
+
+const PromotionalBanners: React.FC<PromotionalBannersProps> = ({ banners }) => {
+   if (!banners?.length) {
     return <p>No Banners Available</p>
    }
     return (
@@ -18,7 +15,6 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
             <section className='grid-cols-1 md:grid-cols-2 gap-7 mt-10 hidden md:grid'>
                 {
                     banners?.[0] &&
-
                     <div>
                         <Image
                             src={banners?.[0]?.image_url_mid}
@@ -31,7 +27,7 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
                     </div>
                 }
 
-                <div className='space-y-7'>
+                <div className='grid grid-cols-1 gap-7'>
                     {
                         banners?.[1] &&
                         <div>
@@ -60,7 +56,7 @@ const PromotionalBanners: React.FC = async (): Promise<AsyncReactElement> => {
                     }
                 </div>
             </section>
-            <section className='md:hidden grid gap-7 mt-5'>
+            <section className='grid grid-cols-2 gap-4 mt-10 md:hidden'>
                 {
                     banners?.[3] &&
                     <div>

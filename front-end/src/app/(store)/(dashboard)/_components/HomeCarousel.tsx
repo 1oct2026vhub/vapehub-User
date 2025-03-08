@@ -1,26 +1,27 @@
 import React from 'react';
 import BannerSlider from './BannerSlider';
 import MobileBannerSlider from './MobileBannerSlider';
-import { getCarouselList } from '@/lib/server.actions';
-import { ServerActionStatus } from '@/lib/config/app.config';
+import { CarouselConfig } from '@/lib/config/carousel.config';
 
-const HomeCarousel: React.FC = async () => {
-  
-    const response = await getCarouselList();
-    if(response.status === ServerActionStatus.ERROR) {
-      return <p>{response.message}</p>
-    }
+interface HomeCarouselProps {
+  banners: CarouselConfig[];
+}
+
+const HomeCarousel: React.FC<HomeCarouselProps> = ({ banners }) => {
+  if (!banners?.length) {
+    return null;
+  }
         
-    return (
-        <>
-        <section className="banner-carousel hidden lg:block">
-          <BannerSlider banners={response.data}/>
-        </section>
-        <section className="mobile-banner-carousel lg:hidden">
-          <MobileBannerSlider banners={response.data}/>
-        </section>
-        </>
-    );
+  return (
+    <>
+      <section className="banner-carousel hidden lg:block">
+        <BannerSlider banners={banners}/>
+      </section>
+      <section className="mobile-banner-carousel lg:hidden">
+        <MobileBannerSlider banners={banners}/>
+      </section>
+    </>
+  );
 };
 
 export default HomeCarousel;

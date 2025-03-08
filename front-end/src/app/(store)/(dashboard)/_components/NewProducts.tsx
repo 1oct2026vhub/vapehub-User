@@ -2,22 +2,22 @@ import React from "react";
 import SectionHeading from "@/components/ui/SectionHeading";
 // import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
-import { AsyncReactElement, ServerActionStatus } from "@/lib/config/app.config";
-import { getProductList } from "@/lib/server.actions"; 
+import { ProductResponseData } from "@/lib/config/product.config";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 
 interface NewProductsProps {
   title?: string;
   viewAllHref?: string;
+  products: ProductResponseData;
 }
 
-const NewProducts: React.FC<NewProductsProps> = async ({
+const NewProducts: React.FC<NewProductsProps> = ({
   title = "New Products",
-  viewAllHref = "/"
-}): AsyncReactElement => {
-  const response = await getProductList({sort_by:"id",order:"DESC",limit:8,offset:0});
-  if(response.status == ServerActionStatus.ERROR) {
-    return (<p>{response.message}</p>);
+  viewAllHref = "/",
+  products
+}) => {
+  if (!products?.products?.length) {
+    return <p>No products available</p>;
   }
  
   return (
@@ -27,7 +27,7 @@ const NewProducts: React.FC<NewProductsProps> = async ({
         <ViewAllLink href={viewAllHref} />
       </div>
       <div className="slider-container section-slider products-slider">
-        <ProductsSlider data={response.data}/>
+        <ProductsSlider data={products}/>
       </div>
     </section>
   );

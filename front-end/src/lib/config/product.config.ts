@@ -41,7 +41,33 @@ export interface ProductImage {
     updatedAt: string;
     deletedAt: string | null;
 }
+export interface prodAttribute {
+    id: number;
+    name: string;
+    type: "select" | "radio" | "checkbox";
+}
+export interface prodTerm {
+    id: number;
+    name: string;
+    slug: string;
+}
+export interface productAttributeTerms  {
+    id: number;
+    product_id: number;
+    attribute_id: number;
+    term_id: number;
+    is_visible_page: boolean;
+    used_in_variation: boolean;
+    updated_by: number;
+    created_at: string;
+    updated_at: string;
+    deleted_at: null;
+    attribute: prodAttribute;
+    term: prodTerm;
+}
 export interface Product {
+    variants: string[];
+    productAttributeTerms: productAttributeTerms[];
     id: number;
     updated_by: number | null;
     name: string;

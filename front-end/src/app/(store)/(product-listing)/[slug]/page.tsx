@@ -13,14 +13,14 @@ type PageProps = {
   params,
   searchParams,
 }: {
-  params: Promise<PageProps>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  searchParams: any
+  params: Promise<PageProps>, 
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
+ searchParams: any
 }) => {
     
   const slug = (await params).slug;
   const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
-  const combinedParams = { ...defaultParams, ...await searchParams };
+  const combinedParams = { ...defaultParams, ...(await searchParams) };
   // If product doesn't exist, try category
  
   const category = await fetchCategory(slug, combinedParams);

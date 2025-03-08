@@ -175,3 +175,11 @@ export const getProductByBrand = async (
     method: 'GET',
   });
 };
+
+// get blog by slug
+export const getBlogBySlug = async (slug: string): Promise<ServerActionResponse<BlogResponse>> => {
+  return await handleRequest<BlogResponse, unknown>({
+    endpoint: API_ROUTES.GET_BLOGS_BY_SLUG(slug),
+    method: 'GET',
+  });
+};

@@ -111,7 +111,7 @@ const HeaderTopBar = () => {
                             <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
                                 <h4 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h4>
                             </DrawerHeader>
-                            <DrawerBody>
+                            <DrawerBody className='max-sm:px-4'>
                                 <div className='space-y-5 my-3'>
                                     <ShoppingCartCardDrawer showAddMoreItem />
                                     <ShoppingCartCardDrawer showAddMoreItem />

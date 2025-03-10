@@ -56,10 +56,10 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 md:gap-5">
-              <Button size="sm" isIconOnly variant="light" className="hover:!bg-transparent !min-w-fit !w-fit">
+              <Button size="sm" isIconOnly variant="light" className="!p-0 hover:!bg-transparent !min-w-fit !w-fit">
                 <TrashIcon className='w-4 h-4.5 md:w-5.5 md:h-6' />
               </Button>
-              <Button size="sm" isIconOnly variant="light" className="hover:!bg-transparent !min-w-fit !w-fit">
+              <Button size="sm" isIconOnly variant="light" className="!p-0 hover:!bg-transparent !min-w-fit !w-fit">
                 <EditIcon className='w-4 h-4.5 md:w-5.5 md:h-6' />
               </Button>
             </div>
@@ -69,7 +69,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ showAddMoreItem = fal
 
       {/* Add More Item (Conditionally Rendered) */}
       {showAddMoreItem && (
-        <div className="bg-[#FB6767]/30 border border-skin-white shadow-sm p-1.5 md:p-3 flex gap-4 justify-between rounded-10">
+        <div className="bg-[#FB6767]/30 border border-skin-white shadow-sm p-1.5 md:p-3 flex items-center gap-4 justify-between rounded-10">
           <div className="flex gap-2 items-center">
             <DangerIcon />
             <p className="text-content-3 md:text-content-1 font-semibold text-skin-neutral-500">

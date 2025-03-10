@@ -17,7 +17,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   return (
     <div className="w-full relative text-center pt-2 px-1.5 md:px-5 first:pl-0">
       {/* Title Container */}
-      <div className="p-1 md:p-2 bg-[#F8FCFA] w-fit mx-auto absolute left-[50%] translate-x-[-50%] -top-2 sm:-top-2 md:-top-3.5">
+      <div className="p-1 md:p-2 bg-[#F8FCFA] w-fit mx-auto absolute left-[50%] md:left-[47%] translate-x-[-50%] -top-2 sm:-top-2 md:-top-3.5">
         <h3 className="uppercase text-[#030303] text-title-2 md:text-title-1 xl:text-[22px] md:text-nowrap font-semibold leading-normal">
           {title}
         </h3>

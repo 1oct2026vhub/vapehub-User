@@ -31,7 +31,7 @@ const AccountAddresses: NextPage = () => {
             {!showForm && (
               <button
                 onClick={() => setShowForm(true)}
-                className="pr-8 primary-gradient-100 text-content-2 md:text-content-1 font-semibold hover:border-b border-skin-primary-500 cursor-pointer"
+                className="primary-gradient-100 text-content-2 md:text-content-1 font-semibold hover:border-b border-skin-primary-500 cursor-pointer"
               >
                 Add New
               </button>

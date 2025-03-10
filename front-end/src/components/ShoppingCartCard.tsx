@@ -34,7 +34,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ showAddMoreItem = false }) 
 
           <div className="flex items-center gap-5 justify-between">
              {/* Quantity Selector */}
-             <div className="flex items-center border bg-skin-white w-fit shadow-base text-content-2 md:text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10 mt-auto">
+             <div className="flex items-center border bg-skin-white w-fit shadow-base text-content-2 md:text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10">
               <Button
                 isIconOnly
                 size="lg"
@@ -71,7 +71,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ showAddMoreItem = false }) 
 
       {/* Add More Item (Conditionally Rendered) */}
       {showAddMoreItem && (
-        <div className="bg-[#FB6767]/30 border border-skin-white shadow-sm p-1.5 md:p-3 flex gap-4 justify-between rounded-10">
+        <div className="bg-[#FB6767]/30 border border-skin-white shadow-sm p-1.5 md:p-3 flex items-center gap-4 justify-between rounded-10">
           <div className="flex gap-2 items-center">
             <DangerIcon />
             <p className="text-content-3 md:text-content-1 font-semibold text-skin-neutral-500">

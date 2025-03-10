@@ -273,7 +273,7 @@ input[type='search'] {
 
 .section-slider .slick-prev,
 .section-slider .slick-next {
-  @apply top-auto max-[390px]:-bottom-[7.3%] -bottom-[6.5%] sm:-bottom-[17%] md:-bottom-[15.5%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;
+  @apply top-auto -bottom-[6.3%] sm:-bottom-[17%] md:-bottom-[11.5%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;
 }
 
 .section-slider .slick-prev {
@@ -348,7 +348,7 @@ input[type='search'] {
 
 .section-slider.products-slider .slick-prev,
 .section-slider.products-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-6.6%] bottom-[-9%] sm:bottom-[-11.5%] md:bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-10.2%] 2xl:bottom-[-10.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-7.5%] bottom-[-9%] sm:bottom-[-11.5%] md:bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-10.2%] 2xl:bottom-[-10.6%] !important;
 }
 
 @media screen and (min-width:1890px) {  
@@ -415,7 +415,7 @@ input[type='search'] {
 
 .section-slider.testimonial-slider .slick-prev,
 .section-slider.testimonial-slider .slick-next {
-  @apply top-auto bottom-[-13.5%] sm:bottom-[-19%] md:bottom-[-12.5%] lg:bottom-[-16.5%] xl:bottom-[-13.9%] !important;
+  @apply top-auto bottom-[-16.5%] sm:bottom-[-19%] md:bottom-[-14.5%] lg:bottom-[-19.5%] xl:bottom-[-15.9%] !important;
 }
 
 .section-slider.testimonial-slider .slick-list {
@@ -436,16 +436,16 @@ input[type='search'] {
 
 .section-slider.blogs-slider .slick-prev,
 .section-slider.blogs-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-10%] bottom-[-9%]  sm:bottom-[-11.7%] md:bottom-[-10%] lg:bottom-[-10.6%] xl:bottom-[-9.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-14.5%] bottom-[-13%]  sm:bottom-[-11.7%] md:bottom-[-10%] lg:bottom-[-10.6%] xl:bottom-[-9.6%] !important;
 }
 
 
 .section-slider.blogs-slider .slick-prev {
-  @apply max-[390px]:left-[28%]
+  @apply left-[30%]
 }
 
 .section-slider.blogs-slider .slick-next {
-  @apply max-[390px]:right-[28%]
+  @apply right-[30%]
 }
 
 
@@ -549,7 +549,7 @@ input[type="checkbox"] + span {
 
 /* //Loader */
 .loader {
-	border-top-color: #1c3656;
+	border-top-color: var(--primary-500) !important;
 	-webkit-animation: spinner 1.5s linear infinite;
 	animation: spinner 1.5s linear infinite;
 }

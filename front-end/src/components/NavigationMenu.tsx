@@ -10,7 +10,6 @@ import InputField from "./InputField";
 import { SearchIcon } from "./Icons";
 import { Form } from '@/components/ui/Form';
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 
 type Props = {
   categories: Category[]
@@ -120,8 +119,6 @@ const NavigationMenu: React.FC<Props> = ({ categories }): ReactElement => {
   const handleMouseLeave = () => {
     setTimeout(() => setActiveCategory(null), 10000); // Add a delay before hiding
   };
-
-  const pathname = usePathname();
 
   return (
     <div className="hidden lg:block">

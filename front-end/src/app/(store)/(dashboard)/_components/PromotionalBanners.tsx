@@ -1,91 +1,80 @@
 import { BannerResponse } from '@/lib/config/global.config';
-import Image from 'next/image'
-import React from 'react'
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { memo } from 'react';
+
+interface BannerImageProps {
+  banner: BannerResponse;
+  width: number;
+  height: number;
+  priority?: boolean;
+}
+
+const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false }) => (
+  <Link href={`/${banner.redirect_url}`}>
+    <Image
+      src={banner.image_url_mid}
+      alt={banner.title}
+      width={width}
+      height={height}
+      className="w-full h-full object-cover"
+      loading={priority ? "eager" : "lazy"}
+      priority={priority}
+    />
+  </Link>
+));
+
+BannerImage.displayName = 'BannerImage';
 
 interface PromotionalBannersProps {
   banners: BannerResponse[];
 }
 
-const PromotionalBanners: React.FC<PromotionalBannersProps> = ({ banners }) => {
-   if (!banners?.length) {
-    return <p>No Banners Available</p>
-   }
-    return (
-        <>
-            <section className='grid-cols-1 md:grid-cols-2 gap-7 mt-10 hidden md:grid'>
-                {
-                    banners?.[0] &&
-                    <div>
-                        <Image
-                            src={banners?.[0]?.image_url_mid}
-                            alt={banners?.[0]?.title}
-                            width={662}
-                            height={573}
-                            className='w-full h-full'
-                            loading="lazy"
-                        />
-                    </div>
-                }
+const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners }) => {
+  if (!Array.isArray(banners) || banners.length === 0) {
+    return <p className="text-center text-gray-500">No Banners Available</p>;
+  }
 
-                <div className='grid grid-cols-1 gap-7'>
-                    {
-                        banners?.[1] &&
-                        <div>
-                            <Image
-                                src={banners?.[1]?.image_url_mid}
-                                alt={banners?.[1]?.title}
-                                width={662}
-                                height={274}
-                                className='w-full'
-                                loading="lazy"
-                            />
-                        </div>
-                    }
-                    {
-                        banners?.[2] &&
-                        <div>
-                            <Image
-                                src={banners?.[2]?.image_url_mid}
-                                alt={banners?.[2]?.title}
-                                width={662}
-                                height={274}
-                                className='w-full'
-                                loading="lazy"
-                            />
-                        </div>
-                    }
-                </div>
-            </section>
-            <section className='grid grid-cols-2 gap-4 mt-10 md:hidden'>
-                {
-                    banners?.[3] &&
-                    <div>
-                        <Image
-                            src={banners?.[3]?.image_url_mid}
-                            alt={banners?.[3]?.title}
-                            width={361}
-                            height={274}
-                            className='w-full max-h-[274px]'
-                            loading="lazy"
-                        />
-                    </div>
-                }
-                {
-                    banners?.[4] &&
-                    <div>
-                        <Image
-                            src={banners?.[4]?.image_url_mid}
-                            alt={banners?.[4]?.title}
-                            width={361}
-                            height={274}
-                            className='w-full max-h-[274px]'
-                            loading="lazy"
-                        />
-                    </div>
-                }
-            </section>
-        </>
-    )
-}
+  const sortedBanners = [...banners].sort((a, b) => a.display_order - b.display_order);
 
-export default PromotionalBanners
+  return (
+    <>
+      <section className="grid-cols-1 md:grid-cols-2 gap-7 mt-10 hidden md:grid" role="region" aria-label="Promotional Banners Desktop">
+        {sortedBanners[0] && (
+          <BannerImage
+            banner={sortedBanners[0]}
+            width={662}
+            height={573}
+            priority
+          />
+        )}
+
+        <div className="grid grid-cols-1 gap-7">
+          {sortedBanners.slice(1, 3).map((banner, index) => (
+            <BannerImage
+              key={`desktop-banner-${banner.title}-${index}`}
+              banner={banner}
+              width={662}
+              height={274}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="grid grid-cols-2 gap-4 mt-10 md:hidden" role="region" aria-label="Promotional Banners Mobile">
+        {sortedBanners.slice(3, 5).map((banner, index) => (
+          <BannerImage
+            key={`mobile-banner-${banner.title}-${index}`}
+            banner={banner}
+            width={361}
+            height={274}
+          />
+        ))}
+      </section>
+    </>
+  );
+});
+
+PromotionalBanners.displayName = 'PromotionalBanners';
+
+export default PromotionalBanners;

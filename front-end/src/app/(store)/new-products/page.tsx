@@ -10,7 +10,7 @@ const NewProductsPage: NextPage<{searchParams: Promise<any>}> = async ({searchPa
      
     const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 };
     const combinedParams = { ...defaultParams, ...await searchParams };
-
+    
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "New Products", href: `/${ROUTES.NEW_PRODUCTS}`, isActive: true },

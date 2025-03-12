@@ -15,18 +15,19 @@ import dynamic from "next/dynamic";
 import NewProducts from "./_components/NewProducts";
 import { getDashboardData } from "./page.data";
 import { ServerActionStatus } from "@/lib/config/app.config";
+import SuspenseLoader from "@/components/ui/SuspenseLoader";
 
 // Dynamically import components that are below the fold
 const DynamicTestimonials = dynamic(() => import('./_components/Testimonials'), {
-  loading: () => <div className="h-48 animate-pulse bg-gray-100 rounded-lg" />
+  loading: () => <SuspenseLoader />
 })
 
 const DynamicSubscription = dynamic(() => import('./_components/Subscription'), {
-  loading: () => <div className="h-32 animate-pulse bg-gray-100 rounded-lg" />
+  loading: () => <SuspenseLoader height='h-32'/>
 })
 
 const DynamicBlogsSection = dynamic(() => import('./_components/BlogsSection'), {
-  loading: () => <div className="h-48 animate-pulse bg-gray-100 rounded-lg" />
+  loading: () => <SuspenseLoader />
 })
 
 export const revalidate = 60; // Revalidate every minute
@@ -62,13 +63,13 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
         <FeatureCards />
       </section>
 
-      <Suspense fallback={<div className="h-48 animate-pulse bg-gray-100 rounded-lg" />}>
+      <Suspense fallback={<SuspenseLoader />}>
         <ShopByCategory categories={data.categories.status === ServerActionStatus.SUCCESS ? data.categories.data : []} />
         <HottestCollections brands={data.brands.status === ServerActionStatus.SUCCESS ? data.brands.data.slice(0, 10) : []} />
         <NewProducts products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse} viewAllHref={ROUTES.NEW_PRODUCTS} />
       </Suspense>
 
-      <Suspense fallback={<div className="h-48 animate-pulse bg-gray-100 rounded-lg" />}>
+      <Suspense fallback={<SuspenseLoader />}>
         <ShopByDeals />
         <MostPopularVapes products={data.popularVapes.status === ServerActionStatus.SUCCESS ? data.popularVapes.data : emptyProductResponse} viewAllHref="disposables" />
         <MostPopularSalts products={data.popularSalts.status === ServerActionStatus.SUCCESS ? data.popularSalts.data : emptyProductResponse} viewAllHref="nic-salts" />

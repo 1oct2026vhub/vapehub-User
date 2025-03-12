@@ -34,7 +34,7 @@ const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => 
         <Link
           key={index}
           className="overflow-hidden rounded-lg"
-          href={`/${banner.redirect_url}`}
+          href={banner.redirect_url}
         >
           <Image
             src={banner?.image_url_low || banner?.image_url}

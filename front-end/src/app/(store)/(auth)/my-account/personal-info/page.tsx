@@ -26,7 +26,7 @@ const PersonalInfo: NextPage = () => {
                         {!showButtons && (
                             <button
                                 onClick={() => setShowButtons(true)}
-                                className="pr-8 primary-gradient-100 text-content-2 md:text-content-1 font-semibold hover:border-b border-skin-primary-500 cursor-pointer"
+                                className="primary-gradient-100 text-content-2 md:text-content-1 font-semibold hover:border-b border-skin-primary-500 cursor-pointer"
                             >
                                 Edit
                             </button>
@@ -34,8 +34,22 @@ const PersonalInfo: NextPage = () => {
                     </div>
                     <form className='space-y-4 md:space-y-6'>
                         <div className="grid sm:grid-cols-2 gap-2.5 md:gap-4">
-                            <InputForm type="text" placeholder="Neerajdev" className="w-full" />
-                            <InputForm type="text" placeholder="R" className="w-full" />
+                            <div className='space-y-3 md:space-y-4.5'>
+                                <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">First Name</h2>
+                                <InputForm
+                                    type='text'
+                                    placeholder='Neerajdev'
+                                    className='w-full'
+                                />
+                            </div>
+                            <div className='space-y-3 md:space-y-4.5'>
+                                <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Last Name</h2>
+                                <InputForm
+                                    type='text'
+                                    placeholder='R'
+                                    className='w-full'
+                                />
+                            </div>
                         </div>
                         <div className='space-y-3 md:space-y-4.5 sm:pr-4'>
                             <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Email</h2>
@@ -93,7 +107,7 @@ const PersonalInfo: NextPage = () => {
                                         <ModalHeader className="flex flex-col gap-1">Delete Account</ModalHeader>
                                         <ModalBody className='py-8'>
                                             <p className='text-content-1 md:text-title-2 font-semibold text-skin-neutral-500 text-center'>
-                                                Are you sure do you want to delete your account? 
+                                                Are you sure do you want to delete your account?
                                             </p>
                                         </ModalBody>
                                         <ModalFooter>

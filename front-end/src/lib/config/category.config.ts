@@ -11,11 +11,13 @@ export interface Category extends SubCategory {
     name: string;
     description: string;
     slug: string;
-    
+    feature?: string;
+    subCategories: SubCategory[];
 }
 export interface SubCategory {
     name: string;
     slug: string;
+    feature?: string;
 }
 
 export const defaultNavLinks:SubCategory[] = [

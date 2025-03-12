@@ -10,7 +10,7 @@ import { isLessThanOneMonth } from "@/lib/config/app.config";
 import { BrandByProductResponse, CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FunctionComponent, ReactElement, useState } from "react";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 
 type ProductListProps = {
   data: CategoryResponseData | BrandByProductResponse | ProductResponseData
@@ -84,14 +84,18 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
     <>
       <section className="product-listing-container border-t border-skin-neutral-200 flex flex-row items-start !gap-5 xl:!gap-12">
        
-      <motion.div
+      {/* <motion.div
         initial={{ width: 0 }}
         animate={{ width: isFilterVisible ? "auto" : 0, opacity: isFilterVisible ? 1 : 0 }}
         transition={{ duration: 0.3 }} 
         
-      >
+      > */}
+        {
+          isFilterVisible &&
           <FilterSidebar appliedFilters={appliedFilters} onRemoveFilter={handleRemoveFilter} filterOptions={filterOptions} /> 
-          </motion.div>
+
+        }
+         
         <div className="flex flex-col gap-7.5 md:gap-9 w-full">
           <ProductListingActionsWeb 
             onSortChange={handleSortChange} 

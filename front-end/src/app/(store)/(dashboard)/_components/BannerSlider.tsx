@@ -35,7 +35,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
         <Link
           key={index}
           className="overflow-hidden rounded-2.5xl min-h-[671px] bg-gray-100"
-          href={`/${banner.redirect_url}`}
+          href={banner.redirect_url}
         >
           <Image
             src={banner?.image_url_mid || banner?.image_url}

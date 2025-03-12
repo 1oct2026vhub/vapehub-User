@@ -1,7 +1,8 @@
-import { Accordion, AccordionItem, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from '@nextui-org/react'
+import { Accordion, AccordionItem, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Selection, useDisclosure } from '@nextui-org/react'
 import React from 'react'
 import { CloseIcon, DownArrowIcon, FilterIcon } from './Icons'
 import FilterCheckboxGroup from './FilterCheckboxGroup';
+import { sortByOptions } from '@/lib/config/filter.config';
 
 const priceOptions = [
     { label: "£0 - £10", count: 376, value: "0-10" },
@@ -31,9 +32,28 @@ const filterOptions = [
     { title: "Puff Count", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
   ];
 
+type ProductListingActionsWebProps = {
+    onSortChange: (value: string) => void;
+    initialValue?: string;
+    isFilterVisible?: boolean;
+    onFilterToggle?: () => void;
+}
 
-
-export const ProductListingActionsWeb: React.FC = () => {
+export const ProductListingActionsWeb: React.FC<ProductListingActionsWebProps> = ({
+    onSortChange, 
+    initialValue = "Sort By",
+    isFilterVisible = true,
+    onFilterToggle
+}) => {
+    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([initialValue]));
+     
+    const onChangeSortChange = (keys: Selection) => {
+        const selected = Array.from(keys)[0];
+        const selectedValue = sortByOptions.find(option => option.value === selected.toString())?.value as string;
+            onSortChange(selectedValue.toString());
+            setSelectedKeys(keys);
+         
+    }
     return (
         <div className="bg-skin-white border border-skin-base rounded-xl hidden md:flex items-center gap-3 py-3 px-3.5 ml-auto w-fit">
             <Dropdown>
@@ -44,13 +64,20 @@ export const ProductListingActionsWeb: React.FC = () => {
                         radius="md"
                         endContent={<DownArrowIcon />}
                         className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
-                    >
-                        Sort By
+                    > 
+                        {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label || initialValue}
                     </Button>
                 </DropdownTrigger>
-                <DropdownMenu aria-label="Static Actions">
-                    <DropdownItem key="new">Latest</DropdownItem>
-                    <DropdownItem key="copy">Oldest</DropdownItem>
+                
+                <DropdownMenu aria-label="Static Actions"
+                 selectedKeys={selectedKeys}
+                 selectionMode="single"
+                 disallowEmptySelection
+                 variant="flat"
+                 onSelectionChange={onChangeSortChange}>
+                    {sortByOptions.map((option) => (
+                        <DropdownItem key={option.value}>{option.label}</DropdownItem>
+                    ))}
                 </DropdownMenu>
             </Dropdown>
             <Button
@@ -58,20 +85,35 @@ export const ProductListingActionsWeb: React.FC = () => {
                 size="lg"
                 radius="md"
                 endContent={<FilterIcon />}
+                onPress={onFilterToggle}
                 className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
             >
-                Hide Filter
+                {isFilterVisible ? 'Hide Filter' : 'Show Filter'}
             </Button>
         </div>
     )
 }
 
 
-export const ProductListingActionsMob: React.FC = () => {
+export const ProductListingActionsMob: React.FC<ProductListingActionsWebProps> = ({
+    onSortChange, 
+    initialValue = "Sort By",
+   
+}) => {
 
     const appliedFilters = ["ELUX", "Almond (7 items)"];
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([initialValue]));
+    
+    const onChangeSortChange = (keys: Selection) => {
+        const selected = Array.from(keys)[0];
+         
+        if (selected) {
+            onSortChange(selected.toString());
+            setSelectedKeys(keys);
+        }
+    }
 
     const itemClasses = {
         base: "w-full shadow-none !p-0",
@@ -92,12 +134,17 @@ export const ProductListingActionsMob: React.FC = () => {
                         endContent={<DownArrowIcon />}
                         className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
                     >
-                        Sort By
+                         {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label ||  initialValue}
                     </Button>
                 </DropdownTrigger>
-                <DropdownMenu aria-label="Static Actions">
-                    <DropdownItem key="new">Latest</DropdownItem>
-                    <DropdownItem key="copy">Oldest</DropdownItem>
+                <DropdownMenu aria-label="Static Actions"
+                selectedKeys={selectedKeys}
+                selectionMode="single"
+                 variant="flat"
+                 onSelectionChange={onChangeSortChange}>
+                    {sortByOptions.map((option) => (
+                        <DropdownItem key={option.value}>{option.label}</DropdownItem>
+                    ))}
                 </DropdownMenu>
             </Dropdown>
             <Button

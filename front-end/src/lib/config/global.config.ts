@@ -45,6 +45,7 @@ export interface BannerResponse {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+    redirect_url: string;
 }
 
 export interface FooterConfig {

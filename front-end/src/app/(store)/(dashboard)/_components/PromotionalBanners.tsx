@@ -11,6 +11,8 @@ interface BannerImageProps {
 }
 
 const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false }) => (
+  <>
+  {banner.image_url_mid && banner.image_url_mid.startsWith('http') ?
   <Link href={banner.redirect_url}>
     <Image
       src={banner.image_url_mid}
@@ -21,7 +23,8 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
       loading={priority ? "eager" : "lazy"}
       priority={priority}
     />
-  </Link>
+  </Link>: <p>No image found</p> }
+  </>
 ));
 
 BannerImage.displayName = 'BannerImage';

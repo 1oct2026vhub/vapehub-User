@@ -32,23 +32,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-neutral-50 rounded-10">
           {imageSrc && imageSrc.startsWith('http') ? (
-                  <Image
-                    src={imageSrc} alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[164px] md:max-h-[234px] md:min-h-[234px]' loading="lazy"
-                  />
-                ) : 
-                
-                <Image
-                    src="/images/product-1.png" alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[164px] md:max-h-[234px] md:min-h-[234px]' loading="lazy"
-                  />
-                
+            <Image
+              src={imageSrc} alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[235px] md:min-h-[235px]' loading="lazy"
+            />
+          ) :
+
+            <Image
+              src="/images/product-1.png" alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[235px] md:min-h-[235px]' loading="lazy"
+            />
+
           }
 
           {totalPuffs && (
             <div className='quantity'>
-            <span>{totalPuffs}</span>
-          </div>
+              <span>{totalPuffs}</span>
+            </div>
           )}
-          
+
           {
             isNew && (
               <div className='new-product'>
@@ -59,8 +59,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         </div>
         <div className="flex flex-col gap-2.5 md:gap-3.5">
-          <div className="flex flex-col justify-between xl:min-h-[77px]">
-            <h3 className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</h3>
+          <div className="flex flex-col justify-between gap-1">
+            <div className='min-h-[40px] xl:min-h-[78px]'>
+              <h3 className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</h3>
+            </div>
             <div className="flex items-center gap-1">
               <div className="flex items-center">
                 {Array.from({ length: 5 }, (_, i) => (

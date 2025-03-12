@@ -10,12 +10,12 @@ import { FooterConfig } from '@/lib/config/global.config';
 
 const Footer = async (): AsyncReactElement => {
   const response = await getCategoryList();
-  if(response.status !== ServerActionStatus.SUCCESS) {
+  if (response.status !== ServerActionStatus.SUCCESS) {
     return <div>{response.message}</div>;
   }
   const categories: Category[] = response.data;
- 
-  
+
+
   const footerSections: FooterConfig[] = [
     {
       title: 'help',
@@ -87,7 +87,7 @@ const Footer = async (): AsyncReactElement => {
 
         {/* Mobile Section */}
         <div className='w-full md:hidden'>
-          <FooterMobile footerSections={footerSections} categories={categories}/>
+          <FooterMobile footerSections={footerSections} categories={categories} />
         </div>
 
         {/* Right Section */}
@@ -95,9 +95,12 @@ const Footer = async (): AsyncReactElement => {
           <Logo className="max-w-56 max-h-9" />
           <div className="text-skin-white text-center md:text-right mt-2 md:mt-auto">
             <h4 className="text-title-2 font-bold">Customer Services</h4>
-            <a href='mailto:customerservices@vapehub.co.uk' className="text-content-2 lg:text-content-1 font-normal whitespace-nowrap hover:underline">
-              Email us: customerservices@vapehub.co.uk
-            </a>
+            <div className='text-content-2 lg:text-content-1 font-normal'>
+              Email us: 
+              <a href='mailto:customerservices@vapehub.co.uk' className="whitespace-nowrap hover:underline ml-1">
+                customerservices@vapehub.co.uk
+              </a>
+            </div>
             <div className="flex items-center gap-4.5 justify-center md:justify-end mt-4 xl:mt-5.5">
               {socialMediaLinks.map((link, idx) => (
                 <a key={idx} href={link.href}>

@@ -11,7 +11,7 @@ interface BannerImageProps {
 }
 
 const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false }) => (
-  <Link href={`/${banner.redirect_url}`}>
+  <Link href={banner.redirect_url}>
     <Image
       src={banner.image_url_mid}
       alt={banner.title}
@@ -61,8 +61,8 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 mt-10 md:hidden" role="region" aria-label="Promotional Banners Mobile">
-        {sortedBanners.slice(3, 5).map((banner, index) => (
+      <section className="grid grid-cols-1 gap-4 mt-10 md:hidden" role="region" aria-label="Promotional Banners Mobile">
+        {sortedBanners.map((banner, index) => (
           <BannerImage
             key={`mobile-banner-${banner.title}-${index}`}
             banner={banner}

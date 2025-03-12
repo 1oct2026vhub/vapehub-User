@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import React from "react";
 
 const menuItems = [
-  { label: "My Orders", path: "/my-account/orders/" },
-  { label: "Personal Information", path: "/my-account/personal-info/" },
-  { label: "Manage Addresses", path: "/my-account/addresses/" },
-  { label: "Security", path: "/my-account/security/" },
-  { label: "Referrals", path: "/my-account/referrals/" },
+  { label: "My Orders", path: "/my-account/orders" },
+  { label: "Personal Information", path: "/my-account/personal-info" },
+  { label: "Manage Addresses", path: "/my-account/addresses" },
+  { label: "Security", path: "/my-account/security" },
+  { label: "Referrals", path: "/my-account/referrals" },
 ];
 
 const AccountSidebar: React.FC = () => {
@@ -24,7 +24,7 @@ const AccountSidebar: React.FC = () => {
               href={item.path}
               className={`p-2 md:px-4 md:py-3 text-content-2 md:text-content-1 text-nowrap justify-center md:justify-start font-semibold rounded-lg md:rounded-10 w-full flex transition-colors ${
                 pathname === item.path
-                  ? "bg-primary-gradient-100 md:bg-primary-gradient-600 text-skin-white border border-skin-primary-500"
+                  ? "bg-primary-gradient-100 md:bg-primary-gradient-600 text-skin-white max-sm:border border-skin-primary-500"
                   : "text-skin-primary-500 max-md:border border-skin-primary-400 md:hover:bg-skin-primary-50"
               }`}
             >

@@ -9,7 +9,7 @@ const CheckoutDetails: React.FC = () => {
     return (
         <div className='bg-skin-white p-3.5 sm:p-5 border border-skin-neutral-50 shadow-checkout rounded-14 flex flex-col gap-5 w-full'>
             <form className='flex flex-col gap-5 lg:gap-7.5'>
-                <div className='space-y-3.5 lg:space-y-5'>
+                <div className='space-y-6'>
                     {/* contact info */}
                     <div className='space-y-4 lg:space-y-6'>
                         <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Enter Contact Info</h2>
@@ -166,7 +166,7 @@ const CheckoutDetails: React.FC = () => {
                     </div>
 
                     {/* shipping methods */}
-                    <div className='space-y-4 pt-3'>
+                    <div className='space-y-4 pt-2'>
                         <div className='space-y-2'>
                             <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Payment Information</h2>
                             <h3 className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</h3>

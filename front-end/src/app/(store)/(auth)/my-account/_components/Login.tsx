@@ -19,6 +19,9 @@ const Login: FunctionComponent = (): ReactElement => {
     const { rememberMe, forgetMe, getRememberedCredentials } = useRememberMe()
     const [pwdVisibility, setPwdVisibility] = useState(false);
     const rememberRef = getRememberedCredentials();
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const callbackUrl = searchParams.get('callbackUrl') || '/my-account';
 
     const signInFromConfig = useForm<SignInFormSchema>({
         resolver: zodResolver(SIGN_IN_SCHEMA),
@@ -31,7 +34,8 @@ const Login: FunctionComponent = (): ReactElement => {
             email,
             password,
             rememberMeValue,
-            redirect: false
+            redirect: false,
+            callbackUrl
         });
  
         if (!response || response?.error) {

@@ -1,9 +1,10 @@
 import { ServerActionResponse } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
+import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogResponse } from "./config/blog.config";
 import { BrandConfig } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { Category } from "./config/category.config";
-import { BannerResponse, BlogResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { BannerResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
@@ -177,9 +178,16 @@ export const getProductByBrand = async (
 };
 
 // get blog by slug
-export const getBlogBySlug = async (slug: string): Promise<ServerActionResponse<BlogResponse>> => {
-  return await handleRequest<BlogResponse, unknown>({
+export const getBlogBySlug = async (slug: string): Promise<ServerActionResponse<BlogBySlugResponse>> => {
+  return await handleRequest<BlogBySlugResponse, unknown>({
     endpoint: API_ROUTES.GET_BLOGS_BY_SLUG(slug),
+    method: 'GET',
+  });
+};
+// get blog by category and blog slug
+export const getBlogByCategoryAndSlug = async (categorySlug: string, blogSlug: string): Promise<ServerActionResponse<BlogByCategoryAndSlugResponse>> => {
+  return await handleRequest<BlogByCategoryAndSlugResponse, unknown>({
+    endpoint: API_ROUTES.GET_BLOGS_BY_CATEGORY_AND_SLUG(categorySlug, blogSlug),
     method: 'GET',
   });
 };

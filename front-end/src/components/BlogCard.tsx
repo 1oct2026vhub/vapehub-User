@@ -1,10 +1,10 @@
 // import Image from 'next/image'
 import React from 'react'
 // import { RightArrowIcon } from './Icons'
-import { BlogResponse } from '@/lib/config/global.config'
 import Image from 'next/image'
 import { RightArrowIcon } from './Icons'
 import Link from 'next/link'
+import { BlogResponse } from '@/lib/config/blog.config'
 
 type Props = {
     blog: BlogResponse

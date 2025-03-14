@@ -2,14 +2,14 @@
 
 import BlogCard from '@/components/BlogCard';
 import BreadCrumbs from '@/components/BreadCrumbs';
-import { ServerActionStatus } from '@/lib/config/app.config';
-import { BlogResponse } from '@/lib/config/global.config';
+import { ServerActionStatus } from '@/lib/config/app.config'; 
 import { getBlogList } from '@/lib/server.actions';
 import { Card, CardBody } from '@nextui-org/react';
 import { NextPage } from 'next'
 import React, { ReactElement, useEffect, useState } from 'react'
 // import { Key } from '@react-types/shared';
 import { ROUTES } from '@/lib/routes';
+import { BlogResponse } from '@/lib/config/blog.config';
 
 const BlogsListingPage: NextPage = (): ReactElement => {
 

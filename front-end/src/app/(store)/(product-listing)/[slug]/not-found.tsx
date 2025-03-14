@@ -1,15 +1,27 @@
 import { ROUTES } from '@/lib/routes';
+import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react'; 
+import React from 'react';
 
 const NotFoundPage: React.FC = () => {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">404 - Page Not Found</h1>
-            <p className="text-lg text-gray-600 mb-8">Sorry, the page you are looking for does not exist.</p>
-            <Link href={ROUTES.WELCOME} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                    Go Back Home
-            </Link>
+        <div className="auth-form-container md:!py-[84px]">
+            <div className="auth-form-wrapper !items-center !space-y-0 !rounded-3xl !max-w-[772px] !gap-8">
+                <div className='space-y-2 text-center'>
+                    <h1 className='text-h5 md:text-h4 font-bold primary-gradient-600'>Uh-oh! This Page Went Up in Smoke!</h1>
+                    <p className='text-content-1 font-bold text-skin-neutral-300'>Looks like this page took a puff and disappeared! But don’t worry, you’re not lost forever.</p>
+                </div>
+                <Image
+                    src='/images/404-not-found.jpg'
+                    alt="404 not found"
+                    width={410}
+                    height={354}
+                    className="mx-auto"
+                />
+                <Link href={ROUTES.WELCOME} className="btn primary-btn w-full text-center text-title-2 font-semibold">
+                    Go Back
+                </Link>
+            </div>
         </div>
     );
 };

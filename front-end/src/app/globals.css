@@ -189,7 +189,7 @@
 }
 
 input[type='search'] {
-  @apply text-content-3 lg:text-title-2 font-normal lg:font-bold !important;
+  @apply text-content-2 lg:text-title-2 font-normal lg:font-bold !important;
 }
 
 .slick-prev,

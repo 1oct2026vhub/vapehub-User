@@ -32,10 +32,10 @@ export async function middleware(request: NextRequest) {
 // Configure which routes to run middleware on
 export const config = {
   matcher: [
-    `${ROUTES.MY_ACCOUNT_ORDERS}/:path*`,
-    `${ROUTES.MY_ACCOUNT_PERSONAL_INFO}/:path*`,
-    `${ROUTES.MY_ACCOUNT_REFERRALS}/:path*`,
-    `${ROUTES.MY_ACCOUNT_ADDRESSES}/:path*`,
-    `${ROUTES.MY_ACCOUNT_SECURITY}/:path*`,
+    '/my-account/orders/:path*',
+    '/my-account/personal-info/:path*',
+    '/my-account/referrals/:path*',
+    '/my-account/addresses/:path*',
+    '/my-account/security/:path*',
   ],
 } 

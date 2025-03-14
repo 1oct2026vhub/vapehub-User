@@ -1,8 +1,8 @@
 import React from "react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ViewAllLink from "@/components/ui/ViewAllLink";
-import BlogsSlider from "@/components/BlogsSlider";
-import { BlogResponse } from "@/lib/config/global.config";
+import BlogsSlider from "@/components/BlogsSlider"; 
+import { BlogResponse } from "@/lib/config/blog.config";
 
 interface BlogsSectionProps {
   title?: string;

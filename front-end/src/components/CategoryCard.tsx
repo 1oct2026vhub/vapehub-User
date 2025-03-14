@@ -1,7 +1,5 @@
 import Image from "next/image";
 import React from "react";
-import { Button } from "@nextui-org/react";
-import Link from "next/link";
 
 interface CategoryCardProps {
   title: string;

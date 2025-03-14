@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import LogoutButton from "./LogoutButton";
 
 const menuItems = [
   { label: "My Orders", path: "/my-account/orders" },
@@ -33,9 +34,7 @@ const AccountSidebar: React.FC = () => {
           </li>
         ))}
       </ul>
-      <Link href="/logout" className="mt-auto red-gradient-100 px-4 py-3 md:flex text-content-1 font-semibold hidden">
-        Logout
-      </Link>
+      <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 md:flex text-content-1 font-semibold hidden" />
     </div>
   );
 };

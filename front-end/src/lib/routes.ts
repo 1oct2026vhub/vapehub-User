@@ -10,7 +10,12 @@ BRANDS: '/brands',
 BRAND: '/brand/:slug',
 BLOGS: '/blogs',
 DEALS: '/deals',
-NEW_PRODUCTS: '/new-products'
+NEW_PRODUCTS: '/new-products',
+MY_ACCOUNT_ORDERS: '/my-account/orders',
+MY_ACCOUNT_PERSONAL_INFO: '/my-account/personal-info',
+MY_ACCOUNT_REFERRALS: '/my-account/referrals',
+MY_ACCOUNT_ADDRESSES: '/my-account/addresses',
+MY_ACCOUNT_SECURITY: '/my-account/security'
 }
 
  

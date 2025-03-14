@@ -10,6 +10,7 @@ import InputField from "./InputField";
 import { SearchIcon } from "./Icons";
 import { Form } from '@/components/ui/Form';
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 type Props = {
   categories: Category[]
@@ -111,6 +112,7 @@ const MegaMenu: React.FC = () => {
 
 const NavigationMenu: React.FC<Props> = ({ categories }): ReactElement => {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
+  const pathname = usePathname();
 
   const handleMouseEnter = (category: Category) => {
     setActiveCategory(category);
@@ -123,14 +125,18 @@ const NavigationMenu: React.FC<Props> = ({ categories }): ReactElement => {
   return (
     <div className="hidden lg:block">
       <ul className="inline-flex flex-wrap items-center justify-center w-full">
-        {categories.slice(0, 8).map((item: Category, index: number) => (
-          <li key={index} onMouseEnter={() => handleMouseEnter(item)} onMouseLeave={handleMouseLeave}>
-            <Link href={`/${item?.slug}`} passHref className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-400 uppercase font-extrabold hover:opacity-70 transition-all duration-300 ease-in`}>
-              {item?.name}
-            </Link>
-            {activeCategory === item && <MegaMenu />}
-          </li>
-        ))}
+        {categories.slice(0, 8).map((item: Category, index: number) => {
+          const isActive = pathname === `/${item.slug}`; // Check if active
+          return (
+            <li key={index}>
+              <Link href={`/${item?.slug}`} onMouseEnter={() => handleMouseEnter(item)} onMouseLeave={handleMouseLeave} passHref className={`px-3 text-shadow text-lg uppercase font-extrabold transition-all duration-300 ease-in
+              ${isActive ? "text-skin-primary2-500 border-b border-skin-primary2-500" : "text-skin-neutral-400 hover:opacity-70"}`}>
+                {item?.name}
+              </Link>
+              {activeCategory === item && <MegaMenu />}
+            </li>
+          );
+        })}
         {
           defaultNavLinks.map((item: SubCategory, index: number) => (
             <li key={index}>

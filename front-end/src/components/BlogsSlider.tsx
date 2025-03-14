@@ -27,7 +27,7 @@ const BlogsSlider: FunctionComponent<BlogProps> = ({ data }) => {
     ],
   };
   if (!data.length) {
-    return <p>No Blogs Available</p>
+    return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No Blogs Available</p>
   }
   return (
     <Slider {...settings}>

@@ -16,7 +16,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = ({
   products
 }) => {
   if (!products?.products?.length) {
-    return <p>No products available</p>;
+    return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No products available</p>;
   }
     
   return (
@@ -38,7 +38,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = ({
   products
 }) => {
   if (!products?.products?.length) {
-    return <p>No products available</p>;
+    return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No products available</p>;
   }
     
   return (

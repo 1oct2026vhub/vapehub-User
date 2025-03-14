@@ -16,7 +16,7 @@ const BlogsSection: React.FC<BlogsSectionProps> = ({
   blogs
 }) => {
   if (!blogs?.length) {
-    return <p>No blogs available</p>;
+    return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No blogs available</p>;
   }
   
   return (

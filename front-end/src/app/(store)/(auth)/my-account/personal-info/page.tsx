@@ -107,7 +107,7 @@ const PersonalInfo: NextPage = () => {
                                         <ModalHeader className="flex flex-col gap-1">Delete Account</ModalHeader>
                                         <ModalBody className='py-8'>
                                             <p className='text-content-1 md:text-title-2 font-semibold text-skin-neutral-500 text-center'>
-                                                Are you sure do you want to delete your account?
+                                                Are you sure, Do you want to delete your account?
                                             </p>
                                         </ModalBody>
                                         <ModalFooter>

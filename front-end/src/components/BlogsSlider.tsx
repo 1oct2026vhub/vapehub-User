@@ -1,6 +1,7 @@
 "use client"
 import { BlogResponse } from "@/lib/config/global.config";
-// import Image from "next/image";
+import Image from "next/image";
+import Link from "next/link";
 import { FunctionComponent } from "react";
 import Slider, { Settings } from "react-slick";
 
@@ -32,16 +33,16 @@ const BlogsSlider: FunctionComponent<BlogProps> = ({ data }) => {
   return (
     <Slider {...settings}>
       {data.map((blog) => (
-        <div key={blog.id} className="px-1 md:px-2 xl:px-5 py-4 relative first:pl-0">
-          <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-          {/* <Image src={"/images/blog-card.jpg"}
-            alt={blog.title} width={322} height={512}
+        <Link key={blog.id} href={`/blogs/${blog.slug}`} className="px-1 md:px-2 xl:px-5 py-4 relative first:pl-0">
+          {/* <div dangerouslySetInnerHTML={{ __html: blog.content }} /> */}
+          <Image src={blog.image_url ?? "/images/blog-card.jpg"} loading="lazy"
+            alt={blog.name} width={322} height={512}
             className="rounded-3xl shadow-xl cursor-pointer hover:shadow-slider-card" />
           <div className="space-y-4 absolute left-0 bottom-0 p-6">
-            <div className="bg-white/50 py-1 px-2.5 font-semibold text-content-3 sm:text-content-1 text-black">{blog.title}</div>
-            <h4 className="text-content-1 md:text-title-1 font-semibold text-skin-white">{blog.content}</h4>
-          </div> */}
-        </div>
+            <div className="bg-white/50 py-1 px-2.5 font-semibold text-content-3 sm:text-content-1 text-black">{blog.name}</div>
+            <h4 className="text-content-1 md:text-title-1 font-semibold text-skin-white">{blog.description}</h4>
+          </div>
+        </Link>
       ))}
     </Slider>
   );

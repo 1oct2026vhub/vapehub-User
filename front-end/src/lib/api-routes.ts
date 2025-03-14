@@ -19,8 +19,8 @@ export const API_ROUTES = {
     GET_BLOGS: (group?: string | number) => buildRequestUrl(`/api/blogs?blog_group=${group}`),
     GET_PROMOTION_BANNER: buildRequestUrl('/api/home/banner-images'),
     GET_BRAND_PRODUCTS_BY_SLUG: (slug:string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/brands/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
-    GET_BLOGS_BY_SLUG: (slug:string) => buildRequestUrl(`/api/blogs/slug/${slug}`),
-    
+    GET_BLOGS_BY_SLUG: (slug:string) => buildRequestUrl(`/api/blogs/${slug}`),
+    GET_BLOGS_BY_CATEGORY_AND_SLUG: (categorySlug: string, blogSlug: string) => buildRequestUrl(`/api/blogs/${categorySlug}/${blogSlug}`),
 }
 
 // * Helper functions

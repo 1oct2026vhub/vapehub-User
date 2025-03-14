@@ -1,13 +1,22 @@
 "use client";
-import { FunctionComponent, ReactElement, useState } from "react";
+import { FunctionComponent, ReactElement, useState, useEffect } from "react";
 import Login from "./Login";
 import Register from "./Register";
 import { Button } from "@nextui-org/button";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/lib/routes";
 
 const MyAccountTab: FunctionComponent = (): ReactElement => {
     const [isLogin, setLogin] = useState(true);
-    const { data: sessionData, status } = useSession();
+    const { status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.push(ROUTES.MY_ACCOUNT_ORDERS);
+        }
+    }, [status, router]);
 
     if (status == 'loading') return (
         <div className="auth-form-wrapper">
@@ -15,23 +24,13 @@ const MyAccountTab: FunctionComponent = (): ReactElement => {
         </div>
     );
      
-    if (status == 'authenticated') return (
-        <div className="auth-form-wrapper">
-            <p>MY Account: {sessionData?.user?.email}</p>
-            <div className="auth-button-wrapper">
-                <Button
-                    size="md"
-                    radius="sm"
-                    color="primary"
-                    className={`btn text-title-2 md:text-12 max-md:h-10 ${isLogin ? "primary-btn shadow-input" : "primary-outline-btn"}`}
-                    onPress={() => signOut()}
-
-                >
-                    Logout
-                </Button>
+    if (status == 'authenticated') {
+        return (
+            <div className="auth-form-wrapper">
+                <p>Redirecting to my account...</p>
             </div>
-        </div>
-    );
+        );
+    }
 
     return (
         <div className="auth-form-wrapper">

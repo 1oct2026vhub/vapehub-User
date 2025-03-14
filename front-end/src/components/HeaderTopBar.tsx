@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { MenuIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
+import { SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
 import InputField from "@/components/InputField";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@nextui-org/button";

@@ -10,4 +10,5 @@ export interface CarouselConfig {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+    redirect_url: string;
 }

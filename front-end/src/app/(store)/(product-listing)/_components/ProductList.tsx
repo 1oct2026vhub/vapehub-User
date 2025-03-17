@@ -8,16 +8,19 @@ import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import { isLessThanOneMonth } from "@/lib/config/app.config";
 import { BrandByProductResponse, CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
-import { useRouter } from "next/navigation";
-import { FunctionComponent, ReactElement } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { FunctionComponent, ReactElement, useState } from "react";
+// import { motion } from "framer-motion";
 
 type ProductListProps = {
   data: CategoryResponseData | BrandByProductResponse | ProductResponseData
 }
 
 const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElement => {
-
+  const [isFilterVisible, setIsFilterVisible] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const priceOptions = [
     { label: "£0 - £10", count: 376, value: "0-10" },
     { label: "£10 - £25", count: 29, value: "10-25" },
@@ -60,23 +63,51 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const pageLimit = data?.pagination?.limit ?? 0;
   // on pagination change
   const handlePagination = (page: number) => {
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("offset", (page - 1).toString());
-  
-    router.replace(
-      `${window.location.pathname}?${searchParams.toString()}`,
-      { scroll: false }
-    );
+     
+    const params = new URLSearchParams(searchParams);
+    params.set("offset", (page - 1).toString());
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
+
+  const handleSortChange = (sort: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (!sort) {
+      params.delete("order");
+    } else {
+      params.set("order", sort);
+    } 
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
 
     <>
       <section className="product-listing-container border-t border-skin-neutral-200 flex flex-row items-start !gap-5 xl:!gap-12">
-        <FilterSidebar appliedFilters={appliedFilters} onRemoveFilter={handleRemoveFilter} filterOptions={filterOptions} />
+       
+      {/* <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: isFilterVisible ? "auto" : 0, opacity: isFilterVisible ? 1 : 0 }}
+        transition={{ duration: 0.3 }} 
+        
+      > */}
+        {
+          isFilterVisible &&
+          <FilterSidebar appliedFilters={appliedFilters} onRemoveFilter={handleRemoveFilter} filterOptions={filterOptions} /> 
+
+        }
+         
         <div className="flex flex-col gap-7.5 md:gap-9 w-full">
-          <ProductListingActionsWeb />
-          <ProductListingActionsMob />
-          <div className="grid max-[390px]:!grid-cols-1 grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5 xl:gap-10 products-slider">
+          <ProductListingActionsWeb 
+            onSortChange={handleSortChange} 
+            initialValue={searchParams.get("order") ?? "Sort By"} 
+            isFilterVisible={isFilterVisible}
+            onFilterToggle={() => setIsFilterVisible(!isFilterVisible)}
+          />
+          <ProductListingActionsMob 
+            onSortChange={handleSortChange} 
+            initialValue={searchParams.get("order") ?? "Sort By"} 
+          />
+          <div className={`grid max-[390px]:!grid-cols-1 grid-cols-2  ${isFilterVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} transition-all duration-600 ease-in-out gap-3 md:gap-5 xl:gap-10 products-slider`}>
             {products.length === 0 ? (
               <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No products found.</p>
             ) : products.map((product, index) => (
@@ -90,7 +121,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
                 reviews={10}
                 link={`/${product.slug}`}
                 totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}
-                isNew={isLessThanOneMonth(product?.createdAt) ? "New" : ""}
+                isNew={isLessThanOneMonth(product?.createdAt) ? "New" : ""} 
               />
             ))}
           </div>

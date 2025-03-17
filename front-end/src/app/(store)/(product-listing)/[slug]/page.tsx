@@ -1,9 +1,11 @@
  
-import { getProductByCategory, getProductBySlug } from "@/lib/server.actions";
+import { getBlogByCategoryAndSlug, getBlogBySlug, getProductByCategory, getProductBySlug } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { notFound } from 'next/navigation';
 import ProductView from "../ProductView";
+import BlogView from "../../blogs/_components/BlogView";
+import CategoryBlogs from "../../blogs/_components/CategoryBlog";
 
 type PageProps = {
   slug: string;
@@ -20,9 +22,21 @@ type PageProps = {
     
   const slug = (await params).slug;
   const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
-  const combinedParams = { ...defaultParams, ...(await searchParams) };
-  // If product doesn't exist, try category
- 
+  const combinedParams = { ...defaultParams, ...(await searchParams) }; 
+
+   // If we only have blog slug, fetch specific blog
+   const blogs = await fetchBlogBySlug(slug);
+   if (blogs) {
+     return <BlogView data={blogs} />;
+   }
+
+  //  If we only have category blogs slug, fetch specific category blog
+       const categoryBlogs = await fetchBlogByCategoryAndSlug(slug);
+    if (categoryBlogs) {
+      return <CategoryBlogs data={categoryBlogs} />;
+    }
+   
+
   const category = await fetchCategory(slug, combinedParams);
   if (category) {
     return (
@@ -62,7 +76,21 @@ const fetchProduct = async (slug: string, params: any) => {
   return response.data;
 };
  
+const fetchBlogByCategoryAndSlug = async (categorySlug: string) => {
+  const response = await getBlogByCategoryAndSlug("geek-zone", categorySlug);
+  if (response.status === ServerActionStatus.ERROR) {
+    return null;
+  }
+  return response.data;
+};
 
+const fetchBlogBySlug = async (slug: string) => {
+  const response = await getBlogBySlug(slug);
+  if (response.status === ServerActionStatus.ERROR) {
+    return null;
+  }
+  return response.data;
+};
 export async function generateMetadata({ params, searchParams }: {
   params: Promise<PageProps>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,7 +98,42 @@ export async function generateMetadata({ params, searchParams }: {
 }) {
   const slug = (await params).slug;
   const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
-  const combinedParams = { ...defaultParams, ...await searchParams };
+  const combinedParams = { ...defaultParams, ...await searchParams }; 
+   
+    const blog = await fetchBlogByCategoryAndSlug(slug);
+    if (blog) {
+      return {
+        title: blog.title,
+        description: "",
+        openGraph: {
+          title: blog.title,
+          description: "",
+          images: blog.image_url ? [{
+            url: blog.image_url,
+            width: 1200,
+            height: 630
+          }] : undefined
+        }
+      };
+    }
+  
+
+  const categoryBlogs = await fetchBlogBySlug(slug);
+  if (categoryBlogs) {
+    return {
+      title: categoryBlogs.name,
+      description: categoryBlogs.description,
+      openGraph: {
+        title: categoryBlogs.name,
+        description: categoryBlogs.description,
+        images: categoryBlogs.image_url ? [{
+          url: categoryBlogs.image_url,
+          width: 1200,
+          height: 630
+        }] : undefined
+      }
+    };
+  }
 
   const category = await fetchCategory(slug, combinedParams);
   if (category) {

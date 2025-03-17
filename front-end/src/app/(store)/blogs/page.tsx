@@ -2,14 +2,14 @@
 
 import BlogCard from '@/components/BlogCard';
 import BreadCrumbs from '@/components/BreadCrumbs';
-import { ServerActionStatus } from '@/lib/config/app.config';
-import { BlogResponse } from '@/lib/config/global.config';
+import { ServerActionStatus } from '@/lib/config/app.config'; 
 import { getBlogList } from '@/lib/server.actions';
-import { Card, CardBody, Tab, TabItemProps, Tabs } from '@nextui-org/react';
+import { Card, CardBody } from '@nextui-org/react';
 import { NextPage } from 'next'
 import React, { ReactElement, useEffect, useState } from 'react'
-import { Key } from '@react-types/shared';
+// import { Key } from '@react-types/shared';
 import { ROUTES } from '@/lib/routes';
+import { BlogResponse } from '@/lib/config/blog.config';
 
 const BlogsListingPage: NextPage = (): ReactElement => {
 
@@ -17,29 +17,29 @@ const BlogsListingPage: NextPage = (): ReactElement => {
         { label: "Home", href: ROUTES.WELCOME },
         { label: "Blogs", href: ROUTES.BLOGS, isActive: true },
     ];
-    const tabs: TabItemProps[] = [
-        {
-            key: "",
-            title: "All",
+    // const tabs: TabItemProps[] = [
+    //     {
+    //         key: "",
+    //         title: "All",
             
-        },
-        {
-            key: "Geek Zone",
-            title: "Geek Zone",
-        },
-        {
-            key: "Product Reviews",
-            title: "Product Reviews",
-        },
-    ]
+    //     },
+    //     {
+    //         key: "Geek Zone",
+    //         title: "Geek Zone",
+    //     },
+    //     {
+    //         key: "Product Reviews",
+    //         title: "Product Reviews",
+    //     },
+    // ]
     const [blogs, setBlogs] = useState<BlogResponse[]>([]);
-    const [selectedTab, setSelectedTab] = useState<Key>("");
+    // const [selectedTab, setSelectedTab] = useState<Key>("");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchBlogs = async () => {
             setLoading(true);
-            const response = await getBlogList(selectedTab);
+            const response = await getBlogList();
             if (response.status === ServerActionStatus.ERROR) {
                 setBlogs([]);
             } else {
@@ -50,11 +50,11 @@ const BlogsListingPage: NextPage = (): ReactElement => {
 
 
         fetchBlogs();
-    }, [selectedTab]);
+    }, []);
 
-    const handleTabChange = (tabKey: Key) => {
-        setSelectedTab(tabKey);
-    };
+    // const handleTabChange = (tabKey: Key) => {
+    //     setSelectedTab(tabKey);
+    // };
 
     
 
@@ -63,8 +63,8 @@ const BlogsListingPage: NextPage = (): ReactElement => {
             <BreadCrumbs items={breadcrumbs} />
             <section className="w-full">
                 <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Blogs</h1>
-                <div className='w-full mt-2.5 lg:-mt-16'>
-                    <Tabs aria-label="Options" onSelectionChange={(e) => handleTabChange(e)}
+                <div className='w-full mt-2.5 lg:-mt-16 '>
+                    {/* <Tabs aria-label="Options" onSelectionChange={(e) => handleTabChange(e)}
                         variant='bordered'
                         color='primary'
                         classNames={{
@@ -78,9 +78,9 @@ const BlogsListingPage: NextPage = (): ReactElement => {
                     >
                         
                         {tabs.map((tab) => (
-                            <Tab key={tab.key} title={tab.title} >
+                            <Tab key={tab.key} title={tab.title} > */}
                                 <Card classNames={{
-                                    base: "!bg-transparent border-none shadow-none p-0"
+                                    base: "!bg-transparent border-none shadow-none p-0 mt-12"
                                 }}>
                                     <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
                                         {
@@ -91,9 +91,9 @@ const BlogsListingPage: NextPage = (): ReactElement => {
 
                                     </CardBody>
                                 </Card>
-                            </Tab>
+                            {/* </Tab>
                         ))}
-                    </Tabs>
+                    </Tabs> */}
                 </div>
 
             </section>

@@ -1,4 +1,4 @@
-import { User } from "./auth.config";
+import { User } from "./auth.config"; 
 
  
 export interface TestimonialResponse {
@@ -20,19 +20,6 @@ export interface mailSubscriptionResponse {
     createdAt: string;
 }
 
-export interface BlogResponse {
-    id: number;
-    user_id: number;
-    blog_group: string;
-    title: string;
-    content: string;
-    slug: string;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: string | null;
-    User: User;
-}
-
 export interface BannerResponse {
     id: number;
     display_order: number;
@@ -45,6 +32,7 @@ export interface BannerResponse {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+    redirect_url: string;
 }
 
 export interface FooterConfig {

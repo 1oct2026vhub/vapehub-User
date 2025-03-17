@@ -11,8 +11,9 @@ import { CategoryResponseData, ProductResponseData } from "@/lib/config/product.
 import { BrandConfig } from "@/lib/config/brand.config";
 import { Category } from "@/lib/config/category.config";
 import { CarouselConfig } from "@/lib/config/carousel.config";
-import { BannerResponse, BlogResponse } from "@/lib/config/global.config";
+import { BannerResponse } from "@/lib/config/global.config";
 import { ServerActionResponse } from "@/lib/config/app.config";
+import { BlogResponse } from "@/lib/config/blog.config";
 
 type DashboardData = {
   popularVapes: ServerActionResponse<CategoryResponseData>;

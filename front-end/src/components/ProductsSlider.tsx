@@ -58,7 +58,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
         <div key={index} className="px-1 md:px-2 xl:px-5 py-4 first:pl-0">
           <ProductCard
             title={product?.name}
-            imageSrc={product?.ProductImages[0]?.image_url}
+            imageSrc={product?.ProductImages[0]?.image_url || ""}
             price={product?.price}
             buttonText={"3 for £30"}
             reviews={10}

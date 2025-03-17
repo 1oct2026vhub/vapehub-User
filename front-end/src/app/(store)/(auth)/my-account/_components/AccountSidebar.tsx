@@ -4,6 +4,7 @@ import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDi
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import LogoutButton from "./LogoutButton";
 
 const menuItems = [
   { label: "My Orders", path: "/my-account/orders" },
@@ -35,31 +36,7 @@ const AccountSidebar: React.FC = () => {
           </li>
         ))}
       </ul>
-      <Button onPress={onOpen} className="mt-auto red-gradient-100 px-4 py-3 md:flex text-content-1 !justify-start font-semibold hidden">
-        Logout
-      </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">Log Out</ModalHeader>
-              <ModalBody className='py-8'>
-                <p className='text-content-1 md:text-title-2 font-semibold text-skin-neutral-500 text-center'>
-                  Are you sure, Do you want to logout?
-                </p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="primary" onPress={onClose} className="!text-content-2 md:!text-content-1 max-md:h-10 rounded-lg primary-outline-btn !font-extrabold !w-fit">
-                  Cancel
-                </Button>
-                <Button color="primary" onPress={onClose} className="!text-content-2 md:!text-content-1 max-md:h-10 rounded-lg primary-btn !font-extrabold !w-fit">
-                  Yes
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 md:flex text-content-1 font-semibold hidden" />
     </div>
   );
 };

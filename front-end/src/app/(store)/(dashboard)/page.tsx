@@ -66,7 +66,7 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
       <Suspense fallback={<SuspenseLoader />}>
         <ShopByCategory categories={data.categories.status === ServerActionStatus.SUCCESS ? data.categories.data : []} />
         <HottestCollections brands={data.brands.status === ServerActionStatus.SUCCESS ? data.brands.data.slice(0, 10) : []} />
-        <NewProducts products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse} viewAllHref={ROUTES.NEW_PRODUCTS} />
+        <NewProducts products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse} viewAllHref={ROUTES.SHOP} />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>

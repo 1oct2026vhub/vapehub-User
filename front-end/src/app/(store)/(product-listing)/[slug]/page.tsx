@@ -103,10 +103,10 @@ export async function generateMetadata({ params, searchParams }: {
     const blog = await fetchBlogByCategoryAndSlug(slug);
     if (blog) {
       return {
-        title: blog.title,
+        title: `${blog.title} | VapeHub`,
         description: "",
         openGraph: {
-          title: blog.title,
+          title: `${blog.title} | VapeHub`,
           description: "",
           images: blog.image_url ? [{
             url: blog.image_url,
@@ -121,10 +121,10 @@ export async function generateMetadata({ params, searchParams }: {
   const categoryBlogs = await fetchBlogBySlug(slug);
   if (categoryBlogs) {
     return {
-      title: categoryBlogs.name,
+      title: `${categoryBlogs.name} | VapeHub`,
       description: categoryBlogs.description,
       openGraph: {
-        title: categoryBlogs.name,
+        title: `${categoryBlogs.name} | VapeHub`,
         description: categoryBlogs.description,
         images: categoryBlogs.image_url ? [{
           url: categoryBlogs.image_url,

@@ -13,6 +13,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/config/header.config';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/Form';
+import { useCart } from '@/lib/context/CartContext';
+import { ROUTES } from '@/lib/routes';
 
 const itemClasses = {
     base: "w-full shadow-none !p-0",
@@ -33,6 +35,8 @@ const HeaderTopBar = () => {
         resolver: zodResolver(HEADER_IN_SCHEMA),
         mode: 'onBlur',
     });
+
+    const { cartItems, cartTotal, itemCount } = useCart();
 
     // Cart Drawer
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -66,8 +70,8 @@ const HeaderTopBar = () => {
                     <Button onPress={onOpen} variant='light' className="flex items-center gap-0.5 hover:!bg-transparent">
                         <ShoppingCartIcon />
                         <div>
-                            <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">1 item</h6>
-                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">£ 3.99</h6>
+                            <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">{itemCount} item{itemCount !== 1 ? 's' : ''}</h6>
+                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">£ {cartTotal.toFixed(2)}</h6>
                         </div>
                     </Button>
                     <Link href='/my-account' className="flex items-center gap-0.5">
@@ -91,7 +95,7 @@ const HeaderTopBar = () => {
                         <Link href='/my-account'>
                             <UserIcon />
                         </Link>
-                        <Badge content="1" size="md" className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
+                        <Badge content={itemCount} size="md" className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
                             <Button isIconOnly size="sm" variant="light" onPress={onOpen}>
                                 <ShoppingCartIcon />
                             </Button>
@@ -140,17 +144,34 @@ const HeaderTopBar = () => {
             <Drawer isOpen={isOpen} onOpenChange={onOpenChange} className='filter-drawer rounded-l-32 md:!w-[637px]'>
                 <DrawerContent>
                     <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
-                        <h4 className='primary-gradient-600 text-title-1 font-bold'>Shopping Cart</h4>
+                        <h4 className='primary-gradient-600 text-title-1 font-bold'>Shopping Cart ({itemCount} item{itemCount !== 1 ? 's' : ''})</h4>
                     </DrawerHeader>
                     <DrawerBody className='max-sm:px-4 space-y-5 my-3'>
-                        <ShoppingCartCardDrawer showAddMoreItem />
+                        {cartItems.length > 0 ? (
+                            cartItems.map((item, idx) => (
+                                <ShoppingCartCardDrawer key={idx} item={item} showAddMoreItem />
+                            ))
+                        ) : (
+                            <div className="flex flex-col items-center justify-center gap-4 py-8">
+                                <p className="text-content-2 text-skin-neutral-500">Your cart is empty</p>
+                                <Link href={ROUTES.SHOP}>
+                                    <Button color="primary" className="shadow-button">
+                                        Continue Shopping
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
                     </DrawerBody>
-                    <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100'>
-                        <ShippingProgress />
-                        <Button size="lg" color="primary" className="w-full">
-                            Checkout Now
-                        </Button>
-                    </DrawerFooter>
+                    {cartItems.length > 0 && (
+                        <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100'>
+                            <ShippingProgress />
+                            <Link href="/checkout" className="w-full">
+                                <Button size="lg" color="primary" className="w-full">
+                                    Checkout Now (£{cartTotal.toFixed(2)})
+                                </Button>
+                            </Link>
+                        </DrawerFooter>
+                    )}
                 </DrawerContent>
             </Drawer>
         </>

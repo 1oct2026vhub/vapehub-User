@@ -9,6 +9,7 @@ import { Product } from '@/lib/config/product.config'
 import { ROUTES } from '@/lib/routes'
 import { DEFAULT_CURRENCY_SYMBOL, isLessThanOneMonth } from '@/lib/config/app.config'
 import Slider, { Settings } from 'react-slick'
+import { useCart } from '@/lib/context/CartContext'
 
 type ProductViewProps = {
     product: Product;
@@ -49,7 +50,24 @@ const settings: Settings = {
 };
 const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
     const [mainImage, setMainImage] = useState(product?.ProductImages[0]);
+    const [quantity, setQuantity] = useState(1);
+    // const [selectedFlavor, setSelectedFlavor] = useState<number | null>(null);
+    const { addItemToCart, updateItemQuantity, isLoading } = useCart();
 
+    const handleQuantityChange = (newQuantity: number) => {
+        if (newQuantity <= 0 || newQuantity > product.stock_quantity) {
+            
+            return;
+        }
+             
+        setQuantity(newQuantity);
+        updateItemQuantity(product.id, newQuantity);
+    };
+
+    const handleAddToCart = async () => {
+        
+        await addItemToCart(product.id, 1, quantity, product);
+    };
 
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
@@ -181,9 +199,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                                 trigger: "shadow-base border-skin-neutral-100",
                                 listboxWrapper: "max-h-[400px]",
                             }}
+                            
                         >
                             {product?.Flavors.map((flavour, idx) => (
-                                <SelectItem key={idx}>{flavour.name}</SelectItem>
+                                <SelectItem key={idx} value={flavour.id}>{flavour.name}</SelectItem>
                             ))}
                         </Select>
                     </div>
@@ -228,19 +247,48 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                         <div
                             className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 !font-bold h-12 md:h-[60px]"
                         >
-                            <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'>
+                            <Button 
+                                isIconOnly 
+                                size='lg' 
+                                variant='light' 
+                                color='primary' 
+                                className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
+                                onPress={() => handleQuantityChange(quantity - 1)}
+                                disabled={isLoading || quantity <= 1}
+                            >
                                 <MinusIcon />
                             </Button>
-                            <input type="tel" name="" id="" placeholder='1' className='w-9 max-w-9 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4' />
-                            <Button isIconOnly size='lg' variant='light' color='primary' className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'>
+                            <input 
+                                type="tel" 
+                                value={quantity}
+                                onChange={(e) => {
+                                    const val = parseInt(e.target.value);
+                                    if (!isNaN(val)) handleQuantityChange(val);
+                                }}
+                                className='w-9 max-w-9 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4 text-center' 
+                            />
+                            <Button 
+                                isIconOnly 
+                                size='lg' 
+                                variant='light' 
+                                color='primary' 
+                                className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
+                                onPress={() => handleQuantityChange(quantity + 1)}
+                                disabled={isLoading || quantity >= product.stock_quantity}
+                            >
                                 <PlusIcon />
                             </Button>
                         </div>
+                        
                         <Button
                             size="lg"
                             radius="md"
                             color="primary"
-                            className="btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px]"
+                            isLoading={isLoading}
+                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            // className="btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px]"
+                            onPress={handleAddToCart}
+                            disabled={isLoading || quantity <= 0 || quantity > product.stock_quantity}
                         >
                             Add to Cart
                         </Button>

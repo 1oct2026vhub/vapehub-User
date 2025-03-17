@@ -6,22 +6,22 @@ import { CART_RESPONSE_DATA } from '@/lib/config/cart.config';
 import { useState } from 'react';
 
 type CartCardProps = {
-  item: CART_RESPONSE_DATA;
+  item?: CART_RESPONSE_DATA;
   showAddMoreItem?: boolean;
 };
 
 const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
   const { updateItemQuantity, removeItem, isLoading } = useCart();
-  const [quantity, setQuantity] = useState(item.quantity);
+  const [quantity, setQuantity] = useState(item?.quantity ?? 0);
 
   const handleQuantityChange = async (newQuantity: number) => {
-    if (newQuantity <= 0 || newQuantity > item.product.stock_quantity) return;
+    if (newQuantity <= 0 || newQuantity > (item?.product.stock_quantity ?? 0)) return;
     setQuantity(newQuantity);
-    await updateItemQuantity(item.product_id, newQuantity);
+    await updateItemQuantity(item?.product_id ?? 0, newQuantity);
   };
 
   const handleRemove = async () => {
-    await removeItem(item.product_id);
+    await removeItem(item?.product_id ?? 0);
   };
 
   return (
@@ -30,10 +30,10 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
         {/* Product Image */}
         <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
-          {item.product.ProductImages?.[0]?.image_url && item.product.ProductImages?.[0]?.image_url.startsWith('http') ? (
-              <Image src={item.product.ProductImages[0].image_url} alt={item.product.name} width={104} height={100} />
+          {item?.product.ProductImages?.[0]?.image_url && item.product.ProductImages?.[0]?.image_url.startsWith('http') ? (
+              <Image src={item?.product.ProductImages[0].image_url} alt={item.product.name} width={104} height={100} />
             ) : (
-              <Image src="/images/product-1.png" alt={item.product.name} width={104} height={100} />
+              <Image src="/images/product-1.png" alt={item?.product.name ?? ""} width={104} height={100} />
             )}
           </div>
         </div>
@@ -41,17 +41,17 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
         <div className="flex flex-col gap-2.5 md:gap-5">
           <div className="flex items-start gap-4 md:gap-8 justify-between">
             <h4 className="text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
-              {item.product.name}
+              {item?.product.name}
             </h4>
 
             {/* Price Section */}
             <div className="text-right">
               <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold">
-                £{(Number(item.product.price) * quantity).toFixed(2)}
+                £{(Number(item?.product.price) * quantity).toFixed(2)}
               </p>
-              {item.product.discount_price && (
+              {item?.product.discount_price && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">
-                  £{(Number(item.product.discount_price) * quantity).toFixed(2)}
+                  £{(Number(item?.product.discount_price) * quantity).toFixed(2)}
                 </p>
               )}
             </div>
@@ -87,7 +87,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
                 color="primary"
                 className="text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent"
                 onPress={() => handleQuantityChange(quantity + 1)}
-                disabled={isLoading || quantity >= item.product.stock_quantity}
+                disabled={isLoading || quantity >= (item?.product.stock_quantity ?? 0)}
               >
                 <PlusIcon className='w-3 md:w-6'/>
               </Button>

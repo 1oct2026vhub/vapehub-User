@@ -21,9 +21,9 @@ const Footer = async (): AsyncReactElement => {
       title: 'help',
       links: [
         'Contact Us',
-        'Delivery Policy',
+        'Delivery Information',
         'Returns Policy',
-        'Privacy Information',
+        'Privacy Policy',
         'Terms & Conditions',
       ],
     },
@@ -58,7 +58,7 @@ const Footer = async (): AsyncReactElement => {
                   <li key={idx}>
                     <a
                       href="#"
-                      className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 transition-all duration-300"
+                      className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 hover:font-semibold transition-all duration-100"
                     >
                       {link}
                     </a>
@@ -75,7 +75,7 @@ const Footer = async (): AsyncReactElement => {
                   <Link
                     href={`/${category.slug}`}
                     passHref
-                    className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 transition-all duration-300"
+                    className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 hover:font-semibold transition-all duration-100"
                   >
                     {category.name}
                   </Link>

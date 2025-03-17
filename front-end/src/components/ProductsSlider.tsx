@@ -50,7 +50,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
     ],
   };
  
-  if (!products.length) return <p>No Products Available</p>;
+  if (!products.length) return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No Products Available</p>;
 
   return (
     <Slider {...settings}>

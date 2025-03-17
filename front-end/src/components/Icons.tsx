@@ -1002,7 +1002,7 @@ export const DownArrowFilledIcon = (
       viewBox="0 0 14 11"
       {...props}
     >
-      <path fill="#fff" d="M7 10.5.938 0h12.124z"></path>
+      <path fill="currentColor" d="M7 10.5.938 0h12.124z"></path>
     </svg>
   )
 };

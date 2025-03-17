@@ -1,6 +1,5 @@
 'use client'
 
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -17,7 +16,6 @@ const menuItems = [
 const AccountSidebar: React.FC = () => {
   const pathname = usePathname();
 
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
     <div className="bg-skin-base md:bg-skin-white px-3.5 py-2.5 md:p-5 xl:p-9 rounded-14 shadow-checkout flex flex-col md:min-h-[670px] justify-between overflow-y-auto min-w-fit max-md:w-full max-md:border border-skin-neutral-100">

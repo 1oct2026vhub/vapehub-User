@@ -1,6 +1,5 @@
 "use client"
 
-import FAQSection from "@/components/FAQSection";
 import FilterCheckboxGroup from "@/components/FilterCheckboxGroup";
 import FilterSidebar from "@/components/FilterSidebar";
 import Pagination from "@/components/Pagination";
@@ -132,9 +131,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
           </div>
         </div>
       </section>
-      <section className="product-listing-container">
-        <FAQSection />
-      </section>
+    
     </>
   );
 };

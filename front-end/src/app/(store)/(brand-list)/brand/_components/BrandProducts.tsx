@@ -1,5 +1,6 @@
 import ProductList from '@/app/(store)/(product-listing)/_components/ProductList';
 import BreadCrumbs from '@/components/BreadCrumbs';
+import FAQSection from '@/components/FAQSection';
 import ProductListingContent from '@/components/ProductListingContent';
 import { BrandByProductResponse } from '@/lib/config/product.config';
 import React, { ReactElement } from 'react';
@@ -20,6 +21,9 @@ const BrandProducts: React.FC<BrandProps> = ({ data }): ReactElement => {
                 <ProductListingContent data={data} />
             </section>
             <ProductList data={data} />
+            <section className="product-listing-container">
+                <FAQSection type="brand" id={data.id} />
+            </section>
         </div>
 
     );

@@ -18,7 +18,7 @@ const ProductList: React.FC = () => {
             {/* Products Section (conditionally rendered) */}
             {isExpanded && (
                 <div className='space-y-4 md:space-y-6'>
-                    <ShoppingCartCard showAddMoreItem />
+                    <ShoppingCartCard showAddMoreItem  />
                 </div>
             )}
         </div>

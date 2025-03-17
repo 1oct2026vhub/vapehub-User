@@ -56,10 +56,10 @@ export async function generateMetadata({ params, searchParams }: {
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
     return {
-      title: brandProduct.name,
+      title: `${brandProduct.name} | VapeHub`,
       description: "",
       openGraph: {
-        title: brandProduct.name,
+        title: `${brandProduct.name} | VapeHub`,
         description: "",
         images: brandProduct.logo_url ? [{
           url: brandProduct.logo_url,

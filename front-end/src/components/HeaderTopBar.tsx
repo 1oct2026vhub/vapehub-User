@@ -14,6 +14,8 @@ import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/co
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/Form';
 import MobileMenu from './MobileMenu';
+import { useCart } from '@/lib/context/CartContext';
+import { ROUTES } from '@/lib/routes';
 
 const HeaderTopBar = () => {
     const searchFromConfig = useForm<HeaderFormSchema>({
@@ -22,7 +24,7 @@ const HeaderTopBar = () => {
     });
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+    const { cartItems, cartTotal, itemCount } = useCart();
     return (
         <>
             <div className="hidden lg:flex items-center justify-between gap-10">
@@ -49,8 +51,8 @@ const HeaderTopBar = () => {
                     <Button onPress={onOpen} variant='light' className="flex items-center gap-0.5 hover:!bg-transparent">
                         <ShoppingCartIcon />
                         <div>
-                            <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">1 item</h6>
-                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">£ 3.99</h6>
+                            <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">{itemCount} item{itemCount !== 1 ? 's' : ''}</h6>
+                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">£ {cartTotal.toFixed(2)}</h6>
                         </div>
                     </Button>
                     <Link href='/my-account' className="flex items-center gap-0.5">
@@ -73,7 +75,7 @@ const HeaderTopBar = () => {
                         <Link href='/my-account'>
                             <UserIcon />
                         </Link>
-                        <Badge content="1" size="md" className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
+                        <Badge content={itemCount} size="md" className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
                             <Button
                                 isIconOnly
                                 size="sm"
@@ -109,10 +111,20 @@ const HeaderTopBar = () => {
                             </DrawerHeader>
                             <DrawerBody className='max-sm:px-4'>
                                 <div className='space-y-5 my-3'>
-                                    <ShoppingCartCardDrawer showAddMoreItem />
-                                    <ShoppingCartCardDrawer showAddMoreItem />
-                                    <ShoppingCartCardDrawer />
-                                    <ShoppingCartCardDrawer />
+                                    {cartItems.length > 0 ? (
+                                        cartItems.map((item, idx) => (
+                                            <ShoppingCartCardDrawer key={idx} item={item} showAddMoreItem />
+                                        ))
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center gap-4 py-8">
+                                            <p className="text-content-2 text-skin-neutral-500">Your cart is empty</p>
+                                            <Link href={ROUTES.SHOP}>
+                                                <Button color="primary" className="shadow-button">
+                                                    Continue Shopping
+                                                </Button>
+                                            </Link>
+                                        </div>
+                                    )}
                                 </div>
                             </DrawerBody>
                             <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100s'>
@@ -121,7 +133,7 @@ const HeaderTopBar = () => {
                                 <div className='space-y-3'>
                                     <div className='flex items-center justify-between text-black font-semibold'>
                                         <p className='text-content-2 md:text-title-1'>Total</p>
-                                        <p className='text-title-2 md:text-h5'>£ 65.58</p>
+                                        <p className='text-title-2 md:text-h5'>£{cartTotal.toFixed(2)}</p>
                                     </div>
                                     <Button
                                         size="lg"
@@ -158,7 +170,7 @@ const HeaderTopBar = () => {
                     )}
                 </DrawerContent>
             </Drawer>
-            
+
         </>
     )
 }

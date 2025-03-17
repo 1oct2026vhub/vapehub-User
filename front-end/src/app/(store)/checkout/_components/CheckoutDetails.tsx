@@ -82,7 +82,7 @@ const CheckoutDetails: React.FC = () => {
                                 />
                                 <InputForm
                                     type='tel'
-                                    label='Pincode'
+                                    label='Postcode'
                                     isRequired
                                     className='w-full'
                                 />
@@ -90,7 +90,7 @@ const CheckoutDetails: React.FC = () => {
                             <div className='grid grid-cols-2 gap-2.5 md:gap-4'>
                                 <InputForm
                                     type='text'
-                                    label='State'
+                                    label='Region'
                                     isRequired
                                     className='w-full'
                                 />

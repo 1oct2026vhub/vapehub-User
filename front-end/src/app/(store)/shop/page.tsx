@@ -1,19 +1,23 @@
 import BreadCrumbs from '@/components/BreadCrumbs';
 import {  AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
 import { getProductList } from '@/lib/server.actions';
-import { NextPage } from 'next'; 
+import { Metadata, NextPage } from 'next'; 
 import ProductList from '../(product-listing)/_components/ProductList';
 import { ROUTES } from '@/lib/routes';
 
+export const metadata: Metadata = {
+  title: "Shop | VapeHub",
+  description: "",
+};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const NewProductsPage: NextPage<{searchParams: Promise<any>}> = async ({searchParams}):AsyncReactElement  => {
+const ShopPage: NextPage<{searchParams: Promise<any>}> = async ({searchParams}):AsyncReactElement  => {
      
     const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 };
     const combinedParams = { ...defaultParams, ...await searchParams };
     
     const breadcrumbs = [
         { label: "Home", href: "/" },
-        { label: "New Products", href: `/${ROUTES.NEW_PRODUCTS}`, isActive: true },
+        { label: "Shop", href: `/${ROUTES.SHOP}`, isActive: true },
       ];
 
     const response = await getProductList(combinedParams);
@@ -32,4 +36,4 @@ const NewProductsPage: NextPage<{searchParams: Promise<any>}> = async ({searchPa
     );
 };
 
-export default NewProductsPage;
+export default ShopPage;

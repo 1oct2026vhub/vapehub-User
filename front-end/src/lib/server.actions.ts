@@ -3,8 +3,9 @@ import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogResponse } from "./config/blog.config";
 import { BrandConfig } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
+import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
-import { BannerResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { BannerResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
@@ -188,6 +189,78 @@ export const getBlogBySlug = async (slug: string): Promise<ServerActionResponse<
 export const getBlogByCategoryAndSlug = async (categorySlug: string, blogSlug: string): Promise<ServerActionResponse<BlogByCategoryAndSlugResponse>> => {
   return await handleRequest<BlogByCategoryAndSlugResponse, unknown>({
     endpoint: API_ROUTES.GET_BLOGS_BY_CATEGORY_AND_SLUG(categorySlug, blogSlug),
+    method: 'GET',
+  });
+};
+// Add item to cart
+export const addToCart = async (
+  product_id: number,
+  variant_id: number,
+  quantity: number
+): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, CART_GET_PAYLOAD>({
+    endpoint: API_ROUTES.ADD_TO_CART,
+    payload: {
+      product_id,
+      variant_id,
+      quantity
+    },
+    method: 'POST',
+  });
+};
+// Bulk add items to cart
+export const bulkAddToCart = async (
+  items: CART_GET_PAYLOAD[]
+): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, {items: CART_GET_PAYLOAD[]}>({
+    endpoint: API_ROUTES.ADD_TO_CART,
+    payload: {
+      items
+    },
+    method: 'POST',
+  });
+};
+
+// Get cart items
+export const getCartItems = async (): Promise<ServerActionResponse<CART_RESPONSE_DATA[]>> => {
+  return await handleRequest<CART_RESPONSE_DATA[], unknown>({
+    endpoint: API_ROUTES.GET_CART_ITEMS,
+    method: 'GET',
+  });
+};
+
+// Update cart item quantity
+export const updateCartItem = async (
+  productId: number,
+  quantity: number
+): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, { 
+    quantity: number;
+  }>({
+    endpoint: API_ROUTES.UPDATE_CART_ITEM(productId),
+    payload: {
+      quantity
+    },
+    method: 'PUT',
+  });
+};
+
+// Remove item from cart
+export const removeFromCart = async (
+  productId: number
+): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, {
+    productId: number;
+  }>({
+    endpoint: API_ROUTES.REMOVE_FROM_CART(productId),     
+    method: 'DELETE',
+  });
+};
+
+// get all faqs
+export const getFaqs = async (type: string, id: number): Promise<ServerActionResponse<FaqResponse[]>> => {
+  return await handleRequest<FaqResponse[], unknown>({
+    endpoint: API_ROUTES.GET_FAQS(type, id),
     method: 'GET',
   });
 };

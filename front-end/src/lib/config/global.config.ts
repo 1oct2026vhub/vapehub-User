@@ -39,3 +39,14 @@ export interface FooterConfig {
     title: string;
     links: string[]; 
 }
+
+export interface FaqResponse {
+    id: number;
+    entity_type: string;
+    entity_id: number;
+    question: string;
+    answer: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+}

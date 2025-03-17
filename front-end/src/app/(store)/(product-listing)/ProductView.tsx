@@ -39,7 +39,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data}): ReactElement 
             <ProductContent /> 
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-40'/>}>
-            <FAQSection />
+            <FAQSection type="product" id={data.id} />
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-64'/>}>
             <RelatedProducts viewAllHref={data.Category.slug} currentProductId={data.id}/>

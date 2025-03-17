@@ -21,6 +21,11 @@ export const API_ROUTES = {
     GET_BRAND_PRODUCTS_BY_SLUG: (slug:string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/brands/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
     GET_BLOGS_BY_SLUG: (slug:string) => buildRequestUrl(`/api/blogs/${slug}`),
     GET_BLOGS_BY_CATEGORY_AND_SLUG: (categorySlug: string, blogSlug: string) => buildRequestUrl(`/api/blogs/${categorySlug}/${blogSlug}`),
+    ADD_TO_CART: buildRequestUrl('/api/cart'),
+    GET_CART_ITEMS: buildRequestUrl('/api/cart'),
+    UPDATE_CART_ITEM: (id:number) => buildRequestUrl(`/api/cart/${id}`),
+    REMOVE_FROM_CART: (id:number) => buildRequestUrl(`/api/cart/${id}`),
+    GET_FAQS: (entity_name: string, entityId: number) => buildRequestUrl(`/api/faqs?entity_type=${entity_name}&entity_id=${entityId}`), 
 }
 
 // * Helper functions

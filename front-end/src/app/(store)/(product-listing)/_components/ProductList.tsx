@@ -38,7 +38,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
     { title: "Price Range", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Product Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Brands", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Flavors", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
+    { title: "Flavours", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Bottle Size", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Nicotine Strength", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Nicotine Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
@@ -109,7 +109,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
           />
           <div className={`grid max-[390px]:!grid-cols-1 grid-cols-2  ${isFilterVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} transition-all duration-600 ease-in-out gap-3 md:gap-5 xl:gap-10 products-slider`}>
             {products.length === 0 ? (
-              <p className="text-center text-skin-neutral-300 font-bold">No products found.</p>
+              <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No products found.</p>
             ) : products.map((product, index) => (
               <ProductCard
                 key={index}

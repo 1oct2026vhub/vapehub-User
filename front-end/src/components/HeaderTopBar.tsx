@@ -1,11 +1,11 @@
 'use client'
 
 import React from 'react'
-import { MenuIcon, SearchIcon, ShoppingCartIcon, UserIcon, CloseIcon } from "@/components/Icons";
+import { SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
 import InputField from "@/components/InputField";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@nextui-org/button";
-import { Badge, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, useDisclosure, Accordion, AccordionItem } from "@nextui-org/react";
+import { Badge, Divider, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, useDisclosure } from "@nextui-org/react";
 import Link from 'next/link';
 import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
 import ShippingProgress from './ShippingProgress';
@@ -13,20 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/config/header.config';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/Form';
-
-const itemClasses = {
-    base: "w-full shadow-none !p-0",
-    title: "!text-content-2 xl:!text-content-1 text-nowrap font-bold",
-    trigger: "rounded-lg h-11 !p-3 flex items-center border border-skin-primary-400",
-    indicator: "text-medium text-skin-neutral-500 -rotate-90 data-[open=true]:rotate-90",
-    content: "text-content-1 !px-3 !pt-4 !pb-0 !space-y-6 rounded-lg border border-skin-neutral-200 shadow-md my-2",
-};
-
-// Placeholder for filter options
-const filterOptions = [
-    { title: "Category", content: <p>Filter content</p> },
-    { title: "Brand", content: <p>Brand filter</p> },
-];
+import MobileMenu from './MobileMenu';
 
 const HeaderTopBar = () => {
     const searchFromConfig = useForm<HeaderFormSchema>({
@@ -34,11 +21,7 @@ const HeaderTopBar = () => {
         mode: 'onBlur',
     });
 
-    // Cart Drawer
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-    // Menu Drawer
-    const { isOpen: isMenuOpen, onOpen: onMenuOpen, onOpenChange: onMenuOpenChange } = useDisclosure();
 
     return (
         <>
@@ -46,7 +29,7 @@ const HeaderTopBar = () => {
                 <Logo className='max-xl:max-w-64' />
                 <div className="flex flex-1 flex-shrink justify-center items-center">
                     <Form {...searchFromConfig}>
-                        <form noValidate className="w-full max-w-[650px]">
+                        <form noValidate className="w-full max-w-[650px] ">
                             <InputField
                                 control={searchFromConfig.control}
                                 name="search"
@@ -73,32 +56,36 @@ const HeaderTopBar = () => {
                     <Link href='/my-account' className="flex items-center gap-0.5">
                         <UserIcon />
                         <div>
-                            <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">Welcome</h6>
-                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">My Account</h6>
+                            <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">welcome</h6>
+                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">my account</h6>
                         </div>
                     </Link>
                 </div>
             </div>
 
             {/* Responsive screens */}
+
             <div className="flex flex-col space-y-3.5 lg:hidden">
                 <div className="flex items-center justify-between gap-5">
-                    <Button isIconOnly size="sm" variant="light" onPress={onMenuOpen}>
-                        {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
-                    </Button>
+                    <MobileMenu />
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     <div className="flex items-center gap-1">
                         <Link href='/my-account'>
                             <UserIcon />
                         </Link>
                         <Badge content="1" size="md" className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
-                            <Button isIconOnly size="sm" variant="light" onPress={onOpen}>
-                                <ShoppingCartIcon />
-                            </Button>
+                            <Button
+                                isIconOnly
+                                size="sm"
+                                variant="light"
+                                startContent={<ShoppingCartIcon />}
+                                onPress={onOpen}
+                            />
                         </Badge>
                     </div>
                 </div>
                 <div className="flex flex-1 flex-shrink justify-center items-center">
+
                     <Form {...searchFromConfig}>
                         <form noValidate className="w-full">
                             <InputField
@@ -112,49 +99,68 @@ const HeaderTopBar = () => {
                         </form>
                     </Form>
                 </div>
-
-                <Drawer isOpen={isMenuOpen} onOpenChange={onMenuOpenChange} placement='bottom' className='filter-drawer max-h-[90vh]'>
-                    <DrawerContent>
-                        <DrawerHeader className="flex flex-col gap-3 pt-5 border-b border-skin-neutral-100" />
-                        <DrawerBody className='pt-5'>
-                            <Accordion variant="splitted" className="!p-0" itemClasses={itemClasses} selectionMode='multiple'>
-                                {filterOptions.map(({ title, content }, index) => (
-                                    <AccordionItem key={index} aria-label={title} title={title}>
-                                        {content}
-                                    </AccordionItem>
-                                ))}
-                            </Accordion>
-                        </DrawerBody>
-                        <DrawerFooter>
-                            <Button color="danger" variant="bordered" onPress={onMenuOpenChange} radius='sm' size='lg'>
-                                Close
-                            </Button>
-                            <Button color="primary" onPress={onMenuOpenChange} radius='sm' size='lg'>
-                                Apply
-                            </Button>
-                        </DrawerFooter>
-                    </DrawerContent>
-                </Drawer>
             </div>
-
-            <Drawer isOpen={isOpen} onOpenChange={onOpenChange} className='filter-drawer rounded-l-32 md:!w-[637px]'>
+            <Drawer isOpen={isOpen} onOpenChange={onOpenChange} className='filter-drawer rounded-l-32 md:!w-[637px] max-w-[90%] md:!max-w-[637px]'>
                 <DrawerContent>
-                    <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
-                        <h4 className='primary-gradient-600 text-title-1 font-bold'>Shopping Cart</h4>
-                    </DrawerHeader>
-                    <DrawerBody className='max-sm:px-4 space-y-5 my-3'>
-                        <ShoppingCartCardDrawer showAddMoreItem />
-                    </DrawerBody>
-                    <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100'>
-                        <ShippingProgress />
-                        <Button size="lg" color="primary" className="w-full">
-                            Checkout Now
-                        </Button>
-                    </DrawerFooter>
+                    {(onClose) => (
+                        <>
+                            <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
+                                <h4 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h4>
+                            </DrawerHeader>
+                            <DrawerBody className='max-sm:px-4'>
+                                <div className='space-y-5 my-3'>
+                                    <ShoppingCartCardDrawer showAddMoreItem />
+                                    <ShoppingCartCardDrawer showAddMoreItem />
+                                    <ShoppingCartCardDrawer />
+                                    <ShoppingCartCardDrawer />
+                                </div>
+                            </DrawerBody>
+                            <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100s'>
+                                <Divider />
+                                <ShippingProgress />
+                                <div className='space-y-3'>
+                                    <div className='flex items-center justify-between text-black font-semibold'>
+                                        <p className='text-content-2 md:text-title-1'>Total</p>
+                                        <p className='text-title-2 md:text-h5'>£ 65.58</p>
+                                    </div>
+                                    <Button
+                                        size="lg"
+                                        radius="md"
+                                        color="primary"
+                                        className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                    >
+                                        Checkout Now
+                                    </Button>
+                                    <div className='flex items-center gap-3'>
+                                        <Button
+                                            size="lg"
+                                            radius="md"
+                                            color="primary"
+                                            className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                            onPress={onClose}
+                                        >
+                                            Keep Shopping
+                                        </Button>
+                                        <Button
+                                            size="lg"
+                                            radius="md"
+                                            color="primary"
+                                            className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                            onPress={onClose}
+                                        >
+                                            View Cart
+                                        </Button>
+                                    </div>
+                                </div>
+
+                            </DrawerFooter>
+                        </>
+                    )}
                 </DrawerContent>
             </Drawer>
+            
         </>
     )
 }
 
-export default HeaderTopBar;
+export default HeaderTopBar

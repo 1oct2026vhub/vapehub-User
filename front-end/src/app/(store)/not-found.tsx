@@ -2,6 +2,18 @@ import { ROUTES } from '@/lib/routes';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+// generate metadata
+export async function generateMetadata() {
+    return {
+        title: "404 Not Found | VapeHub",
+        description: "The page you are looking for does not exist.",
+        openGraph: {
+            title: "404 Not Found | VapeHub",
+            description: "The page you are looking for does not exist.",
+            images: "/images/404-not-found.jpg",
+        },
+    };
+}
 
 const NotFoundPage: React.FC = () => {
     return (

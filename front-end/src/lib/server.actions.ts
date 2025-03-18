@@ -5,7 +5,7 @@ import { BrandConfig } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
-import { BannerResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
@@ -186,9 +186,9 @@ export const getBlogBySlug = async (slug: string): Promise<ServerActionResponse<
   });
 };
 // get blog by category and blog slug
-export const getBlogByCategoryAndSlug = async (categorySlug: string, blogSlug: string): Promise<ServerActionResponse<BlogByCategoryAndSlugResponse>> => {
+export const getBlogByCategoryAndSlug = async (categorySlug: string): Promise<ServerActionResponse<BlogByCategoryAndSlugResponse>> => {
   return await handleRequest<BlogByCategoryAndSlugResponse, unknown>({
-    endpoint: API_ROUTES.GET_BLOGS_BY_CATEGORY_AND_SLUG(categorySlug, blogSlug),
+    endpoint: API_ROUTES.GET_BLOGS_BY_CATEGORY_AND_SLUG(categorySlug),
     method: 'GET',
   });
 };
@@ -261,6 +261,14 @@ export const removeFromCart = async (
 export const getFaqs = async (type: string, id: number): Promise<ServerActionResponse<FaqResponse[]>> => {
   return await handleRequest<FaqResponse[], unknown>({
     endpoint: API_ROUTES.GET_FAQS(type, id),
+    method: 'GET',
+  });
+};
+
+// get dynamic page slug
+export const getDynamicPageSlug = async (slug: string): Promise<ServerActionResponse<DynamicPageSlugResponse>> => {
+  return await handleRequest<DynamicPageSlugResponse, unknown>({
+    endpoint: API_ROUTES.GET_DYNAMIC_PAGE_SLUG(slug),
     method: 'GET',
   });
 };

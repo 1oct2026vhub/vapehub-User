@@ -10,6 +10,7 @@ import { ROUTES } from '@/lib/routes'
 import { DEFAULT_CURRENCY_SYMBOL, isLessThanOneMonth } from '@/lib/config/app.config'
 import Slider, { Settings } from 'react-slick'
 import { useCart } from '@/lib/context/CartContext'
+import Link from 'next/link'
 
 type ProductViewProps = {
     product: Product;
@@ -76,7 +77,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                 <div className='space-y-2 lg:hidden'>
                     <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold'>{product?.name}</h1>
                     <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
-                        Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.slug)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
+                        Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.Brand?.slug)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</Link>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex gap-1">
@@ -144,7 +145,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                     <div className='space-y-3.5 hidden lg:block'>
                         <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>{product?.name}</h1>
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
-                            Brand: <a href={ROUTES.BRAND.replace(':slug', product?.Brand?.slug)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</a>
+                            Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.Brand?.slug)} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.Brand?.name}</Link>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex gap-1">

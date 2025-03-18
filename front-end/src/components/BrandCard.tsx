@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface BrandCardProps {
@@ -17,7 +18,7 @@ const BrandCard: React.FC<BrandCardProps> = ({
   height = 112,
 }) => {
   return (
-    <a
+    <Link
       href={href}
       className="p-1 bg-skin-white border border-[#B9B9B9] shadow-brand-card hover:shadow-slider-card rounded-10 md:rounded-2xl flex items-center justify-center transition-all duration-300 max-w-28 md:max-w-max overflow-hidden"
     >
@@ -27,7 +28,7 @@ const BrandCard: React.FC<BrandCardProps> = ({
         />
       ) : <Image src={"/images/brand-1.png"} alt={altText} width={width} height={height} loading="lazy"/>}
 
-    </a>
+    </Link>
   );
 };
 

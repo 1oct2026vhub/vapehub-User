@@ -50,3 +50,9 @@ export interface FaqResponse {
     updatedAt: string;
     deletedAt: string | null;
 }
+
+export interface DynamicPageSlugResponse {
+    slug: string;
+    entity_type: "category" |  "product" | "blog" | "blog_category";
+    entity_id: number; 
+}

@@ -1,4 +1,5 @@
 import { Category } from "./category.config";
+import { Pagination } from "./product.config";
 
 // Base interface for common blog properties
 interface BaseBlogEntity {
@@ -26,7 +27,7 @@ interface Author {
 }
 
 // Base interface for blog content
-interface BlogContent extends TimeStampFields {
+export interface BlogContent extends TimeStampFields {
     id: number;
     title: string;
     slug: string;
@@ -60,3 +61,16 @@ export interface BlogByCategoryAndSlugResponse extends BlogContent {
         categories: (BaseBlogEntity & TimeStampFields)[];
     })[];
 }
+
+export interface BlogPostListResponse {
+    blogs: (BlogContent & {
+        categories: (BaseBlogEntity & TimeStampFields)[];
+    })[]; 
+    pagination: Pagination;
+
+}
+
+export interface BlogList extends BlogContent {
+    categories: (BaseBlogEntity & TimeStampFields)[];
+}
+

@@ -3,7 +3,7 @@ import { Category } from "./category.config";
 
  
 
-interface Pagination {
+export interface Pagination {
     current_page: number;
     limit: number;
     offset: number;

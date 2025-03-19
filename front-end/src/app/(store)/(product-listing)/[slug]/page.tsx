@@ -2,12 +2,12 @@ import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProduct
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { notFound } from 'next/navigation';
-import ProductView from "../ProductView";
-import BlogView from "../../blogs/_components/BlogView";
+import ProductView from "../ProductView"; 
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
 import { DynamicPageSlugResponse } from "@/lib/config/global.config";
 import { CategoryResponseData, Product } from "@/lib/config/product.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
+import BlogListView from "../../blogs/_components/BlogList";
 
 type PageProps = {
   slug: string;
@@ -33,7 +33,7 @@ const Page = async ({
   const entityTypeHandlers: Record<string, () => Promise<React.ReactNode>> = {
     blog_category: async () => {
       const blogs = await fetchBlogBySlug(slug);
-      return blogs && <BlogView data={blogs} />;
+      return blogs && <BlogListView selectedId={blogs.id.toString()} />;
     },
     blog: async () => {
       const categoryBlogs = await fetchBlogByCategoryAndSlug(slug);  

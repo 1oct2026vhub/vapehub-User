@@ -21,6 +21,7 @@ export const API_ROUTES = {
     GET_BRAND_PRODUCTS_BY_SLUG: (slug:string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/brands/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
     GET_BLOGS_BY_SLUG: (slug:string) => buildRequestUrl(`/api/blogs/category/${slug}?page=1&limit=10`),
     GET_BLOGS_BY_CATEGORY_AND_SLUG: (categorySlug: string) => buildRequestUrl(`/api/blogs/post/${categorySlug}`),
+    GET_BLOGS_POST_LIST: (payload?: BLOG_PAYLOAD) => buildRequestUrl(`/api/blogs/list${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     ADD_TO_CART: buildRequestUrl('/api/cart'),
     GET_CART_ITEMS: buildRequestUrl('/api/cart'),
     UPDATE_CART_ITEM: (id:number) => buildRequestUrl(`/api/cart/${id}`),
@@ -36,6 +37,12 @@ function buildRequestUrl(url: string) {
 export interface PRODUCT_PAYLOAD {
     sort_by: string;
     order: 'ASC' | 'DESC';
+    limit: number;
+    offset: number;
+    categoryId?: string;
+}
+export interface BLOG_PAYLOAD {
+    categoryId?: string;
     limit: number;
     offset: number;
 }

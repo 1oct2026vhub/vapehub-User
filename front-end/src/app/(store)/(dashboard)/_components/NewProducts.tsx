@@ -2,7 +2,7 @@ import React from "react";
 import SectionHeading from "@/components/ui/SectionHeading";
 // import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
-import { ProductResponseData } from "@/lib/config/product.config";
+import { Product, ProductResponseData } from "@/lib/config/product.config";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 
 interface NewProductsProps {
@@ -16,7 +16,8 @@ const NewProducts: React.FC<NewProductsProps> = ({
   viewAllHref = "/",
   products
 }) => {
-  if (!products?.products?.length) {
+  const newProducts:Product[] = products?.products?.filter((product: Product) => product.Category !== null) ?? [];
+  if (!newProducts?.length) {
     return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No products available</p>;
   }
  

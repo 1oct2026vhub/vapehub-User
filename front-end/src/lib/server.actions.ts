@@ -1,7 +1,7 @@
 import { ServerActionResponse } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
-import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogResponse } from "./config/blog.config";
-import { BrandConfig } from "./config/brand.config";
+import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
+import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
@@ -9,7 +9,7 @@ import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionR
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { handleRequest } from "./request.config";
-import { API_ROUTES, PRODUCT_PAYLOAD } from '@/lib/api-routes';
+import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_PAYLOAD } from '@/lib/api-routes';
 
 export const signInAction = async (
     email: string,
@@ -90,9 +90,9 @@ export const getCategoryList = async (): Promise<ServerActionResponse<Category[]
   });
 };
 // brand list api 
-export const getBrandList = async (): Promise<ServerActionResponse<BrandConfig[]>> => {
-  return await handleRequest<BrandConfig[], unknown>({
-    endpoint: API_ROUTES.GET_BRAND_LIST,
+export const getBrandList = async (params?: BrandListPayload): Promise<ServerActionResponse<BrandListResponse>> => {
+  return await handleRequest<BrandListResponse, unknown>({
+    endpoint: API_ROUTES.GET_BRAND_LIST(params),
     method: 'GET',
   });
 };
@@ -192,6 +192,14 @@ export const getBlogByCategoryAndSlug = async (categorySlug: string): Promise<Se
     method: 'GET',
   });
 };
+// get blog list
+export const getBlogPostList = async (payload?: BLOG_PAYLOAD): Promise<ServerActionResponse<BlogPostListResponse>> => {
+  return await handleRequest<BlogPostListResponse, unknown>({
+    endpoint: API_ROUTES.GET_BLOGS_POST_LIST(payload),
+    method: 'GET',
+  });
+};
+
 // Add item to cart
 export const addToCart = async (
   product_id: number,

@@ -3,7 +3,7 @@ import { Category } from "./category.config";
 
  
 
-interface Pagination {
+export interface Pagination {
     current_page: number;
     limit: number;
     offset: number;
@@ -95,7 +95,7 @@ export interface Product {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
-    Category: Category;
+    Category: Category | null;
     Brand: BrandConfig;
     ProductImages: ProductImage[];
     Flavors: Flavor[];

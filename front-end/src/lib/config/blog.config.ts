@@ -1,6 +1,4 @@
 import { Category } from "./category.config";
-import { Pagination } from "./product.config";
-
 // Base interface for common blog properties
 interface BaseBlogEntity {
     id: number;
@@ -66,7 +64,14 @@ export interface BlogPostListResponse {
     blogs: (BlogContent & {
         categories: (BaseBlogEntity & TimeStampFields)[];
     })[]; 
-    pagination: Pagination;
+    pagination: {
+        total: number;
+        totalPages: number;
+        currentPage: number;
+        limit: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+    };
 
 }
 

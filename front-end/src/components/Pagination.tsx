@@ -1,3 +1,4 @@
+"use client"
 import { Button, Pagination, PaginationItemRenderProps, PaginationItemType } from "@nextui-org/react";
 import { LeftArrowIcon, MoreHorizontalIcon, RightArrowIcon } from "./Icons";
 import { cn } from "@/lib/utils";
@@ -72,17 +73,17 @@ const renderItem = ({ ref, key, value, isActive, onNext, onPrevious, setPage }: 
 };
 type PaginationProps = {
     total?: number;
-    onPageChange?: (page: number) => void
+    onPageChange?: (page: number) => void;
+    currentPage?: number;
 }
- const App: React.FC<PaginationProps> = ({total = 10, onPageChange}) => {
+ const App: React.FC<PaginationProps> = ({total = 10, onPageChange, currentPage = 1}) => {
     
-
     return (
         <Pagination
             disableCursorAnimation
             showControls
             className="gap-2"
-            initialPage={1}
+            page={currentPage}
             radius="full"
             renderItem={renderItem}
             total={total}

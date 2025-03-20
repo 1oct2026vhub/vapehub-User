@@ -21,7 +21,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data}): ReactElement 
      
     const breadcrumbs = [
         { label: "Home", href: ROUTES.WELCOME },
-        { label: data.Category.name, href: `/${data.Category.slug}` },
+        { label: data?.Category?.name || "", href: `/${data?.Category?.slug || ""}` },
         { label: data.name, href: data.slug, isActive: true },
     ];
 
@@ -42,7 +42,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data}): ReactElement 
             <FAQSection type="product" id={data.id} />
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-64'/>}>
-            <RelatedProducts viewAllHref={data.Category.slug} currentProductId={data.id}/>
+            <RelatedProducts viewAllHref={data?.Category?.slug || ""} currentProductId={data.id}/>
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-24'/>}>
             <Subscription className="mt-5 md:mt-10"/>

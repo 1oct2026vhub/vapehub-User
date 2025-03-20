@@ -30,7 +30,7 @@ const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactEl
             const categoryBlogs: BlogResponse[] = response.data;
             const allTab: BlogResponse = {
                 id: 0,
-                name: "ALL",
+                name: "All",
                 slug: "all",
                 description: "",
                 image_url: "",

@@ -10,7 +10,7 @@ interface ProductProps {
 }
 const ProductsSlider: React.FC<ProductProps> = ({data}) => {
   
-  const products:Product[] = data?.products ?? [];
+  const products:Product[] = data?.products?.filter((product: Product) => product.Category !== null) ?? [];
   
   const settings: Settings = {
     dots: true,

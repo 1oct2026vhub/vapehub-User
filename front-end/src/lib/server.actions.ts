@@ -1,7 +1,7 @@
 import { ServerActionResponse } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
-import { BrandConfig } from "./config/brand.config";
+import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
@@ -90,9 +90,9 @@ export const getCategoryList = async (): Promise<ServerActionResponse<Category[]
   });
 };
 // brand list api 
-export const getBrandList = async (): Promise<ServerActionResponse<BrandConfig[]>> => {
-  return await handleRequest<BrandConfig[], unknown>({
-    endpoint: API_ROUTES.GET_BRAND_LIST,
+export const getBrandList = async (params?: BrandListPayload): Promise<ServerActionResponse<BrandListResponse>> => {
+  return await handleRequest<BrandListResponse, unknown>({
+    endpoint: API_ROUTES.GET_BRAND_LIST(params),
     method: 'GET',
   });
 };

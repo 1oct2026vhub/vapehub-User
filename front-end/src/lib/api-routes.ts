@@ -45,5 +45,5 @@ export interface PRODUCT_PAYLOAD {
 export interface BLOG_PAYLOAD {
     categoryId?: string;
     limit: number;
-    offset: number;
+    page: number;
 }

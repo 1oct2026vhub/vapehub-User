@@ -95,7 +95,7 @@ export interface Product {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
-    Category: Category;
+    Category: Category | null;
     Brand: BrandConfig;
     ProductImages: ProductImage[];
     Flavors: Flavor[];

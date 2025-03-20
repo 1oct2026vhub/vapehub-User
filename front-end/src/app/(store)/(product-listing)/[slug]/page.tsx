@@ -45,7 +45,13 @@ const Page = async ({
     },
     product: async () => {
       const product = await fetchProduct(slug, combinedParams);
-      return product && <ProductView data={product} />;
+      if(!product) {
+        notFound();
+      } else if(!product.Category) {
+        notFound();
+      } else {
+        return <ProductView data={product} />;
+      }
     }
   };
 
@@ -180,6 +186,9 @@ export async function generateMetadata({ params, searchParams }: {
     product: async () => {
       const product = await fetchProduct(slug, combinedParams);
       if (!product) return null;
+      if(!product.Category) {
+       return null;
+      }
 
       return {
         title: product.name,

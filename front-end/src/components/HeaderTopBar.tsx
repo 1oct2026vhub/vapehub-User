@@ -16,6 +16,7 @@ import { Form } from '@/components/ui/Form';
 import MobileMenu from './MobileMenu';
 import { useCart } from '@/lib/context/CartContext';
 import { ROUTES } from '@/lib/routes';
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 
 const HeaderTopBar = () => {
     const searchFromConfig = useForm<HeaderFormSchema>({
@@ -52,7 +53,7 @@ const HeaderTopBar = () => {
                         <ShoppingCartIcon />
                         <div>
                             <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">{itemCount} item{itemCount !== 1 ? 's' : ''}</h6>
-                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">£ {cartTotal.toFixed(2)}</h6>
+                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">{DEFAULT_CURRENCY_SYMBOL} {cartTotal.toFixed(2)}</h6>
                         </div>
                     </Button>
                     <Link href='/my-account' className="flex items-center gap-0.5">
@@ -133,9 +134,9 @@ const HeaderTopBar = () => {
                                 <div className='space-y-3'>
                                     <div className='flex items-center justify-between text-black font-semibold'>
                                         <p className='text-content-2 md:text-title-1'>Total</p>
-                                        <p className='text-title-2 md:text-h5'>£{cartTotal.toFixed(2)}</p>
+                                        <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
                                     </div>
-                                    <Button
+                                    <Button                                       
                                         size="lg"
                                         radius="md"
                                         color="primary"
@@ -145,6 +146,8 @@ const HeaderTopBar = () => {
                                     </Button>
                                     <div className='flex items-center gap-3'>
                                         <Button
+                                            as={Link}
+                                            href={ROUTES.SHOP}
                                             size="lg"
                                             radius="md"
                                             color="primary"

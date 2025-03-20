@@ -8,7 +8,7 @@ import { Product, ProductResponseData } from "@/lib/config/product.config";
 
 interface RelatedProductsProps {
   title?: string;
-  viewAllHref?: Product["Category"]["slug"]; 
+  viewAllHref?: string; 
   currentProductId: Product["id"];
  }
 

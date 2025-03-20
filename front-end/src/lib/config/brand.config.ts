@@ -9,3 +9,21 @@ export interface BrandConfig {
     updatedAt: string;
     deletedAt: string | null;
 }
+
+export interface BrandListResponse {
+    brands: BrandConfig[];
+    pagination: {
+        currentPage: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+        itemsPerPage: number;
+        totalItems: number;
+        totalPages: number;
+    };
+}
+
+export interface BrandListPayload {
+    page: number;
+    limit: number;
+}
+

@@ -2,6 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { Category } from '@/lib/config/category.config';
 import { BrandConfig } from '@/lib/config/brand.config';
+import Link from 'next/link';
 
 const banners = [
     { src: '/images/product-banner-1.jpg', alt: 'Elf Bar Disposable Vape' },
@@ -29,7 +30,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({data}) => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             {banners.map((banner, index) => (
-                    <a href="#" key={index} aria-label={`View details of ${banner.alt}`}>
+                    <Link href="#" key={index} aria-label={`View details of ${banner.alt}`}>
                         <Image
                             src={banner.src}
                             alt={banner.alt}
@@ -38,7 +39,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({data}) => {
                             className="rounded-xl w-full max-h-[118px] md:max-h-40"
                             loading="lazy"
                         />
-                    </a>
+                    </Link>
                 ))}
             </div>
         </div>

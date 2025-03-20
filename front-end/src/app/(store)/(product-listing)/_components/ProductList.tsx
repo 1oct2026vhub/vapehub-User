@@ -54,8 +54,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
     { title: "Power Supply", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Puff Count", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
   ];
-
-  const products = data?.products ?? [];
+  const products = data?.products? data?.products.filter(product => product.Category !== null) : []; 
   const totalPage = data?.pagination?.total_pages ?? 0;
   const totalCount = data?.pagination?.total_count ?? 0;
   const activePage = data?.pagination?.current_page ?? 0;
@@ -126,8 +125,9 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
           </div>
           <div className="flex items-center gap-3 justify-between pl-5 max-md:hidden">
             <p className="text-content-1 text-skin-neutral-300 font-bold">Showing {activePage}-{pageLimit} of {totalCount} results</p>
-            {/* <Pagination showControls initialPage={1} total={100} /> */}
-            <Pagination total={totalPage} onPageChange={handlePagination}/>
+            {totalPage > 1 && (
+            <Pagination total={totalPage} onPageChange={handlePagination} currentPage={activePage}/>
+            )}
           </div>
         </div>
       </section>

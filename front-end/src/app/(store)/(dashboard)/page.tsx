@@ -51,7 +51,7 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
       data.categories.status === ServerActionStatus.ERROR) {
     return <div>Failed to load dashboard data</div>;
   }
-
+ 
   return (
     <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
       <HomeCarousel banners={data.carousel.status === ServerActionStatus.SUCCESS ? data.carousel.data : []} />
@@ -65,7 +65,7 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
 
       <Suspense fallback={<SuspenseLoader />}>
         <ShopByCategory categories={data.categories.status === ServerActionStatus.SUCCESS ? data.categories.data : []} />
-        <HottestCollections brands={data.brands.status === ServerActionStatus.SUCCESS ? data.brands.data.slice(0, 10) : []} />
+        <HottestCollections brands={data.brands.status === ServerActionStatus.SUCCESS ? data.brands.data.brands : []} />
         <NewProducts products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse} viewAllHref={ROUTES.SHOP} />
       </Suspense>
 

@@ -8,7 +8,7 @@ import {
   getBlogList
 } from "@/lib/server.actions";
 import { CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
-import { BrandConfig } from "@/lib/config/brand.config";
+import { BrandListResponse } from "@/lib/config/brand.config";
 import { Category } from "@/lib/config/category.config";
 import { CarouselConfig } from "@/lib/config/carousel.config";
 import { BannerResponse } from "@/lib/config/global.config";
@@ -19,7 +19,7 @@ type DashboardData = {
   popularVapes: ServerActionResponse<CategoryResponseData>;
   popularSalts: ServerActionResponse<CategoryResponseData>;
   newProducts: ServerActionResponse<ProductResponseData>;
-  brands: ServerActionResponse<BrandConfig[]>;
+  brands: ServerActionResponse<BrandListResponse>;
   categories: ServerActionResponse<Category[]>;
   carousel: ServerActionResponse<CarouselConfig[]>;
   promotions: ServerActionResponse<BannerResponse[]>;
@@ -40,7 +40,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
     getProductByCategory("disposables", {sort_by:"id",order:"ASC",limit:8,offset:0}),
     getProductByCategory("nic-salts", {sort_by:"id",order:"ASC",limit:8,offset:0}),
     getProductList({sort_by:"id",order:"DESC",limit:8,offset:0}),
-    getBrandList(),
+    getBrandList({page:1,limit:10}),
     getCategoryList(),
     getCarouselList(),
     getPromotionBanner(),

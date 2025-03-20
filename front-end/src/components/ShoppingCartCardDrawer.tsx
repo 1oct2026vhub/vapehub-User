@@ -4,6 +4,7 @@ import { MinusIcon, PlusIcon, TrashIcon, EditIcon, DangerIcon } from '@/componen
 import { useCart } from '@/lib/context/CartContext';
 import { CART_RESPONSE_DATA } from '@/lib/config/cart.config';
 import { useState } from 'react';
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 
 type CartCardProps = {
   item: CART_RESPONSE_DATA;
@@ -46,11 +47,11 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
             {/* Price Section */}
             <div className="text-right">
               <p className="primary-gradient-100 text-content-2 md:text-title-1 font-bold">
-                £{(Number(item.product.price) * quantity).toFixed(2)}
+              {DEFAULT_CURRENCY_SYMBOL}{(Number(item.product.price) * quantity).toFixed(2)}
               </p>
               {item.product.discount_price && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 line-through opacity-60 font-bold">
-                  £{(Number(item.product.discount_price) * quantity).toFixed(2)}
+                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item.product.discount_price) * quantity).toFixed(2)}
                 </p>
               )}
             </div>

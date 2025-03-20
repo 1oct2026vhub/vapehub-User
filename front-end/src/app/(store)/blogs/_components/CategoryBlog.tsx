@@ -11,7 +11,7 @@ const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
   if (!data) {
     return <div>No blogs found</div>
   }
-  const breadcrumbs = [
+  const breadcrumbs = [ 
     { label: "Home", href: ROUTES.WELCOME },
     { label: "Blogs", href: ROUTES.BLOGS },
     { label: data.categories?.[0]?.name, href: data.categories?.[0]?.slug },

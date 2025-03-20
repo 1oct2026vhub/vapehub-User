@@ -12,10 +12,10 @@ interface BannerImageProps {
 
 const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false }) => (
   <>
-  {banner.image_url_mid && banner.image_url_mid.startsWith('http') ?
+  {banner.image_url && banner.image_url.startsWith('http') ?
   <Link href={banner.redirect_url}>
     <Image
-      src={banner.image_url_mid}
+      src={banner.image_url}
       alt={banner.title}
       width={width}
       height={height}
@@ -39,7 +39,7 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
   }
 
   const sortedBanners = [...banners].sort((a, b) => a.display_order - b.display_order);
-
+  
   return (
     <>
       <section className="grid-cols-1 md:grid-cols-2 gap-7 mt-10 hidden md:grid" role="region" aria-label="Promotional Banners Desktop">

@@ -15,9 +15,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = ({
   viewAllHref = "#",
   products
 }) => {
-  if (!products?.products?.length) {
-    return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No products available</p>;
-  }
+   
     
   return (
     <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">
@@ -26,7 +24,9 @@ export const MostPopularVapes: React.FC<MostPopularProps> = ({
         <ViewAllLink href={viewAllHref} />
       </div>
       <div className="slider-container section-slider products-slider">
-        <ProductsSlider data={products}/>
+        {
+          products.products.length > 0 ? <ProductsSlider data={products}/> : <p>No products available</p>
+        }
       </div>
     </section>
   );
@@ -37,9 +37,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = ({
   viewAllHref = "#",
   products
 }) => {
-  if (!products?.products?.length) {
-    return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No products available</p>;
-  }
+
     
   return (
     <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">
@@ -48,7 +46,9 @@ export const MostPopularSalts: React.FC<MostPopularProps> = ({
         <ViewAllLink href={viewAllHref} />
       </div>
       <div className="slider-container section-slider products-slider">
-        <ProductsSlider data={products}/>
+        {
+          products.products.length > 0 ? <ProductsSlider data={products}/> : <p>No products available</p>
+        }
       </div>
     </section>
   );

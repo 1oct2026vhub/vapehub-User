@@ -3,6 +3,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
 import { ProductResponseData } from "@/lib/config/product.config";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 interface MostPopularProps {
   title?: string;
@@ -25,7 +26,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = ({
       </div>
       <div className="slider-container section-slider products-slider">
         {
-          products.products.length > 0 ? <ProductsSlider data={products}/> : <p>No products available</p>
+          products.products.length > 0 ? <ProductsSlider data={products}/> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         }
       </div>
     </section>
@@ -47,7 +48,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = ({
       </div>
       <div className="slider-container section-slider products-slider">
         {
-          products.products.length > 0 ? <ProductsSlider data={products}/> : <p>No products available</p>
+          products.products.length > 0 ? <ProductsSlider data={products}/> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         }
       </div>
     </section>

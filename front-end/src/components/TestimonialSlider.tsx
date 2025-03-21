@@ -3,6 +3,7 @@ import React, { FunctionComponent } from "react";
 import Slider, { Settings } from "react-slick";
 import TestimonialCard from "./TestimonialCard";
 import { TestimonialResponse } from "@/lib/config/global.config";
+import EmptyPlaceholder from "./ui/EmptyPlaceholder";
 interface TestimonialProps {
   data: TestimonialResponse[];
 }
@@ -38,7 +39,7 @@ const settings: Settings = {
 };
 
 const TestimonialSlider: FunctionComponent<TestimonialProps> = ({data}) => {
-     if(!data.length) return <p>No Testimonials Available</p>;
+     if(!data.length) return  <EmptyPlaceholder title='Uh, oh!' description='No testimonials available' />;
     return (
         <Slider {...settings}>
             {data.map((testimonial, index) => (

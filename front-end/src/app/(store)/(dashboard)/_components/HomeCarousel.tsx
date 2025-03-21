@@ -2,6 +2,7 @@ import React from 'react';
 import BannerSlider from './BannerSlider';
 import MobileBannerSlider from './MobileBannerSlider';
 import { CarouselConfig } from '@/lib/config/carousel.config';
+import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 
 interface HomeCarouselProps {
   banners: CarouselConfig[];
@@ -9,7 +10,7 @@ interface HomeCarouselProps {
 
 const HomeCarousel: React.FC<HomeCarouselProps> = ({ banners }) => {
   if (!banners?.length) {
-    return null;
+    return  <EmptyPlaceholder title='Uh, oh!' description='No banners available' />;
   }
         
   return (

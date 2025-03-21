@@ -10,6 +10,7 @@ import { ROUTES } from '@/lib/routes';
 import BreadCrumbs from '@/components/BreadCrumbs';
 import Pagination from "@/components/Pagination";
 import PreLoader from '@/components/common/PreLoader';
+import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 
 const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactElement => {
 
@@ -99,7 +100,7 @@ const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactEl
                                 base: "w-full",
                                 tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 lg:ml-auto border border-skin-neutral-100 rounded-xl !bg-skin-base",
                                 cursor: "bg-primary-gradient-100 border-none text-skin-white rounded-lg shadow-md",
-                                tab: "rounded-lg min-w-[124px] h-10 border border-skin-primary2-500 text-skin-primary2-500 group-data-[selected=true]:!border-none",
+                                tab: "rounded-lg min-w-[124px] !w-fit h-10 border border-skin-primary2-500 text-skin-primary2-500 group-data-[selected=true]:!border-none",
                                 tabContent: "group-data-[selected=true]:!text-skin-white text-content-2 md:text-title-2 font-semibold leading-none",
                                 panel: "!px-0"
                             }}
@@ -108,7 +109,7 @@ const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactEl
                             {tabs.map((tab) => (
                                 <Tab key={tab.id} title={tab.name} >
                                     {
-                                        loading ? <PreLoader /> : !blogs.length ? <p>No Blogs Available</p> :
+                                        loading ? <PreLoader /> : !blogs.length ? <EmptyPlaceholder title='Uh, oh!' description='No blogs available'  /> :
                                     <Card classNames={{
                                         base: "!bg-transparent border-none shadow-none p-0 w-full",
                                         body: "px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden"

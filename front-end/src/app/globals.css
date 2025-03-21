@@ -436,16 +436,16 @@ input[type='search'] {
 
 .section-slider.blogs-slider .slick-prev,
 .section-slider.blogs-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-14.5%] bottom-[-13%]  sm:bottom-[-11.7%] md:bottom-[-10%] lg:bottom-[-10.6%] xl:bottom-[-9.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-8.5%] bottom-[-9%]  sm:bottom-[-11.7%] md:bottom-[-10%] lg:bottom-[-10.6%] xl:bottom-[-9.6%] !important;
 }
 
 
 .section-slider.blogs-slider .slick-prev {
-  @apply left-[30%]
+  @apply left-[34%] sm:left-[39%] xl:left-[43%]
 }
 
 .section-slider.blogs-slider .slick-next {
-  @apply right-[30%]
+  @apply right-[34%] sm:right-[39%] xl:right-[43%]
 }
 
 

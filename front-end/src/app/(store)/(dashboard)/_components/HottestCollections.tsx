@@ -1,4 +1,5 @@
 import BrandCard from '@/components/BrandCard'
+import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import SectionHeading from '@/components/ui/SectionHeading'
 import { BrandConfig } from '@/lib/config/brand.config';
 import { ROUTES } from '@/lib/routes';
@@ -12,7 +13,7 @@ interface HottestCollectionsProps {
 
 const HottestCollections: React.FC<HottestCollectionsProps> = ({ brands }) => {
     if (!brands?.length) {
-        return <div>No Brands available</div>;
+        return  <EmptyPlaceholder title='Uh, oh!' description='No brands available' />;
     }
 
     return (

@@ -5,6 +5,7 @@ import ProductsSlider from "@/components/ProductsSlider";
 import { getProductByCategory } from "@/lib/server.actions";
 import { AsyncReactElement, ServerActionStatus } from "@/lib/config/app.config";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 interface RelatedProductsProps {
   title?: string;
@@ -19,7 +20,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
 }): AsyncReactElement => {
    const response = await getProductByCategory(viewAllHref, {sort_by: "id", order: "ASC", limit: 10, offset: 0});
     if (response.status === ServerActionStatus.ERROR) {
-      return <p>No Product Available</p>
+      return <EmptyPlaceholder title='Uh, oh!' description={response.message} />
     }
     
     const categoryProduct: ProductResponseData = response.data;

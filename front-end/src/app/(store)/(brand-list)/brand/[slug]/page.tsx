@@ -12,7 +12,7 @@ interface Props {
     searchParams: any
 }
  
-const BrandPage:  NextPage<Props> = async ({
+const BrandPage: NextPage<Props> = async ({
     params,
     searchParams}): AsyncReactElement => {
         const slug = (await params).slug as string;

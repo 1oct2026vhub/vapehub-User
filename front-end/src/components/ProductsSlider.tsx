@@ -4,6 +4,7 @@ import Slider, { Settings } from "react-slick";
 import ProductCard from "./ProductCard"; 
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import { isLessThanOneMonth } from "@/lib/config/app.config";
+import EmptyPlaceholder from "./ui/EmptyPlaceholder";
  
 interface ProductProps {
   data: ProductResponseData;
@@ -50,7 +51,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
     ],
   };
  
-  if (!products.length) return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No Products Available</p>;
+  if (!products.length) return <EmptyPlaceholder title='Uh, oh!' description='No products available' />
 
   return (
     <Slider {...settings}>

@@ -9,6 +9,7 @@ import BrandCard from "@/components/BrandCard";
 import Pagination from "@/components/Pagination";
 import SuspenseLoader from "@/components/ui/SuspenseLoader";
 import { ROUTES } from "@/lib/routes";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 const BrandList = () => {
   const router = useRouter();
@@ -43,7 +44,7 @@ const BrandList = () => {
     return <SuspenseLoader />;
   }
   if(!data || data.brands.length === 0) {
-    return <div>No brands found</div>;
+    return <EmptyPlaceholder title='Uh, oh!' description='No brands found' />;
   }
 
   return (

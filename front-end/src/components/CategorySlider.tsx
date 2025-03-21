@@ -3,6 +3,7 @@ import React, { ReactElement } from "react";
 import Slider, { Settings } from "react-slick";
 import CategoryCard from "./CategoryCard";
 import { Category } from "@/lib/config/category.config";
+import EmptyPlaceholder from "./ui/EmptyPlaceholder";
 
 type props = {
     categories: Category[];
@@ -45,7 +46,7 @@ const CategorySlider: React.FC<props> = ({ categories }): ReactElement => {
     };
 
     if (categories.length === 0) {
-        return <p>No categories available</p>;
+        return  <EmptyPlaceholder title='Uh, oh!' description='No categories available' />;
     }
     return (
         <Slider {...settings}>

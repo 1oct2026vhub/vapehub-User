@@ -10,6 +10,7 @@ import { ROUTES } from '@/lib/routes';
 import BreadCrumbs from '@/components/BreadCrumbs';
 import Pagination from "@/components/Pagination";
 import PreLoader from '@/components/common/PreLoader';
+import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 
 const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactElement => {
 
@@ -108,7 +109,7 @@ const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactEl
                             {tabs.map((tab) => (
                                 <Tab key={tab.id} title={tab.name} >
                                     {
-                                        loading ? <PreLoader /> : !blogs.length ? <p>No Blogs Available</p> :
+                                        loading ? <PreLoader /> : !blogs.length ? <EmptyPlaceholder title='Uh, oh!' description='No blogs available'  /> :
                                     <Card classNames={{
                                         base: "!bg-transparent border-none shadow-none p-0 w-full",
                                         body: "px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden"

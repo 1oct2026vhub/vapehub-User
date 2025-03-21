@@ -1,26 +1,32 @@
 import React from "react";
-import { Metadata } from "next";
+import { Metadata, NextPage } from "next";
 import FAQSection from "@/components/FAQSection";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import { ROUTES } from "@/lib/routes";
+import { AsyncReactElement } from "@/lib/config/app.config";
 
 export const metadata: Metadata = {
-    title: "Frequently Asked Questions | VapeHub",
+    title: "FAQ | VapeHub",
     description: "Find answers to commonly asked questions about our products and services.",
 };
 
+
+interface Props {  
+    searchParams: Promise<{
+        [key: string]: string | string[] | undefined;
+    }>
+} 
 const breadcrumbs = [
     { label: "Home", href: ROUTES.WELCOME },
     { label: "FAQ", href: ROUTES.FAQ, isActive: true },
 ];
 
-export default function FAQPage({
+const FAQPage: NextPage<Props> = async ({
     searchParams,
-}: {
-    searchParams: { [key: string]: string | string[] | undefined };
-}) {
-    const type = (searchParams.type as "product" | "brand" | "category" | "variant" | "common") || "common";
-    const id = parseInt(searchParams.id as string) || 0;
+}): AsyncReactElement => {
+    const params = await searchParams;
+    const type =  (params?.type as "product" | "brand" | "category" | "variant" | "common") || "common";
+    const id = parseInt(params?.id as string) || 0;
 
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
@@ -36,3 +42,5 @@ export default function FAQPage({
         </main>
     );
 }
+
+export default FAQPage;

@@ -1,3 +1,4 @@
+import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import { BannerResponse } from '@/lib/config/global.config';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -35,7 +36,7 @@ interface PromotionalBannersProps {
 
 const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners }) => {
   if (!Array.isArray(banners) || banners.length === 0) {
-    return <p className="text-center text-gray-500">No Banners Available</p>;
+    return  <EmptyPlaceholder title='Uh, oh!' description='No banners available' />;
   }
 
   const sortedBanners = [...banners].sort((a, b) => a.display_order - b.display_order);

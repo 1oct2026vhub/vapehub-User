@@ -5,6 +5,7 @@ import { ROUTES } from "@/lib/routes";
 import Subscription from "../../(dashboard)/_components/Subscription";
 import BlogCard from "@/components/BlogCard";
 import { Card, CardBody } from "@nextui-org/react";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 interface BlogViewProps {
     data: BlogBySlugResponse;
@@ -28,7 +29,7 @@ const BlogView = ({ data }: BlogViewProps) => {
                             <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
                 {
                     data.blogs.length === 0 ? (
-                        <div>No blogs found</div>
+                         <EmptyPlaceholder title='Uh, oh!' description='No blogs found' />
                     ) : (
                         data.blogs.map((blog, idx) => (
                             <BlogCard key={idx} blog={blog}/> 

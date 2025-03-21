@@ -4,6 +4,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import ProductsSlider from "@/components/ProductsSlider";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import ViewAllLink from "@/components/ui/ViewAllLink";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 interface NewProductsProps {
   title?: string;
@@ -17,9 +18,6 @@ const NewProducts: React.FC<NewProductsProps> = ({
   products
 }) => {
   const newProducts:Product[] = products?.products?.filter((product: Product) => product.Category !== null) ?? [];
-  if (!newProducts?.length) {
-    return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No products available</p>;
-  }
  
   return (
     <section className="space-y-4.5 md:space-y-7.5">
@@ -28,7 +26,11 @@ const NewProducts: React.FC<NewProductsProps> = ({
         <ViewAllLink href={viewAllHref} />
       </div>
       <div className="slider-container section-slider products-slider">
-        <ProductsSlider data={products}/>
+        {newProducts.length > 0 ? (
+          <ProductsSlider data={products}/>
+        ) : (
+          <EmptyPlaceholder title='Uh, oh!' description='No products available' />
+        )}
       </div>
     </section>
   );

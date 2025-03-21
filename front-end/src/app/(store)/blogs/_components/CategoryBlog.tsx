@@ -1,4 +1,5 @@
 import BreadCrumbs from "@/components/BreadCrumbs";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import { BlogByCategoryAndSlugResponse } from "@/lib/config/blog.config";
 import { ROUTES } from "@/lib/routes";
 import Image from "next/image";
@@ -9,7 +10,7 @@ interface CategoryBlogsProps {
 
 const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
   if (!data) {
-    return <div>No blogs found</div>
+    return <EmptyPlaceholder title='Uh, oh!' description='No blogs found' />
   }
   const breadcrumbs = [ 
     { label: "Home", href: ROUTES.WELCOME },
@@ -30,7 +31,7 @@ const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
         className='rounded-10 w-full max-h-80'
         priority
       />
-      <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>{data.categories?.[0]?.name ?? "Blogs"}</h1>
+      <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>{data.title ?? "Blogs"}</h1>
       <div dangerouslySetInnerHTML={{ __html: data.content }} />
 
     </main>

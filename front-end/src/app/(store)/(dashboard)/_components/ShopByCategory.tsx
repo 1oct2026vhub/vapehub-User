@@ -3,6 +3,7 @@ import CategorySlider from "@/components/CategorySlider";
 import SectionHeading from "@/components/ui/SectionHeading";
 // import ViewAllLink from "@/components/ui/ViewAllLink";
 import { Category, CategoryDetails } from "@/lib/config/category.config";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 interface ShopByCategoryProps {
   categories: Category[];
@@ -10,7 +11,7 @@ interface ShopByCategoryProps {
 
 const ShopByCategory: FunctionComponent<ShopByCategoryProps> = ({ categories }): ReactElement => {
   if (!categories?.length) {
-    return <div>No categories available</div>;
+    return  <EmptyPlaceholder title='Uh, oh!' description='No categories available' />;
   }
    
   return (

@@ -3,6 +3,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import BlogsSlider from "@/components/BlogsSlider"; 
 import { BlogResponse } from "@/lib/config/blog.config";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 interface BlogsSectionProps {
   title?: string;
@@ -16,7 +17,7 @@ const BlogsSection: React.FC<BlogsSectionProps> = ({
   blogs
 }) => {
   if (!blogs?.length) {
-    return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No blogs available</p>;
+    return  <EmptyPlaceholder title='Uh, oh!' description='No blogs available' />;
   }
   
   return (

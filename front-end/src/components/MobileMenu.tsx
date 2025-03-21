@@ -43,9 +43,9 @@ const MobileMenu = () => {
         { title: "E-liquids", content: <MobileSubMenu /> },
         { title: "Pouches & Strips", content: <MobileSubMenu /> },
         { title: "Hardware", content: <MobileSubMenu /> },
-        { title: "Brands", content: <MobileSubMenu /> },
-        { title: "Blogs", content: <MobileSubMenu /> },
-        { title: "Deals", content: <MobileSubMenu /> },
+        { title: "Brands" },
+        { title: "Blogs" },
+        { title: "Deals" },
     ];
 
     const subscribeFromConfig = useForm<SubscribeFormSchema>({

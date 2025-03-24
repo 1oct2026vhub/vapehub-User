@@ -9,9 +9,10 @@ interface BannerImageProps {
   width: number;
   height: number;
   priority?: boolean;
+  className?: string;
 }
 
-const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false }) => (
+const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false, className }) => (
   <>
   {banner.image_url && banner.image_url.startsWith('http') ?
   <Link href={banner.redirect_url}>
@@ -20,7 +21,7 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
       alt={banner.title}
       width={width}
       height={height}
-      className="w-full h-full object-cover"
+      className={`w-full h-full object-fill aspect-video ${className}`}
       loading={priority ? "eager" : "lazy"}
       priority={priority}
     />
@@ -50,6 +51,7 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
             width={662}
             height={573}
             priority
+            className='max-h-[573px]'
           />
         )}
 
@@ -60,6 +62,7 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
               banner={banner}
               width={662}
               height={274}
+              className='max-h-[274px]'
             />
           ))}
         </div>
@@ -72,6 +75,7 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
             banner={banner}
             width={361}
             height={274}
+            className='max-h-[274px]'
           />
         ))}
       </section>

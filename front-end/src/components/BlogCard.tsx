@@ -13,7 +13,7 @@ type Props = {
 const BlogCard: React.FC<Props> = ({ blog }) => {
     return (
         // <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-        <Link href={blog?.slug ?? '#'} className='bg-skin-white p-4 items-start shadow-card rounded-14 xl:min-w-[431px] w-full'>
+        <Link href={blog?.slug ?? '#'} className='bg-skin-white p-4 items-start shadow-card rounded-14 w-full'>
             <div className='w-full max-h-60 rounded-10 mb-4.5'>
                 <Image
                     src={blog.image_url ?? '/images/blog-list-card.jpg'}

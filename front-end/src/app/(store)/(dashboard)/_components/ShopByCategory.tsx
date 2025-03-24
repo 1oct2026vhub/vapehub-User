@@ -21,7 +21,7 @@ const ShopByCategory: FunctionComponent<ShopByCategoryProps> = ({ categories }):
         {/* <ViewAllLink href={CategoryDetails.viewAllHref} /> */}
       </div>
       <div className="slider-container section-slider">
-        <CategorySlider categories={categories}/>
+        <CategorySlider categories={categories.slice(0, 8)}/>
       </div>
     </section>
   );

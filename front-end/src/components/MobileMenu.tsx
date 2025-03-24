@@ -93,7 +93,7 @@ const MobileMenu = () => {
             >
                 {<MenuIcon className='z-10 relative' />}
             </div>
-            <Drawer isOpen={isMenuOpen} onOpenChange={handleMenuClose} placement='bottom' className='max-h-[99vh] min-h-[99vh] rounded-t-32' classNames={{
+            <Drawer isOpen={isMenuOpen} onOpenChange={handleMenuClose} placement='bottom' className='max-h-[95vh] min-h-[95vh] rounded-t-32' classNames={{
                 closeButton: '!hidden'
             }}>
                 <DrawerContent>

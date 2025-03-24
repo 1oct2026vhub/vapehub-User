@@ -1,6 +1,7 @@
 "use client"
 
 import FilterCheckboxGroup from "@/components/FilterCheckboxGroup";
+import FilterRadioGroup from "@/components/FilterRadioGroup";
 import FilterSidebar from "@/components/FilterSidebar";
 import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
@@ -34,8 +35,11 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
     console.log("Remove filter:", filter);
   };
 
+  const onFilterChange = (filter: string) => {
+    console.log("filter:", filter);
+  };
   const filterOptions = [
-    { title: "Price Range", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
+    { title: "Price Range", content: <FilterRadioGroup options={priceOptions} defaultValues={["0-10"]}  onChange={onFilterChange} /> },
     { title: "Product Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Brands", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
     { title: "Flavours", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },

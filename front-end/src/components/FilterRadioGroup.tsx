@@ -32,16 +32,21 @@ const FilterRadioGroup: FunctionComponent<FilterRadioGroupProps> = ({
   return (
     <RadioGroup
       defaultValue={defaultValues[0]}
-      onChange={(e) => handleSelectionChange(e.target.value)}
+      onValueChange={(e) => handleSelectionChange(e)}
       className="gap-1"
     >
       {options.map((option) => (
         <Radio
           key={option.value}
           value={option.value}
-          className="text-skin-neutral-300"
-        >
-          {`${option.label} (${option.count})`}
+          classNames={{
+            base: "mb-2",
+            wrapper: "after:bg-primary-gradient-100 after:rounded",
+            label: "!text-content-2 text-nowrap",
+          }}
+        > 
+          <span className="text-skin-neutral-300 font-normal">{option.label}</span>
+          <span className="text-skin-neutral-500 font-medium">  ({option.count}) </span>
         </Radio>
       ))}
     </RadioGroup>

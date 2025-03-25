@@ -44,18 +44,41 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
   
   return (
     <>
-      <section className="md:grid-cols-2 grid-cols-1 md:grid-rows-2 gap-7 mt-10 grid" role="region" aria-label="Promotional Banners Desktop">
-      {sortedBanners.map((banner, index) => (
-        <div key={`banner-${banner.title}-${index}`} className={`${index % 3 === 0 ? 'row-span-2 max-h-[274px] md:max-h-[573px]' : 'col-span-1 row-span-1 max-h-[274px]'} `}>
-          <BannerImage 
+      <section className="grid-cols-1 md:grid-cols-2 gap-7 mt-10 hidden md:grid" role="region" aria-label="Promotional Banners Desktop">
+        {sortedBanners[0] && (
+          <BannerImage
+            banner={sortedBanners[0]}
+            width={662}
+            height={573}
+            priority
+            className='max-h-[573px]'
+          />
+        )}
+
+        <div className="grid grid-cols-1 gap-7">
+          {sortedBanners.slice(1, 3).map((banner, index) => (
+            <BannerImage
+              key={`desktop-banner-${banner.title}-${index}`}
+              banner={banner}
+              width={662}
+              height={274}
+              className='max-h-[274px]'
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-4 mt-10 md:hidden" role="region" aria-label="Promotional Banners Mobile">
+        {sortedBanners.slice(0, 3).map((banner, index) => (
+          <BannerImage
+            key={`mobile-banner-${banner.title}-${index}`}
             banner={banner}
             width={361}
-            height={274} 
+            height={274}
+            className='max-h-[274px]'
           />
-          </div>
         ))}
       </section>
-     
     </>
   );
 });

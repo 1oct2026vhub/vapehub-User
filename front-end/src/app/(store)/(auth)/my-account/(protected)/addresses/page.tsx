@@ -68,10 +68,10 @@ const AccountAddresses: NextPage = () => {
             <InputForm type="text" label="Address Line 3" className="w-full" />
             <div className="grid grid-cols-2 gap-2.5 md:gap-4">
               <InputForm type="text" label="City" isRequired className="w-full" />
-              <InputForm type="tel" label="Pincode" isRequired className="w-full" />
+              <InputForm type="tel" label="Postcode" isRequired className="w-full" />
             </div>
             <div className="grid grid-cols-2 gap-2.5 md:gap-4">
-              <InputForm type="text" label="State" isRequired className="w-full" />
+              <InputForm type="text" label="Region" isRequired className="w-full" />
               <InputForm type="text" label="Country" isRequired className="w-full" />
             </div>
 

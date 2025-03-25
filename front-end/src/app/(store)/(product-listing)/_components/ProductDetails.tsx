@@ -57,7 +57,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
 
     const handleQuantityChange = (newQuantity: number) => {
         if (newQuantity <= 0 || newQuantity > product.stock_quantity) {
-            
             return;
         }
              
@@ -66,7 +65,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
     };
 
     const handleAddToCart = async () => {
-        
+        if (quantity <= 0 || quantity > product.stock_quantity) {
+
+            // toast.error("Out of stock")
+            return;
+        }
         await addItemToCart(product.id, 1, quantity, product);
     };
 
@@ -286,7 +289,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                             radius="md"
                             color="primary"
                             isLoading={isLoading}
-                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isLoading || quantity <= 0 || quantity > product.stock_quantity) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             // className="btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px]"
                             onPress={handleAddToCart}
                             disabled={isLoading || quantity <= 0 || quantity > product.stock_quantity}

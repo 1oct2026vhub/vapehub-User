@@ -34,7 +34,7 @@ const AccountSidebar: React.FC = () => {
           </li>
         ))}
       </ul>
-      <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 md:flex text-content-1 font-semibold hidden" />
+      <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 md:flex !justify-start text-content-1 font-semibold hidden" />
     </div>
   );
 };

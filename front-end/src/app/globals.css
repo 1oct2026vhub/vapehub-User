@@ -348,7 +348,7 @@ input[type='search'] {
 
 .section-slider.products-slider .slick-prev,
 .section-slider.products-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-7.5%] bottom-[-9%] sm:bottom-[-11.5%] md:bottom-[-9%] lg:bottom-[-11.5%] xl:bottom-[-10.2%] 2xl:bottom-[-10.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-6.3%] bottom-[-9%] sm:bottom-[-11.5%] md:bottom-[-10%] lg:bottom-[-11.5%] xl:bottom-[-10.2%] 2xl:bottom-[-9.6%] !important;
 }
 
 @media screen and (min-width:1890px) {  

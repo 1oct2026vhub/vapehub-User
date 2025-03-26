@@ -34,12 +34,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-neutral-50 rounded-10">
           {imageSrc && imageSrc.startsWith('http') ? (
             <Image
-              src={imageSrc} alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[235px] md:min-h-[235px]' loading="lazy"
+              src={imageSrc} alt={title} width={275} height={275} className='w-full aspect-square' loading="lazy"
             />
           ) :
 
             <Image
-              src="/images/product-1.png" alt={title} width={245} height={234} className='w-full min-h-[164px] max-h-[235px] md:min-h-[235px]' loading="lazy"
+              src="/images/product-1.png" alt={title} width={275} height={275} className='w-full aspect-square' loading="lazy"
             />
 
           }

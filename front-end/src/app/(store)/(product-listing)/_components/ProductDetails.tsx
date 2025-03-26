@@ -101,14 +101,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({ product }) => {
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit '>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full lg:w-[400px] xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2 min-h-[250px] lg:min-h-[425px]'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full lg:w-[400px] xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2 min-h-[250px] lg:min-h-[425px] max-h-[250px] lg:max-h-[425px]'>
                         {mainImage && mainImage?.image_url.startsWith('http') ? (
                             <Image
                                 src={mainImage?.image_url}
                                 alt={product?.name}
-                                width={280}
+                                width={320}
                                 height={396}
-                                className='max-lg:max-w-40 max-sm:max-h-[207px] max-lg:max-h-64 cursor-pointer'
+                                className='aspect-square'
                             />
                         ) : <p>Image not found</p>}
                         {

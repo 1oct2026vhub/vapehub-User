@@ -31,7 +31,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
             alt={`${title} Image`}
             width={230}
             height={204}
-            className="max-h-[150px] md:max-h-[250px] min-h-[150px] md:min-h-[250px]"
+            className="w-full h-full object-fill"
             loading="lazy"
           />
         ) : <Image
@@ -39,7 +39,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         alt={`${title} Image`}
         width={230}
         height={204}
-        className="max-h-[150px] md:max-h-[250px] min-h-[150px] md:min-h-[250px]"
+        className="w-full h-full object-fill"
         loading="lazy"
       />}
         

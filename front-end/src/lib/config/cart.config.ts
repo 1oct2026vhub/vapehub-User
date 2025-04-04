@@ -1,4 +1,4 @@
-import { Product } from "./product.config";
+import { Product, productAllImages } from "./product.config";
 
 export interface CART_RESPONSE_DATA  {
   id: number;
@@ -41,3 +41,35 @@ export type CART_GET_PAYLOAD = {
   variant_id?: number;
   quantity: number;
 }
+
+export type CartItem = {
+  id: number;
+  name: string;
+  price: string;
+  variants: {
+    id: number;
+    product_id: number;
+    slug: string;
+    price: string;
+    discount_price: string;
+    purchase_price?: string;
+    description: string;
+    stock: number;
+    status: string;
+    variantImages: productAllImages[];
+  };
+  ProductImages: productAllImages[];
+  slug: string;
+  description: string;
+  stock_quantity: number;
+  discount_price: string;
+  puff_count?: number; 
+}
+ 
+export type GuestCartItem =  {
+  product_id: number;
+  variant_id: number;
+  quantity: number;
+  flavor_id: null;
+  product?: CartItem
+};

@@ -1,40 +1,58 @@
-import { AsyncReactElement, RouteParams, ServerActionStatus} from '@/lib/config/app.config';
+import { AsyncReactElement, RouteParams, ServerActionStatus } from '@/lib/config/app.config';
 import { NextPage } from 'next';
-import React from 'react'; 
+import React from 'react';
 import BrandProducts from '../_components/BrandProducts';
 import { getProductByBrand } from '@/lib/server.actions';
 import { notFound } from 'next/navigation';
- 
+import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
+
 
 interface Props {
-    params: Promise<RouteParams>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    searchParams: any
+  params: Promise<RouteParams>; 
+  searchParams: Promise<Record<string, string>>
 }
- 
-const BrandPage: NextPage<Props> = async ({
-    params,
-    searchParams}): AsyncReactElement => {
-        const slug = (await params).slug as string;
-        const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
-        const combinedParams = { ...defaultParams, ...await searchParams };
 
-        
+const BrandPage: NextPage<Props> = async ({
+  params,
+  searchParams }): AsyncReactElement => {
+  const slug = (await params).slug as string;
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
+  const searchParamsData = await searchParams;
+  // Convert search params to variant structure
+  const variantParams = Object.entries(searchParamsData)
+    .reduce((acc: Record<string, unknown>, [key, value]) => {
+      if (key.startsWith('attribute_')) {
+        const attributeId = key.replace('attribute_', '');
+        const values = value.split(',').map(Number);
+
+        // Build variant object
+        const variantObj = acc.variant ? JSON.parse(acc.variant as string) : {};
+        variantObj[attributeId] = values;
+
+        // Encode variant object as URL parameter
+        acc.variant = JSON.stringify(variantObj);
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, { ...defaultParams });
+  const combinedParams = { ...defaultParams, ...variantParams };
+
+
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
     return (
-      <BrandProducts data={brandProduct}/>
+      <BrandProducts data={brandProduct} />
     );
-  } 
+  }
   notFound();
 
 };
 
 
 export default BrandPage;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const fetchBrandProduct = async (slug: string, params: any) => {
+ 
+const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
   const response = await getProductByBrand(slug, params);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
@@ -46,8 +64,7 @@ const fetchBrandProduct = async (slug: string, params: any) => {
 
 export async function generateMetadata({ params, searchParams }: {
   params: Promise<RouteParams>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  searchParams: any
+  searchParams: Promise<Record<string, string>>
 }) {
   const slug = (await params).slug as string;
   const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };

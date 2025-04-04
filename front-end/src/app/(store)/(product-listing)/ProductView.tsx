@@ -7,28 +7,31 @@ import FAQSection from '@/components/FAQSection'
 import ProductDetails from './_components/ProductDetails';
 import ProductFeatures from './_components/ProductFeatures';
 import RelatedProducts from './_components/RelatedProducts';
-import Subscription from '../(dashboard)/_components/Subscription';
-import { Product } from '@/lib/config/product.config';
+import Subscription from '../(dashboard)/_components/Subscription'; 
 import { ROUTES } from '@/lib/routes';
 import SuspenseLoader from '@/components/ui/SuspenseLoader';
+import { AttributeProductTerms, AttributeTerms, ProductResponse } from '@/lib/config/product.config';
 
 type ProductViewProps = {
-    data: Product;
+    data: ProductResponse;
+    isVariant?: boolean;
+    selectedVariant?: AttributeProductTerms;
+    availableVariants?: AttributeTerms[];
 }
 
-const ProductView: FunctionComponent<ProductViewProps> = ({data}): ReactElement => {
+const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = false, selectedVariant, availableVariants}): ReactElement => {
     
      
     const breadcrumbs = [
         { label: "Home", href: ROUTES.WELCOME },
-        { label: data?.Category?.name || "", href: `/${data?.Category?.slug || ""}` },
-        { label: data.name, href: data.slug, isActive: true },
+        { label: data?.product?.category?.name || "", href: `/${data?.product?.category?.slug || ""}` },
+        { label: data.product.name, href: data.product.slug, isActive: true },
     ];
 
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
-            <ProductDetails product={data}/>
+            <ProductDetails data={data} isVariant={isVariant} selectedVariant={selectedVariant} availableVariants={availableVariants}/>
             <Suspense fallback={<SuspenseLoader/>}>
             <OrderCard />
             </Suspense>
@@ -36,13 +39,13 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data}): ReactElement 
             <ProductFeatures />
             </Suspense>
             <Suspense fallback={<SuspenseLoader/>}>
-            <ProductContent /> 
+            <ProductContent product={data?.product}/> 
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-40'/>}>
-            <FAQSection type="product" id={data.id} />
+            <FAQSection type="product" id={data.product.id} />
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-64'/>}>
-            <RelatedProducts viewAllHref={data?.Category?.slug || ""} currentProductId={data.id}/>
+            <RelatedProducts viewAllHref={data?.product?.category?.slug || ""} currentProductId={data.product.id}/>
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-24'/>}>
             <Subscription className="mt-5 md:mt-10"/>

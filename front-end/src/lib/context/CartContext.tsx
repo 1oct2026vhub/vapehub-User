@@ -1,16 +1,16 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { CART_RESPONSE_DATA } from '../config/cart.config';
+import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, GuestCartItem } from '../config/cart.config';
 import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem } from '../server.actions';
 import { getCookie, setCookie } from 'cookies-next';
 import { ServerActionStatus } from '../config/app.config';
 import { useSession } from 'next-auth/react';
-import { Product } from '../config/product.config';
+import { ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
 
 interface CartContextType {
   cartItems: CART_RESPONSE_DATA[];
   isLoading: boolean;
-  addItemToCart: (productId: number, variantId: number, quantity: number, product: Product) => Promise<void>;
+  addItemToCart: (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => Promise<void>;
   updateItemQuantity: (productId: number, quantity: number) => Promise<void>;
   removeItem: (productId: number) => Promise<void>;
   cartTotal: number;
@@ -21,23 +21,16 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_COOKIE_NAME = 'guest_cart';
-
-type GuestCartItem = {
-  product_id: number;
-  variant_id: number;
-  quantity: number;
-  flavor_id: null;
-  product?: Product;
-};
-
+ 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CART_RESPONSE_DATA[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { status } = useSession();
   const isAuthenticated = status === 'authenticated';
+  const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
 
   // Calculate cart totals
-  const cartTotal = cartItems.reduce((sum, item) => 
+  const cartTotal:number = cartItems.reduce((sum, item) =>
     sum + (Number(item.product?.price || 0) * item.quantity), 0);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -73,41 +66,60 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     loadCartItems();
   }, [loadCartItems]);
 
-  const addItemToCart = async (productId: number, variantId: number, quantity: number, product: Product) => {
+  const createGuestCartItem = (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string): GuestCartItem => {
+    
+    return {
+      product_id: productId,
+      variant_id: variantId,
+      quantity,
+      flavor_id: null,
+      product: {
+        id: productId,
+        name: productName,
+        price: data.price,
+        variants: {
+          id: data.id,
+          product_id: productId,
+          slug: data.slug,
+          price: data.price,
+          discount_price: data.discount_price,
+          description: "",
+          stock: data.stock,
+          status: data.status,
+          variantImages: [data.primary_image],
+        },
+        ProductImages: [data.primary_image],
+        slug: data.slug,
+        description: "",
+        stock_quantity: data.stock,
+        discount_price: data.discount_price
+      }
+    };
+  };
+
+  const addItemToCart = async (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => {
     setIsLoading(true);
     try {
       if (isAuthenticated) {
         const response = await addToCart(productId, variantId, quantity);
         if (response.status === ServerActionStatus.SUCCESS) {
           await loadCartItems();
-          toast.success(`${product.name} added to cart successfully`);
+          toast.success(`${productName} added to cart successfully`);
         }
       } else {
         // Handle as guest cart
-        const newItem: GuestCartItem = {
-          product_id: productId,
-          variant_id: variantId,
-          quantity,
-          flavor_id: null,
-          product
-        };
-        const updatedCart = [...cartItems, newItem as CART_RESPONSE_DATA];
+        const newItem = createGuestCartItem(productId, variantId, quantity, data, productName);
+        const updatedCart = [...cartItems, newItem as unknown as CART_RESPONSE_DATA];
         setCartItems(updatedCart);
         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
-        toast.success(`${product.name} added to cart successfully`);
+        toast.success(`${productName} added to cart successfully`);
       }
     } catch (error) {
       console.error('Error adding item to cart:', error);
       toast.error('Failed to add item to cart. Please try again.');
       // Handle as guest cart as fallback
-      const newItem: GuestCartItem = {
-        product_id: productId,
-        variant_id: variantId,
-        quantity,
-        flavor_id: null,
-        product
-      };
-      const updatedCart = [...cartItems, newItem as CART_RESPONSE_DATA];
+      const newItem = createGuestCartItem(productId, variantId, quantity, data, productName);
+      const updatedCart = [...cartItems, newItem as unknown as CART_RESPONSE_DATA];
       setCartItems(updatedCart);
       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
     } finally {
@@ -116,12 +128,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updateItemQuantity = async (productId: number, quantity: number) => {
-   
+
     const existingItem = cartItems.find(item => item.product_id === productId);
-        if (!existingItem) {
-          // toast.error("Product not found in cart")
-          return;
-        }
+    if (!existingItem) {
+      // toast.error("Product not found in cart")
+      return;
+    }
     setIsLoading(true);
     try {
       if (isAuthenticated) {
@@ -132,19 +144,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         // Handle as guest cart
-        const updatedCart = cartItems.map(item => 
+        const updatedCart = cartItems.map(item =>
           item.product_id === productId ? { ...item, quantity } : item
         );
         setCartItems(updatedCart);
         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
         toast.success('Cart updated successfully');
-         
+
       }
     } catch (error) {
       console.error('Error updating cart item:', error);
       toast.error('Failed to update cart. Please try again.');
       // Handle as guest cart as fallback
-      const updatedCart = cartItems.map(item => 
+      const updatedCart = cartItems.map(item =>
         item.product_id === productId ? { ...item, quantity } : item
       );
       setCartItems(updatedCart);
@@ -183,21 +195,50 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const syncCookieCart = async () => {
+  const syncCookieCart = async () => { 
+
     if (!isAuthenticated) return; // Only sync if user is authenticated
-    
+
     const cookieCart = getCookie(CART_COOKIE_NAME);
     if (cookieCart) {
-      const items = JSON.parse(cookieCart as string);
+      const items: CART_GET_PAYLOAD[] = JSON.parse(cookieCart as string); 
+      const cartItems = items.map(item => ({
+        product_id: item.product_id,
+        variant_id: item.variant_id,
+        quantity: item.quantity
+      })); 
       try {
-        await bulkAddToCart(items);
-        setCookie(CART_COOKIE_NAME, ''); // Clear cookie cart after sync
-        await loadCartItems();
+        const response = await bulkAddToCart(cartItems);
+        
+        if (response.status === ServerActionStatus.SUCCESS) {
+          setCookie(CART_COOKIE_NAME, ''); // Clear cookie cart after sync
+          await loadCartItems();
+        } else {
+          toast.error(response.message);
+        }
       } catch (error) {
         console.error('Failed to sync cart:', error);
       }
     }
   };
+
+  // Add new useEffect to handle automatic cart sync on authentication
+  useEffect(() => {
+    const handleAuthChange = async () => { 
+      if (isAuthenticated && !hasAttemptedSync) {
+        setHasAttemptedSync(true);
+        const cookieCart = getCookie(CART_COOKIE_NAME);         
+        if (cookieCart) {
+          const items: CART_GET_PAYLOAD[] = JSON.parse(cookieCart as string);
+          if (items.length > 0) {
+            await syncCookieCart();
+          }
+        }
+      }
+    };
+
+    handleAuthChange();
+  }, [isAuthenticated])
 
   return (
     <CartContext.Provider value={{

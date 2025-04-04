@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import NoImage from "./NoImage";
 
 interface CategoryCardProps {
   title: string;
@@ -25,23 +25,14 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
       {/* Card Content */}
       <div className="flex flex-col items-center gap-2 md:gap-3.5 bg-[#F8FCFA] shadow-lg md:shadow-slider-card hover:shadow-brand-card border border-skin-neutral-200 pt-11 px-4.5 md:px-8 pb-3.5 md:pb-6 rounded-xl md:rounded-[20px]">
         
-        {imageSrc && imageSrc.startsWith('http') ? (
-          <Image
+        <NoImage
             src={imageSrc}
             alt={`${title} Image`}
             width={230}
             height={204}
             className="max-h-[150px] md:max-h-[250px] min-h-[150px] md:min-h-[250px]"
-            loading="lazy"
-          />
-        ) : <Image
-        src={"/images/category-image.png"}
-        alt={`${title} Image`}
-        width={230}
-        height={204}
-        className="max-h-[150px] md:max-h-[250px] min-h-[150px] md:min-h-[250px]"
-        loading="lazy"
-      />}
+           />
+        
         
         {/* <Button
           as={Link}

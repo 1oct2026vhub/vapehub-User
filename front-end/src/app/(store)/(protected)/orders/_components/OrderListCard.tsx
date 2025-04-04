@@ -1,14 +1,10 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { ORDER_RESPONSE } from "@/lib/config/order.config";
+// import NoImage from "@/components/NoImage";
 
-interface OrderListCardProps {
-  status: string;
-  imageSrc: string;
-  title: string;
-  orderId: string;
-}
-
-const OrderListCard: React.FC<OrderListCardProps> = ({ status, imageSrc, title, orderId }) => {
+ 
+const OrderListCard: React.FC<ORDER_RESPONSE> = ({order_unique_id, status, orderItems}) => {
+   if(orderItems.length === 0) return null;
   // Define the status color conditionally
   const statusColor = cn(
     "p-1.5 md:p-2 w-fit rounded-md md:rounded-lg border !text-content-3 md:!text-content-1 font-bold",
@@ -23,7 +19,12 @@ const OrderListCard: React.FC<OrderListCardProps> = ({ status, imageSrc, title, 
       {/* Product Image Section */}
       <div className="bg-skin-white p-1 md:p-2 rounded-md md:rounded-10 shadow-brand-card min-w-16 md:min-w-36">
         <div className="bg-skin-base border border-skin-neutral-100 rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
-          <Image src={imageSrc} alt={title} width={104} height={100} />
+          {/* <NoImage 
+            src={orderItems[0].product.image}
+            alt={orderItems[0].product.name}
+            width={104}
+            height={100}
+          /> */}
         </div>
       </div>
 
@@ -34,11 +35,11 @@ const OrderListCard: React.FC<OrderListCardProps> = ({ status, imageSrc, title, 
 
         {/* Order Title */}
         <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 line-clamp-2 font-semibold">
-          {title}
+          {orderItems[0].product?.name}
         </h2>
 
         {/* Order ID */}
-        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Order ID: {orderId}</p>
+        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Order ID: {order_unique_id}</p>
       </div>
     </a>
   );

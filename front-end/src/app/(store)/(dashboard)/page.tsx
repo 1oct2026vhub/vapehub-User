@@ -43,7 +43,8 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
       limit: 8,
       offset: 0,
       total_count: 0
-    }
+    },
+    attributes: []
   };
 
   // Early return if critical data is missing

@@ -1,6 +1,7 @@
 import React from "react";
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import { CloseIcon } from "./Icons";
+import { AppliedFilters } from "@/lib/config/product.config";
 
 interface FilterOption {
     title: string;
@@ -8,8 +9,8 @@ interface FilterOption {
 }
 
 interface FilterSidebarProps {
-    appliedFilters: string[];
-    onRemoveFilter: (filter: string) => void;
+    appliedFilters: AppliedFilters[];
+    onRemoveFilter: (attributeId: number, type: string) => void;
     filterOptions: FilterOption[];
 }
 
@@ -38,8 +39,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
                         key={index}
                         className="flex items-center gap-2 bg-skin-neutral-50 border-2 border-skin-neutral-100 shadow py-1.5 px-2 rounded-lg"
                     >
-                        <span className="text-content-2 font-bold text-skin-neutral-500">{filter}</span>
-                        <button onClick={() => onRemoveFilter(filter)}>
+                        <span className="text-content-2 font-bold text-skin-neutral-500">{filter.attribute} ({filter.count})</span>
+                        <button onClick={() => onRemoveFilter(filter.attributeId, filter.type)}>
                             <CloseIcon />
                         </button>
                     </div>

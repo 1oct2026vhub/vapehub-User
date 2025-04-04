@@ -1,9 +1,9 @@
-import Image from 'next/image';
 import { Button } from '@nextui-org/react';
 import { MinusIcon, PlusIcon, TrashIcon, EditIcon, DangerIcon } from '@/components/Icons';
 import { useCart } from '@/lib/context/CartContext';
 import { CART_RESPONSE_DATA } from '@/lib/config/cart.config';
 import { useState } from 'react';
+import NoImage from './NoImage';
 
 type CartCardProps = {
   item?: CART_RESPONSE_DATA;
@@ -30,11 +30,13 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
         {/* Product Image */}
         <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
-          {item?.product.ProductImages?.[0]?.image_url && item.product.ProductImages?.[0]?.image_url.startsWith('http') ? (
-              <Image src={item?.product.ProductImages[0].image_url} alt={item.product.name} width={104} height={100} />
-            ) : (
-              <Image src="/images/product-1.png" alt={item?.product.name ?? ""} width={104} height={100} />
-            )}
+            <NoImage
+              src={item?.product.ProductImages?.[0]?.image_url}
+              alt={item?.product.name}
+              width={104}
+              height={100}
+            />
+          
           </div>
         </div>
 

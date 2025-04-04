@@ -1,7 +1,7 @@
 "use client"
 
 import { Radio, RadioGroup } from "@nextui-org/react";
-import { FunctionComponent, useCallback } from "react";
+import { FunctionComponent, useState, useEffect } from "react";
 
 interface Option {
   label: string;
@@ -20,19 +20,23 @@ const FilterRadioGroup: FunctionComponent<FilterRadioGroupProps> = ({
   defaultValues = [],
   onChange,
 }) => {
-  const handleSelectionChange = useCallback(
-    (value: string) => {
-      if (onChange) {
-        onChange(value);
-      }
-    },
-    [onChange]
-  );
+  const [selectedValue, setSelectedValue] = useState<string>(defaultValues[0] || "");
+
+  useEffect(() => {
+    setSelectedValue(defaultValues[0] || "");
+  }, [defaultValues]);
+
+  const handleValueChange = (value: string) => {
+    setSelectedValue(value);
+    if (onChange) {
+      onChange(value);
+    }
+  };
 
   return (
     <RadioGroup
-      defaultValue={defaultValues[0]}
-      onValueChange={(e) => handleSelectionChange(e)}
+      value={selectedValue}
+      onValueChange={handleValueChange}
       className="gap-1"
     >
       {options.map((option) => (

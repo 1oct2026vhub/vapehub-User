@@ -11,35 +11,29 @@ export const metadata: Metadata = {
     title: "My account | Orders",
     description: "",
 };
-
-// const orders = [
-//     {
-//         status: "Order Confirmed",
-//         imageSrc: "/images/product-1.png",
-//         title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
-//         orderId: "02456KS566JD444",
-//     },
-//     {
-//         status: "Order Confirmed",
-//         imageSrc: "/images/product-1.png",
-//         title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
-//         orderId: "02456KS566JD444",
-//     },
-//     {
-//         status: "Order Confirmed",
-//         imageSrc: "/images/product-1.png",
-//         title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
-//         orderId: "02456KS566JD444",
-//     },
-// ];
-
-
+ 
 const MyAccountOrders: NextPage = async () => {
     const result = await getOrdersList();
     if (result.status === ServerActionStatus.ERROR) {
         return <p>{result.message}</p>   
     }
-    const orders = result.data;
+    const orders = result.data.flatMap(x => 
+        x.orderItems.map(y => ({
+            id: x.id,
+            order_unique_id: x.order_unique_id,
+            total: x.total,             
+            status: x.status,
+            createdAt: x.createdAt,
+            product_name: y.product.name,
+            quantity: y.quantity,
+            price: y.variant?.price || y.product.price, 
+            discount_price: y.variant?.price || y.product.price,
+            shippingAddress: x.shippingAddress,
+            billingAddress: x.billingAddress,
+            shippingMethod: x.shippingMethod,
+            product_image: { image_url: y.variant?.variantImages[0]?.image_url || '' },
+        }))
+    );
     
      return (
         <main>
@@ -54,7 +48,7 @@ const MyAccountOrders: NextPage = async () => {
                 />:
                 <div className="flex flex-col gap-4.5">
                     {orders.map((order, index) => (
-                        <OrderListCard key={index} {...order} />
+                        <OrderListCard key={index} data={order} />
                     ))}
                 </div>
                 }

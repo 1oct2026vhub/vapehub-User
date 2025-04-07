@@ -1,4 +1,4 @@
-import { AppliedFilters, AttributeTerms } from "@/lib/config/product.config";
+import { AppliedFilters, AttributeTerms, NON_VARIANT_FILTERS } from "@/lib/config/product.config";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { ProductFilters } from "@/lib/config/product.config";
@@ -12,14 +12,18 @@ export const useProductFilters = () => {
     const params = new URLSearchParams(searchParams);
     const filters: ProductFilters = {
       variants: {},
+      nonVariants: {}
     };
 
-    // Get static filters
-    if (params.has("brand")) filters.brand = params.get("brand")!;
-    if (params.has("category")) filters.category = params.get("category")!;
-    if (params.has("price")) filters.price = params.get("price")!;
+    // Get non-variant filters
+    const nonVariantKeys = NON_VARIANT_FILTERS;
+    nonVariantKeys.forEach(key => {
+      if (params.has(key)) {
+        filters.nonVariants![key] = params.get(key)!;
+      }
+    });
 
-    // Get dynamic variant filters
+    // Get dynamic variant filters (only from attribute_* params)
     params.forEach((value, key) => {
       if (key.startsWith("attribute_")) {
         const attributeId = key.replace("attribute_", "");
@@ -33,15 +37,17 @@ export const useProductFilters = () => {
   const updateFilters = useCallback((filters: ProductFilters) => {
     const params = new URLSearchParams(searchParams);
 
-    // Update static filters
-    if (filters.brand) params.set("brand", filters.brand);
-    else params.delete("brand");
+    // Clear all existing non-variant filters first
+    NON_VARIANT_FILTERS.forEach(key => {
+      params.delete(key);
+    });
 
-    if (filters.category) params.set("category", filters.category);
-    else params.delete("category");
-
-    if (filters.price) params.set("price", filters.price);
-    else params.delete("price");
+    // Update non-variant filters
+    Object.entries(filters.nonVariants || {}).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      }
+    });
 
     // Update dynamic variant filters
     Object.entries(filters.variants || {}).forEach(([attributeId, values]) => {
@@ -60,9 +66,9 @@ export const useProductFilters = () => {
     const applied: AppliedFilters[] = [];
 
     // Add static filters
-    if (filters.brand) applied.push({attributeId: 0, attribute: "Brand", count: 1, value: filters.brand, type: "brand"});
-    if (filters.category) applied.push({attributeId: 0, attribute: "Category", count: 1, value: filters.category, type: "category"});
-    if (filters.price) applied.push({attributeId: 0, attribute: "Price", count: 1, value: filters.price, type: "price"});
+    if (filters.nonVariants?.brand) applied.push({attributeId: 0, attribute: "Brand", count: 1, value: filters.nonVariants.brand, type: "brand"});
+    if (filters.nonVariants?.categories) applied.push({attributeId: 0, attribute: "categories", count: 1, value: filters.nonVariants.categories, type: "categories"});
+    if (filters.nonVariants?.price_range) applied.push({attributeId: 0, attribute: "Price Range", count: 1, value: filters.nonVariants.price_range, type: "price"});
 
     // Add dynamic variant filters
     Object.entries(filters.variants || {}).forEach(([attributeId, values]) => {
@@ -88,11 +94,17 @@ export const useProductFilters = () => {
     const filters = getFilterParams();
      
     if (type === "brand") {
-      filters.brand = undefined;
-    } else if (type === "category") {
-      filters.category = undefined;
+      if (filters.nonVariants) {
+        delete filters.nonVariants.brand;
+      }
+    } else if (type === "categories") {
+      if (filters.nonVariants) {
+        delete filters.nonVariants.categories;
+      }
     } else if (type === "price") {
-      filters.price = undefined;
+      if (filters.nonVariants) {
+        delete filters.nonVariants.price_range;
+      }
     } else {
       // Find attribute by name
       const attribute = attributes.find(attr => 

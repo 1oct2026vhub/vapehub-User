@@ -8,7 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import { isLessThanOneMonth } from "@/lib/config/app.config";
-import { BrandByProductResponse, CategoryResponseData, ProductResponseData, AttributeTerms } from "@/lib/config/product.config";
+import { BrandByProductResponse, CategoryResponseData, ProductResponseData, AttributeTerms, NON_VARIANT_FILTERS } from "@/lib/config/product.config";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FunctionComponent, ReactElement, useState } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
@@ -19,6 +19,7 @@ type ProductListProps = {
 }
 
 const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElement => {
+  
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -26,14 +27,8 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const searchParams = useSearchParams();
   const { getFilterParams, getAppliedFilters, removeFilter, updateFilters } = useProductFilters();
 
-  const priceOptions = [
-    { label: "£0 - £10", count: 376, value: "0-10" },
-    { label: "£10 - £25", count: 29, value: "10-25" },
-    { label: "£25 - £50", count: 29, value: "25-50" },
-    { label: "£75 - £100", count: 29, value: "75-100" },
-  ];
 
-  const productAttributeTerms: AttributeTerms[] = data?.attributes?.filter(attr => attr.attribute.is_visible_page) ?? [];
+  const productAttributeTerms: AttributeTerms[] = data?.attributes.filter(attr => attr.attribute.is_visible_page === true);
   const appliedFilters = getAppliedFilters(productAttributeTerms);
 
   const handleRemoveFilter = (attributeId: number, type: string) => {
@@ -47,27 +42,38 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const onFilterChange = (attributeId: string, value: string, isSelect: boolean) => {
     setIsLoading(true);
     const currentFilters = getFilterParams();
-   
+     
     if (!currentFilters.variants) {
       currentFilters.variants = {};
-    }
-
-    if (isSelect) {
-      // For checkbox groups (select type)
-      if (!currentFilters.variants[attributeId]) {
-        currentFilters.variants[attributeId] = [];
+    } 
+    // Handle non-variant parameters
+    if (NON_VARIANT_FILTERS.includes(attributeId)) { 
+      if (!currentFilters.nonVariants) {
+        currentFilters.nonVariants = {};
       }
-      // Instead of splitting and joining the value, we'll receive it as an array directly
-      currentFilters.variants[attributeId] = value.split(',').filter(Boolean);
-    } else {
-      // For radio groups (non-select type)
       if (value) {
-        currentFilters.variants[attributeId] = [value];
+        currentFilters.nonVariants[attributeId] = value;
       } else {
-        currentFilters.variants[attributeId] = [];
+        delete currentFilters.nonVariants[attributeId];
+      }
+    } else {
+      // Handle variant parameters (from attributes)
+      if (isSelect) {
+        // For checkbox groups (select type)
+        if (!currentFilters.variants[attributeId]) {
+          currentFilters.variants[attributeId] = [];
+        }
+        currentFilters.variants[attributeId] = value.split(',').filter(Boolean);
+      } else {
+        // For radio groups (non-select type)
+        if (value) {
+          currentFilters.variants[attributeId] = [value];
+        } else {
+          currentFilters.variants[attributeId] = [];
+        }
       }
     }
-
+   
     updateFilters(currentFilters);
     setTimeout(() => {
       setIsLoading(false);
@@ -77,8 +83,45 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const totalPage = data?.pagination?.total_pages ?? 0;
   const totalCount = data?.pagination?.total_count ?? 0;
   const activePage = data?.pagination?.current_page ?? 0;
-  const filterOptions = [
-    { title: "Price Range", content: <FilterRadioGroup options={priceOptions} defaultValues={[searchParams.get("attribute_price") || ""]} onChange={(value) => onFilterChange("price", value, false)} /> },
+  const priceOptions = data?.price_ranges ?? []; 
+  const categoryOptions = data?.category ?? [];
+  const brandOptions = data?.brand ?? [];
+  
+   const filterOptions = [
+    { 
+      title: "Price Range", 
+      content: <FilterRadioGroup 
+        options={priceOptions} 
+        defaultValues={searchParams.get("price_range") || ""} 
+        onChange={(value) => onFilterChange("price_range", value, false)} 
+      /> 
+    },
+    ...(categoryOptions.length > 0 ? [{
+      title: "Categories",
+      content: <FilterCheckboxGroup
+        options={categoryOptions.map(category => ({
+          label: category.name,
+          value: category.id.toString(),
+          count: category.product_count
+        }))}
+        defaultValues={searchParams.get("categories")?.split(",") || []}
+        onChange={(values) => onFilterChange("categories", values.join(","), true)}
+        isDisabled={isLoading}
+      />
+    }] : []),
+    ...(brandOptions.length > 0 ? [{
+      title: "Brands",
+      content: <FilterCheckboxGroup
+        options={brandOptions.map(brand => ({
+          label: brand.name,
+          value: brand.id.toString(),
+          count: brand.product_count
+        }))}
+        defaultValues={searchParams.get("brand")?.split(",") || []}
+        onChange={(values) => onFilterChange("brand", values.join(","), true)}
+        isDisabled={isLoading}
+      />
+    }] : []),
     ...productAttributeTerms.map(attr => ({
       title: attr.attribute.name,
       content: attr.attribute.type === "select" ? (
@@ -99,7 +142,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
             value: term.id.toString(),
             count: term.product_count
           }))}
-          defaultValues={[searchParams.get(`attribute_${attr.attribute.id}`) || ""]}
+          defaultValues={searchParams.get(`attribute_${attr.attribute.id}`) || ""}
           onChange={(value) => onFilterChange(attr.attribute.id.toString(), value, false)}
         />
       )

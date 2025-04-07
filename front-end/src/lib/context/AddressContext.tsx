@@ -5,6 +5,7 @@ import { AddressFormData } from '@/lib/config/address.config';
 import { addUserAddress, deleteUserAddress, getUserAddresses, updateUserAddress } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { Address, USER_ADDRESS_RESPONSE } from '@/lib/config/user.config';
+import { useSession } from 'next-auth/react';
 
 interface AddressContextType {
   addresses: Address[];
@@ -34,6 +35,10 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { status } = useSession();
+  const isAuthenticated = status === 'authenticated';
+
+  
 
   const fetchAddresses = async () => {
     try {
@@ -147,8 +152,12 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
   };
 
   useEffect(() => {
-    fetchAddresses();
-  }, []);
+    if (isAuthenticated) {
+      fetchAddresses();
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
 
   const value = {
     addresses,

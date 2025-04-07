@@ -1,12 +1,14 @@
+"use client"
 import { Button } from '@nextui-org/react';
 import { MinusIcon, PlusIcon, TrashIcon, EditIcon, DangerIcon } from '@/components/Icons';
-import { useCart } from '@/lib/context/CartContext';
-import { CART_RESPONSE_DATA } from '@/lib/config/cart.config';
+import { useCart } from '@/lib/context/CartContext'; 
 import { useState } from 'react';
 import NoImage from './NoImage';
+import { CartItem } from '@/lib/config/cart.config';
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 
 type CartCardProps = {
-  item?: CART_RESPONSE_DATA;
+  item?: CartItem;
   showAddMoreItem?: boolean;
 };
 
@@ -15,13 +17,13 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
   const [quantity, setQuantity] = useState(item?.quantity ?? 0);
 
   const handleQuantityChange = async (newQuantity: number) => {
-    if (newQuantity <= 0 || newQuantity > (item?.product.stock_quantity ?? 0)) return;
+    if (newQuantity <= 0 || newQuantity > (item?.stock ?? 0)) return;
     setQuantity(newQuantity);
-    await updateItemQuantity(item?.product_id ?? 0, newQuantity);
+    updateItemQuantity(item?.id ?? 0, newQuantity);
   };
 
   const handleRemove = async () => {
-    await removeItem(item?.product_id ?? 0);
+    await removeItem(item?.id ?? 0);
   };
 
   return (
@@ -31,8 +33,8 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
         <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
             <NoImage
-              src={item?.product.ProductImages?.[0]?.image_url}
-              alt={item?.product.name}
+              src={item?.ProductImages}
+              alt={item?.name}
               width={104}
               height={100}
             />
@@ -43,17 +45,17 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
         <div className="flex flex-col gap-2.5 md:gap-5">
           <div className="flex items-start gap-4 md:gap-8 justify-between">
             <h4 className="text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
-              {item?.product.name}
+              {item?.name}
             </h4>
 
             {/* Price Section */}
             <div className="text-right">
               <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold">
-                £{(Number(item?.product.price) * quantity).toFixed(2)}
+                {DEFAULT_CURRENCY_SYMBOL}{(Number(item?.price) * quantity).toFixed(2)}
               </p>
-              {item?.product.discount_price && (
+              {item?.discount_price && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">
-                  £{(Number(item?.product.discount_price) * quantity).toFixed(2)}
+                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item?.discount_price) * quantity).toFixed(2)}
                 </p>
               )}
             </div>
@@ -89,7 +91,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
                 color="primary"
                 className="text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent"
                 onPress={() => handleQuantityChange(quantity + 1)}
-                disabled={isLoading || quantity >= (item?.product.stock_quantity ?? 0)}
+                disabled={isLoading || quantity >= (item?.stock ?? 0)}
               >
                 <PlusIcon className='w-3 md:w-6'/>
               </Button>

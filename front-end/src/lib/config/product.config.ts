@@ -3,12 +3,11 @@ import { Category } from "./category.config";
 
 export interface ProductFilters {
     brand?: string;
-    category?: string;
-    price?: string;
-    variants?: {
-      [key: string]: string[];
-    };
-  }
+    categories?: string;
+    price_range?: string;
+    variants?: Record<string, string[]>;
+    nonVariants?: Record<string, string>;
+}
 
 export interface Pagination {
     current_page: number;
@@ -21,7 +20,11 @@ export interface Pagination {
 export type ProductResponseData = {
     products: Product[];
     pagination: Pagination;
-    attributes: AttributeTerms[]
+    attributes: AttributeTerms[],
+    price_ranges: PriceRange[],
+    brand: BRAND[],
+    category: CATEGORY[]
+
 }
 
 export interface ProductFlavor {
@@ -180,13 +183,37 @@ export interface Product {
 export interface CategoryResponseData extends Category {
     products: Product[];
     pagination: Pagination;
-    attributes: AttributeTerms[]
+    attributes: AttributeTerms[],
+    price_ranges: PriceRange[],
+    brand: BRAND[],
+    category?: CATEGORY[]
+  
+}
+interface BRAND {
+    id: number;
+    name: string;
+    product_count: number;
+    slug: string;
+}
+interface CATEGORY {
+    id: number;
+    name: string;
+    product_count: number;
+    slug: string;
+}
+interface PriceRange {
+    label: string;
+    count: number;
+    value: string;
 }
 
 export interface BrandByProductResponse extends BrandConfig {
     products: Product[];
     pagination: Pagination;
-    attributes: AttributeTerms[]
+    attributes: AttributeTerms[],
+    price_ranges: PriceRange[],
+    brand?: BRAND[],
+    category: CATEGORY[]
 }
 export interface ProductVariant {
     id: number;
@@ -253,3 +280,5 @@ export interface AppliedFilters {
     value: string;
     type: string;
 }
+
+export const NON_VARIANT_FILTERS = ['brand', 'categories', 'price_range', 'order', 'offset'];

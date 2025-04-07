@@ -43,7 +43,7 @@ const FilterCheckboxGroup: React.FC<FilterCheckboxGroupProps> = ({
           key={value}
           size="md"
           value={value}
-          isDisabled={isDisabled}
+          isDisabled={isDisabled || count === 0}
           classNames={{
             base: "mb-2",
             wrapper: "after:bg-primary-gradient-100 after:rounded",

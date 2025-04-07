@@ -49,8 +49,7 @@ export default InputField;
 
 interface StatusProps {
   name: string;
-}
-const ShowPasswordValidityStatus: FunctionComponent<StatusProps> = ({
+}const ShowPasswordValidityStatus: FunctionComponent<StatusProps> = ({
     name,
   }): ReactElement => {
     const { status: passwordStatus, isDirty } =

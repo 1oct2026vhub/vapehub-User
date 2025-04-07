@@ -16,10 +16,10 @@ type ProductViewProps = {
     data: ProductResponse;
     isVariant?: boolean;
     selectedVariant?: AttributeProductTerms;
-    availableVariants?: AttributeTerms[];
+    availableAttributes?: AttributeTerms[];
 }
 
-const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = false, selectedVariant, availableVariants}): ReactElement => {
+const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = false, selectedVariant, availableAttributes}): ReactElement => {
     
      
     const breadcrumbs = [
@@ -31,7 +31,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = fal
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
-            <ProductDetails data={data} isVariant={isVariant} selectedVariant={selectedVariant} availableVariants={availableVariants}/>
+            <ProductDetails data={data} isVariant={isVariant} selectedVariant={selectedVariant} availableAttributes={availableAttributes}/>
             <Suspense fallback={<SuspenseLoader/>}>
             <OrderCard />
             </Suspense>

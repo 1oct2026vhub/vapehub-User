@@ -20,8 +20,8 @@ const ProductList: React.FC = () => {
             {/* Products Section (conditionally rendered) */}
             {isExpanded && (
                 <div className='space-y-4 md:space-y-6'>
-                    {cartItems.map((item) => (
-                        <ShoppingCartCard key={item.product_id} item={item} showAddMoreItem={false} />
+                    {cartItems.map((item, idx) => (
+                        <ShoppingCartCard key={idx} item={item} showAddMoreItem={false} />
                     ))}
                 </div>
             )}

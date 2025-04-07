@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, ReviewStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
@@ -18,7 +18,7 @@ type ProductViewProps = {
     data: ProductResponse;
     isVariant?: boolean;
     selectedVariant?: AttributeProductTerms;
-    availableVariants?: AttributeTerms[];
+    availableAttributes?: AttributeTerms[];
 }
 const settings: Settings = {
     slidesToShow: 4, // Change to 4 if needed
@@ -54,33 +54,42 @@ const settings: Settings = {
     ],
 
 };
-const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant, availableVariants }) => {
+const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant, availableAttributes }) => {
     const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
     const product: ProductViewDetails =  data?.product;
     const productVariant:ProductVariant | null = isVariant ? data?.variants[0] : null;
     const stock = isVariant && productVariant? productVariant.stock : 0;
-     
-    const [mainImage, setMainImage] = useState<productAllImages>(product?.primary_image);
+    const productName = selectedVariant ? `${selectedVariant.terms.name} - ${product?.name}` : product?.name;
+    const [mainImage, setMainImage] = useState<productAllImages | null>(null);
     const [quantity, setQuantity] = useState(1);
-    // const [selectedFlavor, setSelectedFlavor] = useState<number | null>(null);
-    const { addItemToCart, updateItemQuantity, isLoading } = useCart();
+    const { addItemToCart, updateItemQuantity,cartItems, isLoading } = useCart();
     
     const handleQuantityChange = (newQuantity: number) => {
+        if (!productVariant) return;
+        
         if (newQuantity <= 0 || newQuantity > stock) {
             return;
         }
 
         setQuantity(newQuantity);
-        updateItemQuantity(product.id, newQuantity);
+        const cartItem = cartItems.find(item => item.variant_id === productVariant.id);
+        if (cartItem) {
+            updateItemQuantity(cartItem.id, newQuantity);
+        }
+        
     };
-
+    
     const handleAddToCart = async () => {
         if (!productVariant) return;
         if (quantity <= 0 || quantity > stock) { 
             return;
         }
-        await addItemToCart(product.id, productVariant?.id, quantity, productVariant, product.name);
+        await addItemToCart(product.id, productVariant?.id, quantity, productVariant, productName);
     };
+
+    useEffect(() => {
+        setMainImage(isVariant ? data?.variants[0]?.primary_image : product?.primary_image);
+    }, [isVariant, data, product]);
 
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
@@ -112,7 +121,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 <div className='space-y-4 w-full lg:w-fit '>
                     <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full lg:w-[400px] xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2 min-h-[250px] lg:min-h-[425px] max-h-[250px] lg:max-h-[425px]'>
                         <NoImage
-                            src={mainImage.url}
+                            src={mainImage?.url}
                             alt={product?.name}
                             width={320}
                             height={396}
@@ -142,7 +151,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                             }`}
                                         >
                                             <NoImage
-                                                src={image.url}
+                                                src={image?.url}
                                                 alt={`product ${index}`}
                                                 width={118}
                                                 height={111}
@@ -160,7 +169,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 </div>
                 <div className='flex flex-col gap-4.5 lg:gap-5 w-full'>
                     <div className='space-y-3.5 hidden lg:block'>
-                        <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>{product?.name}</h1>
+
+                        <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>{productName}</h1>
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                             Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.brand?.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.brand?.name}</Link>
                         </div>
@@ -202,7 +212,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         </div>
                     </div>
                     <Divider className='max-lg:hidden' />
-                    <ProductVariantFilter attributeTerms={product?.attribute_terms} productSlug={product?.slug} selectedVariant={selectedVariant} availableVariants={availableVariants ?? []} />
+                    <ProductVariantFilter attributeTerms={product?.attribute_terms} productSlug={product?.slug} selectedVariant={selectedVariant} availableAttributes={availableAttributes ?? []} />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
                             stock > 0 ?

@@ -7,29 +7,31 @@ type ProductVariantFilterProps = {
     attributeTerms: AttributeTerms[];
     productSlug: string;
     selectedVariant?: AttributeProductTerms;
-    availableVariants: AttributeTerms[];
+    availableAttributes: AttributeTerms[];
 }
 
 const SelectAttributeTerms = ({ 
     attributeTerm, 
     productSlug, 
     selectedVariant,
-    availableVariants 
+    availableAttributes 
 }: { 
     attributeTerm: AttributeTerms, 
     productSlug: string, 
     selectedVariant?: AttributeProductTerms,
-    availableVariants: AttributeTerms[]
+    availableAttributes: AttributeTerms[]
 }) => {
     const { handleVariantFilter, isTermAvailable, isFiltering, hasActiveFilters, getDefaultSelectedTerm } = useVariantFilter(
         productSlug,
-        availableVariants,
+        availableAttributes,
         selectedVariant
     );
     
     const selectedTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
-
     const isCurrentAttribute = selectedVariant?.attribute.id === attributeTerm.attribute.id;
+    
+    // Check if this attribute has any selected term (either from URL or search params)
+    const hasSelectedTerm = selectedTerm !== undefined || isCurrentAttribute;
 
     return (
         <>
@@ -69,7 +71,12 @@ const SelectAttributeTerms = ({
                     <SelectItem 
                         key={term.slug}
                         value={term.slug}
-                        isDisabled={!isCurrentAttribute && hasActiveFilters() && !isTermAvailable(attributeTerm.attribute.id, term.id)}
+                        isDisabled={
+                            // If this attribute has any selected term, enable all its terms
+                            hasSelectedTerm ? false :
+                            // Otherwise, disable based on availability
+                            hasActiveFilters() && !isTermAvailable(attributeTerm.attribute.id, term.id)
+                        }
                     >
                         {term.name}
                     </SelectItem>
@@ -114,7 +121,11 @@ const ButtonAttributeTerms = ({
                         radius="md"
                         color={finalCurrentTerm === term.slug ? "primary" : "default"}
                         variant={finalCurrentTerm === term.slug ? "solid" : "bordered"}
-                        isDisabled={!isCurrentAttribute && hasActiveFilters() && !isTermAvailable(attributeTerm.attribute.id, term.id)}
+                        isDisabled={
+                            term.slug === finalCurrentTerm ? false :
+                            isCurrentAttribute ? false :
+                            hasActiveFilters() && !isTermAvailable(attributeTerm.attribute.id, term.id)
+                        }
                         className={`btn ${finalCurrentTerm === term.slug ? "primary-btn" : "bg-skin-white border-skin-neutral-200"} w-full shadow-base !text-content-1 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold`}
                     >
                         {term.name}
@@ -129,7 +140,7 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     attributeTerms, 
     productSlug, 
     selectedVariant,
-    availableVariants 
+    availableAttributes 
 }) => {
     const attributeTermData = attributeTerms.filter(
         (attributeTerm) => attributeTerm.attribute.used_in_variation
@@ -144,13 +155,13 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
                     attributeTerm={attributeTerm} 
                     productSlug={productSlug} 
                     selectedVariant={selectedVariant}
-                    availableVariants={availableVariants}
+                    availableAttributes={availableAttributes}
                 /> :
                 <ButtonAttributeTerms 
                     key={attributeTerm.attribute.id} 
                     attributeTerm={attributeTerm} 
                     currentTerm={selectedVariant?.attribute.id === attributeTerm.attribute.id ? selectedVariant.terms.slug : ""}
-                    availableVariants={availableVariants}
+                    availableVariants={availableAttributes}
                     selectedVariant={selectedVariant}
                 />
             ))}

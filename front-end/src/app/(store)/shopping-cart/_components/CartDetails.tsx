@@ -2,7 +2,7 @@
 import InputField from '@/components/InputField'
 import ShippingProgress from '@/components/ShippingProgress'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
-import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
+import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_FORM_TYPE, APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
 import { useCart } from '@/lib/context/CartContext'
 import { ROUTES } from '@/lib/routes'
 import { applyCoupon, checkout } from '@/lib/server.actions'
@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner'
 
 const CartDetails: React.FC = () => {
-    const cartCouponFormConfig = useForm<APPLY_COUPON_FORM_SCHEMA>({
+    const cartCouponFormConfig = useForm<APPLY_COUPON_FORM_TYPE>({
         resolver: zodResolver(APPLY_COUPON_FORM_SCHEMA),
         mode: 'onSubmit',
     });
@@ -23,18 +23,19 @@ const CartDetails: React.FC = () => {
     const [couponSuccessMessage, setCouponSuccessMessage] = useState('');
     const router = useRouter();
 
-    const handleFormSubmit = async (data: APPLY_COUPON_FORM_SCHEMA)  => {
-        const response = await applyCoupon(data as APPLY_COUPON_PAYLOAD);
+    const handleFormSubmit = async (data: { couponCode?: string; shippingMethodId?: number })  => {
+        const response = await applyCoupon(data as unknown as APPLY_COUPON_PAYLOAD);
         if(response.status === ServerActionStatus.SUCCESS) {
             setCouponSuccessMessage(response.data.message);
         } else {
             toast.error(response.message);
-            cartCouponFormConfig.reset({couponCode: ''});
+            cartCouponFormConfig.reset();
         }
     }
 
   const handleCheckout = async () => {
-    const response = await checkout({ couponCode: cartCouponFormConfig.getValues('couponCode') as string});
+    const couponCode = cartCouponFormConfig.getValues('couponCode') || '';
+    const response = await checkout({ couponCode } as unknown as CHECKOUT_PAYLOAD);
     if(response.status === ServerActionStatus.SUCCESS) {
         router.push(ROUTES.CHECKOUT);
     } else {

@@ -7,7 +7,7 @@ import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
-import { ORDER_RESPONSE } from "./config/order.config";
+import { ORDER_RESPONSE, ORDER_RESPONSE_DATA, PLACE_ORDER_PAYLOAD } from "./config/order.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
@@ -261,13 +261,13 @@ export const getCartItems = async (): Promise<ServerActionResponse<CART_RESPONSE
 
 // Update cart item quantity
 export const updateCartItem = async (
-  productId: number,
+  cartId: number,
   quantity: number
 ): Promise<ServerActionResponse<{message: string}>> => {
   return await handleRequest<{message: string}, { 
     quantity: number;
   }>({
-    endpoint: API_ROUTES.UPDATE_CART_ITEM(productId),
+    endpoint: API_ROUTES.UPDATE_CART_ITEM(cartId),
     payload: {
       quantity
     },
@@ -386,7 +386,28 @@ export const changeUserPassword = async (payload: ChangeUserPasswordPayload): Pr
 // get orders list
 export const getOrdersList = async (): Promise<ServerActionResponse<ORDER_RESPONSE[]>> => {
   return await handleRequest<ORDER_RESPONSE[], unknown>({
-    endpoint: API_ROUTES.GET_ORDERS_LIST,
+    endpoint: API_ROUTES.ORDERS,
     method: 'GET',
   });
+};
+
+//  place order
+export const placeOrder = async (payload: PLACE_ORDER_PAYLOAD): Promise<ServerActionResponse<ORDER_RESPONSE_DATA>> => {
+  return await handleRequest<ORDER_RESPONSE_DATA, unknown>({
+    endpoint: API_ROUTES.ORDERS,
+    payload,
+    method: 'POST',
+  });
+};
+
+// Update order status
+export const updateOrderStatus = async (
+    orderReference: string,
+    status: string
+): Promise<ServerActionResponse<{message: string}>> => {
+    return await handleRequest<{message: string}, { status: string }>({
+        endpoint: API_ROUTES.UPDATE_ORDER_STATUS(orderReference),
+        payload: { status },
+        method: 'PUT',
+    });
 };

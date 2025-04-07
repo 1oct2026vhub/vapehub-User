@@ -1,41 +1,68 @@
-import { Product, productAllImages } from "./product.config";
+import { Product } from "./product.config";
 
-export interface CART_RESPONSE_DATA  {
-  id: number;
-  user_id: number;
-  product_id: number;
-  variant_id: number;
-  quantity: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  flavor_id: number | null;
-  product: Product;
-  variant: {
+export interface CART_RESPONSE_DATA {
     id: number;
+    user_id: number;
     product_id: number;
-    slug: string;
-    price: string;
-    discount_price: string;
-    purchase_price: string;
-    weight: string;
-    length: string;
-    width: string;
-    height: string;
-    description: string;
-    barcode: string;
-    stock: number;
-    low_stock_threshold: number;
-    stock_status: string;
-    status: string;
-    updated_by: number;
-    created_at: string;
-    updated_at: string;
-    deleted_at: string | null;
-    variantAttributes: unknown[];
-    variantImages: unknown[];
-  };
+    variant_id: number;
+    quantity: number;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+    flavor_id: number | null;
+    product: Product;   
+    variant: {
+        id: number;
+        product_id: number;
+        slug: string;
+        price: string;
+        discount_price: string | null;
+        purchase_price: string | null;
+        weight: string | null;
+        length: string | null;
+        width: string | null;
+        height: string | null;
+        description: string;
+        barcode: string | null;
+        stock: number;
+        low_stock_threshold: number;
+        stock_status: string;
+        status: string;
+        updated_by: number;
+        created_at: string;
+        updated_at: string;
+        deleted_at: string | null;
+        variantAttributes: {
+            id: number;
+            variant_id: number;
+            attribute_id: number;
+            term_id: number;
+            is_visible: boolean;
+            used_in_variation: boolean;
+            updated_by: number;
+            created_at: string;
+            updated_at: string;
+            deleted_at: string | null;
+            attribute: {
+                id: number;
+                name: string;
+                type: string;
+            };
+            term: {
+                id: number;
+                name: string;
+                slug: string;
+            };
+        }[];
+        variantImages: {
+            id: number;
+            variant_id: number;
+            image_url: string;
+            is_primary: boolean;
+        }[];
+    };
 }
+
 export type CART_GET_PAYLOAD = {
   product_id: number;
   variant_id?: number;
@@ -44,32 +71,15 @@ export type CART_GET_PAYLOAD = {
 
 export type CartItem = {
   id: number;
+  product_id: number;
   name: string;
   price: string;
-  variants: {
-    id: number;
-    product_id: number;
-    slug: string;
-    price: string;
-    discount_price: string;
-    purchase_price?: string;
-    description: string;
-    stock: number;
-    status: string;
-    variantImages: productAllImages[];
-  };
-  ProductImages: productAllImages[];
+  discount_price: string;
+  variant_id: number;
+  stock: number;
   slug: string;
   description: string;
-  stock_quantity: number;
-  discount_price: string;
-  puff_count?: number; 
-}
- 
-export type GuestCartItem =  {
-  product_id: number;
-  variant_id: number;
+  ProductImages: string;
   quantity: number;
-  flavor_id: null;
-  product?: CartItem
-};
+}
+  

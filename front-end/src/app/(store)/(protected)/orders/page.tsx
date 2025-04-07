@@ -3,29 +3,29 @@ import InputForm from '@/components/InputForm'
 import { Button } from '@nextui-org/button'
 import { NextPage } from 'next'
 import React, { ReactElement } from 'react'
-import OrderListCard from './_components/OrderListCard'
+// import OrderListCard from './_components/OrderListCard'
 
-const orders = [
-  {
-    status: "Order Confirmed",
-    imageSrc: "/images/product-1.png",
-    title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
-    orderId: "02456KS566JD444",
-  },
-  {
-    status: "Delivered",
-    imageSrc: "/images/product-1.png",
-    title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
-    orderId: "02456KS566JD444",
-  },
-  {
-    status: "Delivered",
-    imageSrc: "/images/product-1.png",
-    title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
-    orderId: "02456KS566JD444",
-  },
+// const orders = [
+//   {
+//     status: "Order Confirmed",
+//     imageSrc: "/images/product-1.png",
+//     title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
+//     orderId: "02456KS566JD444",
+//   },
+//   {
+//     status: "Delivered",
+//     imageSrc: "/images/product-1.png",
+//     title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
+//     orderId: "02456KS566JD444",
+//   },
+//   {
+//     status: "Delivered",
+//     imageSrc: "/images/product-1.png",
+//     title: "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
+//     orderId: "02456KS566JD444",
+//   },
   
-];
+// ];
 
 const OrdersListingPage: NextPage = (): ReactElement => {
   return (
@@ -52,9 +52,9 @@ const OrdersListingPage: NextPage = (): ReactElement => {
         </div>
       </section>
       <section className='flex flex-col gap-4'>
-        {orders.map((order, index) => (
+        {/* {orders.map((order, index) => (
           <OrderListCard key={index} {...order} />
-        ))}
+        ))} */}
       </section>
     </main>
   )

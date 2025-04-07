@@ -76,8 +76,8 @@ const Page = async ({
     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
       return notFound();
     }
-    const availableVariants = data.available_terms;
-    return <ProductView data={data} isVariant={true} selectedVariant={variant} availableVariants={availableVariants} />;
+    const availableAttributes = data.available_terms;
+    return <ProductView data={data} isVariant={true} selectedVariant={variant} availableAttributes={availableAttributes} />;
   }
 
 
@@ -132,10 +132,9 @@ const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugRespon
 const fetchCategory = async (slug: string, params: PRODUCT_PAYLOAD): Promise<CategoryResponseData | null> => {
 
   const response = await getProductByCategory(slug, params);
-
   if (response.status === ServerActionStatus.ERROR) {
     return null;
-  }
+  } 
   return response.data;
 };
 
@@ -147,7 +146,7 @@ const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Pr
   }
 
   const response = await getProductVariantByID(payload);
-
+  
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -249,14 +248,15 @@ export async function generateMetadata({ params, searchParams }: {
     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
       return notFound();
     }
+
     return {
-      title: data.product.name,
+      title: variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name,
       description: data.product.description,
       openGraph: {
-        title: data.product.name,
+        title: variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name,
         description: data.product.description,
-        images: data.product.primary_image.url ? [{
-          url: data.product.primary_image.url,
+        images: data.variants[0].primary_image?.url ? [{
+          url: data.variants[0].primary_image?.url,
           width: 1200,
           height: 630
         }] : undefined
@@ -329,16 +329,15 @@ export async function generateMetadata({ params, searchParams }: {
     product: async () => {
       const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
       if (!data?.product || !data.product.category) return null;
-
-
+ 
       return {
         title: data.product.name,
         description: data.product.description,
         openGraph: {
           title: data.product.name,
           description: data.product.description,
-          images: data.product.primary_image.url ? [{
-            url: data.product.primary_image.url,
+          images: data.product.primary_image?.url ? [{
+            url: data.product.primary_image?.url,
             width: 1200,
             height: 630
           }] : undefined

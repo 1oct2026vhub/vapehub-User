@@ -1,0 +1,111 @@
+'use client'
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/routes';
+import { ServerActionStatus } from '@/lib/config/app.config';
+import { updateOrderStatus } from '@/lib/server.actions';
+import { toast } from 'sonner';
+import { Button } from '@nextui-org/button';
+import Image from 'next/image';
+
+const PaymentSuccessPage = () => {
+    const router = useRouter();
+    const [transactionDetails, setTransactionDetails] = useState({
+        id: '',
+        amount: '',
+        method: 'Online',
+        date: new Date().toLocaleDateString('en-GB'),
+        time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+    });
+
+    useEffect(() => {
+        const verifyPayment = async () => {
+            try {
+                // Get order reference from URL or local storage
+                const orderRef = localStorage.getItem('vivaOrderRef');
+                if (!orderRef) {
+                    throw new Error('Order reference not found');
+                }
+
+                // Update order status
+                const response = await updateOrderStatus(orderRef, 'completed');
+                if (response.status === ServerActionStatus.SUCCESS) {
+                    // Set transaction details
+                    setTransactionDetails(prev => ({
+                        ...prev,
+                        id: orderRef,
+                        amount: localStorage.getItem('vivaOrderAmount') || '0'
+                    }));
+                    
+                    // Clear the order reference from local storage
+                    localStorage.removeItem('vivaOrderRef');
+                    localStorage.removeItem('vivaOrderAmount');
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Payment verification error:', error);
+                toast.error('Failed to verify payment. Please contact support.');
+                router.push(ROUTES.PAYMENT_FAILED);
+            }
+        };
+
+        verifyPayment();
+    }, [router]);
+
+    return (
+        <div className="auth-form-container md:!py-[84px]">
+            <div className="auth-form-wrapper !space-y-0 !rounded-2xl !max-w-[600px] !p-5 !gap-5">
+                <div className="space-y-3.5 text-center w-full">
+                    <Image
+                        src='/images/payment-success.svg'
+                        alt="payment success"
+                        width={200}
+                        height={200}
+                        className="mx-auto"
+                    />
+                    <h1 className="mx-auto text-title-2 md:text-title-1 text-skin-neutral-300 font-bold">Puff, Paid, Perfect!</h1>
+                    <p className="text-content-2 md:text-content-1 text-center font-bold text-skin-neutral-300 mx-auto max-w-[406px]">
+                        Payment completed. Your next puff is on its way.
+                    </p>
+                </div>
+
+                <div className='py-5 border-t border-b border-skin-neutral-100 w-full space-y-3.5'>
+                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                        <p>Transaction ID</p>
+                        <p>{transactionDetails.id}</p>
+                    </div>
+                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                        <p>Amount Paid</p>
+                        <p>£{transactionDetails.amount}</p>
+                    </div>
+                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                        <p>Payment Method</p>
+                        <p>{transactionDetails.method}</p>
+                    </div>
+                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                        <p>Date</p>
+                        <p>{transactionDetails.date}</p>
+                    </div>
+                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                        <p>Time</p>
+                        <p>{transactionDetails.time}</p>
+                    </div>
+                </div>
+
+                <Button
+                    size="lg"
+                    radius="md"
+                    color="primary"
+                    className="btn primary-btn shadow-input text-content-1 !font-medium h-11 mx-auto"
+                    onPress={() => router.push(ROUTES.MY_ACCOUNT_ORDERS)}
+                >
+                    View Orders
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+export default PaymentSuccessPage; 

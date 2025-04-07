@@ -1,10 +1,14 @@
 "use client"
 import { Card, CardBody, Divider, Tab, Tabs } from '@nextui-org/react'
 import Image from 'next/image'
-import React from 'react'
-import ReviewCard from './ReviewCard'
+import React, { ReactElement } from 'react'
+import ReviewCard from './ReviewCard'; 
+import { ProductViewDetails } from '@/lib/config/product.config';
+type ProductContentProps = {
+    product: ProductViewDetails;
+}
 
-const ProductContent: React.FC = () => {
+const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement => {
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-10 rounded-2.5xl shadow-card space-y-7.5'>
             <div className="flex w-full flex-col">
@@ -27,7 +31,9 @@ const ProductContent: React.FC = () => {
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
                                         <h2 className='text-title-1 md:text-h5 xl:text-38 font-semibold text-black'>Description</h2>
-                                        <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-400'>The Hayati Pro Max 4000 puff disposable vape boasts over 50 unique flavours, there’s something to satisfy all of your cravings. Manufactured by Hayati and equipped with a dual 1.2 ohm mesh coil and a super-efficient 1500 mAh battery means the quality and enjoyment provided by the Hayati Crystal disposable vape range is unrivalled; don’t miss out on this one-of-a-kind vaping experience. The Hayati Pro Max 4000 disposable vape, a re-branded version of the Crystal Pro Max 4000, hails from the same brand that gave us the Hayati Pro Ultra, the Hayati Duo Mesh, the Hayati Twist and the ever-popular Hayati Pro Max Nic Salts. With this pedigree, both quality and satisfaction are assured!</p>
+                                        <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-400' dangerouslySetInnerHTML={{ __html: product.description }}>
+                                             
+                                        </p>
                                     </div>
                                     <Divider />
                                     <div className='space-y-3.5'>

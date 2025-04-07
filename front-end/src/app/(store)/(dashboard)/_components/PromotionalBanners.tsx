@@ -1,6 +1,6 @@
+import NoImage from '@/components/NoImage';
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import { BannerResponse } from '@/lib/config/global.config';
-import Image from 'next/image';
 import Link from 'next/link';
 import React, { memo } from 'react';
 
@@ -14,18 +14,17 @@ interface BannerImageProps {
 
 const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false, className }) => (
   <>
-  {banner.image_url && banner.image_url.startsWith('http') ?
+   
   <Link href={banner.redirect_url}>
-    <Image
+    <NoImage
       src={banner.image_url}
       alt={banner.title}
       width={width}
       height={height}
-      className={`w-full h-full object-fill aspect-video ${className}`}
-      loading={priority ? "eager" : "lazy"}
       priority={priority}
+      className={`w-full h-full object-fill aspect-video ${className}`}
     />
-  </Link>: <p>No image found</p> }
+    </Link>
   </>
 ));
 

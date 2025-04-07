@@ -1,7 +1,7 @@
 "use client"
 
 import { Radio, RadioGroup } from "@nextui-org/react";
-import { FunctionComponent, useCallback } from "react";
+import { FunctionComponent } from "react";
 
 interface Option {
   label: string;
@@ -11,34 +11,34 @@ interface Option {
 
 interface FilterRadioGroupProps {
   options: Option[];
-  defaultValues?: string[];
+  defaultValues?: string;
   onChange?: (value: string) => void;
 }
 
 const FilterRadioGroup: FunctionComponent<FilterRadioGroupProps> = ({
   options,
-  defaultValues = [],
+  defaultValues = "",
   onChange,
 }) => {
-  const handleSelectionChange = useCallback(
-    (value: string) => {
-      if (onChange) {
-        onChange(value);
-      }
-    },
-    [onChange]
-  );
+   
+  const handleValueChange = (value: string) => {
+     
+    if (onChange) {
+      onChange(value);
+    }
+  };
 
   return (
     <RadioGroup
-      defaultValue={defaultValues[0]}
-      onValueChange={(e) => handleSelectionChange(e)}
+      value={defaultValues}
+      onValueChange={handleValueChange}
       className="gap-1"
     >
       {options.map((option) => (
         <Radio
           key={option.value}
           value={option.value}
+          isDisabled={option.count === 0}
           classNames={{
             base: "mb-2",
             wrapper: "after:bg-primary-gradient-100 after:rounded",
@@ -46,7 +46,7 @@ const FilterRadioGroup: FunctionComponent<FilterRadioGroupProps> = ({
           }}
         > 
           <span className="text-skin-neutral-300 font-normal">{option.label}</span>
-          <span className="text-skin-neutral-500 font-medium">  ({option.count}) </span>
+          <span className="text-skin-neutral-500 font-medium">  ({option.count}) </span>
         </Radio>
       ))}
     </RadioGroup>

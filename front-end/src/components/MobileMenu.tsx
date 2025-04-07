@@ -10,7 +10,7 @@ import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
 import ShippingProgress from './ShippingProgress';
 import InputField from '@/components/InputField'
 import { Form } from '@/components/ui/Form';
-import { ServerActionStatus } from '@/lib/config/app.config';
+import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 import { SUBSCRIBE_FORM_CONFIG, SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
 import { subscribeMail } from '@/lib/server.actions';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -207,9 +207,11 @@ const MobileMenu = () => {
                         <div className='space-y-3'>
                             <div className='flex items-center justify-between text-black font-semibold'>
                                 <p className='text-content-2 md:text-title-1'>Total</p>
-                                <p className='text-title-2 md:text-h5'>£{cartTotal.toFixed(2)}</p>
+                                <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
                             </div>
                             <Button
+                                as={Link}
+                                href={ROUTES.CHECKOUT}
                                 size="lg"
                                 radius="md"
                                 color="primary"
@@ -219,6 +221,8 @@ const MobileMenu = () => {
                             </Button>
                             <div className='flex items-center gap-3'>
                                 <Button
+                                    as={Link}
+                                    href={ROUTES.SHOP}
                                     size="lg"
                                     radius="md"
                                     color="primary"
@@ -228,6 +232,8 @@ const MobileMenu = () => {
                                     Keep Shopping
                                 </Button>
                                 <Button
+                                    as={Link}
+                                    href={ROUTES.SHOPPING_CART}
                                     size="lg"
                                     radius="md"
                                     color="primary"

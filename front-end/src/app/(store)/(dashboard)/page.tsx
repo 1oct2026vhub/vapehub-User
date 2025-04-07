@@ -16,6 +16,7 @@ import NewProducts from "./_components/NewProducts";
 import { getDashboardData } from "./page.data";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import SuspenseLoader from "@/components/ui/SuspenseLoader";
+import { type ProductResponseData, type CategoryResponseData } from "@/lib/config/product.config";
 
 // Dynamically import components that are below the fold
 const DynamicTestimonials = dynamic(() => import('./_components/Testimonials'), {
@@ -35,7 +36,7 @@ export const revalidate = 60; // Revalidate every minute
 const Dashboard: NextPage = async (): Promise<ReactElement> => {
   const data = await getDashboardData();
 
-  const emptyProductResponse = {
+  const emptyProductResponse: ProductResponseData = {
     products: [],
     pagination: {
       current_page: 1,
@@ -43,7 +44,11 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
       limit: 8,
       offset: 0,
       total_count: 0
-    }
+    },
+    attributes: [],
+    price_ranges: [],
+    brand: [],
+    category: []
   };
 
   // Early return if critical data is missing
@@ -51,6 +56,16 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
       data.categories.status === ServerActionStatus.ERROR) {
     return <div>Failed to load dashboard data</div>;
   }
+
+  // Transform CategoryResponseData to ProductResponseData where needed
+  const transformCategoryToProductResponse = (response: CategoryResponseData): ProductResponseData => ({
+    products: response.products,
+    pagination: response.pagination,
+    attributes: response.attributes,
+    price_ranges: response.price_ranges,
+    brand: response.brand,
+    category: response.category || []
+  });
  
   return (
     <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
@@ -71,8 +86,8 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
 
       <Suspense fallback={<SuspenseLoader />}>
         <ShopByDeals />
-        <MostPopularVapes products={data.popularVapes.status === ServerActionStatus.SUCCESS ? data.popularVapes.data : emptyProductResponse} viewAllHref="disposables" />
-        <MostPopularSalts products={data.popularSalts.status === ServerActionStatus.SUCCESS ? data.popularSalts.data : emptyProductResponse} viewAllHref="nic-salts" />
+        <MostPopularVapes products={data.popularVapes.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularVapes.data) : emptyProductResponse} viewAllHref="disposables" />
+        <MostPopularSalts products={data.popularSalts.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularSalts.data) : emptyProductResponse} viewAllHref="nic-salts" />
         <PromotionalBanners banners={data.promotions.status === ServerActionStatus.SUCCESS ? data.promotions.data : []} />
         <ReferFriend />
         <DynamicTestimonials />

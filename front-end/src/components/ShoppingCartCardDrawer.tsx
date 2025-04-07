@@ -1,13 +1,13 @@
-import Image from 'next/image';
 import { Button } from '@nextui-org/react';
 import { MinusIcon, PlusIcon, TrashIcon, EditIcon, DangerIcon } from '@/components/Icons';
 import { useCart } from '@/lib/context/CartContext';
-import { CART_RESPONSE_DATA } from '@/lib/config/cart.config';
 import { useState } from 'react';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
+import NoImage from './NoImage';
+import { CartItem } from '@/lib/config/cart.config';
 
 type CartCardProps = {
-  item: CART_RESPONSE_DATA;
+  item: CartItem;
   showAddMoreItem?: boolean;
 };
 
@@ -16,13 +16,13 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
   const [quantity, setQuantity] = useState(item.quantity);
 
   const handleQuantityChange = async (newQuantity: number) => {
-    if (newQuantity <= 0 || newQuantity > item.product.stock_quantity) return;
+    if (newQuantity <= 0 || newQuantity > item.stock) return;
     setQuantity(newQuantity);
-    await updateItemQuantity(item.product_id, newQuantity);
+    await updateItemQuantity(item.id, newQuantity);
   };
 
   const handleRemove = async () => {
-    await removeItem(item.product_id);
+    await removeItem(item.id);
   };
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5">
@@ -30,28 +30,29 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
         {/* Product Image */}
         <div className="bg-skin-white p-1.5 rounded-10 shadow-brand-card min-w-[84px]">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
-            {item.product.ProductImages?.[0]?.image_url && item.product.ProductImages?.[0]?.image_url.startsWith('http') ? (
-              <Image src={item.product.ProductImages[0].image_url} alt={item.product.name} width={65} height={63} />
-            ) : (
-              <Image src="/images/product-1.png" alt={item.product.name} width={65} height={63} />
-            )}
+            <NoImage
+              src={item.ProductImages}
+              alt={item.name}
+              width={65}
+              height={63}
+            />
           </div>
         </div>
 
         <div className="flex flex-col items-start gap-2.5 md:gap-5">
           <div className="flex items-start gap-4 justify-between">
             <h4 className="text-content-2 md:text-title-2 font-semibold text-skin-neutral-400 md:mr-5">
-              {item.product.name}
+              {item.name}
             </h4>
 
             {/* Price Section */}
             <div className="text-right">
               <p className="primary-gradient-100 text-content-2 md:text-title-1 font-bold">
-              {DEFAULT_CURRENCY_SYMBOL}{(Number(item.product.price) * quantity).toFixed(2)}
+              {DEFAULT_CURRENCY_SYMBOL}{(Number(item.price) * quantity).toFixed(2)}
               </p>
-              {item.product.discount_price && (
+              {item.discount_price && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 line-through opacity-60 font-bold">
-                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item.product.discount_price) * quantity).toFixed(2)}
+                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item.discount_price) * quantity).toFixed(2)}
                 </p>
               )}
             </div>
@@ -73,6 +74,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
             <input 
               type="tel" 
               value={quantity}
+              readOnly
               onChange={(e) => {
                 const val = parseInt(e.target.value);
                 if (!isNaN(val)) handleQuantityChange(val);
@@ -86,7 +88,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
               color="primary"
               className="text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent"
               onPress={() => handleQuantityChange(quantity + 1)}
-              disabled={isLoading || quantity >= item.product.stock_quantity}
+              disabled={isLoading || quantity >= item.stock}
             >
               <PlusIcon className='w-3 md:w-6'/>
             </Button>

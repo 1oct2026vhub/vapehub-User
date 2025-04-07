@@ -9,11 +9,32 @@ export const metadata: Metadata = {
   title: "Shop | VapeHub",
   description: "",
 };
+type SearchParams = {
+  searchParams: Promise<Record<string, string>>
+}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ShopPage: NextPage<{searchParams: Promise<any>}> = async ({searchParams}):AsyncReactElement  => {
+const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElement  => {
      
     const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 };
-    const combinedParams = { ...defaultParams, ...await searchParams };
+    const searchParamsData = await searchParams;
+    const variantParams = Object.entries(searchParamsData)
+    .reduce((acc: Record<string, unknown>, [key, value]) => {
+      if (key.startsWith('attribute_')) {
+        const attributeId = key.replace('attribute_', '');
+        const values = value.split(',').map(Number);
+
+        // Build variant object
+        const variantObj = acc.variant ? JSON.parse(acc.variant as string) : {};
+        variantObj[attributeId] = values;
+
+        // Encode variant object as URL parameter
+        acc.variant = JSON.stringify(variantObj);
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, { ...defaultParams });
+    const combinedParams = { ...defaultParams, ...variantParams };
     
     const breadcrumbs = [
         { label: "Home", href: "/" },

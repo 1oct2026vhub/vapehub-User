@@ -3,24 +3,40 @@
 import MyAccountHeading from "@/components/ui/MyAccountHeading";
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
-import InputForm from "@/components/InputForm";
-import { Button } from "@nextui-org/button";
 import AddressCard from "../../_components/AddressCard";
 import LogoutButton from "../../_components/LogoutButton";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
+import { AddressProvider, useAddress } from "@/lib/context/AddressContext";
+import AddressForm from "../../_components/AddressForm";
+import { AddressFormData } from "@/lib/config/address.config";
+import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
-const AccountAddresses: NextPage = () => {
+const AddressesContent: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const { status } = useSession();
   const router = useRouter();
+  const { addresses, isLoading, error, addAddress } = useAddress();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace(ROUTES.MY_ACCOUNT);
     }
   }, [status, router]);
+
+  const handleAddAddress = async (data: AddressFormData) => {
+    try {
+      setIsSubmitting(true);
+      await addAddress(data);
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error adding address:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (status === 'loading') {
     return <div>Loading...</div>;
@@ -53,56 +69,30 @@ const AccountAddresses: NextPage = () => {
 
         {/* Address Form - Visible only when showForm is true */}
         {showForm && (
-          <form className="space-y-4.5 p-5 bg-skin-white border border-skin-neutral-300 rounded-xl">
-            <div className="grid grid-cols-2 gap-2.5 md:gap-4">
-              <InputForm type="text" label="First Name" isRequired className="w-full" />
-              <InputForm type="text" label="Last Name" isRequired className="w-full" />
-            </div>
-            <InputForm
-              type="text"
-              label="Start typing the first line of your address"
-              isRequired
-              className="w-full"
-            />
-            <InputForm type="text" label="Address Line 2" isRequired className="w-full" />
-            <InputForm type="text" label="Address Line 3" className="w-full" />
-            <div className="grid grid-cols-2 gap-2.5 md:gap-4">
-              <InputForm type="text" label="City" isRequired className="w-full" />
-              <InputForm type="tel" label="Postcode" isRequired className="w-full" />
-            </div>
-            <div className="grid grid-cols-2 gap-2.5 md:gap-4">
-              <InputForm type="text" label="Region" isRequired className="w-full" />
-              <InputForm type="text" label="Country" isRequired className="w-full" />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-4.5 justify-end">
-              <Button
-                type="button"
-                size="lg"
-                radius="md"
-                color="primary"
-                className="btn text-content-1 max-md:h-10 primary-outline-btn rounded-10 !font-extrabold"
-                onPress={() => setShowForm(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                size="lg"
-                radius="md"
-                color="primary"
-                className="btn text-content-1 max-md:h-10 primary-btn rounded-10 !font-extrabold"
-              >
-                Save
-              </Button>
-            </div>
-          </form>
+          <AddressForm
+            onSubmit={handleAddAddress}
+            onCancel={() => setShowForm(false)}
+            isSubmitting={isSubmitting}
+          />
         )}
 
         {/* Address List */}
-        <AddressCard />
-        <AddressCard />
+        {isLoading ? (
+          <div className="text-center py-4">Loading addresses...</div>
+        ) : error ? (
+          <div className="text-center py-4 text-red-500">{error}</div>
+        ) : addresses.length === 0 ? (
+          <EmptyPlaceholder
+            title="No addresses found"
+            description="Add your first address above."
+          />
+        ) : (
+          <div className="space-y-4">
+            {addresses.map((address) => (
+              <AddressCard key={address.id} address={address} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Mobile Logout Section */}
@@ -110,6 +100,14 @@ const AccountAddresses: NextPage = () => {
         <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 text-content-1 bg-skin-white font-semibold w-full rounded-lg" />
       </div>
     </main>
+  );
+};
+
+const AccountAddresses: NextPage = () => {
+  return (
+    <AddressProvider>
+      <AddressesContent />
+    </AddressProvider>
   );
 };
 

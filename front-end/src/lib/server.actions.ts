@@ -5,11 +5,14 @@ import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
+import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
-import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData } from "./config/product.config";
+import { ORDER_RESPONSE, ORDER_RESPONSE_DATA, PLACE_ORDER_PAYLOAD } from "./config/order.config";
+import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
+import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
 import { handleRequest } from "./request.config";
-import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_PAYLOAD } from '@/lib/api-routes';
+import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD } from '@/lib/api-routes';
 
 export const signInAction = async (
     email: string,
@@ -111,6 +114,7 @@ export const getProductByCategory = async (
   slug: string,
   params: PRODUCT_PAYLOAD
 ): Promise<ServerActionResponse<CategoryResponseData>> => {
+  
   return await handleRequest<CategoryResponseData, unknown>({
     endpoint: API_ROUTES.GET_CATEGORY_PRODUCTS_BY_SLUG(slug, params),
     method: 'GET',
@@ -124,6 +128,24 @@ export const getProductBySlug = async (
   return await handleRequest<Product, unknown>({
     endpoint: API_ROUTES.GET_PRODUCTS_BY_SLUG(slug, params),
     method: 'GET',
+  });
+};
+
+export const getProductById = async (
+  id: number,
+  params: PRODUCT_PAYLOAD
+): Promise<ServerActionResponse<Product>> => {
+  return await handleRequest<Product, unknown>({
+    endpoint: API_ROUTES.GET_PRODUCTS_BY_ID(id, params),
+    method: 'GET',
+  });
+};
+ 
+export const getProductVariantByID = async (payload: PRODUCT_VARIANT_PAYLOAD): Promise<ServerActionResponse<ProductResponse>> => {
+  return await handleRequest<ProductResponse, unknown>({
+    endpoint: API_ROUTES.GET_PRODUCT_VARIANT_BY_ID,
+    payload,
+    method: 'POST',
   });
 };
 
@@ -207,7 +229,7 @@ export const addToCart = async (
   quantity: number
 ): Promise<ServerActionResponse<{message: string}>> => {
   return await handleRequest<{message: string}, CART_GET_PAYLOAD>({
-    endpoint: API_ROUTES.ADD_TO_CART,
+    endpoint: API_ROUTES.CART,
     payload: {
       product_id,
       variant_id,
@@ -218,12 +240,12 @@ export const addToCart = async (
 };
 // Bulk add items to cart
 export const bulkAddToCart = async (
-  items: CART_GET_PAYLOAD[]
+  cartItems: CART_GET_PAYLOAD[]
 ): Promise<ServerActionResponse<{message: string}>> => {
-  return await handleRequest<{message: string}, {items: CART_GET_PAYLOAD[]}>({
-    endpoint: API_ROUTES.ADD_TO_CART,
+  return await handleRequest<{message: string}, {cartItems: CART_GET_PAYLOAD[]}>({
+    endpoint: API_ROUTES.BULK_ADD_TO_CART,
     payload: {
-      items
+      cartItems
     },
     method: 'POST',
   });
@@ -232,20 +254,20 @@ export const bulkAddToCart = async (
 // Get cart items
 export const getCartItems = async (): Promise<ServerActionResponse<CART_RESPONSE_DATA[]>> => {
   return await handleRequest<CART_RESPONSE_DATA[], unknown>({
-    endpoint: API_ROUTES.GET_CART_ITEMS,
+    endpoint: API_ROUTES.CART,
     method: 'GET',
   });
 };
 
 // Update cart item quantity
 export const updateCartItem = async (
-  productId: number,
+  cartId: number,
   quantity: number
 ): Promise<ServerActionResponse<{message: string}>> => {
   return await handleRequest<{message: string}, { 
     quantity: number;
   }>({
-    endpoint: API_ROUTES.UPDATE_CART_ITEM(productId),
+    endpoint: API_ROUTES.UPDATE_CART_ITEM(cartId),
     payload: {
       quantity
     },
@@ -279,4 +301,113 @@ export const getDynamicPageSlug = async (slug: string): Promise<ServerActionResp
     endpoint: API_ROUTES.GET_DYNAMIC_PAGE_SLUG(slug),
     method: 'GET',
   });
+};
+
+// checkout
+export const checkout = async (payload: CHECKOUT_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.CHECKOUT,
+    payload,
+    method: 'POST',
+  });
+};
+
+// apply coupon
+export const applyCoupon = async (payload: APPLY_COUPON_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.APPLY_COUPON,
+    payload,
+    method: 'POST',
+  });
+};
+
+// get user profile
+export const getUserProfile = async (): Promise<ServerActionResponse<UserProfileResponse>> => {
+  return await handleRequest<UserProfileResponse, unknown>({
+    endpoint: API_ROUTES.GET_USER_PROFILE,
+    method: 'GET',
+  });
+};
+
+// update user profile
+export const updateUserProfile = async (payload: UpdateUserProfilePayload): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.GET_USER_PROFILE,
+    payload,
+    method: 'PUT',
+  });
+};
+// user account delete
+export const deleteUserAccount = async (): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.DELETE_USER_ACCOUNT,
+    method: 'DELETE',
+  });
+};
+// get user addresses
+export const getUserAddresses = async (): Promise<ServerActionResponse<USER_ADDRESS_RESPONSE>> => {
+  return await handleRequest<USER_ADDRESS_RESPONSE, unknown>({
+    endpoint: API_ROUTES.GET_USER_ADDRESSES,
+    method: 'GET',
+  });
+};
+// add user address
+export const addUserAddress = async (payload: USER_ADDRESS_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.ADD_USER_ADDRESS,
+    payload,
+    method: 'POST',
+  });
+};
+// update user address
+export const updateUserAddress = async (id: number, payload: USER_ADDRESS_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.UPDATE_USER_ADDRESS(id),
+    payload,
+    method: 'PUT',
+  });
+};
+// delete user address
+export const deleteUserAddress = async (id: number): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.DELETE_USER_ADDRESS(id),
+    method: 'DELETE',
+  });
+};
+// change user password
+export const changeUserPassword = async (payload: ChangeUserPasswordPayload): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.CHANGE_USER_PASSWORD,
+    payload,
+    method: 'PUT',
+  });
+};
+
+// get orders list
+export const getOrdersList = async (): Promise<ServerActionResponse<ORDER_RESPONSE[]>> => {
+  return await handleRequest<ORDER_RESPONSE[], unknown>({
+    endpoint: API_ROUTES.ORDERS,
+    method: 'GET',
+  });
+};
+
+//  place order
+export const placeOrder = async (payload: PLACE_ORDER_PAYLOAD): Promise<ServerActionResponse<ORDER_RESPONSE_DATA>> => {
+  return await handleRequest<ORDER_RESPONSE_DATA, unknown>({
+    endpoint: API_ROUTES.ORDERS,
+    payload,
+    method: 'POST',
+  });
+};
+
+// Update order status
+export const updateOrderStatus = async (
+    orderReference: string,
+    status: string
+): Promise<ServerActionResponse<{message: string}>> => {
+    return await handleRequest<{message: string}, { status: string }>({
+        endpoint: API_ROUTES.UPDATE_ORDER_STATUS(orderReference),
+        payload: { status },
+        method: 'PUT',
+    });
 };

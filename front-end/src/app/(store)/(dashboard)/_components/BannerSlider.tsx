@@ -34,7 +34,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
       {sortedBanners.map((banner, index) => (
         <Link
           key={index}
-          className="overflow-hidden rounded-2.5xl min-h-[671px] bg-gray-100"
+          className="overflow-hidden rounded-2.5xl bg-gray-100"
           href={banner.redirect_url}
         >
           <Image
@@ -42,7 +42,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
             alt={banner?.title}
             width={1340}
             height={671}
-            className="w-full rounded-2.5xl min-h-[671px] outline-none focus-visible:!outline-none"
+            className="w-full h-full object-fill rounded-2.5xl outline-none focus-visible:!outline-none"
             priority
             loading="eager"
           />

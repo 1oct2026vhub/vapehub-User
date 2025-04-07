@@ -273,7 +273,7 @@ input[type='search'] {
 
 .section-slider .slick-prev,
 .section-slider .slick-next {
-  @apply top-auto -bottom-[6.3%] sm:-bottom-[17%] md:-bottom-[11.5%] lg:-bottom-[16%] xl:-bottom-[14.7%] !important;
+  @apply top-auto max-[390px]:-bottom-[7.5%] -bottom-[7%] sm:-bottom-[17%] lg:-bottom-[19%] xl:-bottom-[15.5%] !important;
 }
 
 .section-slider .slick-prev {

@@ -2,15 +2,74 @@
 
 import MyAccountHeading from '@/components/ui/MyAccountHeading'
 import { NextPage } from 'next'
-import React, { useState } from 'react'
-import InputForm from '@/components/InputForm'
+import React, { useState, useEffect } from 'react' 
 import { Button } from '@nextui-org/button'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react'
 import LogoutButton from '../../_components/LogoutButton'
-
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { userProfileSchema, UserProfileFormData } from '@/lib/config/user.config'
+import { useUserProfile } from '@/lib/hooks/useUserProfile'
+import { toast } from 'sonner'
+import { ServerActionStatus } from '@/lib/config/app.config'
+import InputField from '@/components/InputField' 
+import { signOut } from 'next-auth/react'
+import { ROUTES } from '@/lib/routes'
 const PersonalInfo: NextPage = () => {
-    const [showButtons, setShowButtons] = useState(false);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [showButtons, setShowButtons] = useState(false)
+    const { isOpen, onClose, onOpen, onOpenChange } = useDisclosure()
+    const { fetchProfile, updateProfile, deleteProfile, isLoading } = useUserProfile();
+    const [loading, setLoading] = useState(true);
+     const form = useForm<UserProfileFormData>({
+        resolver: zodResolver(userProfileSchema),
+        defaultValues: {
+            first_name: '',
+            last_name: '',
+            email: '',
+            phone: ''
+        }
+    })
+    const loadProfile = async () => {
+        const result = await fetchProfile(); 
+        if (result) {
+            form.reset({
+                first_name: result.first_name || '',
+                last_name: result.last_name || '',
+                email: result.email || '',
+                phone: result.phone || ''
+            })
+            setLoading(false)
+        }
+    }
+    useEffect(() => {        
+        loadProfile()
+    }, [])
+
+    const onSubmit = async (data: UserProfileFormData) => {
+        const result = await updateProfile(data)
+        if (result?.status === ServerActionStatus.SUCCESS) {
+            toast.success('Profile updated successfully')
+            setShowButtons(false)
+        } else {
+            toast.error('Failed to update profile')
+        }
+    }
+
+    const handleDeleteAccount = async () => {
+        const result = await deleteProfile()
+        if (result?.status === ServerActionStatus.SUCCESS) {
+            toast.success('Account deleted successfully');
+            onClose();
+            signOut({ callbackUrl: ROUTES.MY_ACCOUNT });
+             
+            // Redirect to home or login page
+        } else {
+            toast.error('Failed to delete account')
+        }
+    }
+    if(loading) {
+        return <p>Loading..</p>
+    }
 
     return (
         <main>
@@ -27,40 +86,52 @@ const PersonalInfo: NextPage = () => {
                         </button>
                     )}
                 </div>
-                <form className='space-y-4 md:space-y-6'>
+                <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4 md:space-y-6'>
                     <div className="grid sm:grid-cols-2 gap-2.5 md:gap-4">
                         <div className='space-y-3 md:space-y-4.5'>
                             <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">First Name</h2>
-                            <InputForm
+                            <InputField
+                                control={form.control}
+                                name='first_name'
                                 type='text'
-                                placeholder='Neerajdev'
+                                disabled={!showButtons}
                                 className='w-full'
                             />
+                             
                         </div>
                         <div className='space-y-3 md:space-y-4.5'>
                             <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Last Name</h2>
-                            <InputForm
+                            <InputField
+                                control={form.control}
+                                name='last_name'
                                 type='text'
-                                placeholder='R'
+                                disabled={!showButtons}
                                 className='w-full'
                             />
+                            
                         </div>
                     </div>
                     <div className='space-y-3 md:space-y-4.5 sm:pr-4'>
                         <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Email</h2>
-                        <InputForm
+                        <InputField
+                            control={form.control}
+                            name='email'
                             type='email'
-                            placeholder='neerajdev@gmail.com'
+                            disabled
                             className='w-full sm:max-w-[50%]'
                         />
+                         
                     </div>
                     <div className='space-y-3 md:space-y-4.5 sm:pr-4'>
                         <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Mobile Number</h2>
-                        <InputForm
+                        <InputField
+                            control={form.control}
+                            name='phone'
                             type='tel'
-                            placeholder='8075999260'
+                            disabled={!showButtons}
                             className='w-full sm:max-w-[50%]'
                         />
+                        
                     </div>
                     {showButtons && (
                         <div className="flex items-center gap-4.5 pt-6">
@@ -70,7 +141,7 @@ const PersonalInfo: NextPage = () => {
                                 radius="md"
                                 color="primary"
                                 className="btn !text-content-2 md:!text-content-1 max-md:h-10 rounded-10 primary-outline-btn !font-extrabold"
-                                onPress={() => setShowButtons(false)}
+                                onPress={() => {setShowButtons(false); loadProfile()}}
                             >
                                 Cancel
                             </Button>
@@ -80,6 +151,8 @@ const PersonalInfo: NextPage = () => {
                                 radius="md"
                                 color="primary"
                                 className="btn !text-content-2 md:!text-content-1 max-md:h-10 rounded-10 primary-btn !font-extrabold"
+                                isLoading={isLoading}
+                                isDisabled={isLoading}
                             >
                                 Save
                             </Button>
@@ -106,11 +179,15 @@ const PersonalInfo: NextPage = () => {
                                         </p>
                                     </ModalBody>
                                     <ModalFooter>
-                                        <Button color="primary" onPress={onClose} className="!text-content-2 md:!text-content-1 max-md:h-10 rounded-lg primary-outline-btn !font-extrabold !w-fit">
+                                        <Button color="primary" onPress={onClose}>
                                             Cancel
                                         </Button>
-                                        <Button color="primary" onPress={onClose} className="!text-content-2 md:!text-content-1 max-md:h-10 rounded-lg primary-btn !font-extrabold !w-fit">
-                                            Yes
+                                        <Button 
+                                            color="danger"
+                                            onPress={handleDeleteAccount}
+                                            isLoading={isLoading}
+                                        >
+                                            Delete
                                         </Button>
                                     </ModalFooter>
                                 </>

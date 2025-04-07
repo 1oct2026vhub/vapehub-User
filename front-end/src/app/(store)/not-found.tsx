@@ -1,6 +1,5 @@
-import { ROUTES } from '@/lib/routes';
-import Image from 'next/image';
-import Link from 'next/link';
+import GoBackButton from '@/components/common/GoBackButton';
+import Image from 'next/image'; 
 import React from 'react';
 // generate metadata
 export async function generateMetadata() {
@@ -30,9 +29,8 @@ const NotFoundPage: React.FC = () => {
                     height={354}
                     className="mx-auto"
                 />
-                <Link href={ROUTES.WELCOME} className="btn primary-btn w-full text-center text-title-2 font-semibold">
-                    Go Back
-                </Link>
+                <GoBackButton />
+                
             </div>
         </div>
     );

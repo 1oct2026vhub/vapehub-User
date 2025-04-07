@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { DownArrowIcon } from '@/components/Icons';
 import ShoppingCartCard from '@/components/ShoppingCartCard';
+import { useCart } from '@/lib/context/CartContext';
 
 const ProductList: React.FC = () => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const { cartItems } = useCart();
 
     return (
         <div 
@@ -18,7 +20,9 @@ const ProductList: React.FC = () => {
             {/* Products Section (conditionally rendered) */}
             {isExpanded && (
                 <div className='space-y-4 md:space-y-6'>
-                    <ShoppingCartCard showAddMoreItem  />
+                    {cartItems.map((item, idx) => (
+                        <ShoppingCartCard key={idx} item={item} showAddMoreItem={false} />
+                    ))}
                 </div>
             )}
         </div>

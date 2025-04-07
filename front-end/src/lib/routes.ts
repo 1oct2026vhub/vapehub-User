@@ -11,12 +11,16 @@ BRAND: '/brand/:slug',
 BLOGS: '/blogs',
 DEALS: '/deals',
 SHOP: '/shop',
+SHOPPING_CART: '/shopping-cart',
+CHECKOUT: '/checkout',
 MY_ACCOUNT_ORDERS: '/my-account/orders',
 MY_ACCOUNT_PERSONAL_INFO: '/my-account/personal-info',
 MY_ACCOUNT_REFERRALS: '/my-account/referrals',
 MY_ACCOUNT_ADDRESSES: '/my-account/addresses',
 MY_ACCOUNT_SECURITY: '/my-account/security',
-FAQ: '/faq'
+FAQ: '/faq',
+PAYMENT_SUCCESS: '/payment-success',
+PAYMENT_FAILED: '/payment-failed'
 }
 
  

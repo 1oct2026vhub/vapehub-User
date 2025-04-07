@@ -1,7 +1,13 @@
 import { BrandConfig } from "./brand.config";
 import { Category } from "./category.config";
 
- 
+export interface ProductFilters {
+    brand?: string;
+    categories?: string;
+    price_range?: string;
+    variants?: Record<string, string[]>;
+    nonVariants?: Record<string, string>;
+}
 
 export interface Pagination {
     current_page: number;
@@ -14,8 +20,13 @@ export interface Pagination {
 export type ProductResponseData = {
     products: Product[];
     pagination: Pagination;
+    attributes: AttributeTerms[],
+    price_ranges: PriceRange[],
+    brand: BRAND[],
+    category: CATEGORY[]
+
 }
- 
+
 export interface ProductFlavor {
     product_id: number;
     flavor_id: number;
@@ -51,7 +62,7 @@ export interface prodTerm {
     name: string;
     slug: string;
 }
-export interface productAttributeTerms  {
+export interface productAttributeTerms {
     id: number;
     product_id: number;
     attribute_id: number;
@@ -65,8 +76,75 @@ export interface productAttributeTerms  {
     attribute: prodAttribute;
     term: prodTerm;
 }
+ interface productAttributes {
+    id: number;
+    name: string;
+    type: string;
+    is_visible_page: boolean;
+    used_in_variation: boolean;
+}
+ interface productAttributesTerms {
+    id: number;
+    name: string;
+    slug: string;
+    product_count: number;
+
+}
+export interface AttributeProductTerms {
+    attribute: productAttributes;
+    terms: productAttributesTerms;
+}
+export interface AttributeTerms {
+    attribute: productAttributes;
+    terms: productAttributesTerms[];
+}
 export interface Product {
-    variants: string[];
+    variants: {
+        id: number;
+        product_id: number;
+        slug: string;
+        price: string;
+        discount_price: string;
+        purchase_price: string;
+        weight: number | null;
+        length: number | null;
+        width: number | null;
+        height: number | null;
+        description: string;
+        barcode: string | null;
+        stock: number;
+        low_stock_threshold: number;
+        stock_status: string;
+        status: string;
+        updated_by: number;
+        created_at: string;
+        updated_at: string;
+        deleted_at: string | null;
+        variantAttributes: {
+            id: number;
+            variant_id: number;
+            attribute_id: number;
+            term_id: number;
+            is_visible: boolean;
+            used_in_variation: boolean;
+            updated_by: number;
+            created_at: string;
+            updated_at: string;
+            deleted_at: string | null;
+            attribute: {
+                id: number;
+                name: string;
+                type: string;
+            };
+            term: productAttributesTerms;
+        }[];
+        variantImages: {
+            id: number;
+            variant_id: number;
+            image_url: string;
+            is_primary: boolean;
+        }[];
+    };
     productAttributeTerms: productAttributeTerms[];
     id: number;
     updated_by: number | null;
@@ -99,14 +177,108 @@ export interface Product {
     Brand: BrandConfig;
     ProductImages: ProductImage[];
     Flavors: Flavor[];
-} 
+    attributeTerms: AttributeTerms[];
+}
  
 export interface CategoryResponseData extends Category {
     products: Product[];
     pagination: Pagination;
-  }
+    attributes: AttributeTerms[],
+    price_ranges: PriceRange[],
+    brand: BRAND[],
+    category?: CATEGORY[]
+  
+}
+interface BRAND {
+    id: number;
+    name: string;
+    product_count: number;
+    slug: string;
+}
+interface CATEGORY {
+    id: number;
+    name: string;
+    product_count: number;
+    slug: string;
+}
+interface PriceRange {
+    label: string;
+    count: number;
+    value: string;
+}
 
 export interface BrandByProductResponse extends BrandConfig {
     products: Product[];
     pagination: Pagination;
+    attributes: AttributeTerms[],
+    price_ranges: PriceRange[],
+    brand?: BRAND[],
+    category: CATEGORY[]
 }
+export interface ProductVariant {
+    id: number;
+    slug: string;
+    price: string;
+    discount_price: string;
+    stock: number;
+    stock_status: string;
+    status: string;
+    is_in_stock: boolean;
+    primary_image: {
+        id: number;
+        url: string;
+        alt_text: string | null;
+        is_primary: boolean;
+        sort_order: number;
+    };
+    all_images: {
+        id: number;
+        url: string;
+        alt_text: string | null;
+        is_primary: boolean;
+        sort_order: number;
+    }[];
+}
+export interface StockSummary {
+    total: number;
+    in_stock: number;
+    low_stock: number;
+    out_of_stock: number;
+}
+export interface ProductResponse {
+    product: ProductViewDetails;
+    variants: ProductVariant[];
+    available_terms: AttributeTerms[];
+    stock_summary: StockSummary;
+}
+
+export interface productAllImages {
+    id: number;
+    url: string;
+    is_primary: boolean;
+}
+   
+
+export interface ProductViewDetails {
+
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    category: Category | null;
+    brand: BrandConfig | null;
+    createdAt: string;
+    primary_image: productAllImages;
+    all_images: productAllImages[];
+    attribute_terms: AttributeTerms[]
+};
+
+export interface AppliedFilters {
+    attributeId: number;
+    attribute: string;
+    count: number;
+    value: string;
+    type: string;
+}
+
+export const NON_VARIANT_FILTERS = ['brand', 'categories', 'price_range', 'order', 'offset'];

@@ -216,6 +216,7 @@ const MobileMenu = () => {
                                 radius="md"
                                 color="primary"
                                 className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                onPress={onCartClose}
                             >
                                 Checkout Now
                             </Button>

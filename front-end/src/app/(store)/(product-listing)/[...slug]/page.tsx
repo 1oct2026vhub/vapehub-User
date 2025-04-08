@@ -23,7 +23,7 @@ const Page = async ({
 }) => {
 
   const slug = (await params).slug;
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 };
   const searchParamsData = await searchParams;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
@@ -143,13 +143,13 @@ const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Pr
   const payload: PRODUCT_VARIANT_PAYLOAD = {
     product_id: id,
     attribute_terms: params
-  }
-
+  } 
+    
   const response = await getProductVariantByID(payload);
   
   if (response.status === ServerActionStatus.ERROR) {
     return null;
-  }
+  } 
   return response.data;
 };
 
@@ -198,7 +198,7 @@ export async function generateMetadata({ params, searchParams }: {
   const slug = (await params).slug;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 };
   const searchParamsData = await searchParams;
 
 

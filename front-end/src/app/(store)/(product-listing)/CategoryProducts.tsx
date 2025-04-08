@@ -11,6 +11,7 @@ type CategoryProps = {
 
 
 const CategoryProducts: React.FC<CategoryProps> = ({ data }): ReactElement => {
+  
   const breadcrumbs = [
     { label: "Home", href: "/" },
     { label: data.name, href: `/${data.slug}`, isActive: true },

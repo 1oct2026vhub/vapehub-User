@@ -6,9 +6,10 @@ import { ROUTES } from '@/lib/routes';
 import { toast } from 'sonner';
 import { Button } from '@nextui-org/button';
 import Image from 'next/image';
-
+import { useSession } from 'next-auth/react';
 const PaymentFailedPage = () => {
     const router = useRouter();
+    const { status } = useSession();
     const [transactionDetails, setTransactionDetails] = useState({
         id: '',
         amount: '',
@@ -35,6 +36,20 @@ const PaymentFailedPage = () => {
         localStorage.removeItem('vivaOrderAmount');
         toast.error('Payment failed. Please try again.');
     }, []);
+
+    useEffect(() => {
+        if (status === 'unauthenticated') {
+            router.replace(ROUTES.MY_ACCOUNT);
+        }
+    }, [status, router]);
+
+    if (status === 'loading') {
+        return <div>Loading...</div>;
+    }
+
+    if (status === 'unauthenticated') {
+        return <div>Redirecting to login...</div>;
+    }
 
     return (
         <div className="auth-form-container md:!py-[84px]">

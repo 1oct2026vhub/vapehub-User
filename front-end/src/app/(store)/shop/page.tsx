@@ -44,8 +44,7 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
     const response = await getProductList(combinedParams);
       if(response.status == ServerActionStatus.ERROR) {
         return (<p>{response.message}</p>);
-      }
-     
+      } 
     return (
         <div>
         <section className="product-listing-container flex-col">

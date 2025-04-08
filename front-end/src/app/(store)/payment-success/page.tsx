@@ -8,9 +8,10 @@ import { updateOrderStatus } from '@/lib/server.actions';
 import { toast } from 'sonner';
 import { Button } from '@nextui-org/button';
 import Image from 'next/image';
-
+import { useSession } from 'next-auth/react';
 const PaymentSuccessPage = () => {
     const router = useRouter();
+    const { status } = useSession();
     const [transactionDetails, setTransactionDetails] = useState({
         id: '',
         amount: '',
@@ -37,7 +38,7 @@ const PaymentSuccessPage = () => {
                         id: orderRef,
                         amount: localStorage.getItem('vivaOrderAmount') || '0'
                     }));
-                    
+
                     // Clear the order reference from local storage
                     localStorage.removeItem('vivaOrderRef');
                     localStorage.removeItem('vivaOrderAmount');
@@ -54,6 +55,19 @@ const PaymentSuccessPage = () => {
         verifyPayment();
     }, [router]);
 
+    useEffect(() => {
+        if (status === 'unauthenticated') {
+            router.replace(ROUTES.MY_ACCOUNT);
+        }
+    }, [status, router]);
+
+    if (status === 'loading') {
+        return <div>Loading...</div>;
+    }
+
+    if (status === 'unauthenticated') {
+        return <div>Redirecting to login...</div>;
+    }
     return (
         <div className="auth-form-container md:!py-[84px]">
             <div className="auth-form-wrapper !space-y-0 !rounded-2xl !max-w-[600px] !p-5 !gap-5">

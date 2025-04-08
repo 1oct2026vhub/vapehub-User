@@ -2,7 +2,7 @@ import { z } from "zod"
 
  
 export enum CHECKOUT_PAYMENT_METHODS {
-    VIVA_WALLET = 'vivaWallet',
+    VIVA_WALLET = 'VivaWallet',
     WORLD_PAY = 'Worldpay'
 }
 

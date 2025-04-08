@@ -113,7 +113,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
        stock: data.stock,
        slug: data.slug,
        description: "",
-       ProductImages: data.primary_image.url,
+       ProductImages: data.primary_image?.url || "",
        quantity: quantity
     };
   };
@@ -133,6 +133,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const updatedCart = [...cartItems, newItem];
         setCartItems(updatedCart);
         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+        calculateTotals(updatedCart);
         toast.success(`${productName} added to cart successfully`);
       }
     } catch (error) {
@@ -143,6 +144,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const updatedCart = [...cartItems, newItem];
       setCartItems(updatedCart);
       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+      calculateTotals(updatedCart);
     } finally {
       setIsLoading(false);
     }
@@ -316,6 +318,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCartTotal(0);
     setItemCount(0);
     setCartCouponCode(null);
+    calculateTotals(cartItems);
   };
 
   const value = {
@@ -328,8 +331,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     itemCount,
     syncCookieCart,
     cartCouponCode,
-    error,
-    
+    error, 
     bulkAddItems,
     fetchCartItems,
     clearCart

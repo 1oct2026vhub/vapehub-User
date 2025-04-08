@@ -19,7 +19,7 @@ type ProductListProps = {
 }
 
 const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElement => {
-  
+  console.log(data.pagination);
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -28,7 +28,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const { getFilterParams, getAppliedFilters, removeFilter, updateFilters } = useProductFilters();
 
 
-  const productAttributeTerms: AttributeTerms[] = data?.attributes.filter(attr => attr.attribute.is_visible_page === true);
+  const productAttributeTerms: AttributeTerms[] = data?.attributes.filter(attr => attr.attribute.is_visible === true);
   const appliedFilters = getAppliedFilters(productAttributeTerms);
 
   const handleRemoveFilter = (attributeId: number, type: string) => {
@@ -156,7 +156,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const handlePagination = (page: number) => {
 
     const params = new URLSearchParams(searchParams);
-    params.set("offset", (page - 1).toString());
+    params.set("offset", ((page - 1) * 12).toString());
     router.replace(`${pathname}?${params.toString()}`, { scroll: true });
   };
 

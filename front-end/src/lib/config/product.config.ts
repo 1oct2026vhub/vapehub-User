@@ -80,7 +80,7 @@ export interface productAttributeTerms {
     id: number;
     name: string;
     type: string;
-    is_visible_page: boolean;
+    is_visible: boolean;
     used_in_variation: boolean;
 }
  interface productAttributesTerms {

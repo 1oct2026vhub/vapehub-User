@@ -34,7 +34,12 @@ const CartDetails: React.FC = () => {
     }
 
   const handleCheckout = async () => {
+    
     const couponCode = cartCouponFormConfig.getValues('couponCode') || '';
+    if(!couponCode) {
+        router.replace(ROUTES.CHECKOUT);
+        return;
+    }
     const response = await checkout({ couponCode } as unknown as CHECKOUT_PAYLOAD);
     if(response.status === ServerActionStatus.SUCCESS) {
         router.push(ROUTES.CHECKOUT);

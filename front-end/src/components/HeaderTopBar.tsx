@@ -136,13 +136,14 @@ const HeaderTopBar = () => {
                                         <p className='text-content-2 md:text-title-1'>Total</p>
                                         <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
                                     </div>
-                                    <Button     
+                                    <Button
                                         as={Link}
                                         href={ROUTES.CHECKOUT}
                                         size="lg"
                                         radius="md"
                                         color="primary"
                                         className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                        onPress={onClose}
                                     >
                                         Checkout Now
                                     </Button>
@@ -159,8 +160,8 @@ const HeaderTopBar = () => {
                                             Keep Shopping
                                         </Button>
                                         <Button
-                                        as={Link}
-                                        href={ROUTES.SHOPPING_CART}
+                                            as={Link}
+                                            href={ROUTES.SHOPPING_CART}
                                             size="lg"
                                             radius="md"
                                             color="primary"

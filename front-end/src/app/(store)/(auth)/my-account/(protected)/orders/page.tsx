@@ -31,7 +31,7 @@ const MyAccountOrders: NextPage = async () => {
             shippingAddress: x.shippingAddress,
             billingAddress: x.billingAddress,
             shippingMethod: x.shippingMethod,
-            product_image: { image_url: y.variant?.variantImages[0]?.image_url || '' },
+            product_image: { image_url: y.variant?.variantImages?.[0]?.image_url || "" },
         }))
     );
     

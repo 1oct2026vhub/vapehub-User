@@ -2,12 +2,13 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { SHIPPING_METHOD } from '@/lib/config/order.config';
-import { CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config';
+import { CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS } from '@/lib/config/checkout.config';
 import { placeOrder } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
 import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
+import { useWorldPay } from '@/lib/hooks/useWorldpay';
 import { useCart } from './CartContext';
 
 interface CheckoutContextType {
@@ -35,25 +36,56 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     const [selectedShippingMethod, setSelectedShippingMethod] = useState<SHIPPING_METHOD | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const router = useRouter();
-    const { initiatePayment } = useVivaWallet();
+    const { initiatePayment: initiateVivaPayment } = useVivaWallet();
+    const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
     const { cartTotal, clearCart } = useCart();
 
     const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD) => {
-       
         try {
             setIsProcessing(true);
             const response = await placeOrder(data); 
-        
+            
             if (response.status === ServerActionStatus.SUCCESS) {
-                // Initiate Viva Wallet payment
-                await initiatePayment({
-                    amount: cartTotal,
-                    orderReference: response.data.data.order_id,
-                    customerEmail: data.email,
-                    customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
-                    orderDescription: `Order #${response.data.message}`
-                });
+                if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
+                    // Initiate Viva Wallet payment
+                    await initiateVivaPayment({
+                        amount: cartTotal,
+                        orderReference: response.data.data.order_id,
+                        customerEmail: data.email,
+                        customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
+                        orderDescription: `Order #${response.data.message}`
+                    });
+                } else if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
+                    // Initiate WorldPay Smart Checkout
+                    await initiateWorldPayPayment({
+                        amount: cartTotal,
+                        currency: 'EUR', // Adjust based on your needs
+                        orderReference: response.data.data.order_id,
+                        customerEmail: data.email,
+                        customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
+                        orderDescription: `Order #${response.data.message}`,
+                        returnUrl: `${window.location.origin}${ROUTES.PAYMENT_SUCCESS}`,
+                        cancelUrl: `${window.location.origin}${ROUTES.PAYMENT_FAILED}`,
+                        billingAddress: {
+                            address1: data.billing_address.address_line_1,
+                            address2: data.billing_address.address_line_2,
+                            city: data.billing_address.city,
+                            state: data.billing_address.region,
+                            postalCode: data.billing_address.post_code,
+                            country: data.billing_address.country,
+                        },
+                        shippingAddress: {
+                            address1: data.shipping_address.address_line_1,
+                            address2: data.shipping_address.address_line_2,
+                            city: data.shipping_address.city,
+                            state: data.shipping_address.region,
+                            postalCode: data.shipping_address.post_code,
+                            country: data.shipping_address.country,
+                        }
+                    });
+                }
                 clearCart();
+                
             } else {
                 router.push(ROUTES.PAYMENT_FAILED);
             }

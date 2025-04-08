@@ -1,7 +1,7 @@
 import { Button, Select, SelectItem } from '@nextui-org/react'
 import { FunctionComponent } from 'react';
 import { AttributeTerms, AttributeProductTerms } from '@/lib/config/product.config';
-import { useVariantFilter } from '@/hooks/useVariantFilter';
+import { useVariantFilter } from '@/lib/hooks/useVariantFilter';
 
 type ProductVariantFilterProps = {
     attributeTerms: AttributeTerms[];

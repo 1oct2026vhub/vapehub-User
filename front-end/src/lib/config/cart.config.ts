@@ -72,6 +72,7 @@ export type CART_GET_PAYLOAD = {
 export type CartItem = {
   id: number;
   product_id: number;
+  product_slug: string;
   name: string;
   price: string;
   discount_price: string;

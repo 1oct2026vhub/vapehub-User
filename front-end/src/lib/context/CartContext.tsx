@@ -90,6 +90,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return {
       id: item.id,
       product_id: item.product_id,
+      product_slug: item.product.slug,
       name: item.product.name,
       price: item.variant.price || '0',
       discount_price: item.variant.discount_price || '0',
@@ -106,6 +107,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return {
        id: id,
        product_id: productId,
+       product_slug: data.slug,
        name: productName,
        price: data.price,
        discount_price: data.discount_price,

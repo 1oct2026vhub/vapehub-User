@@ -12,8 +12,10 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner'
+import { useSession } from 'next-auth/react'
 
 const CartDetails: React.FC = () => {
+    const { status } = useSession();
     const cartCouponFormConfig = useForm<APPLY_COUPON_FORM_TYPE>({
         resolver: zodResolver(APPLY_COUPON_FORM_SCHEMA),
         mode: 'onSubmit',
@@ -50,34 +52,38 @@ const CartDetails: React.FC = () => {
 
     return (
         <div className='flex flex-col p-3 md:p-5 gap-3 bg-white border border-skin-neutral-100 rounded-14 w-full lg:w-4/6 xl:w-full xl:max-w-[584px]'>
-            <form onSubmit={cartCouponFormConfig.handleSubmit(handleFormSubmit)} className='flex items-center gap-3'>
-                <InputField
-                    type='text'
-                    label="Coupon Code"
-                    isRequired
-                    className='xl:min-w-[366px]'
-                    control={cartCouponFormConfig.control}
-                    name='couponCode'
-                />
-                <Button
-                    size="lg"
-                    radius="md"
-                    color="primary"
-                    className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-11 md:h-12"
-                    type='submit'
-                    isLoading={cartCouponFormConfig.formState.isSubmitting}
-                    isDisabled={!cartCouponFormConfig.formState.isValid}
-                >
-                    Apply Code
-                </Button>
-                
-            </form>
-            {couponSuccessMessage && <p className='text-success-500 text-content-3 md:text-content-1 font-bold'>{couponSuccessMessage}</p>}
+            {status === 'authenticated' && (
+                <>
+                <form onSubmit={cartCouponFormConfig.handleSubmit(handleFormSubmit)} className='flex items-center gap-3'>
+                    <InputField
+                        type='text'
+                        label="Coupon Code"
+                        isRequired
+                        className='xl:min-w-[366px]'
+                        control={cartCouponFormConfig.control}
+                        name='couponCode'
+                    />
+                    <Button
+                        size="lg"
+                        radius="md"
+                        color="primary"
+                        className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-11 md:h-12"
+                        type='submit'
+                        isLoading={cartCouponFormConfig.formState.isSubmitting}
+                        isDisabled={!cartCouponFormConfig.formState.isValid}
+                    >
+                        Apply Code
+                    </Button>
+                </form>
+            
+           {couponSuccessMessage && <p className='text-success-500 text-content-3 md:text-content-1 font-bold'>{couponSuccessMessage}</p>}
             <Divider />
             <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
                 <p>Extra 10% Off</p>
                 <p>-£ 6.58</p>
             </div>
+            </>
+            )}
             <div className='space-y-1.5'>
                 <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
                     <p className='text-skin-neutral-500'>Number of Items</p>

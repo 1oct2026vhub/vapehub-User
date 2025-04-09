@@ -41,8 +41,7 @@ export type USER_ADDRESS_PAYLOAD = {
   country: string;
   street: string;
   apartment: string;
-  town: string;
-  county: string;
+  town: string; 
   region: string;
   post_code: string;
   phone: string;
@@ -55,8 +54,7 @@ export interface Address {
   country: string;
   street: string;
   apartment: string;
-  town: string;
-  county: string;
+  town: string; 
   region: string;
   post_code: string;
   phone: string;
@@ -77,7 +75,8 @@ export type ChangeUserPasswordPayload = {
 }
 
 export const changeUserPasswordSchema = z.object({
-  currentPassword: z.string().min(8, "Current password must be at least 8 characters"),
+  currentPassword: z.string().min(1, ValidationMessage.PASSWORD)
+  .max(16, "Password must be less than 16 characters"),
   newPassword: zodPasswordValidator(),
   confirmPassword: z.string({
     required_error: ValidationMessage.CONFIRM_PASSWORD,

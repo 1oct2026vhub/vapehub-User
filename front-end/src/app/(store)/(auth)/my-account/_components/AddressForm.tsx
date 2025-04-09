@@ -7,6 +7,7 @@ import { AddressFormData, addressSchema } from '@/lib/config/address.config';
 import InputForm from '@/components/InputForm';
 import { Button } from '@nextui-org/button';
 import { Form } from '@/components/ui/Form';
+import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
 
 interface AddressFormProps {
   initialData?: AddressFormData;
@@ -24,16 +25,26 @@ const AddressForm: React.FC<AddressFormProps> = ({
   const form = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     mode: 'all',
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      name: initialData?.name || '',
+      last_name: initialData?.last_name || '',
+      street: initialData?.street || '',
+      apartment: initialData?.apartment || '',
+      company_name: initialData?.company_name || '',
+      town: initialData?.town || '',
+      post_code: initialData?.post_code || '',
+      country: initialData?.country || DEFAULT_COUNTRY,
+      phone: initialData?.phone || '',
+      region: initialData?.region || '',
+    } : {
       name: '',
       last_name: '',
       street: '',
       apartment: '',
       company_name: '',
-      town: '',
-      county: '',
+      town: '',      
       post_code: "",
-      country: '',
+      country: DEFAULT_COUNTRY,
       phone: '',
       region: '',
     },
@@ -105,23 +116,16 @@ const AddressForm: React.FC<AddressFormProps> = ({
       </div>
       
       <div className="grid grid-cols-2 gap-2.5 md:gap-4">
-        <InputForm
-          control={form.control}
-          name="county"
-          label="County"
-          placeholder="Enter your county"
-          isRequired
-          className="w-full"
-        />
+        
         <InputForm
           control={form.control}
           name="region"
           label="Region"
           placeholder="Enter your region"
+          isRequired
           className="w-full"
         />
-      </div>
-      <InputForm
+        <InputForm
           control={form.control}
           name="country"
           label="Country"
@@ -129,6 +133,8 @@ const AddressForm: React.FC<AddressFormProps> = ({
           isRequired
           className="w-full"
         />
+      </div>
+      
       <InputForm
         control={form.control}
         type="number"

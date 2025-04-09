@@ -33,7 +33,7 @@ const AddressList: FunctionComponent<AddressListProps> = ({ selectedAddressId, o
                 {address.street}{address.apartment ? `, ${address.apartment}` : ''}
               </p>
               <p className='text-content-2 md:text-content-1 text-skin-neutral-300 font-bold'>
-                {address.town}, {address.county}, {address.post_code}
+                {address.town}, {address.region}, {address.post_code}
               </p>
               <p className='text-content-2 md:text-content-1 text-skin-neutral-300 font-bold'>
                 {address.country}

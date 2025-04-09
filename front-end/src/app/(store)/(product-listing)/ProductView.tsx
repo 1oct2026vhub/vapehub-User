@@ -16,12 +16,11 @@ type ProductViewProps = {
     data: ProductResponse;
     isVariant?: boolean;
     selectedVariant?: AttributeProductTerms;
-    availableAttributes?: AttributeTerms[];
 }
 
-const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = false, selectedVariant, availableAttributes}): ReactElement => {
+const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = false, selectedVariant}): ReactElement => {
     
-     
+    const productFeatures = data?.product?.attribute_terms.filter((attrTerm: AttributeTerms) => (attrTerm.attribute.is_visible_page && !attrTerm.attribute.used_in_variation));
     const breadcrumbs = [
         { label: "Home", href: ROUTES.WELCOME },
         { label: data?.product?.category?.name || "", href: `/${data?.product?.category?.slug || ""}` },
@@ -31,12 +30,12 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = fal
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
-            <ProductDetails data={data} isVariant={isVariant} selectedVariant={selectedVariant} availableAttributes={availableAttributes}/>
+            <ProductDetails data={data} isVariant={isVariant} selectedVariant={selectedVariant}/>
             <Suspense fallback={<SuspenseLoader/>}>
             <OrderCard />
             </Suspense>
             <Suspense fallback={<SuspenseLoader/>}>
-            <ProductFeatures />
+            <ProductFeatures productFeatures={productFeatures} />
             </Suspense>
             <Suspense fallback={<SuspenseLoader/>}>
             <ProductContent product={data?.product}/> 

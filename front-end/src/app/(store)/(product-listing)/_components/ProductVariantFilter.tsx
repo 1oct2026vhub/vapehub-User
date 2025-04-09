@@ -10,14 +10,14 @@ type ProductVariantFilterProps = {
     availableAttributes: AttributeTerms[];
 }
 
-const SelectAttributeTerms = ({ 
-    attributeTerm, 
-    productSlug, 
+const SelectAttributeTerms = ({
+    attributeTerm,
+    productSlug,
     selectedVariant,
-    availableAttributes 
-}: { 
-    attributeTerm: AttributeTerms, 
-    productSlug: string, 
+    availableAttributes
+}: {
+    attributeTerm: AttributeTerms,
+    productSlug: string,
     selectedVariant?: AttributeProductTerms,
     availableAttributes: AttributeTerms[]
 }) => {
@@ -26,12 +26,12 @@ const SelectAttributeTerms = ({
         availableAttributes,
         selectedVariant
     );
-    
+
     const selectedTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
     const isCurrentAttribute = selectedVariant?.attribute.id === attributeTerm.attribute.id;
-    
+
     // Check if this attribute has any selected term (either from URL or search params)
-    const hasSelectedTerm = selectedTerm !== undefined || isCurrentAttribute;
+    // const hasSelectedTerm = selectedTerm !== undefined || isCurrentAttribute;
 
     return (
         <>
@@ -41,9 +41,9 @@ const SelectAttributeTerms = ({
                 </p>
                 <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>
                     {hasActiveFilters() && !isCurrentAttribute
-                        ? `${attributeTerm?.terms.filter(term => 
+                        ? `${attributeTerm?.terms.filter(term =>
                             isTermAvailable(attributeTerm.attribute.id, term.id)
-                          ).length} available`
+                        ).length} available`
                         : `${attributeTerm?.terms.length} available`
                     }
                 </p>
@@ -68,15 +68,15 @@ const SelectAttributeTerms = ({
                 }}
             >
                 {attributeTerm.terms.map((term) => (
-                    <SelectItem 
+                    <SelectItem
                         key={term.slug}
                         value={term.slug}
-                        isDisabled={
-                            // If this attribute has any selected term, enable all its terms
-                            hasSelectedTerm ? false :
-                            // Otherwise, disable based on availability
-                            hasActiveFilters() && !isTermAvailable(attributeTerm.attribute.id, term.id)
-                        }
+                        // isDisabled={
+                        //     // If this attribute has any selected term, enable all its terms
+                        //     hasSelectedTerm ? false :
+                        //         // Otherwise, disable based on availability
+                        //         hasActiveFilters() && !isTermAvailable(attributeTerm.attribute.id, term.id)
+                        // }
                     >
                         {term.name}
                     </SelectItem>
@@ -86,18 +86,18 @@ const SelectAttributeTerms = ({
     );
 };
 
-const ButtonAttributeTerms = ({ 
-    attributeTerm, 
+const ButtonAttributeTerms = ({
+    attributeTerm,
     currentTerm,
     availableVariants,
     selectedVariant
-}: { 
-    attributeTerm: AttributeTerms, 
+}: {
+    attributeTerm: AttributeTerms,
     currentTerm: string,
     availableVariants: AttributeTerms[],
     selectedVariant?: AttributeProductTerms
 }) => {
-    const { isTermAvailable, hasActiveFilters, getDefaultSelectedTerm } = useVariantFilter(
+    const { handleVariantFilter, getDefaultSelectedTerm } = useVariantFilter(
         "",
         availableVariants,
         selectedVariant
@@ -106,7 +106,7 @@ const ButtonAttributeTerms = ({
     const defaultTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
     const finalCurrentTerm = currentTerm || defaultTerm || "";
 
-    const isCurrentAttribute = selectedVariant?.attribute.id === attributeTerm.attribute.id;
+    // const isCurrentAttribute = selectedVariant?.attribute.id === attributeTerm.attribute.id;
 
     return (
         <>
@@ -121,11 +121,19 @@ const ButtonAttributeTerms = ({
                         radius="md"
                         color={finalCurrentTerm === term.slug ? "primary" : "default"}
                         variant={finalCurrentTerm === term.slug ? "solid" : "bordered"}
-                        isDisabled={
-                            term.slug === finalCurrentTerm ? false :
-                            isCurrentAttribute ? false :
-                            hasActiveFilters() && !isTermAvailable(attributeTerm.attribute.id, term.id)
+                        onPress={() => {
+                            const newTerm = attributeTerm.terms.find(t => t.slug === term.slug);
+                            if (newTerm) {
+                                handleVariantFilter(attributeTerm, newTerm);
+                            }
                         }
+
+                        }
+                        // isDisabled={
+                        //     term.slug === finalCurrentTerm ? false :
+                        //         isCurrentAttribute ? false :
+                        //             hasActiveFilters() && !isTermAvailable(attributeTerm.attribute.id, term.id)
+                        // }
                         className={`btn ${finalCurrentTerm === term.slug ? "primary-btn" : "bg-skin-white border-skin-neutral-200"} w-full shadow-base !text-content-1 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold`}
                     >
                         {term.name}
@@ -136,11 +144,11 @@ const ButtonAttributeTerms = ({
     );
 };
 
-const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({ 
-    attributeTerms, 
-    productSlug, 
+const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
+    attributeTerms,
+    productSlug,
     selectedVariant,
-    availableAttributes 
+    availableAttributes
 }) => {
     const attributeTermData = attributeTerms.filter(
         (attributeTerm) => attributeTerm.attribute.used_in_variation
@@ -149,21 +157,21 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     return (
         <div className='space-y-2 lg:space-y-3.5'>
             {attributeTermData?.map((attributeTerm) => (
-                attributeTerm.attribute.type === "select" ? 
-                <SelectAttributeTerms 
-                    key={attributeTerm.attribute.id} 
-                    attributeTerm={attributeTerm} 
-                    productSlug={productSlug} 
-                    selectedVariant={selectedVariant}
-                    availableAttributes={availableAttributes}
-                /> :
-                <ButtonAttributeTerms 
-                    key={attributeTerm.attribute.id} 
-                    attributeTerm={attributeTerm} 
-                    currentTerm={selectedVariant?.attribute.id === attributeTerm.attribute.id ? selectedVariant.terms.slug : ""}
-                    availableVariants={availableAttributes}
-                    selectedVariant={selectedVariant}
-                />
+                attributeTerm.attribute.type === "select" ?
+                    <SelectAttributeTerms
+                        key={attributeTerm.attribute.id}
+                        attributeTerm={attributeTerm}
+                        productSlug={productSlug}
+                        selectedVariant={selectedVariant}
+                        availableAttributes={availableAttributes}
+                    /> :
+                    <ButtonAttributeTerms
+                        key={attributeTerm.attribute.id}
+                        attributeTerm={attributeTerm}
+                        currentTerm={selectedVariant?.attribute.id === attributeTerm.attribute.id ? selectedVariant.terms.slug : ""}
+                        availableVariants={availableAttributes}
+                        selectedVariant={selectedVariant}
+                    />
             ))}
         </div>
     );

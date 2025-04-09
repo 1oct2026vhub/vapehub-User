@@ -112,7 +112,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
               </Button>
               <Button 
                 as={Link}
-                href={`/${item?.product_slug}/${item?.slug}`}
+                href={`/${item?.product_slug}`}
                 size="sm" 
                 isIconOnly 
                 variant="light" 

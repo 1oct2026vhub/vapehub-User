@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import SectionHeading from "./ui/SectionHeading";
-import ViewAllLink from "./ui/ViewAllLink";
+// import ViewAllLink from "./ui/ViewAllLink";
 import { getFaqs } from "@/lib/server.actions";
 import { FaqResponse } from "@/lib/config/global.config";
 import { ServerActionStatus } from "@/lib/config/app.config";
@@ -39,7 +39,7 @@ const FAQSection: React.FC<FAQProps> = ({
         const fetchFaqs = async () => {
           const faqs = await getFaqs(type, id);
           if (faqs.status === ServerActionStatus.SUCCESS) {
-            setFaqs(showAll ? faqs.data : faqs.data.slice(0, 5));
+            setFaqs(showAll ? faqs.data : faqs.data.slice(0, 10));
           } else {
             setFaqs([]);
             toast.error(faqs.message);
@@ -53,7 +53,7 @@ const FAQSection: React.FC<FAQProps> = ({
             {/* FAQ Heading & View All */}
             <div className="flex items-center justify-between w-full">
                 <SectionHeading title={title} />
-                {!showAll && <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} />}
+                {/* {!showAll && <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} />} */}
             </div>
             {faqs.length > 0 ? (
                

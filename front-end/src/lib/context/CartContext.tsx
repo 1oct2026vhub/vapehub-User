@@ -56,7 +56,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (isAuthenticated) {
         const response = await getCartItems(); 
         
-        if (response.status === ServerActionStatus.SUCCESS) {
+        if (response.status === ServerActionStatus.SUCCESS) { 
           const cartItems:CartItem[] = response.data.map(bindCartItem);
           setCartItems(cartItems); 
           calculateTotals(cartItems);
@@ -193,7 +193,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const response = await updateCartItem(cartId, quantity);
         if (response.status === ServerActionStatus.SUCCESS) {
           await loadCartItems();
-          toast.success('Cart updated successfully');
+          // toast.success('Cart updated successfully');
         }
       } else {
         // Handle as guest cart
@@ -203,7 +203,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         setCartItems(updatedCart);
         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
         calculateTotals(updatedCart);
-        toast.success('Cart updated successfully');
+        // toast.success('Cart updated successfully');
       }
     } catch (error) {
       console.error('Error updating cart item:', error);

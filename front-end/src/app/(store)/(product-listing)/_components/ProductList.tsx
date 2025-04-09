@@ -19,7 +19,7 @@ type ProductListProps = {
 }
 
 const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElement => {
-  console.log(data.pagination);
+ 
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();

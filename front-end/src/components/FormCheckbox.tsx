@@ -12,11 +12,12 @@ const CustomCheckbox = <T extends FieldValues>({ label, control, name }: CustomC
   return (
     <Controller
       name={name}
-      control={control}
-      render={({ field }) => (
+      control={control}      
+      render={({ field, fieldState: { error } }) => (
+        <div className="flex flex-col gap-2">
         <Checkbox
           {...field}
-          isSelected={field.value}
+          isSelected={field.value} 
           classNames={{
             base: "!py-0",
             wrapper: "after:bg-primary-gradient-100",
@@ -26,6 +27,8 @@ const CustomCheckbox = <T extends FieldValues>({ label, control, name }: CustomC
         >
           {label}
         </Checkbox>
+        {error && <p className="text-danger text-tiny p-1">{error.message}</p>}
+        </div>
       )}
     />
   );

@@ -6,6 +6,7 @@ import { addUserAddress, deleteUserAddress, getUserAddresses, updateUserAddress 
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { Address, USER_ADDRESS_RESPONSE } from '@/lib/config/user.config';
 import { useSession } from 'next-auth/react';
+import { DEFAULT_COUNTRY } from '../utils/address.utils';
 
 interface AddressContextType {
   addresses: Address[];
@@ -63,6 +64,7 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
   };
 
   const addAddress = async (addressData: AddressFormData) => {
+    console.log(addressData);
     try {
       setIsLoading(true);
       setError(null);
@@ -72,11 +74,10 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
         name: addressData.name,
         last_name: addressData.last_name,
         company_name: addressData.company_name || '',
-        country: addressData.country,
+        country: addressData.country || DEFAULT_COUNTRY,
         street: addressData.street,
         apartment: addressData.apartment || '',
-        town: addressData.town,
-        county: addressData.county,
+        town: addressData.town, 
         region: addressData.region,
         post_code: addressData.post_code,
         phone: addressData.phone || '',
@@ -107,11 +108,10 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
         name: addressData.name,
         last_name: addressData.last_name,
         company_name: addressData.company_name || '',
-        country: addressData.country,
+        country: addressData.country || DEFAULT_COUNTRY,
         street: addressData.street,
         apartment: addressData.apartment || '',
-        town: addressData.town,
-        county: addressData.county,
+        town: addressData.town, 
         post_code: addressData.post_code,
         phone: addressData.phone || '',
         region: addressData.region,

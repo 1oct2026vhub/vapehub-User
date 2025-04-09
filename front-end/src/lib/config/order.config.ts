@@ -163,8 +163,7 @@ export interface ORDER_LIST_RESPONSE {
             country: string;
             street: string;
             apartment: string | null;
-            town: string;
-            county: string | null;
+            town: string; 
             region: string;
             post_code: string;
             phone: string | null;

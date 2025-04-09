@@ -17,6 +17,7 @@ import AddressList from './AddressList';
 import { Address } from '@/lib/config/user.config';
 import { useUserProfile } from '@/lib/hooks/useUserProfile';
 import Flag from '@/components/ui/Flag';
+import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
 
 const CheckoutDetails: React.FC = () => {
     const { fetchProfile } = useUserProfile();
@@ -41,7 +42,7 @@ const CheckoutDetails: React.FC = () => {
             shippingCity: '',
             shippingPostcode: '',
             shippingRegion: '',
-            shippingCountry: '',
+            shippingCountry: DEFAULT_COUNTRY,
             billingFirstName: '',
             billingLastName: '',
             billingAddress1: '',
@@ -50,7 +51,7 @@ const CheckoutDetails: React.FC = () => {
             billingCity: '',
             billingPostcode: '',
             billingRegion: '',
-            billingCountry: ''
+            billingCountry: DEFAULT_COUNTRY
         }
     });
     const { selectedShippingMethod, setSelectedShippingMethod, handlePlaceOrder, isProcessing } = useCheckout();
@@ -63,7 +64,7 @@ const CheckoutDetails: React.FC = () => {
     }, [form.watch('useShippingAsBilling')]);
 
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
-
+        
         // Handle form submission
         if (!data) return;
 
@@ -77,7 +78,7 @@ const CheckoutDetails: React.FC = () => {
                 address_line_2: data.shippingAddress2 || '',
                 city: data.shippingCity || '',
                 region: data.shippingRegion || '',
-                country: data.shippingCountry || '',
+                country: data.shippingCountry || DEFAULT_COUNTRY,
                 post_code: data.shippingPostcode || ''
             },
             billing_address: {
@@ -87,7 +88,7 @@ const CheckoutDetails: React.FC = () => {
                 address_line_2: data.useShippingAsBilling ? data.shippingAddress2 || '' : data.billingAddress2 || '',
                 city: data.useShippingAsBilling ? data.shippingCity || '' : data.billingCity || '',
                 region: data.useShippingAsBilling ? data.shippingRegion || '' : data.billingRegion || '',
-                country: data.useShippingAsBilling ? data.shippingCountry || '' : data.billingCountry || '',
+                country: data.useShippingAsBilling ? data.shippingCountry || DEFAULT_COUNTRY : data.billingCountry || DEFAULT_COUNTRY,
                 post_code: data.useShippingAsBilling ? data.shippingPostcode || '' : data.billingPostcode || ''
             },
             useShippingAsBilling: data.useShippingAsBilling,
@@ -118,7 +119,7 @@ const CheckoutDetails: React.FC = () => {
         form.setValue('shippingCity', address.town);
         form.setValue('shippingRegion', address.region);
         form.setValue('shippingPostcode', address.post_code);
-        form.setValue('shippingCountry', address.country);
+        form.setValue('shippingCountry', address.country || DEFAULT_COUNTRY);
         if (address.phone) {
             form.setValue('phone', address.phone);
         }
@@ -137,7 +138,7 @@ const CheckoutDetails: React.FC = () => {
                 shippingCity: '',
                 shippingPostcode: '',
                 shippingRegion: '',
-                shippingCountry: '',
+                shippingCountry: DEFAULT_COUNTRY,
             });
         } else {
             handleAddressSelect(addresses[0]);
@@ -195,7 +196,8 @@ const CheckoutDetails: React.FC = () => {
                                             </div>
                                         </div>
                                     }
-                                    className='w-full'
+                                    inputClassName='ps-[25px]'
+                                    className='w-full '
                                     pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
                                 />
 
@@ -208,10 +210,7 @@ const CheckoutDetails: React.FC = () => {
                                 name="ageConfirmation"
                                 label='I confirm that I am aged 18 or over *'
                             />
-                            {/* showing error message if checkbox is not checked */}
-                            {form.formState.errors.ageConfirmation && (
-                                <p className='text-skin-red-400 text-content-2 md:text-content-1 '>{form.formState.errors.ageConfirmation.message}</p>
-                            )}
+                             
                         </div>
 
                         {/* shipping details */}
@@ -521,10 +520,7 @@ const CheckoutDetails: React.FC = () => {
                                         </a>
                                     }
                                 />
-                                {/* showing error message if terms agreement is not checked */}
-                                {form.formState.errors.termsAgreement && (
-                                    <p className='text-skin-red-400 text-content-2 md:text-content-1 '>{form.formState.errors.termsAgreement.message}</p>
-                                )}
+                                 
                             </div>
                             <Button
                                 type="submit"

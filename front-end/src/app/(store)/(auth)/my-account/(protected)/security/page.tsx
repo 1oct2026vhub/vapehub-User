@@ -56,13 +56,13 @@ const AccountSecurity: NextPage = () => {
                 newPassword: data.newPassword,
                 confirmPassword: data.confirmPassword
             });
-
+             
             if (response.status === ServerActionStatus.SUCCESS) {
                 toast.success(response.data?.message || "Password updated successfully");
                 form.reset();
                 setShowButtons(false);
             } else {
-                toast.error(response.message || "Failed to update password");
+                toast.error(response?.message || "Failed to update password");
             }
         } catch (err) {
             console.error("Password change error:", err);
@@ -154,7 +154,7 @@ const AccountSecurity: NextPage = () => {
                                     control={form.control}
                                     name="confirmPassword"
                                     type={confirmPwdVisibility ? "text" : "password"}
-                                    label="Confirm New Password"
+                                    label="Confirm Password"
                                     isRequired
                                     className="w-full"
                                     endContent={

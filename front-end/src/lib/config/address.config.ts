@@ -9,15 +9,18 @@ export const addressSchema = z.object({
     .max(50, "Last name must not exceed 50 characters"),
   street: z.string()
     .min(3, "Street address is required")
-    .max(100, "Street address must not exceed 100 characters"),
+    .max(255, "Street address must not exceed 100 characters"),
   apartment: z.string().optional(),
   company_name: z.string().optional(),
   town: z.string()
     .min(3, "Town/City is required")
     .max(50, "Town/City must not exceed 50 characters"),
   county: z.string()
-    .min(1, "County/Region is required")
-    .max(50, "County/Region must not exceed 50 characters"),
+    .min(1, "County is required")
+    .max(50, "County must not exceed 50 characters"),
+  region: z.string()
+    .min(1, "Region is required")
+    .max(50, "Region must not exceed 50 characters"),
   post_code: z.string()
     .min(1, "Postcode is required")
     .max(20, "Postcode must not exceed 20 characters")

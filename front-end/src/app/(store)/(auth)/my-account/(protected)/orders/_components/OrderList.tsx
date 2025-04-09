@@ -1,9 +1,9 @@
 "use client";
-import OrderListCard from "@/app/(store)/(protected)/orders/_components/OrderListCard";
 import Pagination from "@/components/Pagination";
 import { ORDER_RESPONSE, PAGINATION } from "@/lib/config/order.config";
 import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
+import OrderListCard from "./OrderListCard";
 
 interface OrderListProps {
     orders: ORDER_RESPONSE[];

@@ -56,3 +56,10 @@ export const redirectIfAuthenticated = async (
     );
   }
 };
+
+export const redirectIfUnauthenticated = async (): Promise<void> => {
+  const session = await getServerSessionData();
+  if (!session?.user) {
+    return permanentRedirect(ROUTES.MY_ACCOUNT, RedirectType.replace);
+  }
+};

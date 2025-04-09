@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils"; 
 import NoImage from "@/components/NoImage";
 import { ORDER_RESPONSE } from "@/lib/config/order.config";
+import Link from "next/link";
+import { ROUTES } from "@/lib/routes";
 // import NoImage from "@/components/NoImage";
 type OrderListCardProps = {
     data: ORDER_RESPONSE;
@@ -20,7 +22,7 @@ const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
   );
 
   return (
-    <a href="" className="bg-white rounded-14 shadow-card hover:shadow-brand-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
+    <Link href={`${ROUTES.ORDER_DETAILS}/${data.id}`} className="bg-white rounded-14 shadow-card hover:shadow-brand-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
       {/* Product Image Section */}
       <div className="bg-skin-white p-1 md:p-2 rounded-md md:rounded-10 shadow-brand-card min-w-16 md:min-w-36">
         <div className="bg-skin-base border border-skin-neutral-100 rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
@@ -42,11 +44,12 @@ const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
         <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 line-clamp-2 font-semibold">
           {data.orderItems?.[0]?.product?.name}
         </h2>
+        {data.orderItems.length > 1 && <p className="primary-gradient-100 font-semibold text-sm ml-1 ">(+ {data.orderItems.length - 1} more)</p>}
 
         {/* Order ID */}
         <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Order ID: {data.order_unique_id}</p>
       </div>
-    </a>
+    </Link>
   );
 };
 

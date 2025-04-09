@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { zodPasswordValidator } from "../validators/password.validator";
+import { ValidationMessage } from '@/lib/config/form.config';
 
 export interface UserProfileResponse {
       first_name: string;
@@ -41,6 +43,7 @@ export type USER_ADDRESS_PAYLOAD = {
   apartment: string;
   town: string;
   county: string;
+  region: string;
   post_code: string;
   phone: string;
 }
@@ -54,6 +57,7 @@ export interface Address {
   apartment: string;
   town: string;
   county: string;
+  region: string;
   post_code: string;
   phone: string;
 } 
@@ -74,9 +78,16 @@ export type ChangeUserPasswordPayload = {
 
 export const changeUserPasswordSchema = z.object({
   currentPassword: z.string().min(8, "Current password must be at least 8 characters"),
-  newPassword: z.string().min(8, "New password must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Confirm password must be at least 8 characters"),
-})
+  newPassword: zodPasswordValidator(),
+  confirmPassword: z.string({
+    required_error: ValidationMessage.CONFIRM_PASSWORD,
+  })
+  .min(1, ValidationMessage.CONFIRM_PASSWORD)
+  .max(16, "Confirm Password must be less than 16 characters"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Passwords does not match',
+  path: ['confirmPassword'],
+});
 
 export type ChangeUserPasswordFormData = z.infer<typeof changeUserPasswordSchema>
 

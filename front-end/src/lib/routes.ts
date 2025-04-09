@@ -20,7 +20,9 @@ MY_ACCOUNT_ADDRESSES: '/my-account/addresses',
 MY_ACCOUNT_SECURITY: '/my-account/security',
 FAQ: '/faq',
 PAYMENT_SUCCESS: '/payment-success',
-PAYMENT_FAILED: '/payment-failed'
+PAYMENT_FAILED: '/payment-failed',
+ORDER_DETAILS: '/order-details'
+
 }
 
  

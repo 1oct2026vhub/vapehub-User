@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
+import Link from 'next/link';
 
 type CartCardProps = {
   item: CartItem;
@@ -107,6 +108,8 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
               <TrashIcon className='w-4 h-4.5 md:w-5.5 md:h-6' />
             </Button>
             <Button 
+              as={Link}
+              href={`/${item.product_slug}/${item.slug}`}
               size="sm" 
               isIconOnly 
               variant="light" 

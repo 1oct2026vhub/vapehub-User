@@ -6,7 +6,7 @@ import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem 
 import { getCookie, setCookie } from 'cookies-next';
 import { ServerActionStatus } from '../config/app.config';
 import { useSession } from 'next-auth/react';
-import { ProductVariant } from '../config/product.config';
+import { ProductImage, ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
 
 interface CartContextType {
@@ -54,7 +54,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       if (isAuthenticated) {
-        const response = await getCartItems();
+        const response = await getCartItems(); 
+        
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartItems:CartItem[] = response.data.map(bindCartItem);
           setCartItems(cartItems); 
@@ -98,10 +99,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       stock: item.variant.stock,
       slug: item.product.slug,
       description: item.variant.description,
-      ProductImages: item.variant.variantImages[0].image_url || item.product.ProductImages?.[0]?.image_url,
+      ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
       quantity: item.quantity
     };
   };
+  const getPrimaryProductImage = (item: ProductImage[]): string => {
+    return item.find(image => image.is_primary)?.image_url || item[0]?.image_url;
+  }
   const createGuestCartItem = (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string): CartItem => {
     const id = Math.random();
     return {
@@ -123,6 +127,29 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const addItemToCart = async (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => {
     setIsLoading(true);
     try {
+      // Check if the product with the same product ID and variant ID already exists in the cart
+      const existingItem = cartItems.find(item => 
+        item.product_id === productId && item.variant_id === variantId
+      );
+      
+      // Check if there's enough stock available
+      const stockAvailable = data.stock || 0;
+      const requestedQuantity = existingItem ? existingItem.quantity + quantity : quantity;
+      
+      if (requestedQuantity > stockAvailable) {
+        toast.error(`Only ${stockAvailable} items available in stock`);
+        setIsLoading(false);
+        return;
+      }
+
+      if (existingItem) {
+        // If the item exists, update its quantity instead of adding a duplicate
+        const newQuantity = existingItem.quantity + quantity;
+        await updateItemQuantity(existingItem.id, newQuantity);
+        toast.success(`${productName} quantity updated in cart`);
+        return;
+      }
+
       if (isAuthenticated) {
         const response = await addToCart(productId, variantId, quantity);
         if (response.status === ServerActionStatus.SUCCESS) {
@@ -230,7 +257,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const syncCookieCart = async () => { 
 
     if (!isAuthenticated) return; // Only sync if user is authenticated
-
+        
     const cookieCart = getCookie(CART_COOKIE_NAME);
     if (cookieCart) {
       const items: CartItem[] = JSON.parse(cookieCart as string); 

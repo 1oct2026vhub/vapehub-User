@@ -44,7 +44,16 @@ export interface ORDER_RESPONSE {
         price: string;
     };
 }
-
+export interface PAGINATION {
+    total_pages: number;
+    current_page: number;
+    total_items: number;
+}
+export interface ORDER_LIST_RESPONSE {
+    orders: ORDER_RESPONSE[];
+    pagination: PAGINATION;
+}
+ 
 export interface PLACE_ORDER_PAYLOAD {
     email: string;
     phone: string;

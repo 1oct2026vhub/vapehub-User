@@ -81,6 +81,7 @@ export interface productAttributeTerms {
     name: string;
     type: string;
     is_visible: boolean;
+    is_visible_page: boolean;
     used_in_variation: boolean;
 }
  interface productAttributesTerms {
@@ -249,6 +250,7 @@ export interface ProductResponse {
     product: ProductViewDetails;
     variants: ProductVariant[];
     available_terms: AttributeTerms[];
+    filtered_attribute_terms: AttributeTerms[];
     stock_summary: StockSummary;
 }
 

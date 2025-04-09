@@ -7,7 +7,7 @@ export enum CHECKOUT_PAYMENT_METHODS {
 }
 
 
-export const CHECKOUT_FORM_SCHEMA = z.object({
+export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object({
     email: z.string().email('Please enter a valid email address'),
     phone: z.string().min(1, 'Phone number is required'),
     ageConfirmation: z.boolean().refine(val => val === true, {
@@ -15,24 +15,34 @@ export const CHECKOUT_FORM_SCHEMA = z.object({
     }),
     selectedAddressId: z.number().optional(),
     // Shipping Address - Make validation more lenient
-    shippingFirstName: z.string().min(1, 'First name is required').optional().or(z.literal('')),
-    shippingLastName: z.string().min(1, 'Last name is required').optional().or(z.literal('')),
-    shippingAddress1: z.string().min(1, 'Address line 1 is required').optional().or(z.literal('')),
+    shippingFirstName: z.string().min(1, 'First name is required').max(50, 'First name must not exceed 50 characters'),
+    shippingLastName: z.string().min(1, 'Last name is required').max(50, 'Last name must not exceed 50 characters'),
+    shippingAddress1: z.string().min(1, 'Address line 1 is required').max(255, 'Address line 1 must not exceed 255 characters'),
     shippingAddress2: z.string().optional(),
     shippingAddress3: z.string().optional(),
-    shippingCity: z.string().min(1, 'City is required').optional().or(z.literal('')),
-    shippingPostcode: z.string().min(1, 'Postcode is required').optional().or(z.literal('')),
-    shippingRegion: z.string().min(1, 'Region is required').optional().or(z.literal('')),
-    shippingCountry: z.string().min(1, 'Country is required').optional().or(z.literal('')),
+    shippingCity: z.string().min(1, 'City is required'),
+    shippingPostcode: z.string().min(1, "Postcode is required")
+    .max(20, "Postcode must not exceed 20 characters")
+    .regex(
+      /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i,
+      "Please enter a valid UK postcode"
+    ),
+    shippingRegion: z.string().min(1, 'Region is required'),
+    shippingCountry: z.string().min(1, 'Country is required'),
     // Billing Address
     useShippingAsBilling: z.boolean(),
-    billingFirstName: z.string().optional(),
-    billingLastName: z.string().optional(),
-    billingAddress1: z.string().optional(),
+    billingFirstName: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'First name is required'),
+    billingLastName: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Last name is required'),
+    billingAddress1: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Address line 1 is required'),
     billingAddress2: z.string().optional(),
     billingAddress3: z.string().optional(),
-    billingCity: z.string().optional(),
-    billingPostcode: z.string().optional(),
+    billingCity: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'City is required'),
+    billingPostcode: useShippingAsBilling ? z.string().optional() : z.string().min(1, "Postcode is required")
+    .max(20, "Postcode must not exceed 20 characters")
+    .regex(
+      /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i,
+      "Please enter a valid UK postcode"
+    ),
     billingRegion: z.string().optional(),
     billingCountry: z.string().optional(),
     // Payment
@@ -42,41 +52,13 @@ export const CHECKOUT_FORM_SCHEMA = z.object({
         message: 'You must agree to the terms and conditions'
     }),
     // Shipping Method must be a number and must be greater than 0
-    shippingMethodId: z.number().min(1, 'Shipping method is required'),
+    shippingMethodId: z.string().min(1, 'Shipping method is required'),
     // Coupon
-    couponCode: z.string().optional()
-}).refine((data) => {
-    // Only validate fields when there's a submission attempt
-    if (!data.ageConfirmation) return true; // Skip validation if we're not at submission stage
-    
-    // For shipping fields
-    const hasRequiredShippingFields = data.shippingFirstName && 
-                                    data.shippingLastName && 
-                                    data.shippingAddress1 && 
-                                    data.shippingCity && 
-                                    data.shippingPostcode && 
-                                    data.shippingRegion && 
-                                    data.shippingCountry;
-    
-    // For billing fields (only if not using shipping as billing)
-    if (!data.useShippingAsBilling) {
-        return hasRequiredShippingFields && 
-               data.billingFirstName && 
-               data.billingLastName && 
-               data.billingAddress1 && 
-               data.billingCity && 
-               data.billingPostcode && 
-               data.billingRegion && 
-               data.billingCountry;
-    }
-    
-    return hasRequiredShippingFields;
-}, {
-    message: 'Please fill in all required address fields',
-    path: ['shippingAddress1']
+    couponCode: z.string().optional(),
+    marketingConsent: z.boolean().optional()
 });
 
-export type CHECKOUT_FORM_TYPE = z.infer<typeof CHECKOUT_FORM_SCHEMA>;
+export type CHECKOUT_FORM_TYPE = z.infer<ReturnType<typeof CHECKOUT_FORM_SCHEMA>>;
 
 export const APPLY_COUPON_FORM_SCHEMA = z.object({
     couponCode: z.string().optional(),

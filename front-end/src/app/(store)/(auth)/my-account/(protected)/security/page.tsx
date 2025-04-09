@@ -2,8 +2,7 @@
 
 import MyAccountHeading from "@/components/ui/MyAccountHeading";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
-import InputForm from "@/components/InputForm";
+import React, { useEffect, useState } from "react"; 
 import { Button } from "@nextui-org/button";
 import LogoutButton from "../../_components/LogoutButton";
 import { ChangeUserPasswordFormData, changeUserPasswordSchema } from "@/lib/config/user.config";
@@ -17,6 +16,7 @@ import { EyeClosedIcon, EyeOpenIcon } from "@/components/Icons";
 import InputField from "@/components/InputField";
 import { useUserProfile } from "@/lib/hooks/useUserProfile";
 import { Spinner } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 
 const AccountSecurity: NextPage = () => {
     const [showButtons, setShowButtons] = useState(false);
@@ -39,6 +39,7 @@ const AccountSecurity: NextPage = () => {
 
     const form = useForm<ChangeUserPasswordFormData>({
         resolver: zodResolver(changeUserPasswordSchema),
+        mode: 'all',
         defaultValues: {
             currentPassword: "",
             newPassword: "",
@@ -84,12 +85,12 @@ const AccountSecurity: NextPage = () => {
                     <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
                         User ID
                     </h2>
-                    <InputForm
+                    <Input
                         type='email'
                         placeholder='dummy@email.com'
                         value={email}
-                        disabled
-                        className='w-full md:max-w-[50%] disabled-input'
+                        isDisabled
+                        className='!bg-skin-white !text-skin-neutral-400 font-bold text-content-2 md:!text-title-2 placeholder:!text-skin-neutral-200 placeholder:font-semibold max-md:placeholder:text-content-1'
                     />
                 </div>
                 <div className="flex items-start flex-col gap-4.5">
@@ -107,7 +108,7 @@ const AccountSecurity: NextPage = () => {
                     
                     {showButtons && (
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full md:max-w-[50%]">
+                            <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-4 w-full md:max-w-[50%]">
                                 <InputField
                                     control={form.control}
                                     name="currentPassword"

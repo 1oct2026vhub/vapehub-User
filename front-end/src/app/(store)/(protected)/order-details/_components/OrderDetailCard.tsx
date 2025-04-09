@@ -1,17 +1,19 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { ORDER_DETAILS_RESPONSE } from "@/lib/config/order.config";
+import NoImage from "@/components/NoImage";
+import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
+import Link from "next/link";
 
 interface OrderDetailCardProps {
-    status?: string;
-    imageSrc?: string;
-    title?: string;
+    status: ORDER_DETAILS_RESPONSE['status'];
+    data: ORDER_DETAILS_RESPONSE['orderItems'][0];
+    isCouponApplied: ORDER_DETAILS_RESPONSE['coupon'] | null;
 }
 
 const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
-    status = "Delivered",
-    imageSrc = "/images/product-1.png",
-    title = "RandM Tornado 9000 Puff Disposable Vape - Watermelon Skittles",
-
+    status,
+    isCouponApplied,
+    data
 }) => {
     const statusColor = cn(
         "p-1.5 md:p-2 w-fit rounded-md md:rounded-lg border !text-content-3 md:!text-content-1 font-bold",
@@ -22,11 +24,17 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     );
 
     return (
-        <a href="" className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
+        <Link href={`/${data.variant?.slug}`} className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
 
             <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
                 <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
-                    <Image src={imageSrc} alt={title} width={104} height={100} />
+
+                    <NoImage
+                        src={data.variant?.variantImages?.[0]?.image_url || ""}
+                        alt={data.product.name}
+                        width={104}
+                        height={100}
+                    />
                 </div>
             </div>
 
@@ -37,21 +45,21 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
 
                     {/* Order Title */}
                     <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 font-semibold">
-                        {title}
+                        {data.product.name}
                     </h2>
 
                     {/* Order ID */}
                     <div>
-                        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Quantity : 2</p>
-                        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Flavour : Watermelon</p>
+                        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Quantity : {data.quantity}</p>
+                        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Flavour : {data.variant?.slug}</p>
                     </div>
                 </div>
                 <div className="space-y-2 text-right">
-                    <p className="text-skin-neutral-500 text-content-1 sm:text-title-2 lg:text-h5 font-bold">£12.99</p>
-                    <p className="primary-gradient-100 text-content-3 sm:text-content-1 lg:text-title-1 font-bold text-nowrap">Coupon Applied</p>
+                    <p className="text-skin-neutral-500 text-content-1 sm:text-title-2 lg:text-h5 font-bold">{DEFAULT_CURRENCY_SYMBOL}{data.variant?.price}</p>
+                    {isCouponApplied && <p className="primary-gradient-100 text-content-3 sm:text-content-1 lg:text-title-1 font-bold text-nowrap">Coupon Applied</p>}
                 </div>
             </div>
-        </a>
+        </Link>
     );
 };
 

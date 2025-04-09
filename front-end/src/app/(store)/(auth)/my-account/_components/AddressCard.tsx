@@ -30,7 +30,7 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
     }
   };
 
-  const handleUpdate = async (data: AddressFormData) => {
+  const handleUpdate = async (data: AddressFormData) => {     
     try {
       setIsSubmitting(true);
       await updateAddress(address.id, data);

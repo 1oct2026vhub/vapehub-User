@@ -6,23 +6,23 @@ export interface ORDER_RESPONSE {
     status: string;
     createdAt: string;
     orderItems: {
-    id: number;
-    unit: string;
-    unit_price: string;
-    quantity: number;
-    discount_price: string | null;
-    total: string;
-    product: {
         id: number;
-        name: string;
-        price: string;
-    };
-    variant: {
-        id: number;
-        slug: string;
-        price: string;
-        variantImages: {image_url: string}[];
-    } | null;
+        unit: string;
+        unit_price: string;
+        quantity: number;
+        discount_price: string | null;
+        total: string;
+        product: {
+            id: number;
+            name: string;
+            price: string;
+        };
+        variant: {
+            id: number;
+            slug: string;
+            price: string;
+            variantImages: { image_url: string }[];
+        } | null;
     }[];
     shippingAddress: {
         name: string;
@@ -53,7 +53,7 @@ export interface ORDER_LIST_RESPONSE {
     orders: ORDER_RESPONSE[];
     pagination: PAGINATION;
 }
- 
+
 export interface PLACE_ORDER_PAYLOAD {
     email: string;
     phone: string;
@@ -115,18 +115,22 @@ export const SHIPPING_METHODS: SHIPPING_METHOD[] = [
     {
         id: 4,
         name: 'DPD Next Day Delivery',
-        price: 16.85, 
+        price: 16.85,
         message: 'This is not a guaranteed service'
     }
 ]
 
 export interface ORDER_RESPONSE_DATA {
     message: string;
-    data: {
-        order_id: string;
-        status: string;
-        total: number;
-        order_items: {
+    data: ORDER_LIST_RESPONSE;
+}
+
+export interface ORDER_LIST_RESPONSE {
+
+    order_id: string;
+    status: string;
+    total: number;
+    order_items: {
         product_name: string;
         quantity: number;
         total: number;
@@ -138,9 +142,10 @@ export interface ORDER_RESPONSE_DATA {
             length: number | null;
             width: number | null;
             height: number | null;
-            description: string;
+            description: string | null;
         };
     }[];
+    order_code: number;
     pricing: {
         subtotal: number;
         shipping_cost: number;
@@ -150,17 +155,81 @@ export interface ORDER_RESPONSE_DATA {
     shipping: {
         address: {
             id: number;
-            user_id: number;
-            last_name: string;
-            country: string;
-            post_code: string;
-            name: string;
-            street: string;
-            town: string;
             updated_by: number;
-            updatedAt: string;
+            user_id: number;
+            name: string;
+            last_name: string;
+            company_name: string | null;
+            country: string;
+            street: string;
+            apartment: string | null;
+            town: string;
+            county: string | null;
+            region: string;
+            post_code: string;
+            phone: string | null;
+            token: string | null;
             createdAt: string;
+            updatedAt: string;
+            deletedAt: string | null;
         };
+    };
+
+}
+
+export interface ORDER_DETAILS_RESPONSE {
+    order_unique_id: string;
+    total: string;
+    discount_price: string | null;
+    status: string;
+    createdAt: string;
+    orderItems: {
+        id: number;
+        unit: string;
+        unit_price: string;
+        quantity: number;
+        discount_price: string | null;
+        total: string;
+        product: {
+            id: number;
+            name: string;
+            price: string;
+            ProductImages: {
+                image_url: string;
+            }[];
         };
-    }
+        variant: {
+            id: number;
+            slug: string;
+            price: string;
+            variantImages: {
+                image_url: string;
+            }[];
+        };
+    }[];
+    shippingAddress: {
+        name: string;
+        street: string;
+        town: string;
+        post_code: string;
+        phone: string | null;
+        region: string;
+        country: string;
+    } | null;
+    billingAddress: {
+        name: string;
+        street: string;
+        town: string;
+        post_code: string;
+        phone: string | null;
+        region: string;
+        country: string
+    } | null;
+    shippingMethod: {
+        id: number;
+        shipping_method: string;
+        shipping_cost: number;
+    };
+    coupon: null;
+
 }

@@ -41,16 +41,17 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     const { cartTotal, clearCart } = useCart();
 
     const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD) => {
+       
         try {
             setIsProcessing(true);
             const response = await placeOrder(data); 
-            
             if (response.status === ServerActionStatus.SUCCESS) {
+                const orderData = response.data.data;
                 if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
                     // Initiate Viva Wallet payment
                     await initiateVivaPayment({
                         amount: cartTotal,
-                        orderReference: response.data.data.order_id,
+                        orderReference: String(orderData.order_code),
                         customerEmail: data.email,
                         customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
                         orderDescription: `Order #${response.data.message}`
@@ -60,7 +61,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                     await initiateWorldPayPayment({
                         amount: cartTotal,
                         currency: 'EUR', // Adjust based on your needs
-                        orderReference: response.data.data.order_id,
+                        orderReference: String(orderData.order_code),
                         customerEmail: data.email,
                         customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
                         orderDescription: `Order #${response.data.message}`,

@@ -13,6 +13,7 @@ import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
 import ProductVariantFilter from './ProductVariantFilter'
 import NoImage from '@/components/NoImage'
+import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -83,7 +84,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
             if (numValue < minQuantity) {
                 setError(`Minimum quantity is ${minQuantity}`);
             } else if (numValue > stock) {
-                setError(`Product is out of stock`);
+                setError(`Only ${stock} items available in stock`);
             } else {
                 setError(null);
                 setQuantity(numValue);
@@ -154,12 +155,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
 
                 <div className='space-y-4 w-full lg:w-fit '>
                     <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full lg:w-[400px] xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2 min-h-[250px] lg:min-h-[425px] max-h-[250px] lg:max-h-[425px]'>
-                        <NoImage
-                            src={mainImage?.url}
-                            alt={product?.name}
+                        <CustomImageMagnifier
+                            src={mainImage?.url || ''}
+                            alt={product?.name || ''}
                             width={320}
                             height={396}
                             className='aspect-square'
+                            zoomLevel={2}
                         />
 
                         {
@@ -250,7 +252,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         {
                             stock > 0 ?
                                 <p className='text-content-2 md:text-title-2 font-bold primary-gradient-100'>In stock</p> :
-                                <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>
+                                isVariant && <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>
                         }
                     </div>
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>

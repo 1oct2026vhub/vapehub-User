@@ -43,8 +43,8 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
       /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i,
       "Please enter a valid UK postcode"
     ),
-    billingRegion: z.string().optional(),
-    billingCountry: z.string().optional(),
+    billingRegion: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Region is required'),
+    billingCountry: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Country is required'),
     // Payment
     paymentMethod: z.enum([CHECKOUT_PAYMENT_METHODS.VIVA_WALLET, CHECKOUT_PAYMENT_METHODS.WORLD_PAY]),  
     // Terms

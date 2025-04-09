@@ -1,4 +1,5 @@
 import { ORDER_DETAILS_RESPONSE } from '@/lib/config/order.config'
+import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils'
 import React from 'react'
 
 const OrderDetails: React.FC<{data: ORDER_DETAILS_RESPONSE}> = ({data}) => {
@@ -10,7 +11,7 @@ const OrderDetails: React.FC<{data: ORDER_DETAILS_RESPONSE}> = ({data}) => {
                     <h5>{data.shippingAddress?.name || ""}</h5>
                     <p>{data.shippingAddress?.street || ""}</p>
                     <p>{data.shippingAddress?.post_code || ""}</p>
-                    <p>{data.shippingAddress?.country || ""}</p>
+                    <p>{data.shippingAddress?.country || DEFAULT_COUNTRY}</p>
                 </div>
             </div>
 

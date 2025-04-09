@@ -15,6 +15,7 @@ import { ServerActionStatus } from '@/lib/config/app.config'
 import InputField from '@/components/InputField' 
 import { signOut } from 'next-auth/react'
 import { ROUTES } from '@/lib/routes'
+import { Form } from '@/components/ui/Form'
 const PersonalInfo: NextPage = () => {
     const [showButtons, setShowButtons] = useState(false)
     const { isOpen, onClose, onOpen, onOpenChange } = useDisclosure()
@@ -22,6 +23,7 @@ const PersonalInfo: NextPage = () => {
     const [loading, setLoading] = useState(true);
      const form = useForm<UserProfileFormData>({
         resolver: zodResolver(userProfileSchema),
+        mode: 'all',
         defaultValues: {
             first_name: '',
             last_name: '',
@@ -86,15 +88,16 @@ const PersonalInfo: NextPage = () => {
                         </button>
                     )}
                 </div>
-                <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4 md:space-y-6'>
-                    <div className="grid sm:grid-cols-2 gap-2.5 md:gap-4">
-                        <div className='space-y-3 md:space-y-4.5'>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='space-y-4 md:space-y-6'>
+                        <div className="grid sm:grid-cols-2 gap-2.5 md:gap-4">
+                            <div className='space-y-3 md:space-y-4.5'>
                             <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">First Name</h2>
                             <InputField
                                 control={form.control}
                                 name='first_name'
                                 type='text'
-                                disabled={!showButtons}
+                                isDisabled={!showButtons}
                                 className='w-full'
                             />
                              
@@ -105,7 +108,7 @@ const PersonalInfo: NextPage = () => {
                                 control={form.control}
                                 name='last_name'
                                 type='text'
-                                disabled={!showButtons}
+                                isDisabled={!showButtons}
                                 className='w-full'
                             />
                             
@@ -117,7 +120,7 @@ const PersonalInfo: NextPage = () => {
                             control={form.control}
                             name='email'
                             type='email'
-                            disabled
+                            isDisabled
                             className='w-full sm:max-w-[50%]'
                         />
                          
@@ -128,7 +131,7 @@ const PersonalInfo: NextPage = () => {
                             control={form.control}
                             name='phone'
                             type='tel'
-                            disabled={!showButtons}
+                            isDisabled={!showButtons}
                             className='w-full sm:max-w-[50%]'
                         />
                         
@@ -194,7 +197,8 @@ const PersonalInfo: NextPage = () => {
                             )}
                         </ModalContent>
                     </Modal>
-                </form>
+                    </form>
+                </Form>
             </div>
             <div className="flex md:hidden bg-skin-white p-4 rounded-14 shadow-card w-full mt-4">
                 <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 text-content-1 bg-skin-white font-semibold w-full rounded-lg" />

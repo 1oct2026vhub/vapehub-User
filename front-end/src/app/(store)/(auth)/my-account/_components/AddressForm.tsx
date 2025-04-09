@@ -4,8 +4,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AddressFormData, addressSchema } from '@/lib/config/address.config';
-import InputField from '@/components/InputField';
+import InputForm from '@/components/InputForm';
 import { Button } from '@nextui-org/button';
+import { Form } from '@/components/ui/Form';
 
 interface AddressFormProps {
   initialData?: AddressFormData;
@@ -20,10 +21,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
   onCancel,
   isSubmitting = false,
 }) => {
-  const {
-    control,
-    handleSubmit,
-  } = useForm<AddressFormData>({
+  const form = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     mode: 'all',
     defaultValues: initialData || {
@@ -37,22 +35,24 @@ const AddressForm: React.FC<AddressFormProps> = ({
       post_code: "",
       country: '',
       phone: '',
+      region: '',
     },
   });
 
   return (
-    <form className="space-y-4.5 p-5 bg-skin-white border border-skin-neutral-300 rounded-xl" onSubmit={handleSubmit(onSubmit)}>
+    <Form {...form}>
+    <form className="space-y-4.5 p-5 bg-skin-white border border-skin-neutral-300 rounded-xl" noValidate onSubmit={form.handleSubmit(onSubmit)}>
       <div className="grid grid-cols-2 gap-2.5 md:gap-4">
-        <InputField
-          control={control}
+        <InputForm
+          control={form.control}
           name="name"
           label="First Name"
           placeholder="Enter your first name"
           isRequired
           className="w-full"
         />
-        <InputField
-          control={control}
+        <InputForm
+          control={form.control}
           name="last_name"
           label="Last Name"
           placeholder="Enter your last name"
@@ -61,8 +61,8 @@ const AddressForm: React.FC<AddressFormProps> = ({
         />
       </div>
       
-      <InputField
-        control={control}
+      <InputForm
+        control={form.control}
         name="street"
         label="Street Address"
         placeholder="Enter your street address"
@@ -70,15 +70,15 @@ const AddressForm: React.FC<AddressFormProps> = ({
         className="w-full"
       />
       
-      <InputField
-        control={control}
+      <InputForm
+        control={form.control}
         name="apartment"
         label="Apartment, suite, etc. (optional)"
         placeholder="Apartment, suite, unit, building, floor, etc."
         className="w-full"
       />
-      <InputField
-        control={control}
+      <InputForm
+        control={form.control}
         name="company_name"
         label="Company Name"
         placeholder="Enter your company name (optional)"
@@ -86,16 +86,16 @@ const AddressForm: React.FC<AddressFormProps> = ({
       />
       
       <div className="grid grid-cols-2 gap-2.5 md:gap-4">
-        <InputField
-          control={control}
+        <InputForm
+          control={form.control}
           name="town"
           label="Town/City"
           placeholder="Enter your town or city"
           isRequired
           className="w-full"
         />
-        <InputField
-          control={control}
+        <InputForm
+          control={form.control}
           name="post_code"
           label="Postcode"
           placeholder="Enter your postcode"
@@ -105,26 +105,32 @@ const AddressForm: React.FC<AddressFormProps> = ({
       </div>
       
       <div className="grid grid-cols-2 gap-2.5 md:gap-4">
-        <InputField
-          control={control}
+        <InputForm
+          control={form.control}
           name="county"
-          label="County/Region"
-          placeholder="Enter your county or region"
+          label="County"
+          placeholder="Enter your county"
           isRequired
           className="w-full"
         />
-        <InputField
-          control={control}
+        <InputForm
+          control={form.control}
+          name="region"
+          label="Region"
+          placeholder="Enter your region"
+          className="w-full"
+        />
+      </div>
+      <InputForm
+          control={form.control}
           name="country"
           label="Country"
           placeholder="Enter your country"
           isRequired
           className="w-full"
         />
-      </div>
-      
-      <InputField
-        control={control}
+      <InputForm
+        control={form.control}
         type="number"
         name="phone"
         label="Phone Number (optional)"
@@ -157,6 +163,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
         </Button>
       </div>
     </form>
+    </Form>
   );
 };
 

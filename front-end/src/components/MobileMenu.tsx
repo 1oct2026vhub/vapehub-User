@@ -201,6 +201,7 @@ const MobileMenu = () => {
                                     )}
                         </div>
                     </DrawerBody>
+                    {cartItems.length > 0 && (
                     <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100s'>
                         <Divider />
                         <ShippingProgress />
@@ -246,6 +247,7 @@ const MobileMenu = () => {
                             </div>
                         </div>
                     </DrawerFooter>
+                    )}
                 </DrawerContent>
             </Drawer>
         </div>

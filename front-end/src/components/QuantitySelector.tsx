@@ -47,7 +47,8 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   }, [maxQuantity, minQuantity]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
+
     setInputValue(value);
 
     // Only update quantity if the input is a valid number

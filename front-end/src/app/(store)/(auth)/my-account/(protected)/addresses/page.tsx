@@ -79,8 +79,6 @@ const AddressesContent: React.FC = () => {
         {/* Address List */}
         {isLoading ? (
           <div className="text-center py-4">Loading addresses...</div>
-        ) : error ? (
-          <div className="text-center py-4 text-red-500">{error}</div>
         ) : addresses.length === 0 ? (
           <EmptyPlaceholder
             title="No addresses found"
@@ -92,6 +90,9 @@ const AddressesContent: React.FC = () => {
               <AddressCard key={address.id} address={address} />
             ))}
           </div>
+        )}
+        {error && (
+          <div className="text-center py-4 text-red-500">{error}</div>
         )}
       </div>
 

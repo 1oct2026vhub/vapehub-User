@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { BenefitIcon, DealsIcon, DispatchIcon, ReviewStarFilled } from '@/components/Icons'
+import { BenefitIcon, DealsIcon, DispatchIcon, ReviewStarFilled, MinusIcon, PlusIcon } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
 import Image from 'next/image'
@@ -13,7 +13,6 @@ import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
 import ProductVariantFilter from './ProductVariantFilter'
 import NoImage from '@/components/NoImage'
-import QuantitySelector from '@/components/QuantitySelector'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -56,34 +55,67 @@ const settings: Settings = {
 };
 const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => {
     const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
-    const product: ProductViewDetails =  data?.product;
-    const productVariant:ProductVariant | null = isVariant ? data?.variants[0] : null;
-    const stock = isVariant && productVariant? productVariant.stock : 0;
+    const product: ProductViewDetails = data?.product;
+    const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;
+    const stock = isVariant && productVariant ? productVariant.stock : 0;
     const productName = selectedVariant ? `${selectedVariant.terms.name} - ${product?.name}` : product?.name;
     const availableAttributes: AttributeTerms[] = data.available_terms;
-    const filteredAttributeTerms: AttributeTerms[] = data.filtered_attribute_terms;
-    // concatenate the available attributes and the filtered attribute terms 
-    const availableAttributeTerms = availableAttributes.map(attribute => {
-        const filteredTerm = filteredAttributeTerms.find(term => term.attribute.id === attribute.attribute.id);
-        return filteredTerm ? { ...attribute, terms: filteredTerm.terms } : null;
-    }).filter(Boolean);
-    console.log(availableAttributeTerms);
+    const minQuantity = 1; 
+    const price = isVariant ? data?.variants[0]?.price: (productVariant?.price ?? data?.variants[0]?.price);
+    // const filteredAttributeTerms: AttributeTerms[] = data.filtered_attribute_terms;
+     
+    // const allAttributeTerms = [...availableAttributes, ...filteredAttributeTerms];
+
+    // console.log(allAttributeTerms);
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
     const [quantity, setQuantity] = useState(1);
-    const { addItemToCart, updateItemQuantity,cartItems, isLoading } = useCart();
-    
-    const handleQuantityChange = (newQuantity: number) => {
-        if (!productVariant) return;
-        setQuantity(newQuantity);
-        const cartItem = cartItems.find(item => item.variant_id === productVariant.id);
-        if (cartItem) {
-            updateItemQuantity(cartItem.id, newQuantity);
+    const { addItemToCart, isLoading } = useCart();
+    const [inputValue, setInputValue] = useState(quantity.toString());
+    const [error, setError] = useState<string | null>(null);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
+        setInputValue(value);
+
+        // Only update quantity if the input is a valid number
+        const numValue = parseInt(value);
+        if (!isNaN(numValue)) {
+            if (numValue < minQuantity) {
+                setError(`Minimum quantity is ${minQuantity}`);
+            } else if (numValue > stock) {
+                setError(`Product is out of stock`);
+            } else {
+                setError(null);
+                setQuantity(numValue);
+            }
         }
     };
+
     
+  const handleBlur = () => {
+    // Reset to current quantity if input is invalid
+    const numValue = parseInt(inputValue);
+    if (isNaN(numValue) || numValue < minQuantity || numValue > stock) {
+      setInputValue(quantity.toString());
+      setError(null);
+    }
+  };
+  
+    const handleQuantityChange = (newQuantity: number) => {
+        if (!productVariant) return;
+        if (newQuantity < minQuantity) {
+            setError(`Minimum quantity is ${minQuantity}`);
+            return;
+          }
+          setError(null);
+          setQuantity(newQuantity);
+          setInputValue(newQuantity.toString());
+
+    };
+
     const handleAddToCart = async () => {
         if (!productVariant) return;
-        if (quantity <= 0 || quantity > stock) { 
+        if (quantity <= 0 || quantity > stock) {
             return;
         }
         await addItemToCart(product.id, productVariant?.id, quantity, productVariant, productName);
@@ -129,9 +161,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                             height={396}
                             className='aspect-square'
                         />
-                         
+
                         {
-                           product?.createdAt && isLessThanOneMonth(product?.createdAt) &&
+                            product?.createdAt && isLessThanOneMonth(product?.createdAt) &&
                             <div className='new-product'>
                                 <span>New</span>
                             </div>
@@ -145,12 +177,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 <div key={index}>
                                     <div className='px-0.5 py-1.5 bg-skin-base flex items-center justify-center '>
 
-                                        <Button 
-                                            onPress={() => setMainImage(image)}  
+                                        <Button
+                                            onPress={() => setMainImage(image)}
                                             isIconOnly
-                                            className={`p-0 w-[118px] h-[111px] flex items-center justify-center bg-transparent ${
-                                                mainImage?.id === image.id ? 'ring-2 ring-skin-primary2-500' : ''
-                                            }`}
+                                            className={`p-0 w-[118px] h-[111px] flex items-center justify-center bg-transparent ${mainImage?.id === image.id ? 'ring-2 ring-skin-primary2-500' : ''
+                                                }`}
                                         >
                                             <NoImage
                                                 src={image?.url}
@@ -160,7 +191,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                                 className={`lg:max-w-max cursor-pointer rounded-lg shadow-brand-card shrink border `}
                                             />
                                         </Button>
-                                         
+
                                     </div>
                                 </div>
                             ))
@@ -186,7 +217,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
-                        <p className='text-title-1 md:text-h5 xl:text-h4'>{DEFAULT_CURRENCY_SYMBOL}{productVariant?.price ?? 0}</p>
+                        <p className='text-title-1 md:text-h5 xl:text-h4'>{DEFAULT_CURRENCY_SYMBOL}{price}</p>
                         <p className='text-content-2 md:text-title-2'>or Mix & Match</p>
                         <Button
                             size="sm"
@@ -223,12 +254,51 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         }
                     </div>
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
-                        <QuantitySelector
-                            initialQuantity={quantity}
-                            maxQuantity={stock}
-                            onQuantityChange={handleQuantityChange}
-                            isLoading={isLoading}
-                        />
+                        <div
+                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 !font-bold h-12 md:h-[60px]"
+                        >
+                            <Button
+                                isIconOnly
+                                size='lg'
+                                variant='light'
+                                color='primary'
+                                className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
+                                onPress={() => handleQuantityChange(quantity - 1)}
+                                disabled={isLoading || quantity <= 1}
+                            >
+                                <MinusIcon />
+                            </Button>
+                            <input
+                                type="tel"
+                                value={inputValue}
+                                onChange={handleInputChange}
+                                onBlur={handleBlur}
+                                pattern="[0-9]*"
+                                inputMode="numeric"
+                                className='w-9 max-w-9 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4 text-center'
+                            />
+                            {/* <input
+                                type="tel"
+                                value={quantity}
+                                onChange={(e) => {
+                                    const val = parseInt(e.target.value);
+                                    if (!isNaN(val)) handleQuantityChange(val);
+                                }}
+                                className='w-9 max-w-9 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4 text-center'
+                            /> */}
+                            <Button
+                                isIconOnly
+                                size='lg'
+                                variant='light'
+                                color='primary'
+                                className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
+                                onPress={() => handleQuantityChange(quantity + 1)}
+                                disabled={isLoading || quantity >= stock}
+                            >
+                                <PlusIcon />
+                            </Button>
+                        </div>
+
 
                         <Button
                             size="lg"
@@ -242,6 +312,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                             Add to Cart
                         </Button>
                     </div>
+                    {error && <p className='text-red-500 text-sm'>{error}</p>}
                 </div>
             </div>
             <Divider />

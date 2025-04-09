@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, ReviewStarFilled } from '@/components/Icons'
+import { BenefitIcon, DealsIcon, DispatchIcon, ReviewStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
 import Image from 'next/image'
@@ -13,6 +13,7 @@ import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
 import ProductVariantFilter from './ProductVariantFilter'
 import NoImage from '@/components/NoImage'
+import QuantitySelector from '@/components/QuantitySelector'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -66,17 +67,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     
     const handleQuantityChange = (newQuantity: number) => {
         if (!productVariant) return;
-        
-        if (newQuantity <= 0 || newQuantity > stock) {
-            return;
-        }
-
         setQuantity(newQuantity);
         const cartItem = cartItems.find(item => item.variant_id === productVariant.id);
         if (cartItem) {
             updateItemQuantity(cartItem.id, newQuantity);
         }
-        
     };
     
     const handleAddToCart = async () => {
@@ -221,41 +216,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         }
                     </div>
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
-                        <div
-                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 !font-bold h-12 md:h-[60px]"
-                        >
-                            <Button
-                                isIconOnly
-                                size='lg'
-                                variant='light'
-                                color='primary'
-                                className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
-                                onPress={() => handleQuantityChange(quantity - 1)}
-                                disabled={isLoading || quantity <= 1}
-                            >
-                                <MinusIcon />
-                            </Button>
-                            <input
-                                type="tel"
-                                value={quantity}
-                                onChange={(e) => {
-                                    const val = parseInt(e.target.value);
-                                    if (!isNaN(val)) handleQuantityChange(val);
-                                }}
-                                className='w-9 max-w-9 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4 text-center'
-                            />
-                            <Button
-                                isIconOnly
-                                size='lg'
-                                variant='light'
-                                color='primary'
-                                className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
-                                onPress={() => handleQuantityChange(quantity + 1)}
-                                disabled={isLoading || quantity >= stock}
-                            >
-                                <PlusIcon />
-                            </Button>
-                        </div>
+                        <QuantitySelector
+                            initialQuantity={quantity}
+                            maxQuantity={stock}
+                            onQuantityChange={handleQuantityChange}
+                            isLoading={isLoading}
+                        />
 
                         <Button
                             size="lg"

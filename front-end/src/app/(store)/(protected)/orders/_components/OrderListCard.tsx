@@ -1,38 +1,9 @@
 import { cn } from "@/lib/utils"; 
 import NoImage from "@/components/NoImage";
+import { ORDER_RESPONSE } from "@/lib/config/order.config";
 // import NoImage from "@/components/NoImage";
 type OrderListCardProps = {
-    data: {
-        id: number;
-        order_unique_id: string; 
-        status: string;
-        createdAt: string;
-        product_name: string;
-        quantity: number;
-        total: string;
-        discount_price: string;
-        price: string;
-        shippingAddress: {
-            name: string;
-            street: string;
-            town: string;
-            post_code: string;
-            phone: string;
-        };
-        billingAddress: {
-            name: string;
-            street: string;
-            town: string;
-            post_code: string;
-            phone: string;
-        };
-        shippingMethod: {
-            id: number;
-            name: string;
-            price: string;
-        };
-        product_image: {image_url: string};
-    };
+    data: ORDER_RESPONSE;
 }
  
 const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
@@ -54,8 +25,8 @@ const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
       <div className="bg-skin-white p-1 md:p-2 rounded-md md:rounded-10 shadow-brand-card min-w-16 md:min-w-36">
         <div className="bg-skin-base border border-skin-neutral-100 rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
           <NoImage 
-            src={data.product_image.image_url}
-            alt={data.product_name}
+            src={data.orderItems?.[0]?.variant?.variantImages?.[0]?.image_url || ""}
+            alt={data.orderItems?.[0]?.product?.name || ""}
             width={104}
             height={100}
           />
@@ -69,7 +40,7 @@ const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
 
         {/* Order Title */}
         <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 line-clamp-2 font-semibold">
-          {data.product_name}
+          {data.orderItems?.[0]?.product?.name}
         </h2>
 
         {/* Order ID */}

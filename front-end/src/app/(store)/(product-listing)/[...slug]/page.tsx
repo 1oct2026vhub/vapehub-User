@@ -76,8 +76,8 @@ const Page = async ({
     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
       return notFound();
     }
-    const availableAttributes = data.available_terms;
-    return <ProductView data={data} isVariant={true} selectedVariant={variant} availableAttributes={availableAttributes} />;
+    
+    return <ProductView data={data} isVariant={true} selectedVariant={variant}  />;
   }
 
 
@@ -149,7 +149,7 @@ const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Pr
   
   if (response.status === ServerActionStatus.ERROR) {
     return null;
-  } 
+  }  
   return response.data;
 };
 

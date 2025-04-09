@@ -40,6 +40,8 @@ export const API_ROUTES = {
     UPDATE_USER_ADDRESS: (id: number) => buildRequestUrl(`/api/users/user-address/${id}`),
     DELETE_USER_ADDRESS: (id: number) => buildRequestUrl(`/api/users/user-address/${id}`),
     CHANGE_USER_PASSWORD: buildRequestUrl('/api/users/change-password'),
+    GET_ORDER_BY_ID: (id: number) => buildRequestUrl(`/api/order/${id}`),
+    GET_ORDER_LIST: (page: number, limit: number) => buildRequestUrl(`/api/order?page=${page}&limit=${limit}`),
     ORDERS: buildRequestUrl('/api/order'),
     UPDATE_ORDER_STATUS: (orderReference: string) => `/api/orders/${orderReference}/status`,
 }

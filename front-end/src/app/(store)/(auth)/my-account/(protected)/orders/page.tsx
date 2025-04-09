@@ -1,39 +1,27 @@
 import MyAccountHeading from "@/components/ui/MyAccountHeading";
 import { Metadata, NextPage } from "next";
-import React from "react";
-import OrderListCard from "@/app/(store)/(protected)/orders/_components/OrderListCard";
+import React from "react"; 
 import LogoutButton from "../../_components/LogoutButton";
 import { getOrdersList } from "@/lib/server.actions";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
+import OrderList from "./_components/OrderList";
+import { ORDER_RESPONSE } from "@/lib/config/order.config";
 
 export const metadata: Metadata = {
     title: "My account | Orders",
     description: "",
 };
  
-const MyAccountOrders: NextPage = async () => {
-    const result = await getOrdersList();
+const MyAccountOrders: NextPage<{searchParams: {page: string}}> = async ({searchParams}) => {    
+    const LIMIT = 10
+    const page = searchParams.page ? parseInt(searchParams.page) : 1;
+    const result = await getOrdersList(page, LIMIT);
     if (result.status === ServerActionStatus.ERROR) {
         return <p>{result.message}</p>   
     }
-    const orders = result.data.flatMap(x => 
-        x.orderItems.map(y => ({
-            id: x.id,
-            order_unique_id: x.order_unique_id,
-            total: x.total,             
-            status: x.status,
-            createdAt: x.createdAt,
-            product_name: y.product.name,
-            quantity: y.quantity,
-            price: y.variant?.price || y.product.price, 
-            discount_price: y.variant?.price || y.product.price,
-            shippingAddress: x.shippingAddress,
-            billingAddress: x.billingAddress,
-            shippingMethod: x.shippingMethod,
-            product_image: { image_url: y.variant?.variantImages?.[0]?.image_url || "" },
-        }))
-    );
+     
+    const orders:ORDER_RESPONSE[] = result.data.orders;
     
      return (
         <main>
@@ -47,9 +35,7 @@ const MyAccountOrders: NextPage = async () => {
                     className="h-full"
                 />:
                 <div className="flex flex-col gap-4.5">
-                    {orders.map((order, index) => (
-                        <OrderListCard key={index} data={order} />
-                    ))}
+                    <OrderList orders={orders} pagination={result.data.pagination} />
                 </div>
                 }
             </div>

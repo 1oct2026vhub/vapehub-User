@@ -7,7 +7,7 @@ import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
-import { ORDER_RESPONSE, ORDER_RESPONSE_DATA, PLACE_ORDER_PAYLOAD } from "./config/order.config";
+import { ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, PLACE_ORDER_PAYLOAD } from "./config/order.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
@@ -384,9 +384,9 @@ export const changeUserPassword = async (payload: ChangeUserPasswordPayload): Pr
 };
 
 // get orders list
-export const getOrdersList = async (): Promise<ServerActionResponse<ORDER_RESPONSE[]>> => {
-  return await handleRequest<ORDER_RESPONSE[], unknown>({
-    endpoint: API_ROUTES.ORDERS,
+export const getOrdersList = async (page: number, limit: number): Promise<ServerActionResponse<ORDER_LIST_RESPONSE>> => {
+  return await handleRequest<ORDER_LIST_RESPONSE, unknown>({
+    endpoint: API_ROUTES.GET_ORDER_LIST(page, limit),
     method: 'GET',
   });
 };

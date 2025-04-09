@@ -18,8 +18,7 @@ import QuantitySelector from '@/components/QuantitySelector'
 type ProductViewProps = {
     data: ProductResponse;
     isVariant?: boolean;
-    selectedVariant?: AttributeProductTerms;
-    availableAttributes?: AttributeTerms[];
+    selectedVariant?: AttributeProductTerms
 }
 const settings: Settings = {
     slidesToShow: 4, // Change to 4 if needed
@@ -55,12 +54,20 @@ const settings: Settings = {
     ],
 
 };
-const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant, availableAttributes }) => {
+const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => {
     const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
     const product: ProductViewDetails =  data?.product;
     const productVariant:ProductVariant | null = isVariant ? data?.variants[0] : null;
     const stock = isVariant && productVariant? productVariant.stock : 0;
     const productName = selectedVariant ? `${selectedVariant.terms.name} - ${product?.name}` : product?.name;
+    const availableAttributes: AttributeTerms[] = data.available_terms;
+    const filteredAttributeTerms: AttributeTerms[] = data.filtered_attribute_terms;
+    // concatenate the available attributes and the filtered attribute terms 
+    const availableAttributeTerms = availableAttributes.map(attribute => {
+        const filteredTerm = filteredAttributeTerms.find(term => term.attribute.id === attribute.attribute.id);
+        return filteredTerm ? { ...attribute, terms: filteredTerm.terms } : null;
+    }).filter(Boolean);
+    console.log(availableAttributeTerms);
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
     const [quantity, setQuantity] = useState(1);
     const { addItemToCart, updateItemQuantity,cartItems, isLoading } = useCart();

@@ -1,41 +1,56 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
 import { toast } from 'sonner';
 import { Button } from '@nextui-org/button';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
+import { ServerActionStatus } from '@/lib/config/app.config';
+import { getTransactionDetails } from '@/lib/server.actions';
 const PaymentFailedPage = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { status } = useSession();
     const [transactionDetails, setTransactionDetails] = useState({
         id: '',
-        amount: '',
+        amount: 0,
         method: 'Online',
         date: new Date().toLocaleDateString('en-GB'),
         time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
     });
 
     useEffect(() => {
+        const verifyPayment = async () => {
+        try {
         // Get transaction details from local storage
-        const orderRef = localStorage.getItem('vivaOrderRef');
-        const amount = localStorage.getItem('vivaOrderAmount');
+        const transactionId = searchParams.get('t');
+        const sessionId = searchParams.get('s');
         
-        if (orderRef && amount) {
-            setTransactionDetails(prev => ({
-                ...prev,
-                id: orderRef,
-                amount: amount
-            }));
+        if (!transactionId || !sessionId) {
+            throw new Error('Missing required payment parameters');
         }
-
-        // Clear the order reference from local storage
-        localStorage.removeItem('vivaOrderRef');
-        localStorage.removeItem('vivaOrderAmount');
-        toast.error('Payment failed. Please try again.');
-    }, []);
+        const response = await getTransactionDetails(transactionId);
+               
+                if (response.status === ServerActionStatus.SUCCESS) {
+                    // Set transaction details
+                    setTransactionDetails(prev => ({
+                        ...prev,
+                        id: transactionId,
+                        amount: response.data.amount
+                    })); 
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Payment verification error:', error);
+                toast.error('Failed to verify payment. Please contact support.');
+                 
+            }
+        };
+        verifyPayment();
+    }, [router, searchParams]);
 
     useEffect(() => {
         if (status === 'unauthenticated') {

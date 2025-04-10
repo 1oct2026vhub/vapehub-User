@@ -1,10 +1,10 @@
 import { Button } from '@nextui-org/react';
-import { TrashIcon, EditIcon, DangerIcon } from '@/components/Icons';
+import { TrashIcon, DangerIcon } from '@/components/Icons';
 import { useCart } from '@/lib/context/CartContext';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
-import Link from 'next/link';
+// import Link from 'next/link';
 import QuantitySelector from './QuantitySelector';
 
 type CartCardProps = {
@@ -77,7 +77,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
             >
               <TrashIcon className='w-4 h-4.5 md:w-5.5 md:h-6' />
             </Button>
-            <Button 
+            {/* <Button 
               as={Link}
               href={`/${item.product_slug}`}
               size="sm" 
@@ -86,7 +86,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
               className="!p-0 hover:!bg-transparent !min-w-fit !w-fit"
             >
               <EditIcon className='w-4 h-4.5 md:w-5.5 md:h-6' />
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>

@@ -4,11 +4,11 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { SHIPPING_METHOD } from '@/lib/config/order.config';
 import { CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS } from '@/lib/config/checkout.config';
 import { placeOrder } from '@/lib/server.actions';
-import { ServerActionStatus } from '@/lib/config/app.config';
-import { useRouter } from 'next/navigation';
+import { ServerActionStatus } from '@/lib/config/app.config'; 
 import { ROUTES } from '@/lib/routes';
 import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
 import { useWorldPay } from '@/lib/hooks/useWorldpay';
+import { toast } from 'sonner';
 
 interface CheckoutContextType {
     selectedShippingMethod: SHIPPING_METHOD | null;
@@ -34,16 +34,13 @@ interface CheckoutProviderProps {
 export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) => {
     const [selectedShippingMethod, setSelectedShippingMethod] = useState<SHIPPING_METHOD | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
-    const router = useRouter();
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
     const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
      
-    const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD) => {
-       
+    const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD) => { 
         try {
             setIsProcessing(true);
-            const response = await placeOrder(data);
-            console.log('response', response);
+            const response = await placeOrder(data); 
             if (response.status === ServerActionStatus.SUCCESS) {
                 const orderData = response.data.data;
                 if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
@@ -87,11 +84,12 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                 // clearCart();
                 
             } else {
-                router.push(ROUTES.PAYMENT_FAILED);
+                toast.error(response.message);
             }
         } catch (error) {
             console.error('Place order error:', error);
-            router.push(ROUTES.PAYMENT_FAILED);
+            toast.error('An error occurred while placing your order. Please try again.');
+            // router.push(ROUTES.PAYMENT_FAILED);
         } finally {
             setIsProcessing(false);
         }

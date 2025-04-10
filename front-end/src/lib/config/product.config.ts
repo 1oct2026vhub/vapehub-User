@@ -89,6 +89,8 @@ export interface productAttributeTerms {
     name: string;
     slug: string;
     product_count: number;
+    is_visible_page: boolean;
+    used_in_variation: boolean;
 
 }
 export interface AttributeProductTerms {

@@ -9,7 +9,6 @@ import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
 import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
 import { useWorldPay } from '@/lib/hooks/useWorldpay';
-import { useCart } from './CartContext';
 
 interface CheckoutContextType {
     selectedShippingMethod: SHIPPING_METHOD | null;
@@ -38,8 +37,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     const router = useRouter();
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
     const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
-    const { cartTotal, clearCart } = useCart();
-
+     
     const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD) => {
        
         try {
@@ -50,7 +48,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                 if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
                     // Initiate Viva Wallet payment
                     await initiateVivaPayment({
-                        amount: cartTotal,
+                        amount: data.total,
                         orderReference: String(orderData.order_code),
                         customerEmail: data.email,
                         customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
@@ -59,7 +57,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                 } else if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
                     // Initiate WorldPay Smart Checkout
                     await initiateWorldPayPayment({
-                        amount: cartTotal,
+                        amount: data.total,
                         currency: 'EUR', // Adjust based on your needs
                         orderReference: String(orderData.order_code),
                         customerEmail: data.email,
@@ -85,7 +83,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                         }
                     });
                 }
-                clearCart();
+                // clearCart();
                 
             } else {
                 router.push(ROUTES.PAYMENT_FAILED);

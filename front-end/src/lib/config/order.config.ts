@@ -1,3 +1,5 @@
+import { USER_ADDRESS_RESPONSE } from "./user.config";
+
 export interface ORDER_RESPONSE {
     id: number;
     order_unique_id: string;
@@ -176,7 +178,12 @@ export interface ORDER_LIST_RESPONSE {
 
 }
 
+
 export interface ORDER_DETAILS_RESPONSE {
+   order: ORDER;
+   user: USER_ADDRESS_RESPONSE;
+}
+export interface ORDER {
     order_unique_id: string;
     total: string;
     discount_price: string | null;
@@ -230,5 +237,4 @@ export interface ORDER_DETAILS_RESPONSE {
         shipping_cost: number;
     };
     coupon: null;
-
 }

@@ -29,9 +29,10 @@ const CheckoutDetails: React.FC = () => {
             email: '',
             phone: '',
             ageConfirmation: false,
-            useShippingAsBilling: true,
+            useShippingAsBilling: false,
             termsAgreement: false,
             shippingMethodId: "3",
+            marketingConsent: false,
             paymentMethod: CHECKOUT_PAYMENT_METHODS.VIVA_WALLET,
             selectedAddressId: undefined,
             shippingFirstName: '',
@@ -71,6 +72,8 @@ const CheckoutDetails: React.FC = () => {
         const orderPayload: CHECKOUT_PAYLOAD = {
             email: data.email,
             phone: data.phone,
+            receive_promotions: data.marketingConsent || false,
+            shipping_address_id: data.selectedAddressId || 0,
             shipping_address: {
                 first_name: data.shippingFirstName || '',
                 last_name: data.shippingLastName || '',
@@ -82,16 +85,16 @@ const CheckoutDetails: React.FC = () => {
                 post_code: data.shippingPostcode || ''
             },
             billing_address: {
-                first_name: data.useShippingAsBilling ? data.shippingFirstName || '' : data.billingFirstName || '',
-                last_name: data.useShippingAsBilling ? data.shippingLastName || '' : data.billingLastName || '',
-                address_line_1: data.useShippingAsBilling ? data.shippingAddress1 || '' : data.billingAddress1 || '',
-                address_line_2: data.useShippingAsBilling ? data.shippingAddress2 || '' : data.billingAddress2 || '',
-                city: data.useShippingAsBilling ? data.shippingCity || '' : data.billingCity || '',
-                region: data.useShippingAsBilling ? data.shippingRegion || '' : data.billingRegion || '',
-                country: data.useShippingAsBilling ? data.shippingCountry || DEFAULT_COUNTRY : data.billingCountry || DEFAULT_COUNTRY,
-                post_code: data.useShippingAsBilling ? data.shippingPostcode || '' : data.billingPostcode || ''
+                first_name: !data.useShippingAsBilling ? data.shippingFirstName || '' : data.billingFirstName || '',
+                last_name: !data.useShippingAsBilling ? data.shippingLastName || '' : data.billingLastName || '',
+                address_line_1: !data.useShippingAsBilling ? data.shippingAddress1 || '' : data.billingAddress1 || '',
+                address_line_2: !data.useShippingAsBilling ? data.shippingAddress2 || '' : data.billingAddress2 || '',
+                city: !data.useShippingAsBilling ? data.shippingCity || '' : data.billingCity || '',
+                region: !data.useShippingAsBilling ? data.shippingRegion || '' : data.billingRegion || '',
+                country: !data.useShippingAsBilling ? data.shippingCountry || DEFAULT_COUNTRY : data.billingCountry || DEFAULT_COUNTRY,
+                post_code: !data.useShippingAsBilling ? data.shippingPostcode || '' : data.billingPostcode || ''
             },
-            useShippingAsBilling: data.useShippingAsBilling,
+            useShippingAsBilling: !data.useShippingAsBilling,
             couponCode: cartCouponCode || undefined,
             shipping_method_id: Number(selectedShippingMethod?.id) || 0,
             payment_method: {
@@ -99,8 +102,8 @@ const CheckoutDetails: React.FC = () => {
             },
             total: cartTotal + (selectedShippingMethod?.price || 0)
 
-        };
-
+        }; ;
+        
         await handlePlaceOrder(orderPayload);
         form.reset();
         setSelectedShippingMethod(SHIPPING_METHODS[0]);
@@ -331,7 +334,7 @@ const CheckoutDetails: React.FC = () => {
                                     name="useShippingAsBilling"
                                     label='Use different billing details'
                                 />
-                                {!form.watch('useShippingAsBilling') && (
+                                {form.watch('useShippingAsBilling') && (
                                     <div className='space-y-4'>
                                         <div className='grid grid-cols-2 gap-2.5 md:gap-4'>
                                             <InputForm

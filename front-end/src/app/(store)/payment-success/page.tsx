@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
 import { ServerActionStatus } from '@/lib/config/app.config';
-import { updateOrderStatus } from '@/lib/server.actions';
+import { getTransactionDetails } from '@/lib/server.actions';
 import { toast } from 'sonner';
 import { Button } from '@nextui-org/button';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 const PaymentSuccessPage = () => {
     const router = useRouter();
@@ -16,7 +17,7 @@ const PaymentSuccessPage = () => {
     const { status } = useSession();
     const [transactionDetails, setTransactionDetails] = useState({
         id: '',
-        amount: '',
+        amount: 0,
         method: 'Online',
         date: new Date().toLocaleDateString('en-GB'),
         time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -28,25 +29,21 @@ const PaymentSuccessPage = () => {
                 // Get parameters from URL
                 const transactionId = searchParams.get('t');
                 const sessionId = searchParams.get('s');
-
+                
                 if (!transactionId || !sessionId) {
                     throw new Error('Missing required payment parameters');
                 }
 
                 // Update order status with transaction details
-                const response = await updateOrderStatus(transactionId, 'completed');
-
+                const response = await getTransactionDetails(transactionId);
+               
                 if (response.status === ServerActionStatus.SUCCESS) {
                     // Set transaction details
                     setTransactionDetails(prev => ({
                         ...prev,
                         id: transactionId,
-                        amount: localStorage.getItem('vivaOrderAmount') || '0'
-                    }));
-
-                    // Clear the order reference from local storage
-                    localStorage.removeItem('vivaOrderRef');
-                    localStorage.removeItem('vivaOrderAmount');
+                        amount: response.data.amount
+                    })); 
                 } else {
                     throw new Error(response.message);
                 }
@@ -114,11 +111,12 @@ const PaymentSuccessPage = () => {
                 </div>
 
                 <Button
+                    as={Link}
+                    href={ROUTES.MY_ACCOUNT_ORDERS}
                     size="lg"
                     radius="md"
                     color="primary"
                     className="btn primary-btn shadow-input text-content-1 !font-medium h-11 mx-auto"
-                    onPress={() => router.push(ROUTES.MY_ACCOUNT_ORDERS)}
                 >
                     View Orders
                 </Button>

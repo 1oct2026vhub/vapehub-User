@@ -21,9 +21,9 @@ import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
 
 const CheckoutDetails: React.FC = () => {
     const { fetchProfile } = useUserProfile();
-    const [useShippingAsBilling, setUseShippingAsBilling] = useState(true);
+    const [shippingAsBilling, setShippingAsBilling] = useState(true);
     const form = useForm<CHECKOUT_FORM_TYPE>({
-        resolver: zodResolver(CHECKOUT_FORM_SCHEMA(useShippingAsBilling)),
+        resolver: zodResolver(CHECKOUT_FORM_SCHEMA(shippingAsBilling)),
         mode: 'all',
         defaultValues: {
             email: '',
@@ -61,7 +61,7 @@ const CheckoutDetails: React.FC = () => {
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
 
     useEffect(() => {
-        setUseShippingAsBilling(form.watch('useShippingAsBilling'));
+        setShippingAsBilling(form.watch('useShippingAsBilling'));
     }, [form.watch('useShippingAsBilling')]);
 
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
@@ -190,6 +190,7 @@ const CheckoutDetails: React.FC = () => {
                                     control={form.control}
                                     type='tel'
                                     name="phone"
+                                    placeholder='+44xxxxxxxxxx'
                                     label={
                                         <div className='flex items-center gap-4'>
                                             <Flag className="group-data-[focus=true]:w-4" />

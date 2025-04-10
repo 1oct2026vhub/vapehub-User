@@ -8,6 +8,7 @@ import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, PLACE_ORDER_PAYLOAD } from "./config/order.config";
+import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
@@ -404,6 +405,14 @@ export const placeOrder = async (payload: PLACE_ORDER_PAYLOAD): Promise<ServerAc
     endpoint: API_ROUTES.ORDERS,
     payload,
     method: 'POST',
+  });
+};
+
+// get transaction details
+export const getTransactionDetails = async (transactionId: string): Promise<ServerActionResponse<TRANSACTION_DETAILS_RESPONSE>> => {
+  return await handleRequest<TRANSACTION_DETAILS_RESPONSE, unknown>({
+    endpoint: API_ROUTES.GET_TRANSACTION_DETAILS(transactionId),
+    method: 'GET',
   });
 };
 

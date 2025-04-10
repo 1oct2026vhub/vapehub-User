@@ -42,7 +42,8 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
        
         try {
             setIsProcessing(true);
-            const response = await placeOrder(data); 
+            const response = await placeOrder(data);
+            console.log('response', response);
             if (response.status === ServerActionStatus.SUCCESS) {
                 const orderData = response.data.data;
                 if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {

@@ -36,51 +36,62 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
 
   return (
     <div className="relative">
-      <div className="hidden md:block">
-        <div
-          ref={containerRef}
-          className="relative "
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onMouseMove={handleMouseMove}
-        >
+      {
+        src ? (
+          <div className="hidden md:block">
+            <div
+              ref={containerRef}
+              className="relative "
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              onMouseMove={handleMouseMove}
+            >
+              <NoImage
+                src={src}
+                alt={alt}
+                width={width}
+                height={height}
+                className={className}
+              />
+              {isHovered && (
+                <div
+                  className="absolute pointer-events-none border-2 border-white rounded-full bg-white bg-opacity-20"
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    left: `${cursorPosition.x - 20}px`,
+                    top: `${cursorPosition.y - 30}px`,
+                    transform: 'translate(-20%, -30%)',
+                  }}
+                />
+              )}
+              {isHovered && (
+                <div
+                  className="absolute border-2 border-gray-300 hidden md:block shadow-lg rounded-md overflow-hidden"
+                  style={{
+                    width: '300px',
+                    height: '300px',
+                    left: '100%',
+                    top: 0,
+                    backgroundImage: `url(${src})`,
+                    backgroundSize: `${width * zoomLevel}px ${height * zoomLevel}px`,
+                    backgroundPosition: `${position.x}% ${position.y}%`,
+                    backgroundRepeat: 'no-repeat',
+                    zIndex: 10,
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        ) : (
           <NoImage
             src={src}
             alt={alt}
             width={width}
             height={height}
             className={className}
-          />
-          {isHovered && (
-            <div
-              className="absolute pointer-events-none border-2 border-white rounded-full bg-white bg-opacity-20"
-              style={{
-                width: '100px',
-                height: '100px',
-                left: `${cursorPosition.x - 20}px`,
-                top: `${cursorPosition.y - 30}px`,
-                transform: 'translate(-20%, -30%)',
-              }}
-            />
-          )}
-          {isHovered && (
-            <div
-              className="absolute hidden md:block shadow-lg rounded-md overflow-hidden"
-              style={{
-                width: '300px',
-                height: '300px',
-                left: '100%',
-                top: 0,
-                backgroundImage: `url(${src})`,
-                backgroundSize: `${width * zoomLevel}px ${height * zoomLevel}px`,
-                backgroundPosition: `${position.x}% ${position.y}%`,
-                backgroundRepeat: 'no-repeat',
-                zIndex: 10,
-              }}
-            />
-          )}
-        </div>
-      </div>
+          />)
+      }
       <div className="md:hidden">
         <NoImage
           src={src}

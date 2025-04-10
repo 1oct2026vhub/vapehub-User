@@ -44,6 +44,7 @@ export const API_ROUTES = {
     GET_ORDER_LIST: (page: number, limit: number) => buildRequestUrl(`/api/order?page=${page}&limit=${limit}`),
     ORDERS: buildRequestUrl('/api/order'),
     UPDATE_ORDER_STATUS: (orderReference: string) => `/api/orders/${orderReference}/status`,
+    GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
 }
 
 // * Helper functions

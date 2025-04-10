@@ -78,7 +78,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
         setInputValue(value);
-
+         
         // Only update quantity if the input is a valid number
         const numValue = parseInt(value);
         if (!isNaN(numValue)) {
@@ -267,7 +267,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 color='primary'
                                 className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
                                 onPress={() => handleQuantityChange(quantity - 1)}
-                                disabled={isLoading || quantity <= 1}
+                                isDisabled={isLoading || quantity <= 1 || stock === 0}
                             >
                                 <MinusIcon />
                             </Button>
@@ -278,6 +278,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 onBlur={handleBlur}
                                 pattern="[0-9]*"
                                 inputMode="numeric"
+                                disabled={stock === 0}
                                 className='w-9 max-w-9 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4 text-center'
                             />
                             {/* <input
@@ -296,7 +297,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 color='primary'
                                 className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
                                 onPress={() => handleQuantityChange(quantity + 1)}
-                                disabled={isLoading || quantity >= stock}
+                                isDisabled={isLoading || quantity >= stock || stock === 0}
                             >
                                 <PlusIcon />
                             </Button>

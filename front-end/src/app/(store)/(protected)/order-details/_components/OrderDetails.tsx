@@ -35,6 +35,16 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, user}) => {
             </div>
 
             <div className='space-y-2'>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Billing Details</h4>
+                <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
+                    <h5>{data.billingAddress?.name || ""}</h5>
+                    <p>{data.billingAddress?.street || ""}</p>
+                    <p>{data.billingAddress?.post_code || ""}</p>
+                    <p>{data.billingAddress?.country || DEFAULT_COUNTRY}</p>
+                </div>
+            </div>
+
+            <div className='space-y-2'>
                 <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Contact Details</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                     <p>{user?.email || ""}</p>

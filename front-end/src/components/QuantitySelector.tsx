@@ -84,7 +84,8 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
           color="primary"
           className={`text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent ${isLoading ? '!opacity-50 cursor-not-allowed' : ''}`}
           onPress={() => handleQuantityChange(quantity - 1)}
-          disabled={isLoading || quantity <= minQuantity}
+          
+          isDisabled={isLoading || quantity <= minQuantity}
         >
           <MinusIcon className='w-3 md:w-6'/>
         </Button>
@@ -104,10 +105,11 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
           color="primary"
           className={`text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent ${isLoading ? '!opacity-50 cursor-not-allowed' : ''}`}
           onPress={() => handleQuantityChange(quantity + 1)}
-          disabled={isLoading || quantity >= maxQuantity}
+          isDisabled={isLoading || quantity >= maxQuantity}
         >
           <PlusIcon className='w-3 md:w-6'/>
         </Button>
+        
       </div>
       {error && (
         <p className="text-red-500 text-xs md:text-sm font-medium">{error}</p>

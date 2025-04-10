@@ -52,6 +52,13 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
           <p className='text-content-2 md:text-content-1 text-skin-neutral-300 font-bold'>
             {address.street}{address.apartment ? `, ${address.apartment}` : ''}
           </p>
+          {
+            address.company_name && (
+              <p className='text-content-2 md:text-content-1 text-skin-neutral-300 font-bold'>
+                {address.company_name}
+              </p>
+            )
+          }
           <p className='text-content-2 md:text-content-1 text-skin-neutral-300 font-bold'>
             {address.town}, {address.region}, {address.post_code}
           </p>

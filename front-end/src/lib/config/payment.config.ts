@@ -1,0 +1,30 @@
+export interface TRANSACTION_DETAILS_RESPONSE {
+  email: string;
+  bankId: string;
+  amount: number;
+  switching: boolean;
+  orderCode: number;
+  statusId: string;
+  fullName: string;
+  insDate: string;
+  cardNumber: string;
+  sourceCode: string;
+  currencyCode: string;
+  customerTrns: string;
+  merchantTrns: string | null;
+  transactionTypeId: number;
+  recurringSupport: boolean;
+  totalInstallments: number;
+  cardCountryCode: string;
+  cardIssuingBank: string;
+  eventId: string | null;
+  currentInstallment: number;
+  conversionRate: number;
+  originalAmount: number;
+  cardUniqueReference: string;
+  originalCurrencyCode: string;
+  cardExpirationDate: string;
+  cardTypeId: number;
+  digitalWalletId: string | null;
+  loyaltyTransactions: unknown[];
+}

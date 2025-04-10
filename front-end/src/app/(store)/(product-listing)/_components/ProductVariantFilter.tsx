@@ -21,18 +21,22 @@ const SelectAttributeTerms = ({
     selectedVariant?: AttributeProductTerms,
     availableAttributes: AttributeTerms[]
 }) => {
-    const { handleVariantFilter, isTermAvailable, isFiltering, hasActiveFilters, getDefaultSelectedTerm } = useVariantFilter(
+    const { handleVariantFilter, isFiltering, getDefaultSelectedTerm } = useVariantFilter(
         productSlug,
         availableAttributes,
         selectedVariant
     );
 
     const selectedTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
-    const isCurrentAttribute = selectedVariant?.attribute.id === attributeTerm.attribute.id;
+    // const isCurrentAttribute = selectedVariant?.attribute.id === attributeTerm.attribute.id;
 
     // Check if this attribute has any selected term (either from URL or search params)
     // const hasSelectedTerm = selectedTerm !== undefined || isCurrentAttribute;
-
+    // hasActiveFilters() && !isCurrentAttribute
+    // ? `${attributeTerm?.terms.filter(term =>
+    //     isTermAvailable(attributeTerm.attribute.id, term.id)
+    // ).length} available`
+    // : `${attributeTerm?.terms.length} available`
     return (
         <>
             <div>
@@ -40,12 +44,7 @@ const SelectAttributeTerms = ({
                     {attributeTerm?.attribute.name}
                 </p>
                 <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>
-                    {hasActiveFilters() && !isCurrentAttribute
-                        ? `${attributeTerm?.terms.filter(term =>
-                            isTermAvailable(attributeTerm.attribute.id, term.id)
-                        ).length} available`
-                        : `${attributeTerm?.terms.length} available`
-                    }
+                    { `${attributeTerm?.terms.length} available`}
                 </p>
             </div>
             <Select

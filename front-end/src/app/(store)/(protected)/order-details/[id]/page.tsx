@@ -22,8 +22,7 @@ const OrdersListingPage: NextPage<{params: Promise<{id: string}>}> = async ({par
     if(response.status === ServerActionStatus.ERROR) {
         return <EmptyPlaceholder title="Order not found" description="The order you are looking for does not exist." />;
     }
-    const result = response.data;
-
+    const result = response.data; 
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 pt-5 pb-10 flex flex-col gap-6 lg:gap-10'>
             <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>My Order</h1>

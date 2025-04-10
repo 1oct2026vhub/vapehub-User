@@ -1,12 +1,12 @@
 "use client"
 import { Button } from '@nextui-org/react';
-import { MinusIcon, PlusIcon, TrashIcon, EditIcon, DangerIcon } from '@/components/Icons';
+import { MinusIcon, PlusIcon, TrashIcon, DangerIcon } from '@/components/Icons';
 import { useCart } from '@/lib/context/CartContext'; 
 import { useState } from 'react';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
-import Link from 'next/link';
+// import Link from 'next/link';
 
 type CartCardProps = {
   item?: CartItem;
@@ -110,7 +110,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
               >
                 <TrashIcon className='w-5 md:w-9 h-5 md:h-9' />
               </Button>
-              <Button 
+              {/* <Button 
                 as={Link}
                 href={`/${item?.product_slug}`}
                 size="sm" 
@@ -118,7 +118,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
                 variant="light" 
                 className="hover:!bg-transparent">
                 <EditIcon className='w-5 md:w-9 h-5 md:h-9' />
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>

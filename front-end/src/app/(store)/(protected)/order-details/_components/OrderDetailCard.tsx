@@ -25,13 +25,13 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     );
 
     return (
-        <Link href={`/${data.variant?.slug}`} className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
+        <Link href={`/${data.product.slug}`} className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
 
             <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
                 <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
 
                     <NoImage
-                        src={data.variant?.variantImages?.[0]?.image_url || ""}
+                        src={data.variant?.variantImages?.[0]?.image_url || data.product.ProductImages?.[0]?.image_url || ""}
                         alt={data.product.name}
                         width={104}
                         height={100}

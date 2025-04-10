@@ -189,8 +189,7 @@ const CheckoutDetails: React.FC = () => {
                                 <InputForm
                                     control={form.control}
                                     type='tel'
-                                    name="phone"
-                                    placeholder='+44xxxxxxxxxx'
+                                    name="phone" 
                                     label={
                                         <div className='flex items-center gap-4'>
                                             <Flag className="group-data-[focus=true]:w-4" />

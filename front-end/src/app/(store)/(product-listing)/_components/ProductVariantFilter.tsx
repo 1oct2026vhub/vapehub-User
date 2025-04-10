@@ -150,6 +150,7 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     selectedVariant,
     availableAttributes
 }) => {
+    // Filter out attributes that are not used in variation and not used in
     const attributeTermData = attributeTerms.filter(
         (attributeTerm) => attributeTerm.attribute.used_in_variation
     );

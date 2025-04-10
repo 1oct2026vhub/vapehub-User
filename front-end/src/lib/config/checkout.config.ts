@@ -31,20 +31,20 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
     shippingCountry: z.string().min(1, 'Country is required'),
     // Billing Address
     useShippingAsBilling: z.boolean(),
-    billingFirstName: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'First name is required'),
-    billingLastName: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Last name is required'),
-    billingAddress1: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Address line 1 is required'),
+    billingFirstName: !useShippingAsBilling ? z.string().optional() : z.string().min(1, 'First name is required'),
+    billingLastName: !useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Last name is required'),
+    billingAddress1: !useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Address line 1 is required'),
     billingAddress2: z.string().optional(),
     billingAddress3: z.string().optional(),
-    billingCity: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'City is required'),
-    billingPostcode: useShippingAsBilling ? z.string().optional() : z.string().min(1, "Postcode is required")
+    billingCity: !useShippingAsBilling ? z.string().optional() : z.string().min(1, 'City is required'),
+    billingPostcode: !useShippingAsBilling ? z.string().optional() : z.string().min(1, "Postcode is required")
     .max(20, "Postcode must not exceed 20 characters")
     .regex(
       /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i,
       "Please enter a valid UK postcode"
     ),
-    billingRegion: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Region is required'),
-    billingCountry: useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Country is required'),
+    billingRegion: !useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Region is required'),
+    billingCountry: !useShippingAsBilling ? z.string().optional() : z.string().min(1, 'Country is required'),
     // Payment
     paymentMethod: z.enum([CHECKOUT_PAYMENT_METHODS.VIVA_WALLET, CHECKOUT_PAYMENT_METHODS.WORLD_PAY]),  
     // Terms
@@ -75,6 +75,8 @@ export interface APPLY_COUPON_PAYLOAD {
 export interface CHECKOUT_PAYLOAD {
     email: string;
     phone: string;
+    receive_promotions: boolean;
+    shipping_address_id: number;
     couponCode?: string;
     shipping_method_id: number;
     shipping_address: {

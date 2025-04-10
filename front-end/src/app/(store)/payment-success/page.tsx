@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { updateOrderStatus } from '@/lib/server.actions';
@@ -9,8 +9,10 @@ import { toast } from 'sonner';
 import { Button } from '@nextui-org/button';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
+
 const PaymentSuccessPage = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { status } = useSession();
     const [transactionDetails, setTransactionDetails] = useState({
         id: '',
@@ -23,19 +25,22 @@ const PaymentSuccessPage = () => {
     useEffect(() => {
         const verifyPayment = async () => {
             try {
-                // Get order reference from URL or local storage
-                const orderRef = localStorage.getItem('vivaOrderRef');
-                if (!orderRef) {
-                    throw new Error('Order reference not found');
+                // Get parameters from URL
+                const transactionId = searchParams.get('t');
+                const sessionId = searchParams.get('s');
+
+                if (!transactionId || !sessionId) {
+                    throw new Error('Missing required payment parameters');
                 }
 
-                // Update order status
-                const response = await updateOrderStatus(orderRef, 'completed');
+                // Update order status with transaction details
+                const response = await updateOrderStatus(transactionId, 'completed');
+
                 if (response.status === ServerActionStatus.SUCCESS) {
                     // Set transaction details
                     setTransactionDetails(prev => ({
                         ...prev,
-                        id: orderRef,
+                        id: transactionId,
                         amount: localStorage.getItem('vivaOrderAmount') || '0'
                     }));
 
@@ -53,7 +58,7 @@ const PaymentSuccessPage = () => {
         };
 
         verifyPayment();
-    }, [router]);
+    }, [router, searchParams]);
 
     useEffect(() => {
         if (status === 'unauthenticated') {

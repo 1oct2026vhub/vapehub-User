@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
-import { ORDER_DETAILS_RESPONSE } from "@/lib/config/order.config";
+import { ORDER } from "@/lib/config/order.config";
 import NoImage from "@/components/NoImage";
 import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
 import Link from "next/link";
 
 interface OrderDetailCardProps {
-    status: ORDER_DETAILS_RESPONSE['status'];
-    data: ORDER_DETAILS_RESPONSE['orderItems'][0];
-    isCouponApplied: ORDER_DETAILS_RESPONSE['coupon'] | null;
+    status:string;
+    data: ORDER['orderItems'][0];
+    isCouponApplied: number | null;
 }
 
 const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
@@ -16,8 +16,9 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     data
 }) => {
     const statusColor = cn(
-        "p-1.5 md:p-2 w-fit rounded-md md:rounded-lg border !text-content-3 md:!text-content-1 font-bold",
+        "p-1.5 md:p-2 w-fit capitalize rounded-md md:rounded-lg border !text-content-3 md:!text-content-1 font-bold",
         {
+            "bg-skin-white border-skin-neutral":status === "pending",
             "bg-skin-white border-skin-blue-500 blue-gradient": status === "Order Confirmed",
             "bg-skin-primary-50 border-skin-primary2-500 text-skin-primary2-500": status === "Delivered",
         }
@@ -55,7 +56,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
                     </div>
                 </div>
                 <div className="space-y-2 text-right">
-                    <p className="text-skin-neutral-500 text-content-1 sm:text-title-2 lg:text-h5 font-bold">{DEFAULT_CURRENCY_SYMBOL}{data.variant?.price}</p>
+                    <p className="text-skin-neutral-500 text-content-1 sm:text-title-2 lg:text-h5 font-bold">{DEFAULT_CURRENCY_SYMBOL}{Number(data.quantity) * Number(data.variant?.price || 0)}</p>
                     {isCouponApplied && <p className="primary-gradient-100 text-content-3 sm:text-content-1 lg:text-title-1 font-bold text-nowrap">Coupon Applied</p>}
                 </div>
             </div>

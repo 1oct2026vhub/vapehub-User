@@ -4,6 +4,7 @@ import { ORDER_RESPONSE, PAGINATION } from "@/lib/config/order.config";
 import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
 import OrderListCard from "./OrderListCard";
+import { ROUTES } from "@/lib/routes";
 
 interface OrderListProps {
     orders: ORDER_RESPONSE[];
@@ -22,7 +23,7 @@ const OrderList: FunctionComponent<OrderListProps> = ({ orders, pagination }) =>
                     <Pagination
                         total={pagination.total_pages}
                         currentPage={pagination.current_page}
-                        onPageChange={(page) => router.push(`/orders?page=${page}`)}
+                        onPageChange={(page) => router.push(`${ROUTES.MY_ACCOUNT_ORDERS}?page=${page}`)}
                     />
                 </div>
             )}

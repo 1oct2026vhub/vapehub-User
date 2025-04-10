@@ -1,7 +1,7 @@
 import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionStatus } from "@/lib/config/app.config";
-import { notFound } from 'next/navigation';
+import { notFound, redirect, RedirectType } from 'next/navigation';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
 import { DynamicPageSlugResponse } from "@/lib/config/global.config";
@@ -35,6 +35,7 @@ const Page = async ({
   if (primarySlug && secondarySlug) {
     const response = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
     const variantTerms: AttributeTerms[] | undefined = response?.product.attribute_terms.filter((attrTerm: AttributeTerms) => attrTerm.attribute.used_in_variation === true);
+    
     const variant: AttributeProductTerms | null = variantTerms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
 
       const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
@@ -43,7 +44,7 @@ const Page = async ({
           attribute: attrTerm.attribute,
           terms: matchingTerm
         };
-      }
+      } 
       return result;
     }, null) ?? null;
 
@@ -51,15 +52,15 @@ const Page = async ({
 
     // Add variant payload if exists
     if (variant) {
-      payload.push({ 
-        attribute_id: variant.attribute.id, 
-        term_id: variant.terms.id 
+      payload.push({
+        attribute_id: variant.attribute.id,
+        term_id: variant.terms.id
       });
-    }
-     
+    } 
+
     // Add search params payload
-    if (searchParams) {
-      Object.entries(searchParams).forEach(([attributeId, termSlug]) => {
+    if (searchParamsData) {
+      Object.entries(searchParamsData).forEach(([attributeId, termSlug]) => {
         const term = variantTerms?.find(term => term.attribute.id === parseInt(attributeId) && term.terms.find(t => t.slug === termSlug));
         // Skip if this attribute is already in payload from variant
         if (attributeId !== variant?.attribute.id.toString()) {
@@ -69,15 +70,25 @@ const Page = async ({
           });
         }
       });
-    } 
-     
-    const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
+    }
 
+    const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
+     
+    if(data && !data.variants.length) {
+      const lastPayload = payload[payload.length - 1];
+      const newSlug = data?.filtered_attribute_terms.find(term => term.attribute.id === lastPayload.attribute_id)?.terms.find(t => t.id === lastPayload.term_id)?.slug;
+      if(newSlug) {
+        redirect(`/${data.product.slug}/${newSlug}`, RedirectType.replace);
+      } else {
+        return notFound();
+      }
+    }
+    
     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
       return notFound();
     }
-    
-    return <ProductView data={data} isVariant={true} selectedVariant={variant}  />;
+
+    return <ProductView data={data} isVariant={true} selectedVariant={variant} />;
   }
 
 
@@ -134,7 +145,7 @@ const fetchCategory = async (slug: string, params: PRODUCT_PAYLOAD): Promise<Cat
   const response = await getProductByCategory(slug, params);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
-  } 
+  }
   return response.data;
 };
 
@@ -143,13 +154,13 @@ const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Pr
   const payload: PRODUCT_VARIANT_PAYLOAD = {
     product_id: id,
     attribute_terms: params
-  } 
-    
+  }
+
   const response = await getProductVariantByID(payload);
-  
+
   if (response.status === ServerActionStatus.ERROR) {
     return null;
-  }  
+  }
   return response.data;
 };
 
@@ -223,15 +234,15 @@ export async function generateMetadata({ params, searchParams }: {
 
     // Add variant payload if exists
     if (variant) {
-      payload.push({ 
-        attribute_id: variant.attribute.id, 
-        term_id: variant.terms.id 
+      payload.push({
+        attribute_id: variant.attribute.id,
+        term_id: variant.terms.id
       });
     }
 
     // Add search params payload
-    if (searchParams) {
-      Object.entries(searchParams).forEach(([attributeId, termSlug]) => {
+    if (searchParamsData) {
+      Object.entries(searchParamsData).forEach(([attributeId, termSlug]) => {
         const term = response?.product.attribute_terms?.find(term => term.attribute.id === parseInt(attributeId) && term.terms.find(t => t.slug === termSlug));
         // Skip if this attribute is already in payload from variant
         if (attributeId !== variant?.attribute.id.toString()) {
@@ -244,11 +255,23 @@ export async function generateMetadata({ params, searchParams }: {
     }
 
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
+    if(data &&!data.variants.length) {
+       return {
+        title: data.product.name,
+        description: data.product.description,
+        openGraph: {
+          title: data.product.name,
+          description: data.product.description,
+          
+        }
+       };
+    }
+   
     
     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
       return notFound();
     }
-
+     
     return {
       title: variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name,
       description: data.product.description,
@@ -329,7 +352,7 @@ export async function generateMetadata({ params, searchParams }: {
     product: async () => {
       const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
       if (!data?.product || !data.product.category) return null;
- 
+
       return {
         title: data.product.name,
         description: data.product.description,

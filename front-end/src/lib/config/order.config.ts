@@ -200,6 +200,7 @@ export interface ORDER {
             id: number;
             name: string;
             price: string;
+            slug: string;
             ProductImages: {
                 image_url: string;
             }[];

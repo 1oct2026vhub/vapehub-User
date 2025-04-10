@@ -84,13 +84,14 @@ export interface productAttributeTerms {
     is_visible_page: boolean;
     used_in_variation: boolean;
 }
- interface productAttributesTerms {
+export interface productAttributesTerms {
     id: number;
     name: string;
     slug: string;
     product_count: number;
     is_visible_page: boolean;
     used_in_variation: boolean;
+    is_selected: boolean;
 
 }
 export interface AttributeProductTerms {

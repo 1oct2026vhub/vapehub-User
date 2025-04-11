@@ -1,110 +1,48 @@
 "use client"
-import InputField from '@/components/InputField'
 import ShippingProgress from '@/components/ShippingProgress'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
-import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_FORM_TYPE, APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
 import { useCart } from '@/lib/context/CartContext'
 import { ROUTES } from '@/lib/routes'
-import { applyCoupon, checkout } from '@/lib/server.actions'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Divider } from '@nextui-org/react' 
+import { checkout } from '@/lib/server.actions'
+import { Button, Divider } from '@nextui-org/react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form';
+import React from 'react'
 import { toast } from 'sonner'
 import { useSession } from 'next-auth/react'
+import CouponForm from '@/components/CouponForm'
+import { CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
 
 const CartDetails: React.FC = () => {
     const { status } = useSession();
     const { cartTotal, itemCount, couponDiscount, setCouponDiscount } = useCart();
-    const cartCouponFormConfig = useForm<APPLY_COUPON_FORM_TYPE>({
-        resolver: zodResolver(APPLY_COUPON_FORM_SCHEMA),
-        mode: 'onSubmit',
-        defaultValues: {
-            couponCode: couponDiscount.code || '',
-            shippingMethodId: 0,
-        },
-    });
-
-    
-    const [couponSuccessMessage, setCouponSuccessMessage] = useState(couponDiscount.isApplied ? 'Coupon applied successfully' : '');
     const router = useRouter();
 
-    const handleFormSubmit = async (data: { couponCode?: string; shippingMethodId?: number })  => {
-        const response = await applyCoupon(data as unknown as APPLY_COUPON_PAYLOAD);
+    const handleCheckout = async () => {
+        const response = await checkout({ couponCode: couponDiscount.code || '' } as unknown as CHECKOUT_PAYLOAD);
         if(response.status === ServerActionStatus.SUCCESS) {
-            setCouponSuccessMessage('Coupon applied successfully');
-            setCouponDiscount({
-                value: cartTotal - response.data.total,
-                isApplied: true,
-                code: data.couponCode || null,
-                message: response.data.coupon.description,
-                discountValue: response.data.coupon.discount_value
-            });
+            router.push(ROUTES.CHECKOUT);
         } else {
             toast.error(response.message);
-            cartCouponFormConfig.reset();
-            setCouponDiscount({
-                value: 0,
-                isApplied: false,
-                code: null,
-                message: null,
-                discountValue: ''
-            });
         }
     }
-
-  const handleCheckout = async () => {
-    
-    const couponCode = cartCouponFormConfig.getValues('couponCode') || '';
-    if(!couponCode) {
-        router.replace(ROUTES.CHECKOUT);
-        return;
-    }
-    const response = await checkout({ couponCode } as unknown as CHECKOUT_PAYLOAD);
-    if(response.status === ServerActionStatus.SUCCESS) {
-        router.push(ROUTES.CHECKOUT);
-    } else {
-        toast.error(response.message);
-    }
-  }
 
     return (
         <div className='flex flex-col p-3 md:p-5 gap-3 bg-white border border-skin-neutral-100 rounded-14 w-full lg:w-4/6 xl:w-full xl:max-w-[584px]'>
             {status === 'authenticated' && (
                 <>
-                <form onSubmit={cartCouponFormConfig.handleSubmit(handleFormSubmit)} className='flex items-center gap-3'>
-                    <InputField
-                        type='text'
-                        label="Coupon Code"
-                        isRequired
-                        className='xl:min-w-[366px]'
-                        control={cartCouponFormConfig.control}
-                        name='couponCode'
+                    <CouponForm 
+                        onCouponApplied={setCouponDiscount}
+                        initialCouponCode={couponDiscount.code || ''}
+                        cartTotal={cartTotal}
                     />
-                    
-                    <Button
-                        size="lg"
-                        radius="md"
-                        color="primary"
-                        className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-11 md:h-12"
-                        type='submit'
-                        isLoading={cartCouponFormConfig.formState.isSubmitting}
-                        isDisabled={!cartCouponFormConfig.formState.isValid}
-                    >
-                        Apply Code
-                    </Button>
-                </form>
-            
-           {couponSuccessMessage && <p className='primary-gradient-100 text-content-3 md:text-content-1 font-bold'>{couponSuccessMessage}</p>}
-            <Divider />
-            {couponDiscount.isApplied    && (
-            <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
-                <p>{couponDiscount.message}</p>
-                <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
-            </div>
-            )}
-            </>
+                    {couponDiscount.isApplied && (
+                        <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
+                            <p>{couponDiscount.message}</p>
+                            <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
+                        </div>
+                    )}
+                    <Divider />
+                </>
             )}
             <div className='space-y-1.5'>
                 <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>

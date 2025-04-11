@@ -95,32 +95,33 @@ export interface SHIPPING_METHOD {
     message?: string | null;
     price: number;
 }
-export const SHIPPING_METHODS: SHIPPING_METHOD[] = [
-    {
-        id: 1,
-        name: 'Royal Mail Tracked 48',
-        description: '2 to 4 working days',
-        message: 'Free for orders over £30',
-        price: 10.02
-    },
-    {
-        id: 2,
-        name: 'Royal Mail Tracked 24',
-        description: '1 to 2 working days',
-        price: 12.22
-    },
-    {
-        id: 3,
-        name: 'Royal Mail Next Day Guaranteed',
-        price: 15.59
-    },
-    {
-        id: 4,
-        name: 'DPD Next Day Delivery',
-        price: 16.85,
-        message: 'This is not a guaranteed service'
-    }
-]
+
+// export const SHIPPING_METHODS: SHIPPING_METHOD[] = [
+//     {
+//         id: 1,
+//         name: 'Royal Mail Tracked 48',
+//         description: '2 to 4 working days',
+//         message: 'Free for orders over £30',
+//         price: 10.02
+//     },
+//     {
+//         id: 2,
+//         name: 'Royal Mail Tracked 24',
+//         description: '1 to 2 working days',
+//         price: 12.22
+//     },
+//     {
+//         id: 3,
+//         name: 'Royal Mail Next Day Guaranteed',
+//         price: 15.59
+//     },
+//     {
+//         id: 4,
+//         name: 'DPD Next Day Delivery',
+//         price: 16.85,
+//         message: 'This is not a guaranteed service'
+//     }
+// ]
 
 export interface ORDER_RESPONSE_DATA {
     message: string;
@@ -238,4 +239,63 @@ export interface ORDER {
         shipping_cost: number;
     };
     coupon: null;
+}
+
+
+export interface SHIPPING_METHOD_DATA {
+    id: number;
+    shipping_method: string;
+    description: string;
+    message: string;
+    shipping_cost: number;
+    api_key: string;
+    api_secret: string;
+    updated_by: number;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+
+}
+
+export enum ORDER_STATUS {
+    DRAFT = 'draft',
+    PENDING = 'pending',
+    PROCESSING = 'processing',
+    SHIPPED = 'shipped',
+    DELIVERED = 'delivered',
+    COMPLETED = 'completed',
+    FAIL = 'fail',
+    CANCEL = 'cancel',
+    RETURN_REQUESTED = 'return_requested',
+    RETURN_APPROVED = 'return_approved',
+    RETURN_RECEIVED = 'return_received',
+    REFUNDED = 'refunded'
+}
+ 
+export interface Coupon {
+    id: number;
+    code: string;
+    description: string;
+    discount_type: string;
+    discount_value: string;
+    minimum_purchase: string;
+    maximum_discount: string;
+    usage_limit: number;
+    usage_count: number;
+    is_single_use: boolean;
+    start_date: string;
+    end_date: string;
+    status: string;
+    created_by: number;
+    updated_by: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface CouponResponse {
+    totalItems: number;
+    shippingCost: number;
+    subTotal: number;
+    total: number;
+    coupon: Coupon;
 }

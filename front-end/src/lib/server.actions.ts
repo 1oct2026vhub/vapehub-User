@@ -7,7 +7,7 @@ import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
-import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, PLACE_ORDER_PAYLOAD } from "./config/order.config";
+import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
@@ -314,8 +314,8 @@ export const checkout = async (payload: CHECKOUT_PAYLOAD): Promise<ServerActionR
 };
 
 // apply coupon
-export const applyCoupon = async (payload: APPLY_COUPON_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
-  return await handleRequest<{message: string}, unknown>({
+export const applyCoupon = async (payload: APPLY_COUPON_PAYLOAD): Promise<ServerActionResponse<CouponResponse>> => {
+  return await handleRequest<CouponResponse, unknown>({
     endpoint: API_ROUTES.APPLY_COUPON,
     payload,
     method: 'POST',
@@ -426,4 +426,12 @@ export const updateOrderStatus = async (
         payload: { status },
         method: 'PUT',
     });
+};
+
+//  get shipping methods
+export const getShippingMethods = async (): Promise<ServerActionResponse<SHIPPING_METHOD_DATA[]>> => {
+  return await handleRequest<SHIPPING_METHOD_DATA[], unknown>({
+    endpoint: API_ROUTES.GET_SHIPPING_METHODS,
+    method: 'GET',
+  });
 };

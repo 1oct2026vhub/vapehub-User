@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils"; 
 import NoImage from "@/components/NoImage";
-import { ORDER_RESPONSE } from "@/lib/config/order.config";
+import { ORDER_RESPONSE, ORDER_STATUS } from "@/lib/config/order.config";
 import Link from "next/link";
 import { ROUTES } from "@/lib/routes";
+import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
 // import NoImage from "@/components/NoImage";
 type OrderListCardProps = {
     data: ORDER_RESPONSE;
@@ -10,17 +10,7 @@ type OrderListCardProps = {
  
 const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
     
-  // Define the status color conditionally
-  const statusColor = cn(
-    "p-1.5 md:p-2 w-fit rounded-md md:rounded-lg border !text-content-3 md:!text-content-1 font-bold",
-    {
-      "bg-skin-white border-skin-blue-500 blue-gradient": data.status === "Order Confirmed",
-      "bg-skin-primary-50 border-skin-primary2-500 text-skin-primary2-500": data.status === "Delivered",
-      "bg-skin-white border-skin-red-500 red-gradient": data.status === "Cancelled",
-      "bg-skin-white border-skin-yellow-500 yellow-gradient": data.status === "pending",
-    }
-  );
-
+  
   return (
     <Link href={`${ROUTES.ORDER_DETAILS}/${data.id}`} className="bg-white rounded-14 shadow-card hover:shadow-brand-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
       {/* Product Image Section */}
@@ -38,7 +28,7 @@ const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
       {/* Order Details */}
       <div className="space-y-3.5 md:space-y-5 md:max-w-[50%] xl:max-w-[40%]">
         {/* Status Badge */}
-        <div className={statusColor}>{data.status}</div>
+        <OrderStatusBadge status={data.status as ORDER_STATUS} />  
 
         {/* Order Title */}
         <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 line-clamp-2 font-semibold">

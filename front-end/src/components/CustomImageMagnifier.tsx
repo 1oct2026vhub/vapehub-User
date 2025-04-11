@@ -16,82 +16,96 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
   width,
   height,
   className,
-  zoomLevel = 2
+  zoomLevel = 2.5
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [magnifierPosition, setMagnifierPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
 
     const { left, top, width: containerWidth, height: containerHeight } = containerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - left) / containerWidth) * 100;
-    const y = ((e.clientY - top) / containerHeight) * 100;
+    
+    // Calculate relative position within the container (0 to 1)
+    const relativeX = (e.clientX - left) / containerWidth;
+    const relativeY = (e.clientY - top) / containerHeight;
 
-    setPosition({ x, y });
-    setCursorPosition({ x: e.clientX - left, y: e.clientY - top });
+    // Calculate magnifier position
+    const magnifierX = e.clientX - left - 50; // 50 is half the magnifier width
+    const magnifierY = e.clientY - top - 50; // 50 is half the magnifier height
+
+    // Ensure magnifier stays within bounds
+    const boundedX = Math.max(0, Math.min(magnifierX, containerWidth - 100));
+    const boundedY = Math.max(0, Math.min(magnifierY, containerHeight - 100));
+
+    setMagnifierPosition({ x: boundedX, y: boundedY });
+
+    // Update zoom position (percentage based)
+    const zoomX = relativeX * 100;
+    const zoomY = relativeY * 100;
+
+    const zoomContainer = document.querySelector('.zoom-container') as HTMLDivElement;
+    if (zoomContainer) {
+      zoomContainer.style.backgroundPosition = `${zoomX}% ${zoomY}%`;
+    }
   };
 
   return (
     <div className="relative">
-      {
-        src ? (
-          <div className="hidden md:block">
-            <div
-              ref={containerRef}
-              className="relative "
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onMouseMove={handleMouseMove}
-            >
-              <NoImage
-                src={src}
-                alt={alt}
-                width={width}
-                height={height}
-                className={className}
+      {src ? (
+        <div className="hidden md:block">
+          <div
+            ref={containerRef}
+            className="relative cursor-crosshair"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onMouseMove={handleMouseMove}
+          >
+            <NoImage
+              src={src}
+              alt={alt}
+              width={width}
+              height={height}
+              className={className}
+            />
+            {isHovered && (
+              <div
+                className="absolute pointer-events-none border border-gray-300 rounded-sm bg-white bg-opacity-20"
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  left: `${magnifierPosition.x}px`,
+                  top: `${magnifierPosition.y}px`,
+                }}
               />
-              {isHovered && (
-                <div
-                  className="absolute pointer-events-none border-2 border-white rounded-full bg-white bg-opacity-20"
-                  style={{
-                    width: '100px',
-                    height: '100px',
-                    left: `${cursorPosition.x - 20}px`,
-                    top: `${cursorPosition.y - 30}px`,
-                    transform: 'translate(-20%, -30%)',
-                  }}
-                />
-              )}
-              {isHovered && (
-                <div
-                  className="absolute border-2 border-gray-300 hidden md:block shadow-lg rounded-md overflow-hidden"
-                  style={{
-                    width: '300px',
-                    height: '300px',
-                    left: '100%',
-                    top: 0,
-                    backgroundImage: `url(${src})`,
-                    backgroundSize: `${width * zoomLevel}px ${height * zoomLevel}px`,
-                    backgroundPosition: `${position.x}% ${position.y}%`,
-                    backgroundRepeat: 'no-repeat',
-                    zIndex: 10,
-                  }}
-                />
-              )}
-            </div>
+            )}
+            {isHovered && (
+              <div
+                className="zoom-container absolute border border-gray-300 hidden md:block shadow-lg rounded-md overflow-hidden"
+                style={{
+                  width: '400px',
+                  height: '400px',
+                  left: '105%',
+                  top: '-50px',
+                  backgroundImage: `url(${src})`,
+                  backgroundSize: `${width * zoomLevel}px ${height * zoomLevel}px`,
+                  backgroundRepeat: 'no-repeat',
+                  zIndex: 1000,
+                }}
+              />
+            )}
           </div>
-        ) : (
-          <NoImage
-            src={src}
-            alt={alt}
-            width={width}
-            height={height}
-            className={className}
-          />)
-      }
+        </div>
+      ) : (
+        <NoImage
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          className={className}
+        />
+      )}
       <div className="md:hidden">
         <NoImage
           src={src}

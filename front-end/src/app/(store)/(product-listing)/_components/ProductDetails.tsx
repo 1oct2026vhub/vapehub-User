@@ -60,7 +60,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     const product: ProductViewDetails = data?.product;
     const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;
     const stock = isVariant && productVariant ? productVariant.stock : 0;
-    const productName = selectedVariant ? `${selectedVariant.terms.name} - ${product?.name}` : product?.name;
+    const productName =  product?.name;
     const availableAttributes: AttributeTerms[] = data.available_terms;
     const minQuantity = 1; 
     const price = isVariant ? data?.variants[0]?.price: (productVariant?.price ?? data?.variants[0]?.price);

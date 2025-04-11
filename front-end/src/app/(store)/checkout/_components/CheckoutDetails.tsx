@@ -10,7 +10,7 @@ import { CustomRadio } from '@/components/CustomRadio';
 import { Button, RadioGroup } from '@nextui-org/react';
 import { Form } from '@/components/ui/Form';
 import { useCheckout } from '@/lib/context/CheckoutContext';
-import { SHIPPING_METHODS } from '@/lib/config/order.config';
+import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config';
 import { useCart } from '@/lib/context/CartContext';
 import { useAddress } from '@/lib/context/AddressContext';
 import AddressList from './AddressList';
@@ -18,10 +18,14 @@ import { Address } from '@/lib/config/user.config';
 import { useUserProfile } from '@/lib/hooks/useUserProfile';
 import Flag from '@/components/ui/Flag';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
+import { getShippingMethods } from '@/lib/server.actions';
+import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 
 const CheckoutDetails: React.FC = () => {
     const { fetchProfile } = useUserProfile();
     const [shippingAsBilling, setShippingAsBilling] = useState(true);
+    const [shippingMethods, setShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
+    const [originalShippingMethods, setOriginalShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
     const form = useForm<CHECKOUT_FORM_TYPE>({
         resolver: zodResolver(CHECKOUT_FORM_SCHEMA(shippingAsBilling)),
         mode: 'all',
@@ -31,7 +35,7 @@ const CheckoutDetails: React.FC = () => {
             ageConfirmation: false,
             useShippingAsBilling: false,
             termsAgreement: false,
-            shippingMethodId: "3",
+            shippingMethodId: 0,
             marketingConsent: false,
             paymentMethod: CHECKOUT_PAYMENT_METHODS.VIVA_WALLET,
             selectedAddressId: undefined,
@@ -56,14 +60,11 @@ const CheckoutDetails: React.FC = () => {
         }
     });
     const { selectedShippingMethod, setSelectedShippingMethod, handlePlaceOrder, isProcessing } = useCheckout();
-    const { cartTotal, cartCouponCode } = useCart();
+    const { cartTotal, couponDiscount } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
 
-    useEffect(() => {
-        setShippingAsBilling(form.watch('useShippingAsBilling'));
-    }, [form.watch('useShippingAsBilling')]);
-
+   
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
         
         // Handle form submission
@@ -95,18 +96,18 @@ const CheckoutDetails: React.FC = () => {
                 post_code: !data.useShippingAsBilling ? data.shippingPostcode || '' : data.billingPostcode || ''
             },
             useShippingAsBilling: !data.useShippingAsBilling,
-            couponCode: cartCouponCode || undefined,
+            couponCode: couponDiscount.code || undefined,
             shipping_method_id: Number(selectedShippingMethod?.id) || 0,
             payment_method: {
                 method: data.paymentMethod
             },
-            total: cartTotal + (selectedShippingMethod?.price || 0)
+            total: (cartTotal + (selectedShippingMethod?.shipping_cost || 0)) - couponDiscount.value
 
         }; ;
         
         await handlePlaceOrder(orderPayload);
         form.reset();
-        setSelectedShippingMethod(SHIPPING_METHODS[0]);
+        setSelectedShippingMethod(shippingMethods[0]);
         setShowNewAddressForm(false);
 
     };
@@ -151,13 +152,37 @@ const CheckoutDetails: React.FC = () => {
     useEffect(() => {
         const loadProfile = async () => {
             const profile = await fetchProfile();
+            const response = await getShippingMethods();
+            if (response.status == ServerActionStatus.SUCCESS) {
+                const shippingMethod = response.data;
+                setOriginalShippingMethods(shippingMethod);
+                setShippingMethods(shippingMethod);
+                setSelectedShippingMethod(shippingMethod[0]);
+                form.setValue('shippingMethodId', shippingMethod[0].id);
+            }
             form.setValue('email', profile?.email || '');
             form.setValue('phone', profile?.phone || '');
-            setSelectedShippingMethod(SHIPPING_METHODS.find(m => m.id.toString() === '3') || SHIPPING_METHODS[0]);
+            
         }
         loadProfile();
 
     }, []);
+
+    useEffect(() => {
+        setShippingAsBilling(form.watch('useShippingAsBilling'));
+    }, [form.watch('useShippingAsBilling')]);
+
+    useEffect(() => {
+        const filteredMethods = cartTotal > 30 
+            ? originalShippingMethods
+            : originalShippingMethods.filter(method => method.id !== 1);
+
+        setShippingMethods(filteredMethods);
+        if (filteredMethods.length > 0) {
+            setSelectedShippingMethod(filteredMethods[0]);
+            form.setValue('shippingMethodId', filteredMethods[0].id);
+        }
+    }, [cartTotal, originalShippingMethods]);
 
     useEffect(() => {
         if (addresses.length > 0) {
@@ -426,25 +451,24 @@ const CheckoutDetails: React.FC = () => {
                             {/* value={form.watch('paymentMethod')}
                             onChange={(e) => form.setValue('paymentMethod', e.target.value as CHECKOUT_PAYMENT_METHODS) */}
                             <RadioGroup
-                                value={form.watch('shippingMethodId')}
+                                value={form.watch('shippingMethodId').toString()}
 
                                 onChange={(e) => {
                                     const method = e.target.value;
-                                    form.setValue('shippingMethodId', e.target.value);
-                                    setSelectedShippingMethod(SHIPPING_METHODS.find(m => m.id.toString() === method.toString()) || SHIPPING_METHODS[0]);
+                                    form.setValue('shippingMethodId', Number(method));
+                                    setSelectedShippingMethod(shippingMethods.find(m => m.id.toString() === method.toString()) || shippingMethods[0]);
                                 }}
 
-
                             >
-                                {SHIPPING_METHODS.map((method) => (
+                                    {shippingMethods.map((method) => (
                                     <CustomRadio key={method.id} value={method.id.toString()}>
                                         <div className='space-y-2'>
                                             <div className='flex items-start justify-between gap-4'>
                                                 <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>
-                                                    {method.name} {method.description && <span className='font-bold'>- {method.description}</span>}
+                                                    {method.shipping_method} {method.description && <span className='font-bold'>- {method.description}</span>}
                                                 </h4>
                                                 <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>
-                                                    £{method.price}
+                                                    {method.shipping_cost ? `${DEFAULT_CURRENCY_SYMBOL}${method.shipping_cost}` : 'Free'}
                                                 </p>
                                             </div>
                                             {method.message && (
@@ -458,7 +482,7 @@ const CheckoutDetails: React.FC = () => {
                             </RadioGroup>
                             {/* showing error message if shipping method is not selected */}
                             {form.formState.errors.shippingMethodId && (
-                                <p className='text-skin-red-400 text-content-2 md:text-content-1 '>{form.formState.errors.shippingMethodId.message}</p>
+                                <p className="text-danger text-tiny p-1">{form.formState.errors.shippingMethodId.message}</p>
                             )}
 
 

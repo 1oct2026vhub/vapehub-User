@@ -115,7 +115,7 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
         message: 'You must agree to the terms and conditions'
     }),
     // Shipping Method must be a number and must be greater than 0
-    shippingMethodId: z.string().min(1, 'Shipping method is required'),
+    shippingMethodId: z.number().min(1, 'Shipping method is required'),
     // Coupon
     couponCode: z.string().optional(),
     marketingConsent: z.boolean().optional()

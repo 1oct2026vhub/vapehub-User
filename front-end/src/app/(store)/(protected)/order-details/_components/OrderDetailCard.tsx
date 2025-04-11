@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils";
-import { ORDER } from "@/lib/config/order.config";
+import { ORDER, ORDER_STATUS } from "@/lib/config/order.config";
 import NoImage from "@/components/NoImage";
 import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
 import Link from "next/link";
+import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
 
 interface OrderDetailCardProps {
     status:string;
@@ -15,14 +15,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     isCouponApplied,
     data
 }) => {
-    const statusColor = cn(
-        "p-1.5 md:p-2 w-fit capitalize rounded-md md:rounded-lg border !text-content-3 md:!text-content-1 font-bold",
-        {
-            "bg-skin-white border-skin-neutral":status === "pending",
-            "bg-skin-white border-skin-blue-500 blue-gradient": status === "Order Confirmed",
-            "bg-skin-primary-50 border-skin-primary2-500 text-skin-primary2-500": status === "Delivered",
-        }
-    );
+    
 
     return (
         <Link href={`/${data.product.slug}`} className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
@@ -42,7 +35,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
             <div className="flex items-start gap-6 justify-between w-full">
                 <div className="flex flex-col gap-4">
                     {/* Status Badge */}
-                    <div className={statusColor}>{status}</div>
+                    <OrderStatusBadge status={status as ORDER_STATUS} />
 
                     {/* Order Title */}
                     <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 font-semibold">

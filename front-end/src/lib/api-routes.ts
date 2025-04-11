@@ -45,6 +45,7 @@ export const API_ROUTES = {
     ORDERS: buildRequestUrl('/api/order'),
     UPDATE_ORDER_STATUS: (orderReference: string) => `/api/orders/${orderReference}/status`,
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
+    GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
 }
 
 // * Helper functions

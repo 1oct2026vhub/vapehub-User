@@ -1,5 +1,5 @@
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config'
-import { ORDER, SHIPPING_METHODS } from '@/lib/config/order.config'
+import { ORDER } from '@/lib/config/order.config'
 import { USER_ADDRESS_RESPONSE } from '@/lib/config/user.config'
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils'
 import React from 'react'
@@ -20,7 +20,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, user}) => {
            <div className='space-y-2'>
                 <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Cost</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
-                    <p>{DEFAULT_CURRENCY_SYMBOL}{SHIPPING_METHODS.find(method => method.id === data.shippingMethod?.id)?.price || SHIPPING_METHODS[2].price}</p>
+                    <p>{DEFAULT_CURRENCY_SYMBOL}{data.shippingMethod?.shipping_cost || 0}</p>
                 </div>
             </div>
 
@@ -55,7 +55,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, user}) => {
             <div className='space-y-2'>
                 <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Method</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
-                    <p>{SHIPPING_METHODS.find(method => method.id === data.shippingMethod?.id)?.name || SHIPPING_METHODS[2].name}</p>
+                    <p>{data.shippingMethod?.shipping_method || ""}</p>
                 </div>
             </div>
 

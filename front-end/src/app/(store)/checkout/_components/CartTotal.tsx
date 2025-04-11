@@ -16,29 +16,44 @@ import { toast } from 'sonner'
 import InputField from '@/components/InputField'
 
 const CartTotal: React.FC = () => {
-    const { cartTotal, itemCount, cartCouponCode } = useCart();
+    const { cartTotal, itemCount, setCouponDiscount, couponDiscount } = useCart();
     const { selectedShippingMethod } = useCheckout();
-    const [couponSuccessMessage, setCouponSuccessMessage] = useState('');
+    const [couponSuccessMessage, setCouponSuccessMessage] = useState(couponDiscount.isApplied ? 'Coupon applied successfully' : '');
 
     const couponForm = useForm<APPLY_COUPON_FORM_TYPE>({
         resolver: zodResolver(APPLY_COUPON_FORM_SCHEMA),
         defaultValues: {
-            couponCode: cartCouponCode || ''
+            couponCode: couponDiscount.code || '',
+            shippingMethodId: selectedShippingMethod?.id || 0,
         }
     });
 
     const handleApplyCoupon = async (data: APPLY_COUPON_FORM_TYPE) => {
         const response = await applyCoupon(data as unknown as APPLY_COUPON_PAYLOAD);
         if (response.status === ServerActionStatus.SUCCESS) {
-            setCouponSuccessMessage(response.data.message);
+            setCouponSuccessMessage("Coupon applied successfully");
+            setCouponDiscount({
+                value: cartTotal - response.data.total,
+                isApplied: true,
+                code: data.couponCode || null,
+                message: response.data.coupon.description,
+                discountValue: response.data.coupon.discount_value
+            });
         } else {
             toast.error(response.message);
             couponForm.reset({ couponCode: '' });
+            setCouponDiscount({
+                value: 0,
+                isApplied: false,
+                code: null,
+                message: null,
+                discountValue: ''
+            });
         }
     };
 
-    const shippingCost = selectedShippingMethod?.price || 0;
-    const total = cartTotal + shippingCost;
+    const shippingCost = selectedShippingMethod?.shipping_cost || 0;
+    const total = (cartTotal + shippingCost) - couponDiscount.value;
 
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded-14 w-full'>
@@ -66,15 +81,17 @@ const CartTotal: React.FC = () => {
                     />
                 </div>
                 {couponSuccessMessage && (
-                    <p className='text-success-500 text-content-3 md:text-content-1 font-bold'>
+                    <p className='primary-gradient-100 text-content-3 md:text-content-1 font-bold'>
                         {couponSuccessMessage}
                     </p>
                 )}
                 <Divider className='border-2' />
-                <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
-                    <p>Extra 10% Off</p>
-                    <p>-£ 6.58</p>
-                </div>
+                {couponDiscount.isApplied && (
+                    <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
+                        <p>{couponDiscount.message}</p>
+                        <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
+                    </div>
+                )}
                 <div className='space-y-1.5'>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
                         <p className='text-skin-neutral-500'>Number of Items</p>

@@ -1,7 +1,6 @@
 'use client'
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { SHIPPING_METHOD } from '@/lib/config/order.config';
 import { CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS } from '@/lib/config/checkout.config';
 import { placeOrder } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config'; 
@@ -9,10 +8,11 @@ import { ROUTES } from '@/lib/routes';
 import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
 import { useWorldPay } from '@/lib/hooks/useWorldpay';
 import { toast } from 'sonner';
+import { SHIPPING_METHOD_DATA } from '../config/order.config';
 
 interface CheckoutContextType {
-    selectedShippingMethod: SHIPPING_METHOD | null;
-    setSelectedShippingMethod: (method: SHIPPING_METHOD) => void;
+    selectedShippingMethod: SHIPPING_METHOD_DATA | null;
+    setSelectedShippingMethod: (method: SHIPPING_METHOD_DATA) => void;
     handlePlaceOrder: (data: CHECKOUT_PAYLOAD) => Promise<void>;
     isProcessing: boolean;
 }
@@ -32,7 +32,7 @@ interface CheckoutProviderProps {
 }
 
 export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) => {
-    const [selectedShippingMethod, setSelectedShippingMethod] = useState<SHIPPING_METHOD | null>(null);
+    const [selectedShippingMethod, setSelectedShippingMethod] = useState<SHIPPING_METHOD_DATA | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
     const { initiatePayment: initiateWorldPayPayment } = useWorldPay();

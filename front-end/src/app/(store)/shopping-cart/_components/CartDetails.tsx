@@ -16,22 +16,41 @@ import { useSession } from 'next-auth/react'
 
 const CartDetails: React.FC = () => {
     const { status } = useSession();
+    const { cartTotal, itemCount, couponDiscount, setCouponDiscount } = useCart();
     const cartCouponFormConfig = useForm<APPLY_COUPON_FORM_TYPE>({
         resolver: zodResolver(APPLY_COUPON_FORM_SCHEMA),
         mode: 'onSubmit',
+        defaultValues: {
+            couponCode: couponDiscount.code || '',
+            shippingMethodId: 0,
+        },
     });
 
-    const { cartTotal, itemCount } = useCart();
-    const [couponSuccessMessage, setCouponSuccessMessage] = useState('');
+    
+    const [couponSuccessMessage, setCouponSuccessMessage] = useState(couponDiscount.isApplied ? 'Coupon applied successfully' : '');
     const router = useRouter();
 
     const handleFormSubmit = async (data: { couponCode?: string; shippingMethodId?: number })  => {
         const response = await applyCoupon(data as unknown as APPLY_COUPON_PAYLOAD);
         if(response.status === ServerActionStatus.SUCCESS) {
-            setCouponSuccessMessage(response.data.message);
+            setCouponSuccessMessage('Coupon applied successfully');
+            setCouponDiscount({
+                value: cartTotal - response.data.total,
+                isApplied: true,
+                code: data.couponCode || null,
+                message: response.data.coupon.description,
+                discountValue: response.data.coupon.discount_value
+            });
         } else {
             toast.error(response.message);
             cartCouponFormConfig.reset();
+            setCouponDiscount({
+                value: 0,
+                isApplied: false,
+                code: null,
+                message: null,
+                discountValue: ''
+            });
         }
     }
 
@@ -63,6 +82,7 @@ const CartDetails: React.FC = () => {
                         control={cartCouponFormConfig.control}
                         name='couponCode'
                     />
+                    
                     <Button
                         size="lg"
                         radius="md"
@@ -76,12 +96,14 @@ const CartDetails: React.FC = () => {
                     </Button>
                 </form>
             
-           {couponSuccessMessage && <p className='text-success-500 text-content-3 md:text-content-1 font-bold'>{couponSuccessMessage}</p>}
+           {couponSuccessMessage && <p className='primary-gradient-100 text-content-3 md:text-content-1 font-bold'>{couponSuccessMessage}</p>}
             <Divider />
+            {couponDiscount.isApplied    && (
             <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
-                <p>Extra 10% Off</p>
-                <p>-£ 6.58</p>
+                <p>{couponDiscount.message}</p>
+                <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
             </div>
+            )}
             </>
             )}
             <div className='space-y-1.5'>
@@ -99,7 +121,7 @@ const CartDetails: React.FC = () => {
             <Divider />
             <div className='flex items-center justify-between text-black font-semibold'>
                 <p className='text-content-2 md:text-title-1'>Total</p>
-                <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL} {cartTotal.toFixed(2)}</p>
+                <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.isApplied ?  (cartTotal - couponDiscount.value).toFixed(2): (cartTotal).toFixed(2)}</p>
             </div>
             <Button
                 size="lg"

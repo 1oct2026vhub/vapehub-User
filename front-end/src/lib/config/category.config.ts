@@ -37,6 +37,6 @@ export const defaultNavLinks:SubCategory[] = [
 ];
 
 export enum CategoryDetails {
-    title = "Shop by Category",
+    title = "Shop By Category",
     viewAllHref = "/categories"
 }

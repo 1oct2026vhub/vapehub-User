@@ -1,11 +1,11 @@
 "use client"
 import { Button } from '@nextui-org/react';
-import { MinusIcon, PlusIcon, TrashIcon, DangerIcon } from '@/components/Icons';
+import { TrashIcon, DangerIcon } from '@/components/Icons';
 import { useCart } from '@/lib/context/CartContext'; 
-import { useState } from 'react';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
+import QuantitySelector from './QuantitySelector';
 // import Link from 'next/link';
 
 type CartCardProps = {
@@ -14,18 +14,17 @@ type CartCardProps = {
 };
 
 const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
+  
   const { updateItemQuantity, removeItem, isLoading } = useCart();
-  const [quantity, setQuantity] = useState(item?.quantity ?? 0);
 
   const handleQuantityChange = async (newQuantity: number) => {
-    if (newQuantity <= 0 || newQuantity > (item?.stock ?? 0)) return;
-    setQuantity(newQuantity);
-    updateItemQuantity(item?.id ?? 0, newQuantity);
+    await updateItemQuantity(item?.id ?? 0, newQuantity);
   };
 
   const handleRemove = async () => {
     await removeItem(item?.id ?? 0);
   };
+
 
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5">
@@ -52,11 +51,11 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
             {/* Price Section */}
             <div className="text-right">
               <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold">
-                {DEFAULT_CURRENCY_SYMBOL}{(Number(item?.price) * quantity).toFixed(2)}
+                {DEFAULT_CURRENCY_SYMBOL}{(Number(item?.price) * (item?.quantity ?? 0)).toFixed(2)}
               </p>
               {item?.discount_price && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">
-                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item?.discount_price) * quantity).toFixed(2)}
+                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item?.discount_price) * (item?.quantity ?? 0)).toFixed(2)}
                 </p>
               )}
             </div>
@@ -64,39 +63,13 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
 
           <div className="flex items-center gap-5 justify-between">
             {/* Quantity Selector */}
-            <div className="flex items-center border bg-skin-white w-fit shadow-base text-content-2 md:text-title-1 border-skin-primary-500 !leading-none px-2 rounded md:rounded-10 !font-bold h-5 md:h-10">
-              <Button
-                isIconOnly
-                size="lg"
-                variant="light"
-                color="primary"
-                className="text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent"
-                onPress={() => handleQuantityChange(quantity - 1)}
-                disabled={isLoading || quantity <= 1}
-              >
-                <MinusIcon className='w-3 md:w-6'/>
-              </Button>
-              <input 
-                type="tel" 
-                value={quantity}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  if (!isNaN(val)) handleQuantityChange(val);
-                }}
-                className='w-9 max-w-9 text-center !border-none !outline-none !bg-transparent max-sm:h-3 placeholder:text-skin-neutral-500' 
-              />
-              <Button
-                isIconOnly
-                size="lg"
-                variant="light"
-                color="primary"
-                className="text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent"
-                onPress={() => handleQuantityChange(quantity + 1)}
-                disabled={isLoading || quantity >= (item?.stock ?? 0)}
-              >
-                <PlusIcon className='w-3 md:w-6'/>
-              </Button>
-            </div>
+            
+              <QuantitySelector  
+                initialQuantity={item?.quantity ?? 0}
+                maxQuantity={item?.stock ?? 0}
+                onQuantityChange={handleQuantityChange}
+                isLoading={isLoading}
+              /> 
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2 md:gap-6">

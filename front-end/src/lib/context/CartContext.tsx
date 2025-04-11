@@ -9,6 +9,13 @@ import { useSession } from 'next-auth/react';
 import { ProductImage, ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
 
+interface CouponDiscount {
+  value: number;
+  isApplied: boolean;
+  code: string | null;
+  message: string | null;
+  discountValue: string;
+}
 interface CartContextType {
   cartItems: CartItem[];
   isLoading: boolean;
@@ -17,12 +24,13 @@ interface CartContextType {
   removeItem: (cartId: number) => Promise<void>;
   cartTotal: number;
   itemCount: number;
-  syncCookieCart: () => Promise<void>;
-  cartCouponCode: string | null;
+  syncCookieCart: () => Promise<void>; 
   error: string | null; 
   bulkAddItems: (items: { product_id: number; variant_id: number; quantity: number }[]) => Promise<void>;
   fetchCartItems: () => Promise<void>;
   clearCart: () => void;
+  couponDiscount: CouponDiscount;
+  setCouponDiscount: (discount: CouponDiscount) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -36,9 +44,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = status === 'authenticated';
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
   const [cartTotal, setCartTotal] = useState<number>(0);
+  const [couponDiscount, setCouponDiscount] = useState<CouponDiscount>({
+    value: 0,
+    isApplied: false,
+    code: null,
+    message: null,
+    discountValue: ''
+  });
+
   const [itemCount, setItemCount] = useState<number>(0);
-  const [cartCouponCode, setCartCouponCode] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+   const [error, setError] = useState<string | null>(null);
 
   // Calculate cart totals
   const calculateTotals = (items: CartItem[]) => {
@@ -345,8 +360,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const clearCart = () => {
     setCartItems([]);
     setCartTotal(0);
-    setItemCount(0);
-    setCartCouponCode(null);
+    setItemCount(0); 
+    setCouponDiscount({
+      value: 0,
+      isApplied: false,
+      code: null,
+      message: null,
+      discountValue: ''
+    });
     calculateTotals(cartItems);
   };
 
@@ -358,12 +379,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     removeItem,
     cartTotal,
     itemCount,
-    syncCookieCart,
-    cartCouponCode,
+    syncCookieCart, 
     error, 
     bulkAddItems,
     fetchCartItems,
-    clearCart
+    clearCart,
+    couponDiscount,
+    setCouponDiscount
   };
 
   return (

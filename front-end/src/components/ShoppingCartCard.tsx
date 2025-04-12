@@ -5,8 +5,7 @@ import { useCart } from '@/lib/context/CartContext';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
-import QuantitySelector from './QuantitySelector';
-// import Link from 'next/link';
+import QuantitySelector from './QuantitySelector'; 
 
 type CartCardProps = {
   item?: CartItem;
@@ -15,16 +14,14 @@ type CartCardProps = {
 
 const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
   
-  const { updateItemQuantity, removeItem, isLoading } = useCart();
-
-  const handleQuantityChange = async (newQuantity: number) => {
-    await updateItemQuantity(item?.id ?? 0, newQuantity);
-  };
-
+  const { removeItem, isLoading } = useCart();
+   
   const handleRemove = async () => {
-    await removeItem(item?.id ?? 0);
+    if (!item?.id) return;
+    await removeItem(item.id);
   };
 
+  if (!item) return null;
 
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5">
@@ -33,8 +30,8 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
         <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
             <NoImage
-              src={item?.ProductImages}
-              alt={item?.name}
+              src={item.ProductImages}
+              alt={item.name}
               width={104}
               height={100}
             />
@@ -45,17 +42,17 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
         <div className="flex flex-col gap-2.5 md:gap-5">
           <div className="flex items-start gap-4 md:gap-8 justify-between">
             <h4 className="text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
-              {item?.name}
+              {item.name}
             </h4>
 
             {/* Price Section */}
             <div className="text-right">
               <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold">
-                {DEFAULT_CURRENCY_SYMBOL}{(Number(item?.price) * (item?.quantity ?? 0)).toFixed(2)}
+                {DEFAULT_CURRENCY_SYMBOL}{(Number(item.price) * item.quantity).toFixed(2)}
               </p>
               {item?.discount_price && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">
-                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item?.discount_price) * (item?.quantity ?? 0)).toFixed(2)}
+                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item.discount_price) * item.quantity).toFixed(2)}
                 </p>
               )}
             </div>
@@ -65,10 +62,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
             {/* Quantity Selector */}
             
               <QuantitySelector  
-                initialQuantity={item?.quantity ?? 0}
-                maxQuantity={item?.stock ?? 0}
-                onQuantityChange={handleQuantityChange}
-                isLoading={isLoading}
+                item={item}
               /> 
 
             {/* Action Buttons */}

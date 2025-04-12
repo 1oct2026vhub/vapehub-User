@@ -66,14 +66,17 @@ const Login: FunctionComponent = (): ReactElement => {
         <Form {...signInFromConfig}>
             <form
                 onSubmit={signInFromConfig.handleSubmit(handleFormSubmit)}
-                noValidate className="flex flex-col gap-6 md:gap-8 w-full">
+                noValidate 
+                autoComplete="off"
+                className="flex flex-col gap-6 md:gap-8 w-full">
                 <div className="flex flex-col gap-4.5 md:gap-5 w-full">
                     <div className="flex w-full justify-center items-center">
                         <InputField control={signInFromConfig.control}
                             name="email"
                             type={SIGN_IN_FORM_CONFIG.EMAIL.TYPE}
-                            label={SIGN_IN_FORM_CONFIG.EMAIL.LABEL} isRequired />
-
+                            label={SIGN_IN_FORM_CONFIG.EMAIL.LABEL} 
+                            disableAutocomplete
+                            isRequired />
                     </div>
                     <div className="flex w-full justify-center items-center">
                         <InputField
@@ -82,6 +85,7 @@ const Login: FunctionComponent = (): ReactElement => {
                             type={pwdVisibility ? "text" : SIGN_IN_FORM_CONFIG.PASSWORD.TYPE}
                             label={SIGN_IN_FORM_CONFIG.PASSWORD.LABEL}
                             name="password"
+                            disableAutocomplete
                             endContent={
                                 <Button
                                     size="sm"

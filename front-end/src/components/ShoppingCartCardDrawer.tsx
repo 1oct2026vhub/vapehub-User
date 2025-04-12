@@ -13,11 +13,7 @@ type CartCardProps = {
 };
 
 const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
-  const { updateItemQuantity, removeItem, isLoading } = useCart();
-
-  const handleQuantityChange = async (newQuantity: number) => {
-    await updateItemQuantity(item.id, newQuantity);
-  };
+  const { removeItem, isLoading } = useCart(); 
 
   const handleRemove = async () => {
     await removeItem(item.id);
@@ -58,12 +54,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
           </div>
 
           {/* Quantity Selector */}
-          <QuantitySelector
-            initialQuantity={item.quantity}
-            maxQuantity={item.stock}
-            onQuantityChange={handleQuantityChange}
-            isLoading={isLoading}
-          />
+          <QuantitySelector item={item} />
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3 md:gap-5">

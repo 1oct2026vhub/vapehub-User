@@ -12,10 +12,16 @@ interface InputFieldProps<T extends FieldValues> extends InputProps {
   control: Control<T>; // ✅ Hook Form Control
   name: Path<T>; // ✅ Ensures valid field names
   showStatus?: boolean
+  disableAutocomplete?: boolean;
 }
 
-const InputField = <T extends FieldValues>({ control, name,showStatus = false, ...props }: InputFieldProps<T>) => {
+const InputField = <T extends FieldValues>({ control, name,showStatus = false, disableAutocomplete = false, ...props }: InputFieldProps<T>) => {
    
+  const autocompleteProps = disableAutocomplete ? {
+    autoComplete: "new-password",
+    "data-lpignore": "true"
+  } : {};
+
   return (
     <Controller
       name={name}
@@ -25,6 +31,7 @@ const InputField = <T extends FieldValues>({ control, name,showStatus = false, .
         <Input
           {...field}
           {...props} // ✅ Preserves your existing props (like `type`, `placeholder`, etc.)
+          {...autocompleteProps}
           isInvalid={!!error} // ✅ Show error styling when invalid
           errorMessage={error?.message} // ✅ Display validation errors          
           classNames={{
@@ -33,9 +40,7 @@ const InputField = <T extends FieldValues>({ control, name,showStatus = false, .
             innerWrapper: "!bg-skin-white gap-2 hover:!bg-skin-white group-data-[has-label=true]:pt-9",
             inputWrapper:
               "pl-5 pr-3 h-11 md:h-12 shadow-input rounded-lg lg:rounded-[10px] !bg-skin-white border border-skin-neutral-100 hover:border-skin-primary-500 data-[hover=true]:!bg-skin-white group-data-[focus=true]:border-skin-primary-300 group-data-[focus=true]:!bg-skin-white !cursor-text",
-
           }}
-          
         />
         {(showStatus && error?.message) && <ShowPasswordValidityStatus name={name as string} />}
         </>

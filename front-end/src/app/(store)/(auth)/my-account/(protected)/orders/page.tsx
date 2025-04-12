@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
  
 const MyAccountOrders: NextPage<{searchParams: Promise<{page: string}>}> = async ({searchParams}) => {    
-    const LIMIT = 10
+    const LIMIT = 3
     const searchParamsData = await searchParams;
     const page = searchParamsData.page ? parseInt(searchParamsData.page) : 1;
     const result = await getOrdersList(page, LIMIT);

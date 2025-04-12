@@ -53,8 +53,9 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
 
   return (
     <div className="relative">
-      {src ? (
+      
         <div className="hidden md:block">
+        {src ? (
           <div
             ref={containerRef}
             className="relative cursor-crosshair"
@@ -96,16 +97,17 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
               />
             )}
           </div>
+          ) : (
+            <NoImage
+              src={src}
+              alt={alt}
+              width={width}
+              height={height}
+              className={className}
+            />
+          )}
         </div>
-      ) : (
-        <NoImage
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          className={className}
-        />
-      )}
+      
       <div className="md:hidden">
         <NoImage
           src={src}

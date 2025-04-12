@@ -1,58 +1,46 @@
 import { Accordion, AccordionItem, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Selection, useDisclosure } from '@nextui-org/react'
 import React from 'react'
-import { CloseIcon, DownArrowIcon, FilterIcon } from './Icons'
-import FilterCheckboxGroup from './FilterCheckboxGroup';
+import { CloseIcon, DownArrowIcon, FilterIcon } from './Icons' 
 import { sortByOptions } from '@/lib/config/filter.config';
+import { AppliedFilters } from '@/lib/config/product.config';
 
-const priceOptions = [
-    { label: "£0 - £10", count: 376, value: "0-10" },
-    { label: "£10 - £25", count: 29, value: "10-25" },
-    { label: "£25 - £50", count: 29, value: "25-50" },
-    { label: "£75 - £100", count: 29, value: "75-100" },
-  ];
+interface FilterOption {
+    title: string;
+    content: React.ReactNode;
+}
 
-const filterOptions = [
-    { title: "Price Range", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Product Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Brands", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Flavours", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Bottle Size", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Nicotine Strength", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Nicotine Type", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "VG Ratio", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Vaping Style", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Price", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Battery Capacity", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Device Style", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "E-Liquid Capacity", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Function", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Pod Coil Style", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Pod Fill Style", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Power Supply", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-    { title: "Puff Count", content: <FilterCheckboxGroup options={priceOptions} defaultValues={["0-10"]} /> },
-  ];
+type ProductListingActionsMobProps = {
+    onSortChange: (value: string) => void;
+    initialValue?: string;
+    isFilterVisible?: boolean;
+    onFilterToggle?: () => void;
+    appliedFilters: AppliedFilters[];
+    onRemoveFilter: (attributeId: number, type: string) => void;
+    filterOptions: FilterOption[];
+}
 
 type ProductListingActionsWebProps = {
     onSortChange: (value: string) => void;
     initialValue?: string;
     isFilterVisible?: boolean;
     onFilterToggle?: () => void;
+     
 }
 
 export const ProductListingActionsWeb: React.FC<ProductListingActionsWebProps> = ({
-    onSortChange, 
+    onSortChange,
     initialValue = "Sort By",
     isFilterVisible = true,
     onFilterToggle
 }) => {
     const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([initialValue]));
-     
+
     const onChangeSortChange = (keys: Selection) => {
         const selected = Array.from(keys)[0];
         const selectedValue = sortByOptions.find(option => option.value === selected.toString())?.value as string;
-            onSortChange(selectedValue.toString());
-            setSelectedKeys(keys);
-         
+        onSortChange(selectedValue.toString());
+        setSelectedKeys(keys);
+
     }
     return (
         <div className="bg-skin-white border border-skin-base rounded-xl hidden md:flex items-center gap-3 py-3 px-3.5 ml-auto w-fit">
@@ -64,17 +52,17 @@ export const ProductListingActionsWeb: React.FC<ProductListingActionsWebProps> =
                         radius="md"
                         endContent={<DownArrowIcon />}
                         className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
-                    > 
+                    >
                         {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label || initialValue}
                     </Button>
                 </DropdownTrigger>
-                
+
                 <DropdownMenu aria-label="Static Actions"
-                 selectedKeys={selectedKeys}
-                 selectionMode="single"
-                 disallowEmptySelection
-                 variant="flat"
-                 onSelectionChange={onChangeSortChange}>
+                    selectedKeys={selectedKeys}
+                    selectionMode="single"
+                    disallowEmptySelection
+                    variant="flat"
+                    onSelectionChange={onChangeSortChange}>
                     {sortByOptions.map((option) => (
                         <DropdownItem key={option.value}>{option.label}</DropdownItem>
                     ))}
@@ -95,24 +83,25 @@ export const ProductListingActionsWeb: React.FC<ProductListingActionsWebProps> =
 }
 
 
-export const ProductListingActionsMob: React.FC<ProductListingActionsWebProps> = ({
-    onSortChange, 
+export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> = ({
+    onSortChange,
     initialValue = "Sort By",
-   
+    appliedFilters,
+    onRemoveFilter,
+    filterOptions
+
 }) => {
 
-    const appliedFilters = ["ELUX", "Almond (7 items)"];
-
+   
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([initialValue]));
-    
+
     const onChangeSortChange = (keys: Selection) => {
         const selected = Array.from(keys)[0];
-         
-        if (selected) {
-            onSortChange(selected.toString());
-            setSelectedKeys(keys);
-        }
+        const selectedValue = sortByOptions.find(option => option.value === selected.toString())?.value as string;
+        onSortChange(selectedValue.toString());
+        setSelectedKeys(keys);
+
     }
 
     const itemClasses = {
@@ -134,14 +123,14 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsWebProps> =
                         endContent={<DownArrowIcon />}
                         className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
                     >
-                         {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label ||  initialValue}
+                        {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label || initialValue}
                     </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Static Actions"
-                selectedKeys={selectedKeys}
-                selectionMode="single"
-                 variant="flat"
-                 onSelectionChange={onChangeSortChange}>
+                    selectedKeys={selectedKeys}
+                    selectionMode="single"
+                    variant="flat"
+                    onSelectionChange={onChangeSortChange}>
                     {sortByOptions.map((option) => (
                         <DropdownItem key={option.value}>{option.label}</DropdownItem>
                     ))}
@@ -168,25 +157,44 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsWebProps> =
 
                                     {/* Applied Filters Section */}
                                     <div className="flex flex-wrap gap-2 items-center">
-                                        {appliedFilters.map((filter, index) => (
-                                            <div
-                                                key={index}
-                                                className="flex items-center gap-2 bg-skin-neutral-50 border-2 border-skin-neutral-100 shadow py-1.5 px-2 rounded-lg"
-                                            >
-                                                <span className="text-content-2 font-bold text-skin-neutral-500">{filter}</span>
-                                                <button>
-                                                    <CloseIcon />
-                                                </button>
+                                        {appliedFilters.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 items-center">
+                                                {appliedFilters.map((filter, index) => (
+                                                    <div
+                                                        key={`${filter.attributeId}-${index}`}
+                                                        className="flex items-center gap-2 bg-skin-neutral-50 border-2 border-skin-neutral-100 shadow py-1.5 px-2 rounded-lg"
+                                                    >
+                                                        <span className="text-content-2 font-bold text-skin-neutral-500">
+                                                            {filter.attribute} ({filter.count})
+                                                        </span>
+                                                        <button
+                                                            onClick={() => onRemoveFilter(filter.attributeId, filter.type)}
+                                                            className="hover:opacity-70 transition-opacity"
+                                                        >
+                                                            <CloseIcon />
+                                                        </button>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
+                                        )}
                                     </div>
                                 </div>
                             </DrawerHeader>
                             <DrawerBody className='pt-5'>
                                 {/* Accordion Filters */}
-                                <Accordion variant="splitted" className="!p-0" itemClasses={itemClasses} selectionMode='multiple'>
+                                <Accordion
+                                    variant="splitted"
+                                    className="!p-0"
+                                    defaultExpandedKeys={["0"]}
+                                    itemClasses={itemClasses}
+                                    selectionMode="multiple"
+                                >
                                     {filterOptions.map(({ title, content }, index) => (
-                                        <AccordionItem key={index} aria-label={title} title={title}>
+                                        <AccordionItem
+                                            key={index}
+                                            aria-label={title}
+                                            title={title}
+                                        >
                                             {content}
                                         </AccordionItem>
                                     ))}

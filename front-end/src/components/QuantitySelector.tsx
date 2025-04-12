@@ -1,75 +1,63 @@
 import { Button } from '@nextui-org/react';
 import { MinusIcon, PlusIcon } from '@/components/Icons';
-import { useState, useEffect, useCallback } from 'react';
-import { useDebounce } from '@/lib/hooks/useDebounce';
-
+import { useState, useCallback, useEffect } from 'react';
+import { useCart } from '@/lib/context/CartContext';
+import { CartItem } from '@/lib/config/cart.config';
 
 interface QuantitySelectorProps {
-  initialQuantity: number;
-  maxQuantity: number;
-  minQuantity?: number;
-  onQuantityChange: (quantity: number) => void;
-  isLoading?: boolean;
+  item: CartItem;
   className?: string;
 }
 
 const QuantitySelector: React.FC<QuantitySelectorProps> = ({
-  initialQuantity,
-  maxQuantity,
-  minQuantity = 1,
-  onQuantityChange,
-  isLoading = false,
+  item,
   className = '',
 }) => {
-  const [quantity, setQuantity] = useState(initialQuantity);
-  const [inputValue, setInputValue] = useState(initialQuantity.toString());
+  const { updateItemQuantity, isLoading } = useCart();
   const [error, setError] = useState<string | null>(null);
-  const debouncedQuantity = useDebounce(quantity, 500);
+  const [inputValue, setInputValue] = useState(item.quantity.toString());
 
+  // Update input value when item quantity changes
   useEffect(() => {
-    if (debouncedQuantity !== initialQuantity) {
-      onQuantityChange(debouncedQuantity);
-    }
-  }, [debouncedQuantity, initialQuantity, onQuantityChange]);
+    setInputValue(item.quantity.toString());
+  }, [item.quantity]);
 
-  const handleQuantityChange = useCallback((newQuantity: number) => {
-    if (newQuantity < minQuantity) {
-      setError(`Minimum quantity is ${minQuantity}`);
+  const handleQuantityChange = useCallback(async (newQuantity: number) => {
+    if (newQuantity < 1) {
+      setError(`Minimum quantity is 1`);
       return;
     }
-    if (newQuantity > maxQuantity) {
-      setError(`Only ${maxQuantity} items available in stock`);
+    if (newQuantity > item.stock) {
+      setError(`Only ${item.stock} items available in stock`);
       return;
     }
     setError(null);
-    setQuantity(newQuantity);
     setInputValue(newQuantity.toString());
-  }, [maxQuantity, minQuantity]);
+    await updateItemQuantity(item.id, newQuantity);
+  }, [item.stock, item.id, updateItemQuantity]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
-
     setInputValue(value);
 
     // Only update quantity if the input is a valid number
     const numValue = parseInt(value);
     if (!isNaN(numValue)) {
-      if (numValue < minQuantity) {
-        setError(`Minimum quantity is ${minQuantity}`);
-      } else if (numValue > maxQuantity) {
-        setError(`Only ${maxQuantity} items available in stock`);
+      if (numValue < 1) {
+        setError(`Minimum quantity is 1`);
+      } else if (numValue > item.stock) {
+        setError(`Only ${item.stock} items available in stock`);
       } else {
         setError(null);
-        setQuantity(numValue);
+        updateItemQuantity(item.id, numValue);
       }
     }
   };
 
   const handleBlur = () => {
-    // Reset to current quantity if input is invalid
     const numValue = parseInt(inputValue);
-    if (isNaN(numValue) || numValue < minQuantity || numValue > maxQuantity) {
-      setInputValue(quantity.toString());
+    if (isNaN(numValue) || numValue < 1 || numValue > item.stock) {
+      setInputValue(item.quantity.toString());
       setError(null);
     }
   };
@@ -83,9 +71,8 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
           variant="light"
           color="primary"
           className={`text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent ${isLoading ? '!opacity-50 cursor-not-allowed' : ''}`}
-          onPress={() => handleQuantityChange(quantity - 1)}
-          
-          isDisabled={isLoading || quantity <= minQuantity}
+          onPress={() => handleQuantityChange(item.quantity - 1)}
+          isDisabled={isLoading || item.quantity <= 1}
         >
           <MinusIcon className='w-3 md:w-6'/>
         </Button>
@@ -104,12 +91,11 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
           variant="light"
           color="primary"
           className={`text-title-1 font-medium !px-0 !w-fit md:!w-6 !min-w-fit !h-5 md:!h-10 first:rounded-l-10 last:rounded-r-10 hover:!bg-transparent ${isLoading ? '!opacity-50 cursor-not-allowed' : ''}`}
-          onPress={() => handleQuantityChange(quantity + 1)}
-          isDisabled={isLoading || quantity >= maxQuantity}
+          onPress={() => handleQuantityChange(item.quantity + 1)}
+          isDisabled={isLoading || item.quantity >= item.stock}
         >
           <PlusIcon className='w-3 md:w-6'/>
         </Button>
-        
       </div>
       {error && (
         <p className="text-red-500 text-xs md:text-sm font-medium">{error}</p>

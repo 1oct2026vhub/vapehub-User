@@ -1,3 +1,4 @@
+"use client"
 import { useState } from 'react';
 import { DownArrowIcon } from '@/components/Icons';
 import ShoppingCartCard from '@/components/ShoppingCartCard';
@@ -5,8 +6,7 @@ import { useCart } from '@/lib/context/CartContext';
 
 const ProductList: React.FC = () => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const { cartItems } = useCart();
-
+    const { cartItems } = useCart(); 
     return (
         <div 
             className='bg-skin-white px-3.5 py-2 md:p-5 rounded-10 md:rounded-14 border border-skin-neutral-100 flex flex-col gap-6'

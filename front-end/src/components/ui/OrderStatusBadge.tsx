@@ -6,10 +6,12 @@ const OrderStatusBadge = ({status}: {status: ORDER_STATUS}) => {
         "p-1.5 md:p-2 w-fit capitalize rounded-md md:rounded-lg border !text-content-3 md:!text-content-1 font-bold",
         {
             "bg-skin-white border-skin-neutral grey-gradient":status === ORDER_STATUS.PENDING,
+            "bg-skin-white border-skin-neutral warning-gradient":status === ORDER_STATUS.DRAFT,
             "bg-skin-white border-skin-blue-500 blue-gradient": status === ORDER_STATUS.PROCESSING,
             "bg-skin-white border-skin-blue-500 green-gradient": status === ORDER_STATUS.SHIPPED, 
             "bg-skin-white border-skin-blue-500 success-gradient": status === ORDER_STATUS.COMPLETED,
             "bg-skin-primary-50 border-skin-primary2-500 text-skin-primary2-500": status === ORDER_STATUS.DELIVERED,
+            "bg-skin-white border-skin-red-500 danger-gradient": status === ORDER_STATUS.FAIL,
             "bg-skin-white border-skin-red-500 red-gradient": status === ORDER_STATUS.CANCEL,
             "bg-skin-white border-skin-yellow-500 yellow-gradient": status === ORDER_STATUS.RETURN_REQUESTED,
             "bg-skin-white border-skin-green-500 green-gradient": status === ORDER_STATUS.RETURN_APPROVED,

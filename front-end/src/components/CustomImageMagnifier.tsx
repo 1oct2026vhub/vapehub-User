@@ -83,7 +83,7 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
             )}
             {isHovered && (
               <div
-                className="zoom-container absolute border border-gray-300 hidden md:block shadow-lg rounded-md overflow-hidden"
+                className="bg-skin-base zoom-container absolute border border-gray-300 hidden md:block shadow-lg rounded-md overflow-hidden"
                 style={{
                   width: '400px',
                   height: '400px',
@@ -114,7 +114,7 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
           alt={alt}
           width={width}
           height={height}
-          className={className}
+          className={className + ' min-h-[230px] max-h-[230px]'}
         />
       </div>
     </div>

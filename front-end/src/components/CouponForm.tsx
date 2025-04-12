@@ -6,8 +6,9 @@ import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_FORM_TYPE, APPLY_COUPON_PAYLOAD 
 import { applyCoupon } from '@/lib/server.actions'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { toast } from 'sonner'
-import InputField from '@/components/InputField'
 import { useState } from 'react'
+import { Form } from './ui/Form'
+import InputForm from './InputForm'
 
 interface CouponFormProps {
     onCouponApplied: (discount: {
@@ -34,7 +35,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
     });
 
     const handleApplyCoupon = async (data: APPLY_COUPON_FORM_TYPE) => {
-         
+
         const response = await applyCoupon(data as unknown as APPLY_COUPON_PAYLOAD);
         if (response.status === ServerActionStatus.SUCCESS) {
             setIsApplied(true);
@@ -73,47 +74,50 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
     };
 
     return (
-        <div className='flex items-start gap-3'>
-            <InputField
-                type='text'
-                label="Coupon Code"
-                isRequired
-                className='xl:min-w-[366px]'
-                placeholder='THN-865'
-                control={form.control}
-                name='couponCode'
-                isDisabled={isApplied && !isEditing}
-            />
-            
-            {
-                isApplied ? (
-            
-            <Button
-                size="lg"
-                radius="md"
-                color="primary"
-                className="btn shadow-button bg-skin-neutral-500 !text-skin-white !p-4 !w-fit !min-w-fit !rounded-10"
-                startContent={<EditIcon2 />}
-                onPress={() => handleEdit()}
-                isLoading={form.formState.isSubmitting}
-                isDisabled={!isEditing ? false : !form.formState.isValid}
-            >
-                Edit
-            </Button>)
-            :
-            <Button
-                        size="lg"
-                        radius="md"
-                        color="primary"
-                        className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-11 md:h-12"
-                        onPress={() => form.handleSubmit(handleApplyCoupon)()}
-                        isLoading={form.formState.isSubmitting}
-                        isDisabled={!form.formState.isValid}
-                    >
-                        Apply Code
-                    </Button>
-            }
-        </div>
+        <Form {...form}>
+            <form noValidate onSubmit={form.handleSubmit(handleApplyCoupon)} className='flex items-start gap-3'>
+                <InputForm
+                    type='text'
+                    label="Coupon Code"
+                    isRequired
+                    className='xl:min-w-[366px]'
+                    control={form.control}
+                    name='couponCode'
+                    isDisabled={isApplied && !isEditing}
+                />
+
+                {
+                    isApplied ? (
+
+                        <Button
+                            size="lg"
+                            radius="md"
+                            color="primary"
+                            type='button'
+                            className="btn shadow-button bg-skin-neutral-500 !text-skin-white !p-4 !w-fit !min-w-fit !rounded-10"
+                            startContent={<EditIcon2 />}
+                            onPress={() => handleEdit()}
+                            isLoading={form.formState.isSubmitting}
+                            isDisabled={!isEditing ? false : !form.formState.isValid}
+                        >
+                            Edit
+                        </Button>)
+                        :
+                        <Button
+                            size="lg"
+                            radius="md"
+                            color="primary"
+                            className="btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !leading-none min-w-[130px] md:!min-w-[166px] !font-medium h-11 md:h-12"
+                            isLoading={form.formState.isSubmitting}
+                            type='submit'
+                            isDisabled={!form.formState.isValid}
+
+                        >
+                            Apply Code
+                        </Button>
+                }
+            </form>
+        </Form>
     );
 };
 

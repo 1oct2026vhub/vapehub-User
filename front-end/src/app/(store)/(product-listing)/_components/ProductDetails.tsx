@@ -155,7 +155,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit '>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink w-full lg:w-[400px] xl:w-[550px] shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2 min-h-[250px] lg:min-h-[425px] max-h-[250px] lg:max-h-[425px]'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2  w-full min-h-[250px] max-h-[250px] lg:w-[400px] xl:w-[550px] lg:min-h-[425px] lg:max-h-[425px]'>
                         <CustomImageMagnifier
                             src={mainImage?.url || ''}
                             alt={product?.name || ''}

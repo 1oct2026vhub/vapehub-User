@@ -193,10 +193,14 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
             initialValue={searchParams.get("order") ?? "Sort By"}
             isFilterVisible={isFilterVisible}
             onFilterToggle={() => setIsFilterVisible(!isFilterVisible)}
+            
           />
           <ProductListingActionsMob
             onSortChange={handleSortChange}
             initialValue={searchParams.get("order") ?? "Sort By"}
+            appliedFilters={appliedFilters}
+            onRemoveFilter={handleRemoveFilter}
+            filterOptions={filterOptions}
           />
           {products.length === 0 ? (
             <EmptyPlaceholder title='Uh, oh!' description='No products found.' />

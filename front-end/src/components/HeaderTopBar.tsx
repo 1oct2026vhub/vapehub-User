@@ -119,11 +119,9 @@ const HeaderTopBar = () => {
                                     ) : (
                                         <div className="flex flex-col items-center justify-center gap-4 py-8">
                                             <p className="text-content-2 text-skin-neutral-500">Your cart is empty</p>
-                                            <Link href={ROUTES.SHOP}>
-                                                <Button color="primary" className="shadow-button">
-                                                    Continue Shopping
-                                                </Button>
-                                            </Link>
+                                            <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button" onPress={onClose}>
+                                                Continue Shopping
+                                            </Button>
                                         </div>
                                     )}
                                 </div>

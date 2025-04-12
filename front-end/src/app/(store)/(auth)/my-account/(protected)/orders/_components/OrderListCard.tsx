@@ -26,7 +26,7 @@ const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
       </div>
 
       {/* Order Details */}
-      <div className="space-y-3.5 md:space-y-5 md:max-w-[50%] xl:max-w-[40%]">
+      <div className="space-y-3.5 md:space-y-2 md:max-w-[50%] xl:max-w-[40%]">
         {/* Status Badge */}
         <OrderStatusBadge status={data.status as ORDER_STATUS} />  
 

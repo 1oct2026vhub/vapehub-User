@@ -50,7 +50,7 @@ const PaymentSuccessPage = () => {
             } catch (error) {
                 console.error('Payment verification error:', error);
                 toast.error('Failed to verify payment. Please contact support.');
-                router.push(ROUTES.PAYMENT_FAILED);
+                // router.push(ROUTES.PAYMENT_FAILED);
             }
         };
 

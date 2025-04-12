@@ -18,7 +18,7 @@ const AccountSidebar: React.FC = () => {
 
 
   return (
-    <div className="bg-skin-base md:bg-skin-white px-3.5 py-2.5 md:p-5 xl:p-9 rounded-14 shadow-checkout flex flex-col md:min-h-[670px] justify-between overflow-y-auto min-w-fit max-md:w-full max-md:border border-skin-neutral-100">
+    <div className="bg-skin-base md:bg-skin-white px-3.5 py-2.5 md:p-5 xl:p-9 rounded-14 shadow-checkout flex flex-col md:min-h-[740px] justify-between overflow-y-auto min-w-fit max-md:w-full max-md:border border-skin-neutral-100">
       <ul className="w-full grid max-md:grid-cols-2 max-md:gap-2 md:space-y-1">
         {menuItems.map((item) => (
           <li key={item.path} className="w-full">

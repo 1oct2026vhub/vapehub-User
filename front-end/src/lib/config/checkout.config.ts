@@ -124,7 +124,7 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
 export type CHECKOUT_FORM_TYPE = z.infer<ReturnType<typeof CHECKOUT_FORM_SCHEMA>>;
 
 export const APPLY_COUPON_FORM_SCHEMA = z.object({
-    couponCode: z.string().optional(),
+    couponCode: z.string().min(1, 'Coupon code is required'),
     shippingMethodId: z.number().optional()
 });
 

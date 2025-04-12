@@ -192,11 +192,9 @@ const MobileMenu = () => {
                                     ) : (
                                         <div className="flex flex-col items-center justify-center gap-4 py-8">
                                             <p className="text-content-2 text-skin-neutral-500">Your cart is empty</p>
-                                            <Link href={ROUTES.SHOP}>
-                                                <Button color="primary" className="shadow-button">
-                                                    Continue Shopping
-                                                </Button>
-                                            </Link>
+                                            <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button">
+                                                Continue Shopping
+                                            </Button>
                                         </div>
                                     )}
                         </div>
@@ -217,7 +215,6 @@ const MobileMenu = () => {
                                 radius="md"
                                 color="primary"
                                 className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
-                                onPress={onCartClose}
                             >
                                 Checkout Now
                             </Button>
@@ -229,7 +226,6 @@ const MobileMenu = () => {
                                     radius="md"
                                     color="primary"
                                     className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
-                                    onPress={onCartClose}
                                 >
                                     Keep Shopping
                                 </Button>
@@ -240,7 +236,6 @@ const MobileMenu = () => {
                                     radius="md"
                                     color="primary"
                                     className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
-                                    onPress={onCartClose}
                                 >
                                     View Cart
                                 </Button>

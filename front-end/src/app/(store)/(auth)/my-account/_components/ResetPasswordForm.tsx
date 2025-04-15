@@ -49,7 +49,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
 
     useEffect(() => {
         if (status === 'authenticated') {
-            router.push(ROUTES.MY_ACCOUNT);
+            router.refresh();
         }
     }, [status, router]);
 

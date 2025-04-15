@@ -1,8 +1,8 @@
 "use client"
-import { VerifyUserEmailResponse } from "@/lib/config/auth.config";
+import { VerifyUserEmailResponse } from "@/lib/config/auth.config"; 
 import { Button } from "@nextui-org/button";
 import { signIn } from "next-auth/react";
-import Image from "next/image";
+import Image from "next/image"; 
 import { FunctionComponent, ReactElement } from "react";
 
 interface Props {
@@ -10,12 +10,15 @@ interface Props {
 }
 
 const VerificationSuccess: FunctionComponent<Props> = ({ data }): ReactElement => {
-     
+      
     const handleSubmit = async () => {
         await signIn('credentials', {
             ...data,
-            redirect: true
+            redirect: false
         });
+        // reload the page
+        window.location.reload();
+        
 
     }
     return (

@@ -7,7 +7,7 @@ import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
-import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA } from "./config/order.config";
+import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { SignUpFormSchema } from "./config/register.config";
@@ -408,6 +408,20 @@ export const placeOrder = async (payload: PLACE_ORDER_PAYLOAD): Promise<ServerAc
   });
 };
 
+export const cancelOrderById = async (orderId: number): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.CANCEL_ORDER(orderId),
+    payload: {},
+    method: 'POST',
+  });
+}
+
+export const checkStockToPayment = async (orderId: number): Promise<ServerActionResponse<Payment_Validate>> => {
+  return await handleRequest<Payment_Validate, unknown>({
+    endpoint: API_ROUTES.CONTINUE_TO_PAYMENT(orderId),
+    method: 'GET',
+  });
+}
 // get transaction details
 export const getTransactionDetails = async (transactionId: string): Promise<ServerActionResponse<TRANSACTION_DETAILS_RESPONSE>> => {
   return await handleRequest<TRANSACTION_DETAILS_RESPONSE, unknown>({

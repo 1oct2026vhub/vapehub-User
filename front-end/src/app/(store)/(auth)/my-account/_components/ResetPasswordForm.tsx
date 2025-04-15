@@ -1,6 +1,6 @@
 'use client';
 
-import { FunctionComponent, ReactElement, useState } from "react"
+import { FunctionComponent, ReactElement, useEffect, useState } from "react"
 import { Button } from "@nextui-org/button";
 import { CHANGE_PASSWORD_FORM_CONFIG, CHANGE_PASSWORD_SCHEMA, ChangePasswordFormSchema } from "@/lib/config/reset-password.config";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +13,8 @@ import InputField from "@/components/InputField";
 import { EyeClosedIcon, EyeOpenIcon } from "@/components/Icons";
 import { resetPasswordAction } from "@/lib/server.actions";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Props {
     token: string;
@@ -22,6 +23,8 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
     token
 }): ReactElement => {
 
+    const router = useRouter();
+    const { status } = useSession();
     const changePasswordFormConfig = useForm<ChangePasswordFormSchema>({
         mode: 'all',
         resolver: zodResolver(CHANGE_PASSWORD_SCHEMA),
@@ -42,8 +45,14 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                     ...response.data,
                     redirect: false
                 });
-                window.location.reload();
     };
+
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.refresh();
+        }
+    }, [status, router]);
+
     return (
         <div className="auth-form-container">
             <div className="auth-form-wrapper !max-w-[674px]">

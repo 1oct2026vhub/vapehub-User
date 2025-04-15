@@ -134,6 +134,7 @@ const CheckoutDetails: React.FC = () => {
         if (!showNewAddressForm) {
             form.reset({
                 ...form.getValues(),
+                selectedAddressId: 0,
                 shippingFirstName: '',
                 shippingLastName: '',
                 shippingAddress1: '',

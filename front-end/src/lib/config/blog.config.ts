@@ -1,4 +1,3 @@
-import { Category } from "./category.config";
 // Base interface for common blog properties
 interface BaseBlogEntity {
     id: number;
@@ -51,9 +50,21 @@ export interface BlogBySlugResponse extends BaseBlogEntity, TimeStampFields {
         tags: unknown[];
     })[];
 }
-
+export interface BlogCategory  {
+    
+        id: number;
+        name: string;
+        slug: string;
+        parent_id: number;
+        parent: {
+            id: number;
+            name: string;
+            slug: string;
+        };
+    
+}
 export interface BlogByCategoryAndSlugResponse extends BlogContent {
-    categories: Category[];
+    categories: BlogCategory[];
     tags: unknown[];
     related_blogs: (BlogContent & {
         categories: (BaseBlogEntity & TimeStampFields)[];

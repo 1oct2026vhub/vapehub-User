@@ -15,10 +15,16 @@ const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
   if (!data) {
     return <EmptyPlaceholder title='Uh, oh!' description='No blogs found' />
   }
+  
   const breadcrumbs = [ 
     { label: "Home", href: ROUTES.WELCOME },
     { label: "Blogs", href: ROUTES.BLOGS },
-    { label: data.categories?.[0]?.name, href: data.categories?.[0]?.slug },
+    ...(data.categories?.[0]?.parent ? [
+      { label: data.categories[0].parent.name, href: data.categories[0].parent.slug },
+      { label: data.categories?.[0]?.name, href: data.categories[0].parent.slug },  
+    ] : [
+      { label: data.categories?.[0]?.name, href: data.categories?.[0]?.slug },
+    ]),
     { label: data.title, href: data.slug, isActive: true },
   ];
 

@@ -33,7 +33,7 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
             </div>
             <div className='mt-3.5'>
                 <p className='primary-gradient-100 text-content-3 md:text-content-1 font-semibold'>{('categories' in blog) ? blog.categories?.[0]?.name : ''}</p>
-                <p className='text-content-3 md:text-content-1 font-semibold text-skin-primary-300'>{new Date(blog.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                <p className='text-content-3 md:text-content-1 font-semibold text-skin-primary-300'>{new Date(blog.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
         </Link>
     )

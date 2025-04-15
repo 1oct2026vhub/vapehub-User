@@ -65,6 +65,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, user}) => {
                     <p>{data.order_unique_id}</p>
                 </div>
             </div>
+            <div className='space-y-2'>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order Date</h4>
+                <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
+                    <p>{new Date(data.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                </div>
+            </div>
         </div>
     )
 }

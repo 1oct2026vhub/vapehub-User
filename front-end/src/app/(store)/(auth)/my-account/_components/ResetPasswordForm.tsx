@@ -40,8 +40,9 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
         toast.success(response.data?.message);
          await signIn('credentials', {
                     ...response.data,
-                    redirect: true
+                    redirect: false
                 });
+                window.location.reload();
     };
     return (
         <div className="auth-form-container">

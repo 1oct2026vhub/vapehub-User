@@ -9,38 +9,47 @@ type OrderListCardProps = {
 }
  
 const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
+    const isPaymentPending = data.status === ORDER_STATUS.PENDING;
     
-  
-  return (
-    <Link href={`${ROUTES.ORDER_DETAILS}/${data.id}`} className="bg-white rounded-14 shadow-card hover:shadow-brand-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
-      {/* Product Image Section */}
-      <div className="bg-skin-white p-1 md:p-2 rounded-md md:rounded-10 shadow-brand-card min-w-16 md:min-w-36">
-        <div className="bg-skin-base border border-skin-neutral-100 rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
-          <NoImage 
-            src={data.orderItems?.[0]?.variant?.variantImages?.[0]?.image_url || ""}
-            alt={data.orderItems?.[0]?.product?.name || ""}
-            width={104}
-            height={100}
-          />
-        </div>
-      </div>
+    return (
+        <Link href={`${ROUTES.ORDER_DETAILS}/${data.id}`} className="bg-white rounded-14 shadow-card hover:shadow-brand-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
+            {/* Product Image Section */}
+            <div className="bg-skin-white p-1 md:p-2 rounded-md md:rounded-10 shadow-brand-card min-w-16 md:min-w-36">
+                <div className="bg-skin-base border border-skin-neutral-100 rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
+                    <NoImage 
+                        src={data.orderItems?.[0]?.variant?.variantImages?.[0]?.image_url || ""}
+                        alt={data.orderItems?.[0]?.product?.name || ""}
+                        width={104}
+                        height={100}
+                    />
+                </div>
+            </div>
 
-      {/* Order Details */}
-      <div className="space-y-3.5 md:space-y-2 md:max-w-[50%] xl:max-w-[40%]">
-        {/* Status Badge */}
-        <OrderStatusBadge status={data.status as ORDER_STATUS} />  
+            {/* Order Details */}
+            <div className="space-y-3.5 md:space-y-2 md:max-w-[50%] xl:max-w-[40%]">
+                {/* Status Badge */}
+                <OrderStatusBadge status={data.status as ORDER_STATUS} />  
 
-        {/* Order Title */}
-        <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 line-clamp-2 font-semibold">
-          {data.orderItems?.[0]?.product?.name}
-        </h2>
-        {data.orderItems.length > 1 && <p className="primary-gradient-100 font-semibold text-sm ml-1 ">(+ {data.orderItems.length - 1} more)</p>}
+                {/* Payment Pending Message */}
+                {isPaymentPending && (
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-2 rounded">
+                        <p className="text-yellow-700 text-sm font-medium">
+                            ⚠️ Payment Required: Please complete your payment to confirm this order
+                        </p>
+                    </div>
+                )}
 
-        {/* Order ID */}
-        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Order ID: {data.order_unique_id}</p>
-      </div>
-    </Link>
-  );
+                {/* Order Title */}
+                <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 line-clamp-2 font-semibold">
+                    {data.orderItems?.[0]?.product?.name}
+                </h2>
+                {data.orderItems.length > 1 && <p className="primary-gradient-100 font-semibold text-sm ml-1 ">(+ {data.orderItems.length - 1} more)</p>}
+
+                {/* Order ID */}
+                <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Order ID: {data.order_unique_id}</p>
+            </div>
+        </Link>
+    );
 };
 
 export default OrderListCard;

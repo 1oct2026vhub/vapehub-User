@@ -1,4 +1,3 @@
-import MyAccountHeading from "@/components/ui/MyAccountHeading";
 import { Metadata, NextPage } from "next";
 import React from "react"; 
 import LogoutButton from "../../_components/LogoutButton";
@@ -26,8 +25,9 @@ const MyAccountOrders: NextPage<{searchParams: Promise<{page: string}>}> = async
     
      return (
         <main>
-            <MyAccountHeading />
+             
             <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-4.5 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
+                <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">My Orders</h2>
                 {
                     orders.length === 0 ?
                     <EmptyPlaceholder 

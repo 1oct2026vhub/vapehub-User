@@ -94,6 +94,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
             setIsProcessing(false);
         }
     };
+    
 
     const value = {
         selectedShippingMethod,

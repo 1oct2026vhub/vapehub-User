@@ -1,26 +1,31 @@
 "use client"
-import { VerifyUserEmailResponse } from "@/lib/config/auth.config"; 
+import { VerifyUserEmailResponse } from "@/lib/config/auth.config";
+import { ROUTES } from "@/lib/routes";
 import { Button } from "@nextui-org/button";
-import { signIn } from "next-auth/react";
-import Image from "next/image"; 
-import { FunctionComponent, ReactElement } from "react";
+import { signIn, useSession } from "next-auth/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { FunctionComponent, ReactElement, useEffect } from "react";
 
 interface Props {
     data: VerifyUserEmailResponse;
 }
 
 const VerificationSuccess: FunctionComponent<Props> = ({ data }): ReactElement => {
-      
+     const {status, } = useSession();
+     const router = useRouter();
     const handleSubmit = async () => {
         await signIn('credentials', {
             ...data,
             redirect: false
         });
-        // reload the page
-        window.location.reload();
-        
 
     }
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.push(ROUTES.MY_ACCOUNT);
+        }
+    }, [status, router]);
     return (
         <div className="auth-form-container md:!py-40">
             <div className="auth-form-wrapper !max-w-[600px] !p-5 !gap-5">

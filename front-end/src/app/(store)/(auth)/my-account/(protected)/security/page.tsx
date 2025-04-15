@@ -1,6 +1,4 @@
 'use client'
-
-import MyAccountHeading from "@/components/ui/MyAccountHeading";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react"; 
 import { Button } from "@nextui-org/button";
@@ -79,7 +77,6 @@ const AccountSecurity: NextPage = () => {
 
     return (
         <main>
-            <MyAccountHeading />
             <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-6 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
                 <div className="flex items-start flex-col gap-4.5">
                     <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">

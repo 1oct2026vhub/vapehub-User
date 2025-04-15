@@ -1,6 +1,5 @@
 'use client'
 
-import MyAccountHeading from "@/components/ui/MyAccountHeading";
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
 import AddressCard from "../../_components/AddressCard";
@@ -48,7 +47,7 @@ const AddressesContent: React.FC = () => {
 
   return (
     <main>
-      <MyAccountHeading />
+      
       <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-4.5 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
         {/* Header */}
         <div className="flex items-center gap-4">

@@ -127,6 +127,12 @@ export interface ORDER_RESPONSE_DATA {
     message: string;
     data: ORDER_LIST_RESPONSE;
 }
+export interface Payment_Validate {
+    order_id: number;
+    order_code: string;
+    status: string;
+    message: string;
+}
 
 export interface ORDER_LIST_RESPONSE {
 

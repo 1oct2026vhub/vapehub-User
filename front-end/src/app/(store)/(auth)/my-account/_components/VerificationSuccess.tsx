@@ -1,5 +1,6 @@
 "use client"
 import { VerifyUserEmailResponse } from "@/lib/config/auth.config";
+import { ROUTES } from "@/lib/routes";
 import { Button } from "@nextui-org/button";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -22,7 +23,7 @@ const VerificationSuccess: FunctionComponent<Props> = ({ data }): ReactElement =
     }
     useEffect(() => {
         if (status === 'authenticated') {
-            router.refresh();
+            router.replace(ROUTES.MY_ACCOUNT_PERSONAL_INFO);
         }
     }, [status, router]);
     return (

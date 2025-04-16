@@ -66,7 +66,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data}) => {
             <div className='space-y-2'>
                 <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order Date</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
-                    <p>{new Date(data.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    <p>{new Date(data.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
             </div>
         </div>

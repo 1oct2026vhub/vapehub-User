@@ -67,7 +67,7 @@ export function AgeVerificationProvider({ children }: { children: React.ReactNod
                 <p>You must be 18 years old to access this website.</p>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={handleDeny}>
+                <Button color="danger" variant="bordered" onPress={handleDeny}>
                   No
                 </Button>
                 <Button color="primary" onPress={handleVerification}>

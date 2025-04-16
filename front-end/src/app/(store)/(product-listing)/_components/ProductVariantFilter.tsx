@@ -112,7 +112,7 @@ const ButtonAttributeTerms = ({
             <p className='text-content-1 md:text-title-1 font-semibold text-skin-neutral-500'>
                 {attributeTerm?.attribute.name}
             </p>
-            <div className='flex gap-3.5 items-center'>
+            <div className='flex flex-wrap sm:flex-nowrap gap-3.5 items-center'>
                 {attributeTerm.terms.map((term, idx) => (
                     <Button
                         key={idx}

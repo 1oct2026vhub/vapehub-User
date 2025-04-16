@@ -174,7 +174,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
 
                     </div>
 
-                    <Slider {...settings} className='grid items-center gap-4'>
+                    <Slider {...settings} className='grid items-center gap-4 product-details'>
                         {
                             allImages.map((image, index) => (
                                 <div key={index}>
@@ -279,7 +279,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 pattern="[0-9]*"
                                 inputMode="numeric"
                                 disabled={stock === 0}
-                                className='w-9 max-w-9 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4 text-center'
+                                className='w-9 max-w-9 !border-none text-title-1 !outline-none placeholder:text-skin-neutral-500 bg-transparent text-center'
                             />
                             {/* <input
                                 type="tel"

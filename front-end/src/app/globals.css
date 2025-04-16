@@ -205,6 +205,11 @@ input[type='search'] {
   transform: translateY(-50%);
 }
 
+.product-details .slick-prev,
+.product-details .slick-next {
+  @apply sm:!w-9 sm:!h-9
+}
+
 .slick-disabled { pointer-events: none; cursor: default !important; opacity: 0.5; }
 
 .slick-prev::before {

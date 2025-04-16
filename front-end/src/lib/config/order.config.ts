@@ -196,6 +196,9 @@ export interface ORDER {
     discount_price: string | null;
     status: string;
     createdAt: string;
+    order_code: string;
+    email: string;
+    phone: string;
     orderItems: {
         id: number;
         unit: string;

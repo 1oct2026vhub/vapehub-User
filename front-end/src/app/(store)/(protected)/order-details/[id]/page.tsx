@@ -41,7 +41,7 @@ const OrdersListingPage: NextPage<{ params: Promise<{ id: string }> }> = async (
             </div>
             <section className='flex flex-col gap-4'>
                 <div className='bg-skin-white p-4 shadow-card rounded-14 flex flex-col md:flex-row gap-7 items-start'>
-                    <OrderDetails data={result.order} user={result.user} />
+                    <OrderDetails data={result.order} />
                     <OrderActions />
                 </div>
                 {

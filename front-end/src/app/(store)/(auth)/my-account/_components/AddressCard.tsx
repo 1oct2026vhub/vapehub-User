@@ -126,6 +126,7 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
               color="danger"
               onPress={handleDelete}
               isLoading={isSubmitting}
+              className='!bg-skin-red-400'
             >
               Delete
             </Button>

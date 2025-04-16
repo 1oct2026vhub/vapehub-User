@@ -184,6 +184,7 @@ const PersonalInfo: NextPage = () => {
                                             color="danger"
                                             onPress={handleDeleteAccount}
                                             isLoading={isLoading}
+                                            className='!bg-skin-red-400'
                                         >
                                             Delete
                                         </Button>

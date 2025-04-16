@@ -59,14 +59,10 @@ const PersonalInfo: NextPage = () => {
     const handleDeleteAccount = async () => {
         const result = await deleteProfile()
         if (result?.status === ServerActionStatus.SUCCESS) {
-            toast.success('Account deleted successfully');
+            toast.success("Account deleted successfully");
             onClose();
-            signOut({ callbackUrl: ROUTES.MY_ACCOUNT });
-             
-            // Redirect to home or login page
-        } else {
-            toast.error('Failed to delete account')
-        }
+            signOut({ callbackUrl: ROUTES.MY_ACCOUNT }); 
+        }  
     }
     if(loading) {
         return <p>Loading..</p>

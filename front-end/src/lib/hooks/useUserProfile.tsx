@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { getUserProfile, updateUserProfile, deleteUserAccount } from '@/lib/server.actions'
 import { UserProfileFormData, UserProfileResponse } from '@/lib/config/user.config'
 import { ServerActionStatus } from '../config/app.config'
+import { toast } from 'sonner'
 
 export const useUserProfile = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -42,8 +43,12 @@ export const useUserProfile = () => {
     setIsLoading(true)
     try {
       const response = await deleteUserAccount()
-      if (response.status === ServerActionStatus.ERROR) throw new Error(response.message)
-      return response
+      if (response.status === ServerActionStatus.ERROR) {
+        toast.error(response.message);
+        return null;
+      } else {        
+        return response;
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete account')
       return null

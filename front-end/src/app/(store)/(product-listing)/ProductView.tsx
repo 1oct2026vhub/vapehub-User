@@ -11,6 +11,7 @@ import Subscription from '../(dashboard)/_components/Subscription';
 import { ROUTES } from '@/lib/routes';
 import SuspenseLoader from '@/components/ui/SuspenseLoader';
 import { AttributeProductTerms, AttributeTerms, ProductResponse } from '@/lib/config/product.config';
+import ScrollToTop from '@/components/ScrollToTop';
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -49,6 +50,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = fal
             <Suspense fallback={<SuspenseLoader height='h-24'/>}>
             <Subscription className="mt-5 md:mt-10"/>
             </Suspense>
+            <ScrollToTop />
         </main>
     )
 }

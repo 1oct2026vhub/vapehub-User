@@ -22,7 +22,7 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
       width={width}
       height={height}
       priority={priority}
-      className={`w-full h-full object-fill aspect-video ${className}`}
+      className={`w-full h-full object-fill aspect-video rounded-3xl ${className}`}
     />
     </Link>
   </>
@@ -50,7 +50,7 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
             width={662}
             height={573}
             priority
-            className='max-h-[573px]'
+            className='max-h-[573px] rounded-3xl'
           />
         )}
 
@@ -61,7 +61,7 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
               banner={banner}
               width={662}
               height={274}
-              className='max-h-[274px]'
+              className='max-h-[274px] rounded-3xl'
             />
           ))}
         </div>
@@ -74,7 +74,7 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
             banner={banner}
             width={361}
             height={274}
-            className='max-h-[274px]'
+            className='max-h-[274px] rounded-3xl'
           />
         ))}
       </section>

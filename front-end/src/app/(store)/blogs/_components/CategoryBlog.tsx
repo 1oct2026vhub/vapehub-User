@@ -41,7 +41,7 @@ const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
         priority
       />
       <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>{data.title ?? "Blogs"}</h1>
-      <div className="w-full" dangerouslySetInnerHTML={{ __html: data.content }} />
+      <div className="w-full blog-details" dangerouslySetInnerHTML={{ __html: data.content }} />
       <Suspense fallback={<SuspenseLoader/>}>
       <Subscription/>
       </Suspense>

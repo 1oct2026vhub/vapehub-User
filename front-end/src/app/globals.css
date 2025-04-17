@@ -470,9 +470,6 @@ input[type='search'] {
 
 /* blog details */
 
-.blog-details p {
-  @apply text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
-}
 
 .blog-details ol {
   @apply list-decimal pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
@@ -482,12 +479,15 @@ input[type='search'] {
   @apply list-disc pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
 }
 
-.blog-details h3 {
-  @apply text-h5 md:text-h4 font-semibold text-skin-neutral-500;
-}
 
-.blog-details h4 {
-  @apply text-title-1 md:text-h5 text-skin-neutral-500 font-semibold;
+.blog-details h1, 
+.blog-details h2, 
+.blog-details h3,
+.blog-details h4, 
+.blog-details h5, 
+.blog-details h6, 
+.blog-details p {
+  font-size: revert;
 }
 
 .border-default {

@@ -7,11 +7,11 @@ const StoreRootLayout = ({
 }: Readonly<PropsWithChildren>): ReactElement => {
      
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header/>
         {children}
       <Footer/>
-    </>
+    </div>
   )
 }
 export default StoreRootLayout;

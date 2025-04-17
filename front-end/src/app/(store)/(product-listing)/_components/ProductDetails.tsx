@@ -155,7 +155,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit '>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box pt-5 px-1.5 pb-2  w-full min-h-[250px] max-h-[250px] lg:w-[400px] xl:w-[550px] lg:min-h-[425px] lg:max-h-[425px]'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full lg:w-[400px] xl:w-[550px] h-fit'>
                         <CustomImageMagnifier
                             src={mainImage?.url || ''}
                             alt={product?.name || ''}
@@ -174,7 +174,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
 
                     </div>
 
-                    <Slider {...settings} className='grid items-center gap-4'>
+                    <Slider {...settings} className='grid items-center gap-4 product-details'>
                         {
                             allImages.map((image, index) => (
                                 <div key={index}>
@@ -279,7 +279,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 pattern="[0-9]*"
                                 inputMode="numeric"
                                 disabled={stock === 0}
-                                className='w-9 max-w-9 !border-none max-sm:h-3 !outline-none placeholder:text-skin-neutral-500 ml-4 text-center'
+                                className='w-9 max-w-9 !border-none text-title-1 !outline-none placeholder:text-skin-neutral-500 bg-transparent text-center'
                             />
                             {/* <input
                                 type="tel"
@@ -316,7 +316,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                             Add to Cart
                         </Button>
                     </div>
-                    {error && <p className='text-red-500 text-sm'>{error}</p>}
+                    {error && <p className='text-skin-red-400 text-sm'>{error}</p>}
                 </div>
             </div>
             <Divider />

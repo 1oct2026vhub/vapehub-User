@@ -91,7 +91,7 @@ const OrderPaymentAction: React.FC<{ data: ORDER_DETAILS_RESPONSE, orderId: numb
                                 <Button color="default" variant="light" onPress={onClose}>
                                     Cancel
                                 </Button>
-                                <Button color="danger" onPress={handleCancelOrder} isLoading={isCancelLoading}>
+                                <Button color="danger" onPress={handleCancelOrder} isLoading={isCancelLoading} className='!bg-skin-red-400'>
                                     Confirm Cancellation
                                 </Button>
                             </ModalFooter>

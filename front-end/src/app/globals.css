@@ -534,6 +534,10 @@ input[type="checkbox"] + span {
   @apply bg-skin-neutral-50 !important;
 }
 
+.text-red-500 {
+  @apply !text-skin-red-400
+}
+
 /* Styles for webkit-based browsers */
 ::-webkit-scrollbar {
   width: 5px;

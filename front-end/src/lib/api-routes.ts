@@ -48,6 +48,7 @@ export const API_ROUTES = {
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
+    CHECK_STOCK_VALIDATION: buildRequestUrl('/api/cart/check-stock'),
 }
 
 // * Helper functions

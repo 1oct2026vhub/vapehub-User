@@ -3,7 +3,7 @@ import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
-import { CART_GET_PAYLOAD, CART_RESPONSE_DATA } from "./config/cart.config";
+import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
@@ -285,6 +285,13 @@ export const removeFromCart = async (
   }>({
     endpoint: API_ROUTES.REMOVE_FROM_CART(productId),     
     method: 'DELETE',
+  });
+};
+// check stock validation
+export const checkStockValidation = async (): Promise<ServerActionResponse<StockValidationResponse[]>> => {
+  return await handleRequest<StockValidationResponse[], unknown>({
+    endpoint: API_ROUTES.CHECK_STOCK_VALIDATION,
+    method: 'GET',
   });
 };
 

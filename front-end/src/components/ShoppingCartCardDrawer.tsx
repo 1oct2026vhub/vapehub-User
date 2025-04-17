@@ -13,8 +13,8 @@ type CartCardProps = {
 };
 
 const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
-  const { removeItem, isLoading } = useCart(); 
-
+  const { removeItem, isLoading, stockValidationErrors } = useCart(); 
+  const error = stockValidationErrors.find(error => error.itemId === item.id);
   const handleRemove = async () => {
     await removeItem(item.id);
   };
@@ -55,7 +55,9 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
 
           {/* Quantity Selector */}
           <QuantitySelector item={item} />
-
+          {error && (
+            <p className='text-red-500 text-content-3 md:text-content-1 font-bold'>{error.message}</p>
+          )}
           {/* Action Buttons */}
           <div className="flex items-center gap-3 md:gap-5">
             <Button 

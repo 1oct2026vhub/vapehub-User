@@ -14,15 +14,18 @@ import { CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
 
 const CartDetails: React.FC = () => {
     const { status } = useSession();
-    const { cartTotal, itemCount, couponDiscount, setCouponDiscount } = useCart();
+    const { cartTotal, itemCount, couponDiscount, setCouponDiscount, checkoutStockValidation, stockValidationLoading } = useCart();
     const router = useRouter();
 
     const handleCheckout = async () => {
-        const response = await checkout({ couponCode: couponDiscount.code || '' } as unknown as CHECKOUT_PAYLOAD);
-        if(response.status === ServerActionStatus.SUCCESS) {
-            router.push(ROUTES.CHECKOUT);
-        } else {
-            toast.error(response.message);
+        const isValid = await checkoutStockValidation();
+        if(isValid) {
+            const response = await checkout({ couponCode: couponDiscount.code || '' } as unknown as CHECKOUT_PAYLOAD);
+            if(response.status === ServerActionStatus.SUCCESS) {
+                router.push(ROUTES.CHECKOUT);
+            } else {
+                toast.error(response.message);
+            }
         }
     }
 
@@ -67,6 +70,7 @@ const CartDetails: React.FC = () => {
                 color="primary"
                 className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
                 onPress={handleCheckout}
+                isLoading={stockValidationLoading}
             >
                 Checkout Now
             </Button>

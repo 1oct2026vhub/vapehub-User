@@ -17,15 +17,28 @@ import MobileMenu from './MobileMenu';
 import { useCart } from '@/lib/context/CartContext';
 import { ROUTES } from '@/lib/routes';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
-
-const HeaderTopBar = () => {
+import { useRouter } from 'next/navigation';
+import { Category } from '@/lib/config/category.config';
+type Props = {
+    categories: Category[]
+  }
+const HeaderTopBar = ({categories}: Props) => {
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
         mode: 'onBlur',
     });
 
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const { cartItems, cartTotal, itemCount } = useCart();
+    const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+    const router = useRouter();
+    const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading } = useCart();
+    const handleCheckout = async () => { 
+        const isValid = await checkoutStockValidation(); 
+        if(isValid) {
+            onClose();
+            router.push(ROUTES.CHECKOUT);
+            
+        }
+    }
     return (
         <>
             <div className="hidden lg:flex items-center justify-between gap-10">
@@ -70,7 +83,7 @@ const HeaderTopBar = () => {
 
             <div className="flex flex-col space-y-3.5 lg:hidden">
                 <div className="flex items-center justify-between gap-5">
-                    <MobileMenu />
+                    <MobileMenu categories={categories} />
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     <div className="flex items-center gap-1">
                         <Link href='/my-account'>
@@ -135,14 +148,14 @@ const HeaderTopBar = () => {
                                         <p className='text-content-2 md:text-title-1'>Total</p>
                                         <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
                                     </div>
-                                    <Button
-                                        as={Link}
-                                        href={ROUTES.CHECKOUT}
+                                    <Button 
                                         size="lg"
                                         radius="md"
                                         color="primary"
                                         className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
-                                        onPress={onClose}
+                                        onPress={handleCheckout}
+                                        isLoading={stockValidationLoading}
+                                        
                                     >
                                         Checkout Now
                                     </Button>

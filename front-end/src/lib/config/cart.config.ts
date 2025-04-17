@@ -84,3 +84,10 @@ export type CartItem = {
   quantity: number;
 }
   
+export type StockValidationResponse = {
+    itemId: number;
+    message: string;
+    isOutOfStock: boolean;
+}
+
+

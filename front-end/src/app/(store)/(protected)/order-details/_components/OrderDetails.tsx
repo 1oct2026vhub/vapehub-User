@@ -25,7 +25,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data}) => {
             <div className='space-y-2'>
                 <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Details</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
-                    <h5>{data.shippingAddress?.name || ""}</h5>
+                    <h5>{data.shippingAddress?.name || ""} {data.shippingAddress?.last_name || ""}</h5>
                     <p>{data.shippingAddress?.street || ""}</p>
                     <p>{data.shippingAddress?.post_code || ""}</p>
                     <p>{data.shippingAddress?.country || DEFAULT_COUNTRY}</p>
@@ -35,7 +35,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data}) => {
             <div className='space-y-2'>
                 <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Billing Details</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
-                    <h5>{data.billingAddress?.name || ""}</h5>
+                    <h5>{data.billingAddress?.name || ""} {data.billingAddress?.last_name || ""}</h5>
                     <p>{data.billingAddress?.street || ""}</p>
                     <p>{data.billingAddress?.post_code || ""}</p>
                     <p>{data.billingAddress?.country || DEFAULT_COUNTRY}</p>

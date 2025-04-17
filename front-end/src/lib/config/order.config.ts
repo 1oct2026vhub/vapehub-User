@@ -226,6 +226,7 @@ export interface ORDER {
     }[];
     shippingAddress: {
         name: string;
+        last_name: string;
         street: string;
         town: string;
         post_code: string;
@@ -235,6 +236,7 @@ export interface ORDER {
     } | null;
     billingAddress: {
         name: string;
+        last_name: string;
         street: string;
         town: string;
         post_code: string;

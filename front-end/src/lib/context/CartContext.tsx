@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem } from '../config/cart.config';
-import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem } from '../server.actions';
+import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation } from '../server.actions';
 import { getCookie, setCookie } from 'cookies-next';
 import { ServerActionStatus } from '../config/app.config';
 import { useSession } from 'next-auth/react';
@@ -24,23 +24,28 @@ interface CartContextType {
   removeItem: (cartId: number) => Promise<void>;
   cartTotal: number;
   itemCount: number;
-  syncCookieCart: () => Promise<void>; 
-  error: string | null; 
+  syncCookieCart: () => Promise<void>;
+  error: string | null;
   bulkAddItems: (items: { product_id: number; variant_id: number; quantity: number }[]) => Promise<void>;
   fetchCartItems: () => Promise<void>;
   clearCart: () => void;
   couponDiscount: CouponDiscount;
   setCouponDiscount: (discount: CouponDiscount) => void;
+  checkoutStockValidation: () => Promise<boolean>;
+  stockValidationErrors: Array<{ itemId: number; message: string; isOutOfStock: boolean }>;
+  stockValidationLoading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_COOKIE_NAME = 'guest_cart';
- 
+
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [stockValidationLoading, setStockValidationLoading] = useState(false);
   const { status } = useSession();
+  const [stockValidationErrors, setStockValidationErrors] = useState<Array<{ itemId: number; message: string; isOutOfStock: boolean }>>([]);
   const isAuthenticated = status === 'authenticated';
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
   const [cartTotal, setCartTotal] = useState<number>(0);
@@ -53,7 +58,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const [itemCount, setItemCount] = useState<number>(0);
-   const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Calculate cart totals
   const calculateTotals = (items: CartItem[]) => {
@@ -69,11 +74,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       if (isAuthenticated) {
-        const response = await getCartItems(); 
-        
-        if (response.status === ServerActionStatus.SUCCESS) { 
-          const cartItems:CartItem[] = response.data.map(bindCartItem);
-          setCartItems(cartItems); 
+        const response = await getCartItems();
+
+        if (response.status === ServerActionStatus.SUCCESS) {
+          const cartItems: CartItem[] = response.data.map(bindCartItem);
+          setCartItems(cartItems);
           calculateTotals(cartItems);
         }
       } else {
@@ -87,7 +92,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Error loading cart:', error);
       // Load from cookie as fallback
-      const cookieCart = getCookie(CART_COOKIE_NAME); 
+      const cookieCart = getCookie(CART_COOKIE_NAME);
       if (cookieCart) {
         setCartItems(JSON.parse(cookieCart as string));
         calculateTotals(JSON.parse(cookieCart as string));
@@ -124,18 +129,18 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const createGuestCartItem = (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string): CartItem => {
     const id = Math.random();
     return {
-       id: id,
-       product_id: productId,
-       product_slug: data.slug,
-       name: productName,
-       price: data.price,
-       discount_price: data.discount_price,
-       variant_id: variantId,
-       stock: data.stock,
-       slug: data.slug,
-       description: "",
-       ProductImages: data.primary_image?.url || "",
-       quantity: quantity
+      id: id,
+      product_id: productId,
+      product_slug: data.slug,
+      name: productName,
+      price: data.price,
+      discount_price: data.discount_price,
+      variant_id: variantId,
+      stock: data.stock,
+      slug: data.slug,
+      description: "",
+      ProductImages: data.primary_image?.url || "",
+      quantity: quantity
     };
   };
 
@@ -143,14 +148,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       // Check if the product with the same product ID and variant ID already exists in the cart
-      const existingItem = cartItems.find(item => 
+      const existingItem = cartItems.find(item =>
         item.product_id === productId && item.variant_id === variantId
       );
-      
+
       // Check if there's enough stock available
       const stockAvailable = data.stock || 0;
       const requestedQuantity = existingItem ? existingItem.quantity + quantity : quantity;
-      
+
       if (requestedQuantity > stockAvailable) {
         toast.error(`Only ${stockAvailable} items available in stock`);
         setIsLoading(false);
@@ -195,9 +200,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updateItemQuantity = async (cartId: number, quantity: number) => {
-    
-    const existingItem:CartItem | undefined = cartItems.find(item => item.id === cartId);
-    
+
+    const existingItem: CartItem | undefined = cartItems.find(item => item.id === cartId);
+
     if (!existingItem) {
       // toast.error("Product not found in cart")
       return;
@@ -269,21 +274,21 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const syncCookieCart = async () => { 
+  const syncCookieCart = async () => {
 
     if (!isAuthenticated) return; // Only sync if user is authenticated
-        
+
     const cookieCart = getCookie(CART_COOKIE_NAME);
     if (cookieCart) {
-      const items: CartItem[] = JSON.parse(cookieCart as string); 
+      const items: CartItem[] = JSON.parse(cookieCart as string);
       const cartItems = items.map(item => ({
         product_id: item.product_id,
         variant_id: item.variant_id,
         quantity: item.quantity
-      })); 
+      }));
       try {
         const response = await bulkAddToCart(cartItems);
-        
+
         if (response.status === ServerActionStatus.SUCCESS) {
           setCookie(CART_COOKIE_NAME, ''); // Clear cookie cart after sync
           await loadCartItems();
@@ -296,12 +301,37 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const checkoutStockValidation = async () => {
+    if (isAuthenticated) {
+      setStockValidationLoading(true);
+    const response = await checkStockValidation(); 
+    if (response.status === ServerActionStatus.ERROR) {
+      toast.error(response.message);
+      setStockValidationErrors([]);
+      setStockValidationLoading(false);
+      return false;
+    }
+    const stockValidationErrors = response.data.filter(data => data.isOutOfStock);
+    
+    setStockValidationErrors(stockValidationErrors);
+    if (stockValidationErrors.length > 0) {
+      const errorMessages = stockValidationErrors.map(error => error.message);
+      toast.error(errorMessages.join('\n'));
+      setStockValidationLoading(false);
+      return false;
+    }
+    setStockValidationLoading(false);
+    return true;
+    }
+    return true;
+  }
+
   // Add new useEffect to handle automatic cart sync on authentication
   useEffect(() => {
-    const handleAuthChange = async () => { 
+    const handleAuthChange = async () => {
       if (isAuthenticated && !hasAttemptedSync) {
         setHasAttemptedSync(true);
-        const cookieCart = getCookie(CART_COOKIE_NAME);         
+        const cookieCart = getCookie(CART_COOKIE_NAME);
         if (cookieCart) {
           const items: CART_GET_PAYLOAD[] = JSON.parse(cookieCart as string);
           if (items.length > 0) {
@@ -319,9 +349,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(true);
       setError(null);
       const response = await getCartItems();
-      
+
       if (response.status === ServerActionStatus.SUCCESS) {
-        const cartItems:CartItem[] = response.data.map(bindCartItem);
+        const cartItems: CartItem[] = response.data.map(bindCartItem);
         setCartItems(cartItems);
         calculateTotals(cartItems);
       } else {
@@ -334,13 +364,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     }
   };
- 
+
   const bulkAddItems = async (items: { product_id: number; variant_id: number; quantity: number }[]) => {
     try {
       setIsLoading(true);
       setError(null);
       const response = await bulkAddToCart(items);
-      
+
       if (response.status === ServerActionStatus.SUCCESS) {
         await fetchCartItems();
         toast.success('Items added to cart');
@@ -360,7 +390,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const clearCart = () => {
     setCartItems([]);
     setCartTotal(0);
-    setItemCount(0); 
+    setItemCount(0);
     setCouponDiscount({
       value: 0,
       isApplied: false,
@@ -379,13 +409,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     removeItem,
     cartTotal,
     itemCount,
-    syncCookieCart, 
-    error, 
+    syncCookieCart,
+    error,
     bulkAddItems,
     fetchCartItems,
     clearCart,
     couponDiscount,
-    setCouponDiscount
+    setCouponDiscount,
+    checkoutStockValidation,
+    stockValidationErrors,
+    stockValidationLoading,
   };
 
   return (

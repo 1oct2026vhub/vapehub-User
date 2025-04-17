@@ -1,11 +1,11 @@
 "use client"
 import { Button } from '@nextui-org/react';
 import { TrashIcon, DangerIcon } from '@/components/Icons';
-import { useCart } from '@/lib/context/CartContext'; 
+import { useCart } from '@/lib/context/CartContext';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
-import QuantitySelector from './QuantitySelector'; 
+import QuantitySelector from './QuantitySelector';
 
 type CartCardProps = {
   item?: CartItem;
@@ -13,9 +13,10 @@ type CartCardProps = {
 };
 
 const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
-  
-  const { removeItem, isLoading } = useCart();
-   
+
+  const { removeItem, isLoading, stockValidationErrors } = useCart();
+  const error = stockValidationErrors.find(error => error.itemId === item?.id);
+
   const handleRemove = async () => {
     if (!item?.id) return;
     await removeItem(item.id);
@@ -35,7 +36,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
               width={104}
               height={100}
             />
-          
+
           </div>
         </div>
 
@@ -60,17 +61,17 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
 
           <div className="flex items-center gap-5 justify-between">
             {/* Quantity Selector */}
-            
-              <QuantitySelector  
-                item={item}
-              /> 
 
+            <QuantitySelector
+              item={item}
+            />
+            
             {/* Action Buttons */}
             <div className="flex items-center gap-2 md:gap-6">
-              <Button 
-                size="sm" 
-                isIconOnly 
-                variant="light" 
+              <Button
+                size="sm"
+                isIconOnly
+                variant="light"
                 className="hover:!bg-transparent"
                 onPress={handleRemove}
                 disabled={isLoading}
@@ -88,6 +89,9 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
               </Button> */}
             </div>
           </div>
+          {error && (
+              <p className='text-red-500 text-content-3 md:text-content-1 font-bold'>{error.message}</p>
+            )}
         </div>
       </div>
 

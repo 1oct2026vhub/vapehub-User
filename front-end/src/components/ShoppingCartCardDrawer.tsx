@@ -13,8 +13,8 @@ type CartCardProps = {
 };
 
 const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
-  const { removeItem, isLoading } = useCart();
-
+  const { removeItem, isLoading, stockValidationErrors } = useCart();
+  const error = stockValidationErrors.find(error => error.itemId === item.id);
   const handleRemove = async () => {
     await removeItem(item.id);
   };
@@ -53,11 +53,14 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
             </div>
           </div>
 
-          <div className="flex items-center gap-5 justify-between w-full">
-
-            {/* Quantity Selector */}
-            <QuantitySelector item={item} />
-
+          <div className="flex items-center gap-5 justify-between">
+            <div>
+              {/* Quantity Selector */}
+              <QuantitySelector item={item} />
+              {error && (
+                <p className='text-red-500 text-content-3 md:text-content-1 font-bold'>{error.message}</p>
+              )}
+            </div>
             {/* Action Buttons */}
             <div className="flex items-center gap-3 md:gap-5">
               <Button
@@ -82,31 +85,34 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
             </Button> */}
             </div>
           </div>
-
         </div>
+
       </div>
-
-      {/* Add More Item (Conditionally Rendered) */}
-      {showAddMoreItem && (
-        <div className="bg-[#FB6767]/30 border border-skin-white shadow-sm p-1.5 md:p-3 flex items-center gap-4 justify-between rounded-10">
-          <div className="flex gap-2 items-center">
-            <DangerIcon />
-            <p className="text-content-3 md:text-content-1 font-semibold text-skin-neutral-500">
-              Add 2 or more items to activate the 3 for £25 multibuy.
-            </p>
-          </div>
-          <Button
-            size="md"
-            radius="md"
-            color="default"
-            variant="bordered"
-            className="!py-2 !px-4 bg-skin-neutral-500 border-skin-white shadow-button text-skin-white !rounded-10 !text-content-2 md:!text-content-1 font-semibold !max-h-9 min-w-fit"
-          >
-            Add Now
-          </Button>
-        </div>
-      )}
     </div>
+
+      {/* Add More Item (Conditionally Rendered) */ }
+  {
+    showAddMoreItem && (
+      <div className="bg-[#FB6767]/30 border border-skin-white shadow-sm p-1.5 md:p-3 flex items-center gap-4 justify-between rounded-10">
+        <div className="flex gap-2 items-center">
+          <DangerIcon />
+          <p className="text-content-3 md:text-content-1 font-semibold text-skin-neutral-500">
+            Add 2 or more items to activate the 3 for £25 multibuy.
+          </p>
+        </div>
+        <Button
+          size="md"
+          radius="md"
+          color="default"
+          variant="bordered"
+          className="!py-2 !px-4 bg-skin-neutral-500 border-skin-white shadow-button text-skin-white !rounded-10 !text-content-2 md:!text-content-1 font-semibold !max-h-9 min-w-fit"
+        >
+          Add Now
+        </Button>
+      </div>
+    )
+  }
+    </div >
   );
 };
 

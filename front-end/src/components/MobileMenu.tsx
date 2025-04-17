@@ -19,13 +19,19 @@ import { toast } from 'sonner';
 import MobileSubMenu from './MobileSubMenu';
 import { useCart } from '@/lib/context/CartContext';
 import { ROUTES } from '@/lib/routes';
+import { useRouter } from 'next/navigation';
+import { Category, defaultNavLinks } from '@/lib/config/category.config';
 
-const MobileMenu = () => {
+type Props = {
+    categories: Category[]
+  }
+const MobileMenu = ({categories}: Props) => {
     const { isOpen: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
     const { isOpen: isCartOpen, onOpen: onCartOpen, onClose: onCartClose } = useDisclosure();
     const [openItems, setOpenItems] = useState<number[]>([]);
     const [isFooterVisible, setFooterVisible] = useState(true);
-    const { cartItems, cartTotal, itemCount } = useCart();
+    const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading } = useCart();
+    const router = useRouter();
     const itemClasses = {
         base: "w-full rounded-lg shadow-input border border-skin-neutral-100",
         title: "text-title-2 font-bold uppercase",
@@ -34,19 +40,13 @@ const MobileMenu = () => {
         content: "py-4 border-t border-skin-neutral-200",
     };
 
-    const filterOptions = [
-        { title: "New In", content: <MobileSubMenu /> },
-        { title: "Disposables", content: <MobileSubMenu /> },
-        { title: "Pod Kits", content: <MobileSubMenu /> },
-        { title: "Vape Kits", content: <MobileSubMenu /> },
-        { title: "Nic Salts", content: <MobileSubMenu /> },
-        { title: "E-liquids", content: <MobileSubMenu /> },
-        { title: "Pouches & Strips", content: <MobileSubMenu /> },
-        { title: "Hardware", content: <MobileSubMenu /> },
-        { title: "Brands" },
-        { title: "Blogs" },
-        { title: "Deals" },
-    ];
+    const filterOptions = categories.length > 0 ? categories.slice(0, 8).map((category) => ({
+        title: category.name,
+        content: <MobileSubMenu />,
+        link: category.slug,
+        isLink: false,
+    })) : [];
+    
 
     const subscribeFromConfig = useForm<SubscribeFormSchema>({
         resolver: zodResolver(SUBSCRIBE_IN_SCHEMA),
@@ -63,7 +63,13 @@ const MobileMenu = () => {
         subscribeFromConfig.reset({ email: '' });
     }
 
-
+    const handleCheckout = async () => {
+        const isValid = await checkoutStockValidation();
+        if(isValid) {
+            router.push(ROUTES.CHECKOUT);
+            onCartClose();
+        }
+    }
 
     const handleAccordionItemClick = (index: number) => {
         setOpenItems((prevOpenItems) => {
@@ -135,6 +141,13 @@ const MobileMenu = () => {
                                 </AccordionItem>
                             ))}
                         </Accordion>
+                        {defaultNavLinks.map(({ name, slug }) => (
+                            <Link href={slug} key={name} scroll={true} >   
+                                <button className='w-full text-left text-title-2 font-bold p-2' onClick={handleMenuClose}>
+                                    {name}
+                                </button>
+                            </Link>
+                        ))}
                     </DrawerBody>
                     {isFooterVisible && openItems.length === 0 && (
                         <DrawerFooter className='py-4 px-4 space-y-6 flex-col border-t border-skin-neutral-200'>
@@ -209,12 +222,12 @@ const MobileMenu = () => {
                                 <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
                             </div>
                             <Button
-                                as={Link}
-                                href={ROUTES.CHECKOUT}
+                                onPress={handleCheckout}
                                 size="lg"
                                 radius="md"
                                 color="primary"
                                 className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                isLoading={stockValidationLoading}
                             >
                                 Checkout Now
                             </Button>

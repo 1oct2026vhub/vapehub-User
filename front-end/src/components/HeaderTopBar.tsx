@@ -114,13 +114,13 @@ const HeaderTopBar = () => {
                                 </Button>
                             </DrawerHeader>
                             <DrawerBody className='max-sm:px-4'>
-                                <div className='space-y-5 my-auto'>
+                                <div className='space-y-5 my-3 h-full'>
                                     {cartItems.length > 0 ? (
                                         cartItems.map((item, idx) => (
                                             <ShoppingCartCardDrawer key={idx} item={item} showAddMoreItem />
                                         ))
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center gap-4 py-8">
+                                        <div className="flex flex-col items-center justify-center gap-4 py-8 my-auto h-full">
                                             <ShoppingCartIcon className='w-20 h-20' />
                                             <p className="text-title-2 font-semibold text-skin-neutral-500 italic">Looks like you haven’t added anything yet!</p>
                                             <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button" onPress={onClose}>

@@ -316,7 +316,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                             Add to Cart
                         </Button>
                     </div>
-                    {error && <p className='text-red-500 text-sm'>{error}</p>}
+                    {error && <p className='text-skin-red-400 text-sm'>{error}</p>}
                 </div>
             </div>
             <Divider />

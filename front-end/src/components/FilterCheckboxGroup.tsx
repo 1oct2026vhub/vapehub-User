@@ -47,7 +47,7 @@ const FilterCheckboxGroup: React.FC<FilterCheckboxGroupProps> = ({
           classNames={{
             base: "mb-2",
             wrapper: "after:bg-primary-gradient-100 after:rounded",
-            label: "!text-content-2 text-nowrap",
+            label: "!text-content-2",
           }}
         >
           <span className="text-skin-neutral-300 font-normal">{label}</span>

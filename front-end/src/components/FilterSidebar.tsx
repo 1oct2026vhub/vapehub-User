@@ -21,7 +21,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 }) => {
     const itemClasses = {
         base: "w-full shadow-none !p-0",
-        title: "!text-content-2 xl:!text-content-1 text-nowrap font-bold",
+        title: "!text-content-2 xl:!text-content-1 capitalize text-nowrap font-bold",
         trigger: "rounded-lg h-11 !p-3 flex items-center border border-skin-primary-400",
         indicator: "text-medium text-skin-neutral-500 -rotate-90 data-[open=true]:rotate-90",
         content: "text-content-1 !px-3 !pt-4 !pb-0 !space-y-6 rounded-lg border border-skin-neutral-200 shadow-md my-2",

@@ -92,7 +92,7 @@ const ProductFeatures: React.FC<ProductFeaturesProps> = ({ productFeatures }) =>
             <EmptyPlaceholder
                 title="No features available"
                 description="This product does not have any features"
-                className="h-full"
+                className="h-full w-full"
             />
         )}
     </section>

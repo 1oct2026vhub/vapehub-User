@@ -25,8 +25,8 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
   if (!item) return null;
 
   return (
-    <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5">
-      <div className="flex items-start gap-3 md:gap-6">
+    <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
+      <div className="flex items-start gap-3 md:gap-6 w-full">
         {/* Product Image */}
         <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
@@ -40,7 +40,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
           </div>
         </div>
 
-        <div className="flex flex-col gap-2.5 md:gap-5">
+        <div className="flex flex-col gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 md:gap-8 justify-between">
             <h4 className="text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
               {item.name}

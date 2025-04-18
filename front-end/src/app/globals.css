@@ -205,6 +205,11 @@ input[type='search'] {
   transform: translateY(-50%);
 }
 
+.product-details .slick-prev,
+.product-details .slick-next {
+  @apply sm:!w-9 sm:!h-9
+}
+
 .slick-disabled { pointer-events: none; cursor: default !important; opacity: 0.5; }
 
 .slick-prev::before {
@@ -348,7 +353,7 @@ input[type='search'] {
 
 .section-slider.products-slider .slick-prev,
 .section-slider.products-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-6.3%] bottom-[-9%] sm:bottom-[-11.5%] md:bottom-[-10%] lg:bottom-[-11.5%] xl:bottom-[-10.2%] 2xl:bottom-[-9.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-6.3%] bottom-[-9.5%] sm:bottom-[-11.5%] md:bottom-[-10%] lg:bottom-[-11.5%] xl:bottom-[-10.2%] 2xl:bottom-[-9.6%] !important;
 }
 
 @media screen and (min-width:1890px) {  
@@ -441,11 +446,11 @@ input[type='search'] {
 
 
 .section-slider.blogs-slider .slick-prev {
-  @apply left-[34%] sm:left-[39%] xl:left-[43%]
+  @apply left-[32%] sm:left-[39%] xl:left-[43%]
 }
 
 .section-slider.blogs-slider .slick-next {
-  @apply right-[34%] sm:right-[39%] xl:right-[43%]
+  @apply right-[32%] sm:right-[39%] xl:right-[43%]
 }
 
 
@@ -465,9 +470,6 @@ input[type='search'] {
 
 /* blog details */
 
-.blog-details p {
-  @apply text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
-}
 
 .blog-details ol {
   @apply list-decimal pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
@@ -477,12 +479,15 @@ input[type='search'] {
   @apply list-disc pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
 }
 
-.blog-details h3 {
-  @apply text-h5 md:text-h4 font-semibold text-skin-neutral-500;
-}
 
-.blog-details h4 {
-  @apply text-title-1 md:text-h5 text-skin-neutral-500 font-semibold;
+.blog-details h1, 
+.blog-details h2, 
+.blog-details h3,
+.blog-details h4, 
+.blog-details h5, 
+.blog-details h6, 
+.blog-details p {
+  font-size: revert;
 }
 
 .border-default {
@@ -527,6 +532,10 @@ input[type="checkbox"] + span {
 
 .disabled-input div[data-slot="inner-wrapper"] {
   @apply bg-skin-neutral-50 !important;
+}
+
+.text-red-500 {
+  @apply !text-skin-red-400
 }
 
 /* Styles for webkit-based browsers */

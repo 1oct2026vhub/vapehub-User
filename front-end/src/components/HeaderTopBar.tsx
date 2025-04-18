@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
+import { CloseIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
 import InputField from "@/components/InputField";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@nextui-org/button";
@@ -120,18 +120,22 @@ const HeaderTopBar = ({categories}: Props) => {
                 <DrawerContent>
                     {(onClose) => (
                         <>
-                            <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
+                            <DrawerHeader className="flex items-center justify-between gap-1 border-b border-skin-neutral-100">
                                 <h4 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h4>
+                                <Button isIconOnly variant='light' onPress={onClose}>
+                                    <CloseIcon />
+                                </Button>
                             </DrawerHeader>
                             <DrawerBody className='max-sm:px-4'>
-                                <div className='space-y-5 my-3'>
+                                <div className='space-y-5 my-3 h-full'>
                                     {cartItems.length > 0 ? (
                                         cartItems.map((item, idx) => (
                                             <ShoppingCartCardDrawer key={idx} item={item} showAddMoreItem />
                                         ))
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center gap-4 py-8">
-                                            <p className="text-content-2 text-skin-neutral-500">Your cart is empty</p>
+                                        <div className="flex flex-col items-center justify-center gap-4 py-8 my-auto h-full">
+                                            <ShoppingCartIcon className='w-20 h-20' />
+                                            <p className="text-title-2 font-semibold text-skin-neutral-500 italic">Looks like you haven’t added anything yet!</p>
                                             <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button" onPress={onClose}>
                                                 Continue Shopping
                                             </Button>

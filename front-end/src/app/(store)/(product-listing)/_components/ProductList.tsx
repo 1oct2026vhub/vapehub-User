@@ -223,7 +223,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 justify-between pl-5 max-md:hidden">
+              <div className="flex items-center gap-3 justify-between pl-5">
                 <p className="text-content-1 text-skin-neutral-300 font-bold">Showing {activePage}-{products.length} of {totalCount} results</p>
                 {totalPage > 1 && (
                   <Pagination total={totalPage} onPageChange={handlePagination} currentPage={activePage} />

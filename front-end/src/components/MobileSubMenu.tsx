@@ -12,19 +12,19 @@ import Link from 'next/link';
 const MobileSubMenu: React.FC = () => {
 
     const staticSubCategories: SubCategory[] = [
-        { name: "Elux Legend 3500", slug: "#", feature: "Hot" },
-        { name: "Elf Bar", slug: "#", feature: "New" },
-        { name: "Elux", slug: "#" },
-        { name: "Hayati Pro Mini", slug: "#", feature: "Hot" },
-        { name: "Hayati Pro Max 4000", slug: "#", feature: "New" },
-        { name: "Hayati Twist 5000", slug: "#" },
-        { name: "Hayati", slug: "#" },
-        { name: "IVG Smart 5500", slug: "#", feature: "Hot" },
-        { name: "IVG", slug: "#", feature: "New" },
-        { name: "SKE Crystal Bar 600", slug: "#", feature: "Hot" },
-        { name: "SKE ", slug: "#", feature: "New" },
-        { name: "The Crystal Pro Max 4000", slug: "#", feature: "Hot" },
-        { name: "VNSN Quake 10000", slug: "#", feature: "Hot" },
+        { name: "Elux Legend 3500", slug: "shop", feature: "Hot" },
+        { name: "Elf Bar", slug: "shop", feature: "New" },
+        { name: "Elux", slug: "shop" },
+        { name: "Hayati Pro Mini", slug: "shop", feature: "Hot" },
+        { name: "Hayati Pro Max 4000", slug: "shop", feature: "New" },
+        { name: "Hayati Twist 5000", slug: "shop" },
+        { name: "Hayati", slug: "shop" },
+        { name: "IVG Smart 5500", slug: "shop", feature: "Hot" },
+        { name: "IVG", slug: "shop", feature: "New" },
+        { name: "SKE Crystal Bar 600", slug: "shop", feature: "Hot" },
+        { name: "SKE ", slug: "shop", feature: "New" },
+        { name: "The Crystal Pro Max 4000", slug: "shop", feature: "Hot" },
+        { name: "VNSN Quake 10000", slug: "shop", feature: "Hot" },
     ];
 
 
@@ -70,14 +70,14 @@ const MobileSubMenu: React.FC = () => {
                 </form>
             </Form>
             <div className="grid grid-cols-2 gap-y-7.5 gap-x-3.5">
-                {Object.keys(groupedSubCategories).sort().map(letter => (
-                    <div key={letter} className="mb-4">
+                {Object.keys(groupedSubCategories).sort().map((letter, idx) => (
+                    <div key={idx} className="mb-4">
                         <div className="border-b border-skin-neutral-200 mb-2">
                             <h3 className="text-title-2 font-bold text-skin-neutral-500">{letter}</h3>
                         </div>
                         <ul>
-                            {groupedSubCategories[letter].map(subCategory => (
-                                <li key={subCategory.slug} className="flex items-center gap-2">
+                            {groupedSubCategories[letter].map((subCategory, sIdx) => (
+                                <li key={sIdx} className="flex items-center gap-2">
                                     <Link href={subCategory.slug} className="block py-2 text-skin-neutral-300 font-bold text-content-1 leading-none hover:underline">
                                         {subCategory.name}
                                     </Link>

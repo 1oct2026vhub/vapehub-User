@@ -224,7 +224,27 @@ export interface ORDER {
             }[];
         };
     }[];
-    shippingAddress: {
+    // shippingAddress: {
+    //     name: string;
+    //     last_name: string;
+    //     street: string;
+    //     town: string;
+    //     post_code: string;
+    //     phone: string | null;
+    //     region: string;
+    //     country: string;
+    // } | null;
+    // billingAddress: {
+    //     name: string;
+    //     last_name: string;
+    //     street: string;
+    //     town: string;
+    //     post_code: string;
+    //     phone: string | null;
+    //     region: string;
+    //     country: string
+    // } | null;
+    orderShippingAddress: {
         name: string;
         last_name: string;
         street: string;
@@ -233,8 +253,8 @@ export interface ORDER {
         phone: string | null;
         region: string;
         country: string;
-    } | null;
-    billingAddress: {
+    };
+    orderBillingAddress: {
         name: string;
         last_name: string;
         street: string;
@@ -242,8 +262,8 @@ export interface ORDER {
         post_code: string;
         phone: string | null;
         region: string;
-        country: string
-    } | null;
+        country: string;
+    };
     shippingMethod: {
         id: number;
         shipping_method: string;

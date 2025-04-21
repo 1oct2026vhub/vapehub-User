@@ -488,6 +488,7 @@ input[type='search'] {
 .blog-details h6, 
 .blog-details p {
   font-size: revert;
+  font-weight: revert;
 }
 
 .border-default {

@@ -76,6 +76,7 @@ const OrderPaymentAction: React.FC<{ data: ORDER_DETAILS_RESPONSE, orderId: numb
                     onPress={onOpen}
                     isLoading={isCancelLoading}
                     isDisabled={isCancelLoading}
+                    className="!bg-skin-red-400"
                 >Cancel Order</Button>
             </div>
 

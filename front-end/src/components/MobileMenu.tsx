@@ -129,11 +129,15 @@ const MobileMenu = ({categories}: Props) => {
                     <DrawerBody className='py-4 px-4'>
                         {/* Accordion Filters */}
                         <Accordion variant="splitted" className="!p-0" itemClasses={itemClasses} selectionMode='multiple'>
-                            {filterOptions.map(({ title, content }, index) => (
+                            {filterOptions.map(({ title, content, link }, index) => (
                                 <AccordionItem
                                     key={title}
                                     aria-label={title}
-                                    title={title}
+                                    title={
+                                        <Link href={link} key={title} scroll={true} >   
+                                            {title}
+                                        </Link>
+                                    }
                                     indicator={<DownArrowFilledIcon color='black' />}
                                     onPress={() => handleAccordionItemClick(index)}
                                 >
@@ -142,11 +146,15 @@ const MobileMenu = ({categories}: Props) => {
                             ))}
                         </Accordion>
                         {defaultNavLinks.map(({ name, slug }) => (
-                            <Link href={slug} key={name} scroll={true} >   
-                                <button className='w-full text-left text-title-2 font-bold p-2' onClick={handleMenuClose}>
-                                    {name}
-                                </button>
-                            </Link>
+                            <Button as={Link} href={slug} key={name} variant='light' className='w-full justify-start text-title-2 font-bold p-2'
+                             onPress={handleMenuClose}>
+                                 {name}
+                             </Button>
+                            // <Link href={slug} key={name} scroll={true} >   
+                            //     <button className='w-full text-left text-title-2 font-bold p-2' onClick={handleMenuClose}>
+                            //         {name}
+                            //     </button>
+                            // </Link>
                         ))}
                     </DrawerBody>
                     {isFooterVisible && openItems.length === 0 && (

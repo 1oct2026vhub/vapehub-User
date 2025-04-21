@@ -8,8 +8,8 @@ import { FaqResponse } from "@/lib/config/global.config";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { toast } from "sonner";
 import EmptyPlaceholder from "./ui/EmptyPlaceholder";
-import Link from "next/link";
-import { ROUTES } from "@/lib/routes";
+// import Link from "next/link";
+// import { ROUTES } from "@/lib/routes";
 
 interface FAQProps {
     title?: string;
@@ -21,7 +21,7 @@ interface FAQProps {
 
 const FAQSection: React.FC<FAQProps> = ({
     title = "FAQ",
-    viewAllHref = ROUTES.FAQ,
+    // viewAllHref = ROUTES.FAQ,
     type,
     id,
     showAll = false,
@@ -59,13 +59,12 @@ const FAQSection: React.FC<FAQProps> = ({
                
             <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
                 {faqs.map((faq, index) => (
-                    <AccordionItem key={index} aria-label={faq.question} title={
-                        <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">
-                            {faq.question}
-                        </Link>
-                    }>
+                    <AccordionItem key={index} aria-label={faq.question} title={faq.question}>
                         {faq.answer}
                     </AccordionItem>
+                //     <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">
+                //     {faq.question}
+                // </Link>
                 ))}
             </Accordion> 
             ) : (

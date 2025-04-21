@@ -40,7 +40,7 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
         { label: "Home", href: "/" },
         { label: "Shop", href: `/${ROUTES.SHOP}`, isActive: true },
       ];
-
+    console.log(combinedParams);
     const response = await getProductList(combinedParams);
       if(response.status == ServerActionStatus.ERROR) {
         return (<p>{response.message}</p>);

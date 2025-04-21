@@ -73,7 +73,9 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
         }
       }
     }
-   
+    if(currentFilters.nonVariants) {
+      currentFilters.nonVariants['offset'] = "0";
+    }
     updateFilters(currentFilters);
     setTimeout(() => {
       setIsLoading(false);
@@ -155,7 +157,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   // on pagination change
   const handlePagination = (page: number) => {
 
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);    
     params.set("offset", ((page - 1) * 12).toString());
     router.replace(`${pathname}?${params.toString()}`, { scroll: true });
   };

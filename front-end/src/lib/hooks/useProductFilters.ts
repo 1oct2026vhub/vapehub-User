@@ -117,7 +117,9 @@ export const useProductFilters = () => {
         }
       }
     }
-
+    if(filters.nonVariants) {
+      delete filters.nonVariants.offset;
+    }
     updateFilters(filters);
   }, [getFilterParams, updateFilters]);
 

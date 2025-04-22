@@ -1,7 +1,7 @@
 "use client"
 import { Key } from '@react-types/shared';
 import type { BlogList, BlogResponse } from '@/lib/config/blog.config';
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import { Card, CardBody, Tab, Tabs } from '@nextui-org/react';
 import { getBlogList, getBlogPostList } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
@@ -14,7 +14,6 @@ import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 
 const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactElement => {
 
-    const tabsContainerRef = useRef<HTMLDivElement>(null);
     const [blogs, setBlogs] = useState<BlogList[]>([]);
     const [tabs, setTabs] = useState<BlogResponse[]>([]);
     const [selectedTab, setSelectedTab] = useState<string>(selectedId);
@@ -38,23 +37,6 @@ const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactEl
         setOffset(1);
     };
 
-    const handleWheel = (event: WheelEvent) => {
-        if (tabsContainerRef.current) {
-            event.preventDefault();
-            tabsContainerRef.current.scrollLeft += event.deltaY;
-        }
-    };
-
-    // Add effect to set up and clean up wheel event listener
-    useEffect(() => {
-        const tabsContainer = tabsContainerRef.current;
-        if (tabsContainer) {
-            tabsContainer.addEventListener('wheel', handleWheel, { passive: false });
-            return () => {
-                tabsContainer.removeEventListener('wheel', handleWheel);
-            };
-        }
-    }, []);
 
     useEffect(() => {
         const fetchBlogsCategory = async () => {
@@ -109,43 +91,40 @@ const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactEl
             <section className="w-full">
                 <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Blogs</h1>
                 <div className='w-full mt-2.5 lg:-mt-16 '>
-                    <div ref={tabsContainerRef}
-                        className="overflow-x-auto">
-                        <Tabs aria-label="Options" selectedKey={selectedTab} onSelectionChange={(e) => handleTabChange(e)}
-                            variant='bordered'
-                            color='primary'
-                            classNames={{
-                                base: "w-full",
-                                tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 lg:ml-auto lg:max-w-3xl xl:max-w-5xl ml-auto border border-skin-neutral-100 rounded-xl !bg-skin-base flex whitespace-nowrap",
-                                cursor: "bg-primary-gradient-100 border-none text-skin-white rounded-lg shadow-md",
-                                tab: "rounded-lg max-sm:px-5 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] h-10 border border-skin-primary2-500 text-skin-primary2-500 group-data-[selected=true]:!border-none",
-                                tabContent: "group-data-[selected=true]:!text-skin-white text-content-2 md:text-title-2 font-semibold leading-none",
-                                panel: "!px-0"
-                            }}
-                        >
+                    <Tabs aria-label="Options" selectedKey={selectedTab} onSelectionChange={(e) => handleTabChange(e)}
+                        variant='bordered'
+                        color='primary'
+                        classNames={{
+                            base: "w-full",
+                            tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 lg:ml-auto lg:max-w-3xl xl:max-w-5xl ml-auto border border-skin-neutral-100 rounded-xl !bg-skin-base flex whitespace-nowrap",
+                            cursor: "bg-primary-gradient-100 border-none text-skin-white rounded-lg shadow-md",
+                            tab: "rounded-lg max-sm:px-5 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] h-10 border border-skin-primary2-500 text-skin-primary2-500 group-data-[selected=true]:!border-none",
+                            tabContent: "group-data-[selected=true]:!text-skin-white text-content-2 md:text-title-2 font-semibold leading-none",
+                            panel: "!px-0"
+                        }}
+                    >
 
-                            {tabs.map((tab) => (
-                                <Tab key={tab.id} title={tab.name} >
-                                    {
-                                        loading ? <PreLoader /> : !blogs.length ? <EmptyPlaceholder title='Uh, oh!' description='No blogs available' /> :
-                                            <Card classNames={{
-                                                base: "!bg-transparent border-none shadow-none p-0 w-full",
-                                                body: "px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden"
-                                            }}>
+                        {tabs.map((tab) => (
+                            <Tab key={tab.id} title={tab.name} >
+                                {
+                                    loading ? <PreLoader /> : !blogs.length ? <EmptyPlaceholder title='Uh, oh!' description='No blogs available' /> :
+                                        <Card classNames={{
+                                            base: "!bg-transparent border-none shadow-none p-0 w-full",
+                                            body: "px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden"
+                                        }}>
 
-                                                <CardBody >
-                                                    {
-                                                        blogs.map((blog: BlogList, idx: number) => (
-                                                            <BlogCard key={idx} blog={blog} />
-                                                        ))
-                                                    }
-                                                </CardBody>
-                                            </Card>
-                                    }
-                                </Tab>
-                            ))}
-                        </Tabs>
-                    </div>
+                                            <CardBody >
+                                                {
+                                                    blogs.map((blog: BlogList, idx: number) => (
+                                                        <BlogCard key={idx} blog={blog} />
+                                                    ))
+                                                }
+                                            </CardBody>
+                                        </Card>
+                                }
+                            </Tab>
+                        ))}
+                    </Tabs>
                 </div>
             </section>
 

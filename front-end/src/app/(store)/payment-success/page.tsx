@@ -42,7 +42,7 @@ const PaymentSuccessPage = () => {
                     setTransactionDetails(prev => ({
                         ...prev,
                         id: transactionId,
-                        payment_method: response.data.payment_method,
+                        method: response.data.payment_method,
                         amount: response.data.amount
                     })); 
                 } else {

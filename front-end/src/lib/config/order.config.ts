@@ -319,6 +319,7 @@ export enum ORDER_STATUS {
     COMPLETED = 'completed',
     FAIL = 'fail',
     CANCEL = 'cancel',
+    CANCELLED = 'cancelled',
     RETURN_REQUESTED = 'return_requested',
     RETURN_APPROVED = 'return_approved',
     RETURN_RECEIVED = 'return_received',

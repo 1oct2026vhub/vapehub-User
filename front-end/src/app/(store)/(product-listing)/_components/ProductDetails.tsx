@@ -119,7 +119,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         }
         await addItemToCart(product.id, productVariant?.id, quantity, productVariant, productName);
     };
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
 
+    useEffect(() => {
+        scrollToTop();
+    }, []);
     useEffect(() => {
         setMainImage(isVariant ? data?.variants[0]?.primary_image : product?.primary_image);
     }, [isVariant, data, product]);

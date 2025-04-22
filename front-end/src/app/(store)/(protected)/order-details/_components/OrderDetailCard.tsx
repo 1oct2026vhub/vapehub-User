@@ -56,7 +56,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
                     </div>
                 </div>
                 <div className="space-y-2 text-right">
-                    <p className="text-skin-neutral-500 text-content-1 sm:text-title-2 lg:text-h5 font-bold">{DEFAULT_CURRENCY_SYMBOL}{Number(data.quantity) * Number(data.variant?.price || 0)}</p>
+                    <p className="text-skin-neutral-500 text-content-1 sm:text-title-2 lg:text-h5 font-bold">{DEFAULT_CURRENCY_SYMBOL}{(data.quantity * parseFloat(data.variant?.price || '0')).toFixed(2)}</p>
                     {isCouponApplied && <p className="primary-gradient-100 text-content-3 sm:text-content-1 lg:text-title-1 font-bold text-nowrap">Coupon Applied</p>}
                 </div>
             </div>

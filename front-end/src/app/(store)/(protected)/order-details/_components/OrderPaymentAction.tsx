@@ -1,6 +1,5 @@
 "use client"
 import { ServerActionStatus } from "@/lib/config/app.config";
-import { ORDER_DETAILS_RESPONSE } from "@/lib/config/order.config";
 import { useVivaWallet } from "@/lib/hooks/useVivaWallet";
 import { cancelOrderById, checkStockToPayment } from "@/lib/server.actions";
 import { Button } from '@nextui-org/button'
@@ -9,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const OrderPaymentAction: React.FC<{ data: ORDER_DETAILS_RESPONSE, orderId: number }> = ({ data, orderId }) => {
+const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
     const { initiatePayment } = useVivaWallet();
     const [isLoading, setIsLoading] = useState(false);
     const [isCancelLoading, setIsCancelLoading] = useState(false);
@@ -23,11 +22,7 @@ const OrderPaymentAction: React.FC<{ data: ORDER_DETAILS_RESPONSE, orderId: numb
             const response = await checkStockToPayment(orderId);
             if (response.status === ServerActionStatus.SUCCESS) {
                 await initiatePayment({
-                    amount: Number(data.order.total),
                     orderReference: response.data.order_code,
-                    customerEmail: data.user.email,
-                    customerName: `${data.user.first_name} ${data.user.last_name}`,
-                    orderDescription: `Order #${data.order.order_unique_id}`
                 });
                
             } else {

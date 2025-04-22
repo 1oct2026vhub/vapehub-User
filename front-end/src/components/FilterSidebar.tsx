@@ -1,5 +1,5 @@
 import React from "react";
-import { Accordion, AccordionItem } from "@nextui-org/react";
+import { Accordion, AccordionItem, Button } from "@nextui-org/react";
 import { CloseIcon } from "./Icons";
 import { AppliedFilters } from "@/lib/config/product.config";
 
@@ -11,6 +11,7 @@ interface FilterOption {
 interface FilterSidebarProps {
     appliedFilters: AppliedFilters[];
     onRemoveFilter: (attributeId: number, type: string) => void;
+    onClearAllFilters: () => void;
     filterOptions: FilterOption[];
 }
 
@@ -18,6 +19,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     appliedFilters,
     onRemoveFilter,
     filterOptions,
+    onClearAllFilters
 }) => {
     const itemClasses = {
         base: "w-full shadow-none !p-0",
@@ -29,7 +31,10 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
     return (
         <div className="hidden md:flex flex-col gap-6 xl:min-w-[310px] max-w-[310px] bg-skin-white p-4 xl:p-9 border border-skin-neutral-50 rounded-14">
-            <h4 className="primary-gradient-600 rounded-14 text-h5 font-bold w-fit">Filter by</h4>
+            <div className="flex items-center justify-between">
+                <h4 className="primary-gradient-600 rounded-14 text-h5 font-bold w-fit">Filter by</h4>
+                <Button onPress={onClearAllFilters} color="default" variant="bordered" className="text-skin-neutral-500 text-content-2 font-bold">Clear All</Button>
+            </div>
 
             {/* Applied Filters Section */}
             {appliedFilters.length > 0 && (
@@ -37,7 +42,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     {appliedFilters.map((filter, index) => (
                         <div
                             key={`${filter.attributeId}-${index}`}
-                            className="flex items-center gap-2 bg-skin-neutral-50 border-2 border-skin-neutral-100 shadow py-1.5 px-2 rounded-lg"
+                            className="flex items-center gap-2 bg-skin-neutral-50 border-2 border-skin-neutral-100 shadow py-1.5 px-2 rounded-lg capitalize"
                         >
                             <span className="text-content-2 font-bold text-skin-neutral-500">
                                 {filter.attribute} ({filter.count})

@@ -219,6 +219,28 @@ export interface ORDER {
             id: number;
             slug: string;
             price: string;
+            variantAttributes: {
+                id: number;
+                variant_id: number;
+                attribute_id: number;
+                term_id: number;
+                is_visible: boolean;
+                used_in_variation: boolean;
+                updated_by: number;
+                created_at: string;
+                updated_at: string;
+                deleted_at: string | null;
+                attribute: {
+                    id: number;
+                    name: string;
+                    type: string;
+                };
+                term: {
+                    id: number;
+                    name: string;
+                    slug: string;
+                };
+            }[];
             variantImages: {
                 image_url: string;
             }[];
@@ -297,6 +319,7 @@ export enum ORDER_STATUS {
     COMPLETED = 'completed',
     FAIL = 'fail',
     CANCEL = 'cancel',
+    CANCELLED = 'cancelled',
     RETURN_REQUESTED = 'return_requested',
     RETURN_APPROVED = 'return_approved',
     RETURN_RECEIVED = 'return_received',

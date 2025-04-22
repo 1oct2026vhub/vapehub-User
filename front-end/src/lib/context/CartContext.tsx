@@ -75,7 +75,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (isAuthenticated) {
         const response = await getCartItems();
-
+        
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartItems: CartItem[] = response.data.map(bindCartItem);
           setCartItems(cartItems);
@@ -108,11 +108,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, [loadCartItems]);
 
   const bindCartItem = (item: CART_RESPONSE_DATA): CartItem => {
+    const attributesName = item.variant.variantAttributes.map(attr => attr.term.name).join(', ');
     return {
       id: item.id,
       product_id: item.product_id,
       product_slug: item.product.slug,
-      name: item.product.name,
+      name:  attributesName ? `${item.product.name} - ${attributesName}` : item.product.name,
       price: item.variant.price || '0',
       discount_price: item.variant.discount_price || '0',
       variant_id: item.variant_id,

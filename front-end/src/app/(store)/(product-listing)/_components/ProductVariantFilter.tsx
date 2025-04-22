@@ -40,7 +40,7 @@ const SelectAttributeTerms = ({
     return (
         <>
             <div>
-                <p className='text-content-1 sm:text-title-2 lg:text-title-1 font-semibold text-black'>
+                <p className='text-content-1 sm:text-title-2 lg:text-title-1 font-semibold text-black capitalize'>
                     {attributeTerm?.attribute.name}
                 </p>
                 <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>
@@ -109,7 +109,7 @@ const ButtonAttributeTerms = ({
 
     return (
         <>
-            <p className='text-content-1 md:text-title-1 font-semibold text-skin-neutral-500'>
+            <p className='text-content-1 md:text-title-1 font-semibold text-skin-neutral-500 capitalize'>
                 {attributeTerm?.attribute.name}
             </p>
             <div className='flex flex-wrap sm:flex-nowrap gap-3.5 items-center'>

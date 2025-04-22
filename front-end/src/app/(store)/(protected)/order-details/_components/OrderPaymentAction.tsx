@@ -19,19 +19,20 @@ const OrderPaymentAction: React.FC<{ data: ORDER_DETAILS_RESPONSE, orderId: numb
 
     const payNow = async () => {
         try {
-            setIsLoading(true); 
-            const response = await checkStockToPayment(orderId); 
+            setIsLoading(true);
+            const response = await checkStockToPayment(orderId);
             if (response.status === ServerActionStatus.SUCCESS) {
-            await initiatePayment({
-                amount: Number(data.order.total),
-                orderReference: response.data.order_code,
-                customerEmail: data.user.email,
-                customerName: `${data.user.first_name} ${data.user.last_name}`,
-                orderDescription: `Order #${data.order.order_unique_id}`
-            });
-            router.refresh();
-        } else {
+                await initiatePayment({
+                    amount: Number(data.order.total),
+                    orderReference: response.data.order_code,
+                    customerEmail: data.user.email,
+                    customerName: `${data.user.first_name} ${data.user.last_name}`,
+                    orderDescription: `Order #${data.order.order_unique_id}`
+                });
+               
+            } else {
                 toast.error(response.message);
+                router.refresh();
             }
         } catch (error) {
             console.error('Error cancelling order:', error);

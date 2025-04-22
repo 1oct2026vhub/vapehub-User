@@ -12,7 +12,7 @@ const OrderStatusBadge = ({status}: {status: ORDER_STATUS}) => {
             "bg-skin-primary-50 border-skin-primary-500 text-skin-primary-500": status === ORDER_STATUS.COMPLETED,
             "bg-skin-primary-50 border-skin-primary2-500 text-skin-primary2-500": status === ORDER_STATUS.DELIVERED,
             "bg-skin-white border-skin-red-400 text-skin-red-400": status === ORDER_STATUS.FAIL,
-            "bg-skin-red-400 border-skin-red-400 text-skin-white": status === ORDER_STATUS.CANCEL,
+            "bg-skin-red-400 border-skin-red-400 text-skin-white": status === ORDER_STATUS.CANCEL || status === ORDER_STATUS.CANCELLED,
             "bg-skin-base border-skin-neutral-100 text-skin-neutral-500": status === ORDER_STATUS.RETURN_REQUESTED,
             "bg-skin-white border-skin-primary-400 text-skin-primary-400": status === ORDER_STATUS.RETURN_APPROVED,
             "bg-skin-white border-skin-primary2-400 text-skin-primary2-400": status === ORDER_STATUS.RETURN_RECEIVED,

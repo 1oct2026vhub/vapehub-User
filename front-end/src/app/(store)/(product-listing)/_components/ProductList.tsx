@@ -25,7 +25,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { getFilterParams, getAppliedFilters, removeFilter, updateFilters } = useProductFilters();
+  const { getFilterParams, getAppliedFilters, removeFilter, updateFilters, clearAllFilters } = useProductFilters();
 
 
   const productAttributeTerms: AttributeTerms[] = data?.attributes.filter(attr => attr.attribute.is_visible === true);
@@ -185,7 +185,11 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
       > */}
         {
           isFilterVisible &&
-          <FilterSidebar appliedFilters={appliedFilters} onRemoveFilter={handleRemoveFilter} filterOptions={filterOptions} />
+          <FilterSidebar appliedFilters={appliedFilters} 
+          onRemoveFilter={handleRemoveFilter} 
+          filterOptions={filterOptions} 
+          onClearAllFilters={clearAllFilters}
+          />
 
         }
 
@@ -203,6 +207,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
             appliedFilters={appliedFilters}
             onRemoveFilter={handleRemoveFilter}
             filterOptions={filterOptions}
+            onClearAllFilters={clearAllFilters}
           />
           {products.length === 0 ? (
             <EmptyPlaceholder title='Uh, oh!' description='No products found.' />

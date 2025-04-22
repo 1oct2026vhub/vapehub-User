@@ -220,6 +220,13 @@ export interface BrandByProductResponse extends BrandConfig {
     category: CATEGORY[]
 }
 export interface ProductVariant {
+    attributes: {
+    attribute_id: number;
+    attribute_name: string;
+    term_id: number;
+    term_name: string;
+    term_slug: string;
+    }[];
     id: number;
     slug: string;
     price: string;

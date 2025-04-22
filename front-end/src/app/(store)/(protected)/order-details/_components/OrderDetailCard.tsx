@@ -15,10 +15,12 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     isCouponApplied,
     data
 }) => {
+    const attributes = data.variant?.variantAttributes;
+    const attributeParams = data.variant?.variantAttributes?.[0]?.term.slug ?? '';
     
-
     return (
-        <Link href={`/${data.product.slug}`} scroll={true} className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
+        // 10ml?20=up-to-1500-puffs
+        <Link href={`/${data.product.slug}/${attributeParams}`} scroll={true} className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
 
             <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
                 <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">
@@ -45,7 +47,12 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
                     {/* Order ID */}
                     <div>
                         <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Quantity : {data.quantity}</p>
-                        <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Flavour : {data.variant?.slug}</p>
+                        {/* <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Flavour : {data.variant?.slug}</p> */}
+                        {
+                            attributes?.map((attr) => (
+                                <p key={attr.id} className="primary-gradient-100 text-content-3 md:text-content-1 font-bold capitalize">{attr.attribute.name} : {attr.term.name}</p>
+                            ))
+                        }
                     </div>
                 </div>
                 <div className="space-y-2 text-right">

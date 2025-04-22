@@ -123,10 +123,15 @@ export const useProductFilters = () => {
     updateFilters(filters);
   }, [getFilterParams, updateFilters]);
 
+  const clearAllFilters = useCallback(() => {
+    router.replace(pathname, { scroll: true });
+  }, [pathname, router]);
+
   return {
     getFilterParams,
     updateFilters,
     getAppliedFilters,
     removeFilter,
+    clearAllFilters,
   };
 }; 

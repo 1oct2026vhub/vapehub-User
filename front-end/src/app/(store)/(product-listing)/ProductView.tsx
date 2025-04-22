@@ -35,9 +35,13 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = fal
             <Suspense fallback={<SuspenseLoader/>}>
             <OrderCard />
             </Suspense>
-            <Suspense fallback={<SuspenseLoader/>}>
-            <ProductFeatures productFeatures={productFeatures} />
-            </Suspense>
+            {
+                productFeatures.length > 0 && (
+                    <Suspense fallback={<SuspenseLoader/>}>
+                        <ProductFeatures productFeatures={productFeatures} />
+                    </Suspense>
+                )
+            }
             <Suspense fallback={<SuspenseLoader/>}>
             <ProductContent product={data?.product}/> 
             </Suspense>

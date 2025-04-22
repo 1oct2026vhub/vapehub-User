@@ -1,6 +1,6 @@
 "use client"
-import { Card, CardBody, Divider, Tab, Tabs } from '@nextui-org/react'
-import Image from 'next/image'
+import { Card, CardBody,  Tab, Tabs } from '@nextui-org/react'
+// import Image from 'next/image'
 import React, { ReactElement } from 'react'
 import ReviewCard from './ReviewCard'; 
 import { ProductViewDetails } from '@/lib/config/product.config';
@@ -31,11 +31,9 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
                                         <h2 className='text-title-1 md:text-h5 xl:text-38 font-semibold text-black'>Description</h2>
-                                        <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-400' dangerouslySetInnerHTML={{ __html: product.description }}>
-                                             
-                                        </p>
+                                        <div dangerouslySetInnerHTML={{ __html: product.description }}></div>
                                     </div>
-                                    <Divider />
+                                    {/* <Divider />
                                     <div className='space-y-3.5'>
                                         <h2 className='text-title-2 md:text-h5 xl:text-h4 font-semibold text-black'>Package Contains</h2>
                                         <ul className='list-disc text-skin-neutral-400 text-content-2 md:text-content-1 font-bold pl-5'>
@@ -200,7 +198,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                                             className='w-full min-h-[132px] rounded-10'
                                         />
                                         <h3 className='text-content-1 md:text-title-1 xl:text-h5 font-bold text-skin-neutral-500'>As you can see, Hayati delivers top-level performance!</h3>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </CardBody>
                         </Card>

@@ -4,6 +4,7 @@ export interface TRANSACTION_DETAILS_RESPONSE {
   amount: number;
   switching: boolean;
   orderCode: number;
+  payment_method: string;
   statusId: string;
   fullName: string;
   insDate: string;

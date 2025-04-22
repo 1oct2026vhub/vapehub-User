@@ -45,12 +45,8 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                 const orderData = response.data.data;
                 if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
                     // Initiate Viva Wallet payment
-                    await initiateVivaPayment({
-                        amount: data.total,
-                        orderReference: String(orderData.order_code),
-                        customerEmail: data.email,
-                        customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
-                        orderDescription: `Order #${response.data.message}`
+                    await initiateVivaPayment({                        
+                        orderReference: String(orderData.order_code)
                     });
                 } else if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
                     // Initiate WorldPay Smart Checkout

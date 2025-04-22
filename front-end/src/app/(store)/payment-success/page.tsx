@@ -36,12 +36,13 @@ const PaymentSuccessPage = () => {
 
                 // Update order status with transaction details
                 const response = await getTransactionDetails(transactionId);
-               
+                
                 if (response.status === ServerActionStatus.SUCCESS) {
                     // Set transaction details
                     setTransactionDetails(prev => ({
                         ...prev,
                         id: transactionId,
+                        payment_method: response.data.payment_method,
                         amount: response.data.amount
                     })); 
                 } else {

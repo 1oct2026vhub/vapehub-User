@@ -17,6 +17,7 @@ type ProductListingActionsMobProps = {
     appliedFilters: AppliedFilters[];
     onRemoveFilter: (attributeId: number, type: string) => void;
     filterOptions: FilterOption[];
+    onClearAllFilters: () => void;
 }
 
 type ProductListingActionsWebProps = {
@@ -88,7 +89,8 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
     initialValue = "Sort By",
     appliedFilters,
     onRemoveFilter,
-    filterOptions
+    filterOptions,
+    onClearAllFilters
 
 }) => {
 
@@ -153,7 +155,10 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
                             <DrawerHeader className="flex flex-col gap-3 pt-5 border-b border-skin-neutral-100">
                                 <div className='w-[86px] h-[5px] bg-[#9CA0A7] mx-auto rounded-10' />
                                 <div className="space-y-3">
-                                    <h4 className="primary-gradient-600 rounded-14 text-h5 font-bold w-fit">Filter by</h4>
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="primary-gradient-600 rounded-14 text-h5 font-bold w-fit">Filter by</h4>
+                                        <Button onPress={onClearAllFilters} color="default" variant="bordered" className="text-skin-neutral-500 text-content-2 font-bold">Clear All</Button>
+                                    </div>
 
                                     {/* Applied Filters Section */}
                                     <div className="flex flex-wrap gap-2 items-center">
@@ -164,7 +169,7 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
                                                         key={`${filter.attributeId}-${index}`}
                                                         className="flex items-center gap-2 bg-skin-neutral-50 border-2 border-skin-neutral-100 shadow py-1.5 px-2 rounded-lg"
                                                     >
-                                                        <span className="text-content-2 font-bold text-skin-neutral-500">
+                                                        <span className="text-content-2 font-bold text-skin-neutral-500 capitalize">
                                                             {filter.attribute} ({filter.count})
                                                         </span>
                                                         <button

@@ -60,15 +60,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     const product: ProductViewDetails = data?.product;
     const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;
     const stock = isVariant && productVariant ? productVariant.stock : 0;
-    const productName =  product?.name;
+    const attributesName = isVariant ? productVariant?.attributes.map(attr => attr.term_name).join(', ') : '';
+    const productName =  `${product?.name} ${attributesName ? ` - ${attributesName}` : ''}` 
     const availableAttributes: AttributeTerms[] = data.available_terms;
     const minQuantity = 1; 
-    const price = isVariant ? data?.variants[0]?.price: (productVariant?.price ?? data?.variants[0]?.price);
-    // const filteredAttributeTerms: AttributeTerms[] = data.filtered_attribute_terms;
+    const price = isVariant ? data?.variants[0]?.price: (productVariant?.price ?? data?.variants[0]?.price);    
      
-    // const allAttributeTerms = [...availableAttributes, ...filteredAttributeTerms];
-
-    // console.log(allAttributeTerms);
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
     const [quantity, setQuantity] = useState(1);
     const { addItemToCart, isLoading } = useCart();

@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { getTransactionDetails } from '@/lib/server.actions';
+
 const PaymentFailedPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();

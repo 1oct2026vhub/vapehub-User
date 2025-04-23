@@ -24,7 +24,7 @@ const ReviewCard: React.FC = () => {
                     <p className='text-skin-blue-500 font-medium text-content-1'>4 January 2024</p>
                 </div>
             </div>
-            <h5 className='text-22 text-skin-blue-500 font-semibold'>Savannah Nguyen</h5>
+            <h4 className='text-22 text-skin-blue-500 font-semibold'>Savannah Nguyen</h4>
             <p className='text-title-2 font-medium text-skin-neutral-500'>Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit.
                 Exercitation veniam consequat sunt nostrud amet. Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
         </div>

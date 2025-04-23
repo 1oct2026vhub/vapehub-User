@@ -3,17 +3,17 @@ import { CartItem } from '@/lib/config/cart.config';
 import { useCart } from '@/lib/context/CartContext';
 import { Progress } from '@nextui-org/react'
 import React from 'react'
-
-const FREE_SHIPPING_THRESHOLD = 30;
+import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
+ 
 
 const ShippingProgress: React.FC = () => {
     const { cartItems } = useCart();
     const totalPrice = cartItems.reduce((acc: number, item: CartItem) => acc + parseFloat(item.price) * item.quantity, 0);
-    const progress = Math.min((totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100);
-    const remainingAmount = FREE_SHIPPING_THRESHOLD - totalPrice;
+    const progress = Math.min((totalPrice / FREE_DELIVERY_THRESHOLD) * 100, 100);
+    const remainingAmount = FREE_DELIVERY_THRESHOLD - totalPrice;
 
     const getProgressLabel = () => {
-        if (totalPrice >= FREE_SHIPPING_THRESHOLD) {
+        if (totalPrice >= FREE_DELIVERY_THRESHOLD) {
             return "You've qualified for free shipping!";
         }
         return `You're £${remainingAmount.toFixed(2)} away from free shipping!`;

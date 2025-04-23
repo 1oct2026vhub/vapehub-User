@@ -20,6 +20,7 @@ import Flag from '@/components/ui/Flag';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
 import { getShippingMethods } from '@/lib/server.actions';
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
+import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
 
 const CheckoutDetails: React.FC = () => {
     const { fetchProfile } = useUserProfile();
@@ -174,7 +175,7 @@ const CheckoutDetails: React.FC = () => {
     }, [form.watch('useShippingAsBilling')]);
 
     useEffect(() => {
-        const filteredMethods = cartTotal > 30 
+        const filteredMethods = cartTotal > FREE_DELIVERY_THRESHOLD 
             ? originalShippingMethods
             : originalShippingMethods.filter(method => method.id !== 1);
 

@@ -13,7 +13,7 @@ const ProductList: React.FC = () => {
             
         >
             <div className='flex items-center justify-between cursor-pointer' onClick={() => setIsExpanded(!isExpanded)}>
-                <h2 className='primary-gradient-600 text-title-2 md:text-h5 font-bold'>Product List</h2>
+                <h3 className='primary-gradient-600 text-title-2 md:text-h5 font-bold'>Product List</h3>
                 <DownArrowIcon className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
             </div>
 

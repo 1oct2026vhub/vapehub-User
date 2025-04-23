@@ -30,7 +30,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             <CardBody className='p-0'>
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
-                                        <h2 className='text-title-1 md:text-h5 xl:text-38 font-semibold text-black'>Description</h2>
+                                        <h3 className='text-title-1 md:text-h5 xl:text-38 font-semibold text-black'>Description</h3>
                                         <div dangerouslySetInnerHTML={{ __html: product.description }}></div>
                                     </div>
                                     {/* <Divider />
@@ -228,7 +228,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                         }}>
                             <CardBody className='p-0'>
                                 <div className='flex flex-col gap-7.5 pb-2'>
-                                    <h2 className='text-h5 lg:text-h3 primary-gradient-100 font-bold'>Reviews</h2>
+                                    <h3 className='text-h5 lg:text-h3 primary-gradient-100 font-bold'>Reviews</h3>
                                     <ReviewCard />
                                     <ReviewCard />
                                 </div>

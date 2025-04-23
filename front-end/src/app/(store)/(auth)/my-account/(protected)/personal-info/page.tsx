@@ -87,7 +87,7 @@ const PersonalInfo: NextPage = () => {
                     <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='space-y-4 md:space-y-6'>
                         <div className="grid sm:grid-cols-2 gap-2.5 md:gap-4">
                             <div className='space-y-3 md:space-y-4.5'>
-                            <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">First Name</h2>
+                            <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">First Name</h3>
                             <InputField
                                 control={form.control}
                                 name='first_name'
@@ -98,7 +98,7 @@ const PersonalInfo: NextPage = () => {
                              
                         </div>
                         <div className='space-y-3 md:space-y-4.5'>
-                            <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Last Name</h2>
+                            <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Last Name</h3>
                             <InputField
                                 control={form.control}
                                 name='last_name'
@@ -110,7 +110,7 @@ const PersonalInfo: NextPage = () => {
                         </div>
                     </div>
                     <div className='space-y-3 md:space-y-4.5 sm:pr-4'>
-                        <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Email</h2>
+                        <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Email</h3>
                         <InputField
                             control={form.control}
                             name='email'
@@ -121,7 +121,7 @@ const PersonalInfo: NextPage = () => {
                          
                     </div>
                     <div className='space-y-3 md:space-y-4.5 sm:pr-4'>
-                        <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Mobile Number</h2>
+                        <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Mobile Number</h3>
                         <InputField
                             control={form.control}
                             name='phone'

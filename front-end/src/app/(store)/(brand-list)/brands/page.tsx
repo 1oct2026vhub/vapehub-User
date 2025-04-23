@@ -1,5 +1,4 @@
 import BreadCrumbs from '@/components/BreadCrumbs'
-import SectionHeading from '@/components/ui/SectionHeading'
 import { AsyncReactElement } from '@/lib/config/app.config'
 import { ROUTES } from '@/lib/routes'
 import { Metadata } from 'next'
@@ -23,7 +22,7 @@ const BrandsListing = async (): AsyncReactElement => {
             <section className="product-listing-container flex-col">
                 <BreadCrumbs items={breadcrumbs} />
                 <div>
-                    <SectionHeading title="Brands" className="w-fit" />
+                    <h1 className="primary-gradient-600 text-title-1 md:text-h5 xl:text-h3 font-bold w-fit">Brands</h1>
                     <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">
                         <p>
                             At Vapehub we offer products from all the major brands in the world! Whether it&apos;s the leading disposable vape brands or the leading E-Liquid brands, we have them all! If you&apos;re looking to buy a product from a particular brand, you may browse the list below and click on the brand of your choice.

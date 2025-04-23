@@ -1,37 +1,71 @@
 import { NextPage } from "next";
 import { ReactElement, Suspense } from "react";
-import TrustPilotRatingCard from "./_components/TrustPilotRatingCard";
-import FeatureCards from "./_components/FeatureCards";
-import ShopByCategory from "./_components/ShopByCategory";
-import HottestCollections from "./_components/HottestCollections";
-import ShopByDeals from "./_components/ShopByDeals";
-import { MostPopularSalts, MostPopularVapes } from "./_components/MostPopular";
-import PromotionalBanners from "./_components/PromotionalBanners";
-import ReferFriend from "./_components/ReferFriend";
-import HomeCarousel from "./_components/HomeCarousel";
-import { ROUTES } from "@/lib/routes";
-import ScrollToTop from "@/components/ScrollToTop";
 import dynamic from "next/dynamic";
-import NewProducts from "./_components/NewProducts";
-import { getDashboardData } from "./page.data";
-import { ServerActionStatus } from "@/lib/config/app.config";
+import ScrollToTop from "@/components/ScrollToTop";
 import SuspenseLoader from "@/components/ui/SuspenseLoader";
 import { type ProductResponseData, type CategoryResponseData } from "@/lib/config/product.config";
+import { ROUTES } from "@/lib/routes";
+import { getDashboardData } from "./page.data";
+import { ServerActionStatus } from "@/lib/config/app.config";
 
-// Dynamically import components that are below the fold
+// Dynamically import all heavy components
+const DynamicHomeCarousel = dynamic(() => import('./_components/HomeCarousel'), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicTrustPilotRatingCard = dynamic(() => import('./_components/TrustPilotRatingCard'), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicFeatureCards = dynamic(() => import('./_components/FeatureCards'), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicShopByCategory = dynamic(() => import('./_components/ShopByCategory'), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicHottestCollections = dynamic(() => import('./_components/HottestCollections'), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicNewProducts = dynamic(() => import('./_components/NewProducts'), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicShopByDeals = dynamic(() => import('./_components/ShopByDeals'), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicMostPopularVapes = dynamic(() => import('./_components/MostPopular').then(mod => ({ default: mod.MostPopularVapes })), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicMostPopularSalts = dynamic(() => import('./_components/MostPopular').then(mod => ({ default: mod.MostPopularSalts })), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicPromotionalBanners = dynamic(() => import('./_components/PromotionalBanners'), {
+  loading: () => <SuspenseLoader />
+});
+
+const DynamicReferFriend = dynamic(() => import('./_components/ReferFriend'), {
+  loading: () => <SuspenseLoader />
+});
+
 const DynamicTestimonials = dynamic(() => import('./_components/Testimonials'), {
   loading: () => <SuspenseLoader />
-})
+});
 
 const DynamicSubscription = dynamic(() => import('./_components/Subscription'), {
   loading: () => <SuspenseLoader height='h-32'/>
-})
+});
 
 const DynamicBlogsSection = dynamic(() => import('./_components/BlogsSection'), {
   loading: () => <SuspenseLoader />
-})
+});
 
-export const revalidate = 60; // Revalidate every minute
+export const revalidate = 60;
 
 const Dashboard: NextPage = async (): Promise<ReactElement> => {
   const data = await getDashboardData();
@@ -51,13 +85,11 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
     category: []
   };
 
-  // Early return if critical data is missing
   if (data.carousel.status === ServerActionStatus.ERROR || 
       data.categories.status === ServerActionStatus.ERROR) {
     return <div>Failed to load dashboard data</div>;
   }
 
-  // Transform CategoryResponseData to ProductResponseData where needed
   const transformCategoryToProductResponse = (response: CategoryResponseData): ProductResponseData => ({
     products: response.products,
     pagination: response.pagination,
@@ -66,34 +98,76 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
     brand: response.brand,
     category: response.category || []
   });
- 
+
   return (
     <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
-      <HomeCarousel banners={data.carousel.status === ServerActionStatus.SUCCESS ? data.carousel.data : []} />
+      <Suspense fallback={<SuspenseLoader />}>
+        <DynamicHomeCarousel banners={data.carousel.status === ServerActionStatus.SUCCESS ? data.carousel.data : []} />
+      </Suspense>
+
       <section className="flex flex-col gap-4.5 md:gap-10 max-md:mt-4.5">
-        <TrustPilotRatingCard
-          title="Trustpilot has rated Vapehub as Excellent!"
-          filledStars={4}
-        />
-        <FeatureCards />
+        <Suspense fallback={<SuspenseLoader />}>
+          <DynamicTrustPilotRatingCard
+            title="Trustpilot has rated Vapehub as Excellent!"
+            filledStars={4}
+          />
+          <DynamicFeatureCards />
+        </Suspense>
       </section>
 
       <Suspense fallback={<SuspenseLoader />}>
-        <ShopByCategory categories={data.categories.status === ServerActionStatus.SUCCESS ? data.categories.data : []} />
-        <HottestCollections brands={data.brands.status === ServerActionStatus.SUCCESS ? data.brands.data.brands : []} />
-        <NewProducts products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse} viewAllHref={ROUTES.SHOP} />
+        <DynamicShopByCategory categories={data.categories.status === ServerActionStatus.SUCCESS ? data.categories.data : []} />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
-        <ShopByDeals />
-        <MostPopularVapes products={data.popularVapes.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularVapes.data) : emptyProductResponse} viewAllHref="disposables" />
-        <MostPopularSalts products={data.popularSalts.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularSalts.data) : emptyProductResponse} viewAllHref="nic-salts" />
-        <PromotionalBanners banners={data.promotions.status === ServerActionStatus.SUCCESS ? data.promotions.data : []} />
-        <ReferFriend />
+        <DynamicHottestCollections brands={data.brands.status === ServerActionStatus.SUCCESS ? data.brands.data.brands : []} />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <DynamicNewProducts 
+          products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse} 
+          viewAllHref={ROUTES.SHOP} 
+        />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <DynamicShopByDeals />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <DynamicMostPopularVapes 
+          products={data.popularVapes.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularVapes.data) : emptyProductResponse} 
+          viewAllHref="disposables" 
+        />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <DynamicMostPopularSalts 
+          products={data.popularSalts.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularSalts.data) : emptyProductResponse} 
+          viewAllHref="nic-salts" 
+        />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <DynamicPromotionalBanners banners={data.promotions.status === ServerActionStatus.SUCCESS ? data.promotions.data : []} />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <DynamicReferFriend />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
         <DynamicTestimonials />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
         <DynamicSubscription className="mt-5 md:mt-10" />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
         <DynamicBlogsSection blogs={data.blogs.status === ServerActionStatus.SUCCESS ? data.blogs.data : []} viewAllHref={ROUTES.BLOGS} />
       </Suspense>
+
       <ScrollToTop />
     </div>
   );

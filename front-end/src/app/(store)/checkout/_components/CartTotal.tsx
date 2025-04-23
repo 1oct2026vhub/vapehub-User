@@ -17,7 +17,7 @@ const CartTotal: React.FC = () => {
 
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded-14 w-full'>
-            <h2 className='primary-gradient-600 text-title-2 md:text-h5 font-bold w-fit'>Cart Total</h2>
+            <h3 className='primary-gradient-600 text-title-2 md:text-h5 font-bold w-fit'>Cart Total</h3>
             <div className='flex flex-col gap-3'>
                 <CouponForm 
                     onCouponApplied={setCouponDiscount}

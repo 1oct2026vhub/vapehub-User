@@ -42,9 +42,9 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
 
         <div className="flex flex-col gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 md:gap-8 justify-between">
-            <h4 className="text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
+            <p className="text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
               {item.name}
-            </h4>
+            </p>
 
             {/* Price Section */}
             <div className="text-right">

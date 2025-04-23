@@ -195,7 +195,7 @@ const MobileMenu = ({ categories }: Props) => {
             <Drawer isOpen={isCartOpen} onOpenChange={onCartClose} className='filter-drawer rounded-l-32 md:!w-[637px] max-w-[90%] md:!max-w-[637px]'>
                 <DrawerContent>
                     <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
-                        <h4 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h4>
+                        <h1 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h1>
                     </DrawerHeader>
                     <DrawerBody className='max-sm:px-4'>
                         <div className='space-y-5 my-3'>

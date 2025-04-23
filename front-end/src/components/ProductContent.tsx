@@ -4,6 +4,8 @@ import { Card, CardBody,  Tab, Tabs } from '@nextui-org/react'
 import React, { ReactElement } from 'react'
 import ReviewCard from './ReviewCard'; 
 import { ProductViewDetails } from '@/lib/config/product.config';
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
+import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
 type ProductContentProps = {
     product: ProductViewDetails;
 }
@@ -210,7 +212,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             <CardBody className='p-0'>
                                 <div className="space-y-7.5">
                                     <div className='bg-skin-primary-200 px-7.5 py-4.5 rounded-xl text-center text-title-2 text-skin-neutral-500 font-semibold'>
-                                        ***Free Delivery on all orders over$30***
+                                        ***Free Delivery on all orders over {DEFAULT_CURRENCY_SYMBOL}{FREE_DELIVERY_THRESHOLD}***
                                     </div>
                                     <ul className='list-disc text-skin-neutral-500 text-title-2 font-bold pl-5 space-y-4 md:space-y-6'>
                                         <li>Royal Mail Tracked 48 - 2 to 4 working days</li>

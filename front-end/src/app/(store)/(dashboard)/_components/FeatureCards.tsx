@@ -1,5 +1,7 @@
 import Image from "next/image";
 import React from "react";
+import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
+import { FREE_DELIVERY_THRESHOLD } from "@/lib/utils";
 
 interface FeatureCardProps {
   imageSrc: string;
@@ -19,7 +21,7 @@ const features: FeatureCardProps[] = [
     imageSrc: "/images/delivery.svg",
     altText: "Free UK Delivery",
     title: "Free UK Delivery",
-    subtitle: "Orders-£30",
+    subtitle: `Orders-${DEFAULT_CURRENCY_SYMBOL}${FREE_DELIVERY_THRESHOLD}`,
   },
   {
     imageSrc: "/images/dispatch.svg",

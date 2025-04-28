@@ -92,7 +92,7 @@ const AccountSecurity: NextPage = () => {
                 </div>
                 <div className="flex items-start flex-col gap-4.5">
                     <div className='flex items-center gap-4'>
-                        <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold leading-none">Password</h2>
+                        <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold leading-none">Password</h3>
                         {!showButtons && (
                             <button
                                 onClick={() => setShowButtons(true)}

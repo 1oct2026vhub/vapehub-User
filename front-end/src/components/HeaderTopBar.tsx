@@ -117,7 +117,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                     {(onClose) => (
                         <>
                             <DrawerHeader className="flex items-center justify-between gap-1 border-b border-skin-neutral-100">
-                                <h4 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h4>
+                                <h1 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h1>
                                 <Button isIconOnly variant='light' onPress={onClose}>
                                     <CloseIcon />
                                 </Button>

@@ -230,8 +230,6 @@ const CheckoutDetails: React.FC = () => {
                                     className='w-full '
                                     pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
                                 />
-
-
                             </div>
                         </div>
                         <div className='space-y-4'>
@@ -239,14 +237,13 @@ const CheckoutDetails: React.FC = () => {
                                 control={form.control}
                                 name="ageConfirmation"
                                 label='I confirm that I am aged 18 or over *'
-                            />
-                             
+                            />     
                         </div>
 
                         {/* shipping details */}
                         <div className='space-y-4 lg:space-y-6'>
                             <div className='flex items-center justify-between'>
-                                <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Shipping Details</h2>
+                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Shipping Details</h3>
                                 {addresses.length > 0 && 
                                 <Button
                                     type="button"
@@ -354,7 +351,7 @@ const CheckoutDetails: React.FC = () => {
 
                         {/* billing details */}
                         <div className='space-y-4 lg:space-y-6'>
-                            <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Billing Details</h2>
+                            <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Billing Details</h3>
                             <div className='flex flex-col space-y-5 w-full'>
                                 <CustomCheckbox
                                     control={form.control}
@@ -447,8 +444,8 @@ const CheckoutDetails: React.FC = () => {
                         {/* shipping methods */}
                         <div className='space-y-4'>
                             <div className='space-y-2'>
-                                <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Shipping Methods</h2>
-                                <h3 className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>Important: Order by 3pm for same day dispatch</h3>
+                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Shipping Methods</h3>
+                                <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>Important: Order by 3pm for same day dispatch</p>
                             </div>
                             {/* value={form.watch('paymentMethod')}
                             onChange={(e) => form.setValue('paymentMethod', e.target.value as CHECKOUT_PAYMENT_METHODS) */}
@@ -486,13 +483,11 @@ const CheckoutDetails: React.FC = () => {
                             {form.formState.errors.shippingMethodId && (
                                 <p className="text-danger text-tiny p-1">{form.formState.errors.shippingMethodId.message}</p>
                             )}
-
-
                         </div>
 
                         {/* never miss out */}
                         <div className='space-y-4'>
-                            <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Never Miss Out</h2>
+                            <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Never Miss Out</h3>
                             <div className='flex flex-col w-full'>
                                 <CustomCheckbox
                                     control={form.control}
@@ -505,8 +500,8 @@ const CheckoutDetails: React.FC = () => {
                         {/* payment information */}
                         <div className='space-y-4 pt-2'>
                             <div className='space-y-2'>
-                                <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Payment Information</h2>
-                                <h3 className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</h3>
+                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Payment Information</h3>
+                                <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</p>
                             </div>
                             <RadioGroup
                                 defaultValue={CHECKOUT_PAYMENT_METHODS.VIVA_WALLET}

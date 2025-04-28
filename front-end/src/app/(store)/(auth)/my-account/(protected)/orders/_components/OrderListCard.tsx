@@ -10,6 +10,7 @@ type OrderListCardProps = {
  
 const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
     const isPaymentPending = data.status === ORDER_STATUS.PENDING;
+    const productImage = data.orderItems?.[0]?.variant?.variantImages?.[0]?.image_url || data.orderItems?.[0]?.product?.ProductImages?.[0]?.image_url || "";
     
     return (
         <Link href={`${ROUTES.ORDER_DETAILS}/${data.id}`} className="bg-white rounded-14 shadow-card hover:shadow-brand-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
@@ -17,7 +18,7 @@ const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
             <div className="bg-skin-white p-1 md:p-2 rounded-md md:rounded-10 shadow-brand-card min-w-16 md:min-w-36 w-full max-w-fit">
                 <div className="bg-skin-base border border-skin-neutral-100 rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full w-fit flex flex-col justify-center">
                     <NoImage 
-                        src={data.orderItems?.[0]?.variant?.variantImages?.[0]?.image_url || ""}
+                        src={productImage}
                         alt={data.orderItems?.[0]?.product?.name || ""}
                         width={104}
                         height={100}

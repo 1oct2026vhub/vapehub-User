@@ -21,7 +21,8 @@ MY_ACCOUNT_SECURITY: '/my-account/security',
 FAQ: '/faq',
 PAYMENT_SUCCESS: '/payment-success',
 PAYMENT_FAILED: '/payment-failed',
-ORDER_DETAILS: '/order-details'
+ORDER_DETAILS: '/order-details',
+REFERRAL: '/refer-a-friend'
 
 }
 

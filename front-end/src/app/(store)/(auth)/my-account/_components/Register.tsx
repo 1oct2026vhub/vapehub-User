@@ -11,11 +11,12 @@ import { Form } from "@/components/ui/Form";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { signUpAction } from "@/lib/server.actions";
 import { toast } from 'sonner';
+import { deleteCookie, getCookie } from "cookies-next";
 
 const Register: FunctionComponent = (): ReactElement => {
     const [pwdVisibility, setPwdVisibility] = useState(false);
     const [cPwdVisibility, setCPwdVisibility] = useState(false);
-
+    const referralCode = getCookie('referral_code') as string;
     
     const signUpFormConfig = useForm<SignUpFormSchema>({
         mode: 'all',
@@ -25,10 +26,10 @@ const Register: FunctionComponent = (): ReactElement => {
         },
     });
     const handleFormSubmit = async (fieldValue: SignUpFormSchema) => {
-        const response = await signUpAction(fieldValue);
-          
+        const response = await signUpAction({...fieldValue, referralCode: referralCode ?? ""});          
         if (response.status === ServerActionStatus.SUCCESS) {
             signUpFormConfig.reset({ email: "", password:"", confirmPassword:"" });
+            deleteCookie('referral_code');
             return toast.success(response?.data?.message ?? 'Registration Success'); 
           }
         if (response.status === ServerActionStatus.ERROR) {

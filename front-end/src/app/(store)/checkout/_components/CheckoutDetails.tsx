@@ -21,6 +21,8 @@ import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
 import { getShippingMethods } from '@/lib/server.actions';
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
+import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
 
 const CheckoutDetails: React.FC = () => {
     const { fetchProfile } = useUserProfile();
@@ -65,9 +67,9 @@ const CheckoutDetails: React.FC = () => {
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
 
-   
+
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
-        
+
         // Handle form submission
         if (!data) return;
 
@@ -104,8 +106,8 @@ const CheckoutDetails: React.FC = () => {
             },
             total: (cartTotal + (selectedShippingMethod?.shipping_cost || 0)) - couponDiscount.value
 
-        }; ;
-        
+        };;
+
         await handlePlaceOrder(orderPayload);
         form.reset();
         setSelectedShippingMethod(shippingMethods[0]);
@@ -114,7 +116,7 @@ const CheckoutDetails: React.FC = () => {
     };
 
     const handleAddressSelect = (address: Address) => {
-        
+
         form.setValue('selectedAddressId', address.id);
         form.setValue('shippingFirstName', address.name);
         form.setValue('shippingLastName', address.last_name);
@@ -151,6 +153,24 @@ const CheckoutDetails: React.FC = () => {
         }
         setShowNewAddressForm(!showNewAddressForm);
     }
+
+    const handlePlaceSelect = (place: PlaceAutocompleteAddress) => {
+        form.setValue('shippingAddress1', place.street);
+        form.setValue('shippingCity', place.city);
+        form.setValue('shippingPostcode', place.postcode);
+        form.setValue('shippingCountry', place.country);
+        form.setValue('shippingRegion', place.region);
+    }
+
+    const handleBillingPlaceSelect = (place: PlaceAutocompleteAddress) => {
+        form.setValue('billingAddress1', place.street);
+        form.setValue('billingCity', place.city);
+        form.setValue('billingPostcode', place.postcode);
+        form.setValue('billingCountry', place.country);
+        form.setValue('billingRegion', place.region);
+    }
+
+
     useEffect(() => {
         const loadProfile = async () => {
             const profile = await fetchProfile();
@@ -164,7 +184,7 @@ const CheckoutDetails: React.FC = () => {
             }
             form.setValue('email', profile?.email || '');
             form.setValue('phone', profile?.phone || '');
-            
+
         }
         loadProfile();
 
@@ -175,7 +195,7 @@ const CheckoutDetails: React.FC = () => {
     }, [form.watch('useShippingAsBilling')]);
 
     useEffect(() => {
-        const filteredMethods = cartTotal > FREE_DELIVERY_THRESHOLD 
+        const filteredMethods = cartTotal > FREE_DELIVERY_THRESHOLD
             ? originalShippingMethods
             : originalShippingMethods.filter(method => method.id !== 1);
 
@@ -216,7 +236,7 @@ const CheckoutDetails: React.FC = () => {
                                 <InputForm
                                     control={form.control}
                                     type='tel'
-                                    name="phone" 
+                                    name="phone"
                                     label={
                                         <div className='flex items-center gap-4'>
                                             <Flag className="group-data-[focus=true]:w-4" />
@@ -237,25 +257,25 @@ const CheckoutDetails: React.FC = () => {
                                 control={form.control}
                                 name="ageConfirmation"
                                 label='I confirm that I am aged 18 or over *'
-                            />     
+                            />
                         </div>
 
                         {/* shipping details */}
                         <div className='space-y-4 lg:space-y-6'>
                             <div className='flex items-center justify-between'>
                                 <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Shipping Details</h3>
-                                {addresses.length > 0 && 
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    radius="sm"
-                                    variant="bordered"
-                                    color='default'
-                                    className="btn shadow-button  !py-4 !px-6 max-md:!h-9.5"
-                                    onPress={() => handleShowNewAddressForm()}
-                                >
-                                    {showNewAddressForm ? 'Close' : '+ Add New Address'}
-                                </Button>
+                                {addresses.length > 0 &&
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        radius="sm"
+                                        variant="bordered"
+                                        color='default'
+                                        className="btn shadow-button  !py-4 !px-6 max-md:!h-9.5"
+                                        onPress={() => handleShowNewAddressForm()}
+                                    >
+                                        {showNewAddressForm ? 'Close' : '+ Add New Address'}
+                                    </Button>
                                 }
                             </div>
                             {!showNewAddressForm && addresses.length > 0 && (
@@ -287,13 +307,22 @@ const CheckoutDetails: React.FC = () => {
                                             className='w-full'
                                         />
                                     </div>
-                                    <InputForm
+                                    {/* <InputForm
                                         control={form.control}
                                         name="shippingAddress1"
                                         type='text'
                                         label='Start typing the first line of your address'
                                         isRequired
                                         className='w-full'
+                                    /> */}
+                                    <GooglePlacesAutocomplete
+                                        control={form.control}
+                                        name="shippingAddress1"
+                                        onPlaceSelect={handlePlaceSelect}
+                                        placeholder="Enter your street address"
+                                        label="Street Address"
+                                        isRequired
+                                        inputClassName="w-full"
                                     />
                                     <InputForm
                                         control={form.control}
@@ -378,14 +407,23 @@ const CheckoutDetails: React.FC = () => {
                                                 className='w-full'
                                             />
                                         </div>
-                                        <InputForm
+                                        <GooglePlacesAutocomplete
+                                            control={form.control}
+                                            name="billingAddress1"
+                                            onPlaceSelect={handleBillingPlaceSelect}
+                                            placeholder="Enter your street address"
+                                            label="Address Line 1"
+                                            isRequired
+                                            inputClassName="w-full"
+                                        />
+                                        {/* <InputForm
                                             control={form.control}
                                             name="billingAddress1"
                                             type='text'
                                             label='Address Line 1'
                                             isRequired
                                             className='w-full'
-                                        />
+                                        /> */}
                                         <InputForm
                                             control={form.control}
                                             name="billingAddress2"
@@ -459,7 +497,7 @@ const CheckoutDetails: React.FC = () => {
                                 }}
 
                             >
-                                    {shippingMethods.map((method) => (
+                                {shippingMethods.map((method) => (
                                     <CustomRadio key={method.id} value={method.id.toString()}>
                                         <div className='space-y-2'>
                                             <div className='flex items-start justify-between gap-4'>
@@ -544,7 +582,7 @@ const CheckoutDetails: React.FC = () => {
                                         </a>
                                     }
                                 />
-                                 
+
                             </div>
                             <Button
                                 type="submit"
@@ -553,7 +591,7 @@ const CheckoutDetails: React.FC = () => {
                                 color="primary"
                                 className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
                                 isLoading={isProcessing}
-                                
+
                             >
                                 Place Order Now
                             </Button>

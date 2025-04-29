@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { ReactElement, Suspense } from "react";
+import {  Suspense } from "react";
 import dynamic from "next/dynamic";
 import ScrollToTop from "@/components/ScrollToTop";
 import SuspenseLoader from "@/components/ui/SuspenseLoader";
@@ -67,7 +67,9 @@ const DynamicBlogsSection = dynamic(() => import('./_components/BlogsSection'), 
 
 export const revalidate = 60;
 
-const Dashboard: NextPage = async (): Promise<ReactElement> => {
+const Dashboard: NextPage<{searchParams: Promise<{referral_code: string}>}> = async ({searchParams}) => {
+  const referralCode = (await searchParams).referral_code;
+   
   const data = await getDashboardData();
 
   const emptyProductResponse: ProductResponseData = {
@@ -153,7 +155,7 @@ const Dashboard: NextPage = async (): Promise<ReactElement> => {
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
-        <DynamicReferFriend />
+        <DynamicReferFriend referralCode={referralCode} />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>

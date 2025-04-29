@@ -38,13 +38,14 @@ export const signInAction = async (
   export const signUpAction = async ({
     email,
     password,
-  }: SignUpFormSchema): Promise<ServerActionResponse<{message: string}>> => {
+    referralCode
+  }: SignUpFormSchema & { referralCode: string }): Promise<ServerActionResponse<{message: string}>> => {
     const payload = {
       email,
       password
     };
     return await handleRequest<{message: string}, typeof payload>({
-      endpoint: API_ROUTES.REGISTER,
+      endpoint: API_ROUTES.REGISTER(referralCode),
       payload,
       method: 'POST',
     });
@@ -456,3 +457,16 @@ export const getShippingMethods = async (): Promise<ServerActionResponse<SHIPPIN
     method: 'GET',
   });
 };
+
+// send referral code
+export const sendReferralCode = async (payload: {
+  email: string;
+  referral_code: string;
+}): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.SEND_REFERRAL_CODE,
+    payload,
+    method: 'POST',
+  });
+};
+

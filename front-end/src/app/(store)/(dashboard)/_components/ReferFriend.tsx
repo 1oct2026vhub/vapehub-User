@@ -1,9 +1,19 @@
 import { RightArrowIcon } from '@/components/Icons'
+import { getServerSessionData } from '@/lib/config/auth.config'
+import { ROUTES } from '@/lib/routes'
 import { Button } from '@nextui-org/button'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
+import SetReferralCode from './SetReferralCode'
 
-const ReferFriend: React.FC = () => {
+const ReferFriend: React.FC<{referralCode: string}> = async ({referralCode}) => {
+    
+    const session = await getServerSessionData();
+    const user = session?.user;
+    if (!user) {
+        return <SetReferralCode referralCode={referralCode} />;
+    }
     return (
         <section className='xl:pt-24 xl:pb-12.5 xl:px-5'>
             <div className='bg-skin-white border border-skin-neutral-50 xl:pl-11 pt-7 flex flex-col xl:flex-row h-fit gap-2 shadow-card rounded-[36px] md:rounded-[50px] xl:max-h-[309px]'>
@@ -13,6 +23,8 @@ const ReferFriend: React.FC = () => {
                         <h1 className='primary-gradient-100'>We will reward you both!</h1>
                     </div>
                     <Button
+                        as={Link}
+                        href={ROUTES.REFERRAL}
                         size="lg"
                         radius="sm"
                         color="primary"

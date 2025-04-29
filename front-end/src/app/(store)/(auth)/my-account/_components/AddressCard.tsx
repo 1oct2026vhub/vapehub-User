@@ -7,6 +7,7 @@ import { AddressFormData } from '@/lib/config/address.config'
 import { useAddress } from '@/lib/context/AddressContext'
 import AddressForm from './AddressForm'
 import { Address } from '@/lib/config/user.config'
+import { AnimatePresence, motion } from 'framer-motion'
 
 interface AddressCardProps {
   address: Address;
@@ -14,10 +15,10 @@ interface AddressCardProps {
 
 const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
   const { deleteAddress, updateAddress } = useAddress();
-  const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+  // const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
@@ -30,11 +31,12 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
     }
   };
 
-  const handleUpdate = async (data: AddressFormData) => {     
+  const handleUpdate = async (data: AddressFormData) => { 
+    
     try {
       setIsSubmitting(true);
       await updateAddress(address.id, data);
-      onEditClose();
+      setIsEditOpen(false);
     } catch (error) {
       console.error('Error updating address:', error);
     } finally {
@@ -86,14 +88,54 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
             isIconOnly 
             color='primary' 
             className="bg-skin-neutral-500 rounded-10"
-            onPress={onEditOpen}
+            onPress={() => setIsEditOpen(true)}
           >
             <EditIcon2 className='w-4.5 h-4.5 min-w-4.5' />
           </Button>
         </div>
       </div>
 
-      <Modal isOpen={isEditOpen} onClose={onEditClose} size="2xl">
+       {/* Edit Address modal with animation using motion*/}
+       
+        {isEditOpen && (
+          <AnimatePresence>
+            
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className='fixed inset-0 flex items-center justify-center z-50'
+          >
+            <div className='bg-skin-white p-3.5 border border-skin-neutral-200 rounded-10 shadow-base'>
+            <div className='flex items-center justify-between mb-4'>
+              <h2 className='text-content-1 md:text-title-2 font-bold text-skin-neutral-500 capitalize'>
+                Edit Address
+              </h2>
+              <Button 
+                size="md" 
+                isIconOnly 
+                color='primary' 
+                className="bg-skin-neutral-500 rounded-10"
+                onPress={() => setIsEditOpen(false)}
+              >
+                X
+              </Button>
+            </div>
+            <AddressForm 
+              initialData={address}
+              onSubmit={handleUpdate}
+              onCancel={() => setIsEditOpen(false)}
+              isSubmitting={isSubmitting}
+            />
+            </div>
+          </motion.div>
+
+          </AnimatePresence>
+
+        )} 
+
+      {/* <Modal isOpen={isEditOpen} onClose={onEditClose} size="2xl">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">Edit Address</ModalHeader>
           <ModalBody>
@@ -105,7 +147,7 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
             />
           </ModalBody>
         </ModalContent>
-      </Modal>
+      </Modal> */}
 
       <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
         <ModalContent>

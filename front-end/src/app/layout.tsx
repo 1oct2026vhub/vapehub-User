@@ -13,6 +13,15 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "VapeHub - The Ultimate Online Vape Store",
   description: "Vapehub is the one-stop shop for all your vaping needs! Our online store boasts all the popular brands and products at unbeatable prices with amazing deals.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "VapeHub - The Ultimate Online Vape Store",
+    description: "Vapehub is the one-stop shop for all your vaping needs! Our online store boasts all the popular brands and products at unbeatable prices with amazing deals.",
+    url: "https://www.vapehub.devateam.com/",
+    siteName: "VapeHub",
+  },
 };
 
 export default function RootLayout({
@@ -28,10 +37,12 @@ export default function RootLayout({
           name='viewport'
           content='width=device-width, initial-scale=1.0'
         />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="manifest" href="/site.webmanifest"></link>
+        <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+        <script
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places`}
+          async
+          defer
+        />
       </head>
       <body
         className={`m-0 min-h-screen bg-skin-white lg:bg-skin-base text-skin-black font-poppins antialiased ${poppins.variable}`}

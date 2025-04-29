@@ -5,7 +5,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL ?? 'https://api.v
 
 export const API_ROUTES = {
     SIGN_IN: buildRequestUrl('/api/auth/login'),
-    REGISTER: buildRequestUrl('/api/auth/register'),
+    REGISTER: (referralCode: string) => buildRequestUrl(referralCode ? `/api/auth/register?referral_code=${referralCode}` : '/api/auth/register'),
     GET_VERIFY_EMAIL: (token: string | string[]) => buildRequestUrl(`/api/auth/verify-email?token=${token}`),
     FORGOT_PASSWORD: buildRequestUrl("/api/auth/forgot-password"),
     RESET_PASSWORD: buildRequestUrl('api/auth/reset-password'),
@@ -49,6 +49,7 @@ export const API_ROUTES = {
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
     CHECK_STOCK_VALIDATION: buildRequestUrl('/api/cart/check-stock'),
+    SEND_REFERRAL_CODE: buildRequestUrl('/api/users/refer-a-friend'),
 }
 
 // * Helper functions

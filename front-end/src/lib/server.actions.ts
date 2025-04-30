@@ -10,6 +10,7 @@ import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionR
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
+import { ReferralStatsResponse } from "./config/referral.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
 import { handleRequest } from "./request.config";
@@ -470,3 +471,10 @@ export const sendReferralCode = async (payload: {
   });
 };
 
+// referral stats
+export const getReferralStats = async (): Promise<ServerActionResponse<ReferralStatsResponse>> => {
+  return await handleRequest<ReferralStatsResponse, unknown>({
+    endpoint: API_ROUTES.GET_REFERRAL_STATS,
+    method: 'GET',
+  });
+};

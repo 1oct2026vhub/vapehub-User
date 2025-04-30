@@ -144,6 +144,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       quantity: quantity
     };
   };
+ 
+  // const event = ({ action, category, label, value }: { action: string, category: string, label: string, value: string }) => {
+  //   window.gtag('event', action, {
+  //     event_category: category,
+  //     event_label: label,
+  //     value: value,
+  //   });
+  // };
 
   const addItemToCart = async (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => {
     setIsLoading(true);
@@ -186,6 +194,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         calculateTotals(updatedCart);
         toast.success(`${productName} added to cart successfully`);
       }
+      // if (process.env.NODE_ENV === 'production') {
+      //   event({ action: 'add_to_cart', category: 'ecommerce', label: 'Item added to cart', value: productName });
+      // }
     } catch (error) {
       console.error('Error adding item to cart:', error);
       toast.error('Failed to add item to cart. Please try again.');

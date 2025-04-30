@@ -1,13 +1,13 @@
 'use client';
 
-import { FunctionComponent, ReactElement, useEffect } from 'react';
+import { FunctionComponent, ReactElement, useEffect, Suspense } from 'react';
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { GATagPageView } from '@/lib/analytics/gtagHelper';
 
-const GoogleAnalytics: FunctionComponent<{
+const AnalyticsContent: FunctionComponent<{
   GA_MEASUREMENT_ID: string;
-}> = ({ GA_MEASUREMENT_ID }): ReactElement | null => {
+}> = ({ GA_MEASUREMENT_ID }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -45,6 +45,16 @@ const GoogleAnalytics: FunctionComponent<{
           `}
       </Script>
     </>
+  );
+};
+
+const GoogleAnalytics: FunctionComponent<{
+  GA_MEASUREMENT_ID: string;
+}> = ({ GA_MEASUREMENT_ID }): ReactElement => {
+  return (
+    <Suspense>
+      <AnalyticsContent GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />
+    </Suspense>
   );
 };
 

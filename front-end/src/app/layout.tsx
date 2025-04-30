@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import GlobalProvider from "@/providers/GlobalProvider";
 import { Toaster } from "sonner";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -43,6 +44,9 @@ export default function RootLayout({
           async
           defer
         />
+        <GoogleAnalytics
+        GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_MEASUREMENT_ID ?? ''}
+      />
       </head>
       <body
         className={`m-0 min-h-screen bg-skin-white lg:bg-skin-base text-skin-black font-poppins antialiased ${poppins.variable}`}

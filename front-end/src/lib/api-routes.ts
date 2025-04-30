@@ -50,6 +50,7 @@ export const API_ROUTES = {
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
     CHECK_STOCK_VALIDATION: buildRequestUrl('/api/cart/check-stock'),
     SEND_REFERRAL_CODE: buildRequestUrl('/api/users/refer-a-friend'),
+    GET_REFERRAL_STATS: buildRequestUrl('/api/users/referral-stats'),
 }
 
 // * Helper functions

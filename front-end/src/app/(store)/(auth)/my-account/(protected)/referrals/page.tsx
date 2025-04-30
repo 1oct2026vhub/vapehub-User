@@ -1,11 +1,16 @@
-'use client'
-
- import { NextPage } from "next";
+import { NextPage } from "next";
 import React from "react";
 import ReferralCard from "../../_components/ReferralCard";
 import LogoutButton from "../../_components/LogoutButton";
-
-const AccountReferrals: NextPage = () => {
+import { AsyncReactElement, ServerActionStatus } from "@/lib/config/app.config";
+import { getReferralStats } from "@/lib/server.actions"; 
+const AccountReferrals: NextPage = async (): Promise<AsyncReactElement> => {
+    const response = await getReferralStats();
+    
+    if (response.status === ServerActionStatus.ERROR) {
+        return <div>{response.message}</div>;
+    }
+    const { data } = response;
     return (
         <main>
              
@@ -13,8 +18,9 @@ const AccountReferrals: NextPage = () => {
                 <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
                     My Referrals
                 </h2>
-                <ReferralCard />
-                <ReferralCard />
+                 {data.recent_referrals.map((referral) => (
+                    <ReferralCard key={referral.id} referral={referral} />
+                 ))}
             </div>
             <div className="flex md:hidden bg-skin-white p-4 rounded-14 shadow-card w-full mt-4">
                 <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 text-content-1 bg-skin-white font-semibold w-full rounded-lg" />

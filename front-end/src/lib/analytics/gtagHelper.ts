@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    gtag: (command: string, id: string, config?: { page_path: string }) => void;
+  }
+}
+
 /**
  * Sends a page view event to Google Analytics using the provided measurement ID and URL.
  * @param {string} GA_MEASUREMENT_ID The Google Analytics measurement ID.

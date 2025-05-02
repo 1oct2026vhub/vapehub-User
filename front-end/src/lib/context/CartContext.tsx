@@ -75,7 +75,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (isAuthenticated) {
         const response = await getCartItems();
-        
+
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartItems: CartItem[] = response.data.map(bindCartItem);
           setCartItems(cartItems);
@@ -113,7 +113,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       id: item.id,
       product_id: item.product_id,
       product_slug: item.product.slug,
-      name:  attributesName ? `${item.product.name} - ${attributesName}` : item.product.name,
+      name: attributesName ? `${item.product.name} - ${attributesName}` : item.product.name,
       price: item.variant.price || '0',
       discount_price: item.variant.discount_price || '0',
       variant_id: item.variant_id,
@@ -144,14 +144,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       quantity: quantity
     };
   };
- 
-  // const event = ({ action, category, label, value }: { action: string, category: string, label: string, value: string }) => {
-  //   window.gtag('event', action, {
-  //     event_category: category,
-  //     event_label: label,
-  //     value: value,
-  //   });
-  // };
+
+  const event = ({ action, category, label, value }: { action: string, category: string, label: string, value: string }) => {
+      window.gtag('event', action, {
+        event_category: category,
+        event_label: label,
+        value: value,
+      });
+  };
+
+  const cartAnalytics = ({ action, category, label, value }: { action: string, category: string, label: string, value: string }) => {
+    try {
+      if (process.env.NODE_ENV === 'production') {
+        event({ action, category, label, value });
+      }
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+    }
+
+  }
+
 
   const addItemToCart = async (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => {
     setIsLoading(true);
@@ -194,9 +206,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         calculateTotals(updatedCart);
         toast.success(`${productName} added to cart successfully`);
       }
-      // if (process.env.NODE_ENV === 'production') {
-      //   event({ action: 'add_to_cart', category: 'ecommerce', label: 'Item added to cart', value: productName });
-      // }
+
     } catch (error) {
       console.error('Error adding item to cart:', error);
       toast.error('Failed to add item to cart. Please try again.');
@@ -209,6 +219,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsLoading(false);
     }
+    const actionEvent = { action: 'add_to_cart', category: 'ecommerce', label: 'Item added to cart', value: productName }
+    cartAnalytics(actionEvent);
   };
 
   const updateItemQuantity = async (cartId: number, quantity: number) => {
@@ -316,24 +328,24 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const checkoutStockValidation = async () => {
     if (isAuthenticated) {
       setStockValidationLoading(true);
-    const response = await checkStockValidation(); 
-    if (response.status === ServerActionStatus.ERROR) {
-      toast.error(response.message);
-      setStockValidationErrors([]);
+      const response = await checkStockValidation();
+      if (response.status === ServerActionStatus.ERROR) {
+        toast.error(response.message);
+        setStockValidationErrors([]);
+        setStockValidationLoading(false);
+        return false;
+      }
+      const stockValidationErrors = response.data.filter(data => data.isOutOfStock);
+
+      setStockValidationErrors(stockValidationErrors);
+      if (stockValidationErrors.length > 0) {
+        const errorMessages = stockValidationErrors.map(error => error.message);
+        toast.error(errorMessages.join('\n'));
+        setStockValidationLoading(false);
+        return false;
+      }
       setStockValidationLoading(false);
-      return false;
-    }
-    const stockValidationErrors = response.data.filter(data => data.isOutOfStock);
-    
-    setStockValidationErrors(stockValidationErrors);
-    if (stockValidationErrors.length > 0) {
-      const errorMessages = stockValidationErrors.map(error => error.message);
-      toast.error(errorMessages.join('\n'));
-      setStockValidationLoading(false);
-      return false;
-    }
-    setStockValidationLoading(false);
-    return true;
+      return true;
     }
     return true;
   }

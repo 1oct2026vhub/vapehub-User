@@ -15,9 +15,9 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
   
   const settings: Settings = {
     dots: true,
-    infinite: products.length > 4,
+    infinite: products.length > 5,
     speed: 500,
-    slidesToShow: 4,
+    slidesToShow: 5,
     slidesToScroll: 1,
     initialSlide: 0,
     lazyLoad: "progressive",

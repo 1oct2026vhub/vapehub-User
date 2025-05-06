@@ -1,6 +1,4 @@
 'use client'
-
-import React from 'react'
 import { CloseIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/Icons";
 import InputField from "@/components/InputField";
 import Logo from "@/components/ui/Logo";
@@ -19,6 +17,8 @@ import { ROUTES } from '@/lib/routes';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 import { useRouter } from 'next/navigation';
 import { Category } from '@/lib/config/category.config';
+import NotificationAction from './NotificationAction';
+
 type Props = {
     categories: Category[]
 }
@@ -27,7 +27,7 @@ const HeaderTopBar = ({ categories }: Props) => {
         resolver: zodResolver(HEADER_IN_SCHEMA),
         mode: 'onBlur',
     });
-
+    
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
     const router = useRouter();
     const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading } = useCart();
@@ -62,6 +62,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                 </div>
 
                 <div className="flex items-center gap-6">
+                    <NotificationAction  />
                     <Button onPress={onOpen} variant='light' className="flex items-center gap-0.5 hover:!bg-transparent">
                         <ShoppingCartIcon />
                         <div>
@@ -86,6 +87,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                     <MobileMenu categories={categories} />
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     <div className="flex items-center gap-1">
+                        <NotificationAction  />
                         <Link href={ROUTES.MY_ACCOUNT}>
                             <UserIcon />
                         </Link>
@@ -131,7 +133,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                                     ) : (
                                         <div className="flex flex-col items-center justify-center gap-4 py-8 my-auto h-full">
                                             <ShoppingCartIcon className='w-20 h-20' />
-                                            <p className="text-title-2 font-semibold text-skin-neutral-500 italic">Looks like you haven’t added anything yet!</p>
+                                            <p className="text-title-2 font-semibold text-skin-neutral-500 italic">Looks like you haven&apos;t added anything yet!</p>
                                             <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button" onPress={onClose}>
                                                 Continue Shopping
                                             </Button>

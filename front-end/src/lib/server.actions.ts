@@ -7,6 +7,7 @@ import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, StockValidationResponse } from ".
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { NotificationListResponse } from "./config/notification.config";
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
@@ -476,5 +477,47 @@ export const getReferralStats = async (): Promise<ServerActionResponse<ReferralS
   return await handleRequest<ReferralStatsResponse, unknown>({
     endpoint: API_ROUTES.GET_REFERRAL_STATS,
     method: 'GET',
+  });
+};
+
+// get notification list
+export const getNotificationList = async (): Promise<ServerActionResponse<NotificationListResponse>> => {
+  return await handleRequest<NotificationListResponse, unknown>({
+    endpoint: API_ROUTES.GET_NOTIFICATION_LIST,
+    method: 'GET',
+  });
+};
+
+// get unread notification count
+export const getUnreadNotificationCount = async (): Promise<ServerActionResponse<{count: number}>> => {
+  return await handleRequest<{count: number}, unknown>({
+    endpoint: API_ROUTES.GET_UNREAD_NOTIFICATION_COUNT,
+    method: 'GET',
+  });
+};
+
+// read notification
+export const readNotification = async (id: number): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.READ_NOTIFICATION(id),
+    payload: {},
+    method: 'PUT',
+  });
+};
+
+// read all notifications
+export const readAllNotifications = async (): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.READ_ALL_NOTIFICATIONS,
+    payload: {},
+    method: 'PUT',
+  });
+};
+
+// delete notification
+export const deleteNotification = async (id: number): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.DELETE_NOTIFICATION(id),
+    method: 'DELETE',
   });
 };

@@ -6,6 +6,7 @@ import { NextUIProvider } from '@nextui-org/react';
 import { SessionProvider } from 'next-auth/react';
 import { CartProvider } from '@/lib/context/CartContext';
 import { AgeVerificationProvider } from '@/lib/context/AgeVerificationContext';
+import { NotificationProvider } from '@/lib/context/NotificationContext';
 
 const GlobalProvider: FunctionComponent<PropsWithChildren> = ({
   children,
@@ -17,7 +18,9 @@ const GlobalProvider: FunctionComponent<PropsWithChildren> = ({
       <SessionProvider>
         <AgeVerificationProvider>
           <CartProvider>
-            {children}
+            <NotificationProvider>
+              {children}
+            </NotificationProvider>
           </CartProvider>
         </AgeVerificationProvider>
       </SessionProvider>

@@ -51,6 +51,11 @@ export const API_ROUTES = {
     CHECK_STOCK_VALIDATION: buildRequestUrl('/api/cart/check-stock'),
     SEND_REFERRAL_CODE: buildRequestUrl('/api/users/refer-a-friend'),
     GET_REFERRAL_STATS: buildRequestUrl('/api/users/referral-stats'),
+    GET_NOTIFICATION_LIST: buildRequestUrl('/api/notifications'),
+    GET_UNREAD_NOTIFICATION_COUNT: buildRequestUrl('/api/notifications/unread/count'),
+    READ_NOTIFICATION: (id: number) => buildRequestUrl(`/api/notifications/${id}/read`),
+    READ_ALL_NOTIFICATIONS: buildRequestUrl('/api/notifications/read-all'),
+    DELETE_NOTIFICATION: (id: number) => buildRequestUrl(`/api/notifications/${id}`),
 }
 
 // * Helper functions

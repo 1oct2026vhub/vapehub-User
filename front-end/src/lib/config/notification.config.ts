@@ -4,6 +4,7 @@ export interface NotificationList {
   title: string;
   message: string;
   type:  "order" | "payment" | "system" | "product" | "shipping";
+  url: string;
   related_id: number | null;
   is_read: boolean;
   is_pushed: boolean;

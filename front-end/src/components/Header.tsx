@@ -12,6 +12,12 @@ const Header = async () => {
           return <div>{response.message}</div>;
         }
         const categories: Category[] = response.data;
+        // const megaMenuResponse = await getHeaderMegaMenu();
+        // if(megaMenuResponse.status !== ServerActionStatus.SUCCESS) {
+        //   return <div>{megaMenuResponse.message}</div>;
+        // }
+        // const megaMenu: HeaderMegaMenuResponse = megaMenuResponse.data;
+        // console.log(megaMenu);
        
         
     return (

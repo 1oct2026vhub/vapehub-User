@@ -17,3 +17,73 @@ export const Header_FORM_CONFIG = {
   },
   
 };
+// * Footer Menu
+export interface FooterMenu {
+  id: number;
+  title: string;
+  order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null; 
+  links: FooterMenuLinks[];
+}
+// * Footer Menu Links
+interface FooterMenuLinks {
+  id: number;
+  section_id: number;
+  label: string;
+  url: string;
+  order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+// * Footer Menu Response
+export type FooterMenuResponse = FooterMenu;
+
+
+// * Header Mega Menu
+export interface HeaderMegaMenu {
+  id: number;
+  updated_by: number;
+  label: string;
+  menu_parent: number | null;
+  order: number;
+  original: string;
+  entity_type: string;
+  entity_id: number;
+  status: boolean;
+  show_image: boolean;
+  icon: string;
+  hide_text: boolean;
+  hide_mobile_view: boolean;
+  hide_desktop_view: boolean;
+  icon_position: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  parent: {
+    id: number;
+    label: string;
+    original: string;
+  } | null;
+  children: HeaderMegaMenu[];
+  entity_data?: {
+    id: number;
+    name: string;
+    slug: string;
+    price?: string;
+    discount_price?: string;
+    ProductImages?: {
+      image_url: string;
+    }[];
+  };
+}
+
+// * Header Mega Menu Response
+export interface HeaderMegaMenuResponse {
+  data: HeaderMegaMenu[];
+}
+

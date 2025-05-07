@@ -2,41 +2,31 @@ import React from 'react';
 import Logo from './ui/Logo';
 import { FacebookIcon, InstagramIcon, TwitterIcon } from './Icons';
 import Link from 'next/link';
-import { Category } from '@/lib/config/category.config';
-import { getCategoryList } from '@/lib/server.actions';
+import { getFooterMenu } from '@/lib/server.actions';
 import { AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
 import FooterMobile from './FooterMobile';
-import { FooterConfig } from '@/lib/config/global.config';
+import { FooterMenu } from '@/lib/config/header.config';
 
 const Footer = async (): AsyncReactElement => {
-  const response = await getCategoryList();
-  if (response.status !== ServerActionStatus.SUCCESS) {
-    return <div>{response.message}</div>;
+  const footerMenuResponse = await getFooterMenu();   
+
+  if (footerMenuResponse.status !== ServerActionStatus.SUCCESS) {
+    return <div>{footerMenuResponse.message}</div>;
   }
-  const categories: Category[] = response.data;
 
+  const footerMenu: FooterMenu[] = footerMenuResponse.data;
 
-  const footerSections: FooterConfig[] = [
-    {
-      title: 'help',
-      links: [
-        'Contact Us',
-        'Delivery Information',
-        'Returns Policy',
-        'Privacy Policy',
-        'Terms & Conditions',
-      ],
-    },
-    {
-      title: 'quick links',
-      links: [
-        'About Us',
-        'My Account',
-        'Rewards',
-        'Refer A Friend',
-      ],
-    },
-  ];
+  // Sort footer menu items by order and filter active items
+  const sortedFooterMenu = footerMenu
+    .filter(menu => menu.is_active)
+    .sort((a, b) => a.order - b.order)
+    .map(menu => ({
+      ...menu,
+      links: menu.links
+        .filter(link => link.is_active)
+        .sort((a, b) => a.order - b.order)
+    }))
+    .filter(menu => menu.links.length > 0); // Only keep sections with active links
 
   const socialMediaLinks = [
     { icon: <InstagramIcon className='max-sm:max-w-9' />, href: '#' },
@@ -44,50 +34,33 @@ const Footer = async (): AsyncReactElement => {
     { icon: <TwitterIcon className='max-sm:max-w-9' />, href: '#' },
   ];
 
-
   return (
     <footer className="bg-footer-gradient space-y-6 mt-auto">
       <div className="px-4 lg:px-10 pt-10 flex flex-col md:flex-row items-start justify-between gap-x-7 gap-y-6 md:gap-y-0">
         {/* Left Sections */}
-        <div className="hidden md:grid grid-cols-3 gap-5 lg:gap-8 xl:gap-12">
-          {footerSections.map((section, index) => (
-            <div key={index} className="space-y-4 text-skin-white flex flex-col">
+        <div className="hidden md:grid grid-cols-4 gap-5 lg:gap-8 xl:gap-12">
+          {sortedFooterMenu.map((section) => (
+            <div key={section.id} className="space-y-4 text-skin-white flex flex-col">
               <h6 className="text-title-2 lg:text-title-1 font-semibold uppercase">{section.title}</h6>
               <ul className="space-y-2.5">
-                {section.links.map((link, idx) => (
-                  <li key={idx}>
-                    <a
-                      href="#"
+                {section.links.map((link) => (
+                  <li key={link.id}>
+                    <Link
+                      href={link.url}
                       className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 hover:font-semibold transition-all duration-100"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
-          <div className="space-y-4 text-skin-white flex flex-col">
-            <h6 className="text-title-2 lg:text-title-1 font-semibold uppercase">Shop</h6>
-            <ul className="space-y-2.5">
-              {categories.length > 0 ? categories.slice(0, 8).map((category, idx) => (
-                <li key={idx}>
-                  <Link
-                    href={`/${category.slug}`}
-                    passHref
-                    className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 hover:font-semibold transition-all duration-100"
-                  >
-                    {category.name}
-                  </Link>
-                </li>
-              )) : null}
-            </ul>
-          </div>
         </div>
 
         {/* Mobile Section */}
         <div className='w-full md:hidden'>
-          <FooterMobile footerSections={footerSections} categories={categories} />
+          <FooterMobile footerMenu={sortedFooterMenu} />
         </div>
 
         {/* Right Section */}

@@ -39,9 +39,9 @@ const GooglePlacesAutocomplete = <T extends FieldValues>({
     listenerRef.current = autocompleteRef.current.addListener('place_changed', () => {
       const place = autocompleteRef.current?.getPlace();
       if (place) {
-        const address = extractAddressComponents(place);
-        onPlaceSelect(address);
-        onChangeRef.current(place.formatted_address || '');
+        const address = extractAddressComponents(place); 
+        onPlaceSelect(address); 
+        onChangeRef.current(place.name || '');
       }
     });
 

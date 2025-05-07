@@ -56,6 +56,8 @@ export const API_ROUTES = {
     READ_NOTIFICATION: (id: number) => buildRequestUrl(`/api/notifications/${id}/read`),
     READ_ALL_NOTIFICATIONS: buildRequestUrl('/api/notifications/read-all'),
     DELETE_NOTIFICATION: (id: number) => buildRequestUrl(`/api/notifications/${id}`),
+    GET_FOOTER_MENU: buildRequestUrl('/api/footer'),
+    GET_HEADER_MEGA_MENU: buildRequestUrl('/api/menu'),
 }
 
 // * Helper functions

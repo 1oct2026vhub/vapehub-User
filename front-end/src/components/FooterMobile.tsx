@@ -2,9 +2,8 @@
 import React from 'react';
 import { DownArrowFilledIcon } from './Icons';
 import { Accordion, AccordionItem } from '@nextui-org/react';
-import { Category } from '@/lib/config/category.config';
 import Link from 'next/link';
-import { FooterConfig } from '@/lib/config/global.config';
+import { FooterMenu } from '@/lib/config/header.config';
 
 const itemClasses = {
     base: "w-full rounded-lg",
@@ -14,61 +13,53 @@ const itemClasses = {
     content: "",
 };
 
- type Props = {
-    footerSections: FooterConfig[];
-    categories: Category[]
- }
+type Props = {
+    footerMenu: FooterMenu[];
+}
 
-const FooterMobile: React.FC<Props> = ({footerSections, categories}) => {
-    return (
-        <>
-        <Accordion variant='light' className="!px-0" itemClasses={itemClasses} selectionMode='multiple'>
-            {/* Help Section */}
-          <AccordionItem title="Help" indicator={<DownArrowFilledIcon />}>
-            <ul className="space-y-2.5">
-              {footerSections[0].links.map((link, idx) => (
-                <li key={idx}>
-                  <a href="#" className="text-content-1 font-normal text-skin-white">
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </AccordionItem>
+interface AccordionItem {
+    key: string | number;
+    title: string;
+    content: React.ReactNode;
+}
 
-          {/* Quick Links Section */}
-          <AccordionItem title="Quick Links" indicator={<DownArrowFilledIcon />}>
+const FooterMobile: React.FC<Props> = ({ footerMenu }) => {
+    const items: AccordionItem[] = footerMenu.map(section => ({
+        key: section.id,
+        title: section.title,
+        content: (
             <ul className="space-y-2.5">
-              {footerSections[1].links.map((link, idx) => (
-                <li key={idx}>
-                  <a href="#" className="text-content-1 font-normal text-skin-white">
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </AccordionItem>
-          
-            <AccordionItem aria-label="shop" title="shop" indicator={<DownArrowFilledIcon />}>
-              <ul className="space-y-2.5">
-                {categories.length > 0 && categories.slice(0, 8).map((category, idx) => (
-                  <li key={idx}>
-                    <Link
-                      href={`/${category.slug}`}
-                      passHref
-                      className="text-content-1 font-normal text-skin-white"
-                    >
-                      {category.name}
-                    </Link>
-                  </li>
+                {section.links.map((link) => (
+                    <li key={link.id}>
+                        <Link
+                            href={link.url}
+                            className="text-content-1 font-normal text-skin-white"
+                        >
+                            {link.label}
+                        </Link>
+                    </li>
                 ))}
+            </ul>
+        )
+    }));
 
-              </ul>
-            </AccordionItem>
-
-
-          </Accordion>
-          </>
+    return (
+        <Accordion 
+            variant='light' 
+            className="!px-0" 
+            itemClasses={itemClasses} 
+            selectionMode='multiple'
+        >
+            {items.map((item) => (
+                <AccordionItem
+                    key={item.key}
+                    title={item.title}
+                    indicator={<DownArrowFilledIcon />}
+                >
+                    {item.content}
+                </AccordionItem>
+            ))}
+        </Accordion>
     );
 };
  

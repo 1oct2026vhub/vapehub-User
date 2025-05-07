@@ -7,6 +7,7 @@ import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, StockValidationResponse } from ".
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { NotificationListResponse } from "./config/notification.config";
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
@@ -519,5 +520,20 @@ export const deleteNotification = async (id: number): Promise<ServerActionRespon
   return await handleRequest<{message: string}, unknown>({
     endpoint: API_ROUTES.DELETE_NOTIFICATION(id),
     method: 'DELETE',
+  });
+};
+// get footer menu
+export const getFooterMenu = async (): Promise<ServerActionResponse<FooterMenuResponse[]>> => {
+  return await handleRequest<FooterMenuResponse[], unknown>({
+    endpoint: API_ROUTES.GET_FOOTER_MENU,
+    method: 'GET',
+  });
+};
+
+// get header mega menu
+export const getHeaderMegaMenu = async (): Promise<ServerActionResponse<HeaderMegaMenuResponse>> => {
+  return await handleRequest<HeaderMegaMenuResponse, unknown>({
+    endpoint: API_ROUTES.GET_HEADER_MEGA_MENU,
+    method: 'GET',
   });
 };

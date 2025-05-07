@@ -6,7 +6,7 @@ import { BellIcon, OrderIcon, PaymentIcon, ProductIcon, ShippingIcon } from '@/c
 import { useSession } from 'next-auth/react';
 import { useNotifications } from '@/lib/hooks/useNotifications';
 import { NotificationList } from '@/lib/config/notification.config';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const NotificationAction: React.FC = () => {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
@@ -14,27 +14,30 @@ const NotificationAction: React.FC = () => {
   const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
   const isLoggedIn = status === "authenticated";
   const [tab, setTab] = React.useState<'all' | 'unread'>('all');
-  // const router = useRouter();
+  const router = useRouter();
 
   if (!isLoggedIn) return null;
 
-  // Group notifications by date (Today, Tomorrow, etc.)
+  // Group notifications by date (Today, Yesterday, etc.)
   const groupByDate = (list: NotificationList[] = []): Record<string, NotificationList[]> => {
     const arr = Array.isArray(list) ? list : [];
     const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
     
     const format = (d: Date) => d.toISOString().slice(0, 10);
     
     return arr.reduce<Record<string, NotificationList[]>>((acc, n) => {
-      const notificationDate = n.created_at.slice(0, 10);
-      if (notificationDate === format(today)) {
+      const notificationDate = new Date(n.created_at);
+      notificationDate.setHours(0, 0, 0, 0);
+      
+      if (notificationDate.getTime() === today.getTime()) {
         (acc['Today'] = acc['Today'] || []).push(n);
-      } else if (notificationDate === format(tomorrow)) {
-        (acc['Tomorrow'] = acc['Tomorrow'] || []).push(n);
+      } else if (notificationDate.getTime() === yesterday.getTime()) {
+        (acc['Yesterday'] = acc['Yesterday'] || []).push(n);
       } else {
-        (acc[notificationDate] = acc[notificationDate] || []).push(n);
+        (acc[format(notificationDate)] = acc[format(notificationDate)] || []).push(n);
       }
       return acc;
     }, {});
@@ -71,13 +74,20 @@ const NotificationAction: React.FC = () => {
           {Object.keys(grouped).length > 0 ? (
             Object.entries(grouped).map(([date, notification]) => (
               <div key={date} className="mb-2">
-                <div className="text-xs font-semibold text-gray-400 px-3 py-1">{date === 'Today' || date === 'Tomorrow' ? date : (() => { const d = new Date(date); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); })()}</div>
+                <div className="text-xs font-semibold text-gray-400 px-3 py-1">{date === 'Today' || date === 'Yesterday' ? date : (() => { const d = new Date(date); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); })()}</div>
                 {(notification as NotificationList[]).map((notification: NotificationList) => {
                   const handleClick = async () => {
                     if (!notification.is_read) {
                       await markAsRead(notification.id);
-                      // router.push(`/notifications/${notification.id}`);
+                      if (notification.url) {
+                        router.push(notification.url);
+                      }
                       setIsPopoverOpen(false);
+                    } else {
+                      if (notification.url) {
+                        router.push(notification.url);
+                        setIsPopoverOpen(false);
+                      }
                     }
                   };
                   return (

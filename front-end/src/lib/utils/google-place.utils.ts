@@ -17,7 +17,7 @@ export const extractAddressComponents = (place: google.maps.places.PlaceResult) 
   };
 
   return {
-    street: getComponent('route'),
+    street: place.name || getComponent('route'),
     city: getComponent('locality') || getComponent('postal_town'),
     state: getComponent('administrative_area_level_1'),
     postcode: getComponent('postal_code'),

@@ -9,7 +9,7 @@ import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { NotificationListResponse } from "./config/notification.config";
-import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate } from "./config/order.config";
+import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { ReferralStatsResponse } from "./config/referral.config";
@@ -534,6 +534,36 @@ export const getFooterMenu = async (): Promise<ServerActionResponse<FooterMenuRe
 export const getHeaderMegaMenu = async (): Promise<ServerActionResponse<HeaderMegaMenuResponse>> => {
   return await handleRequest<HeaderMegaMenuResponse, unknown>({
     endpoint: API_ROUTES.GET_HEADER_MEGA_MENU,
+    method: 'GET',
+  });
+};
+
+export const reviewOrder = async (payload: REVIEW_ORDER_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.REVIEW_ORDER,
+    payload,
+    method: 'POST',
+  });
+};
+
+export const getReviewOrder = async (productId: number, userId: number): Promise<ServerActionResponse<REVIEW_ORDER_DATA>> => {
+  return await handleRequest<REVIEW_ORDER_DATA, unknown>({
+    endpoint: API_ROUTES.GET_REVIEW_ORDER(productId, userId),
+    method: 'GET',
+  });
+};
+
+export const updateReviewOrder = async (orderId: number, payload: REVIEW_ORDER_PAYLOAD_UPDATE): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.UPDATE_REVIEW_ORDER(orderId),
+    payload,
+    method: 'PUT',
+  });
+};
+
+export const getReviewOrderByProductId = async (productId: number): Promise<ServerActionResponse<REVIEW_ORDER_RESPONSE>> => {
+  return await handleRequest<REVIEW_ORDER_RESPONSE, unknown>({
+    endpoint: API_ROUTES.GET_REVIEW_ORDER_BY_PRODUCT_ID(productId),
     method: 'GET',
   });
 };

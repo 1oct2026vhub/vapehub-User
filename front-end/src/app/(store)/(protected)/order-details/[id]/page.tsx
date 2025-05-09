@@ -42,7 +42,7 @@ const OrdersListingPage: NextPage<{ params: Promise<{ id: string }> }> = async (
             <section className='flex flex-col gap-4'>
                 <div className='bg-skin-white p-4 shadow-card rounded-14 flex flex-col md:flex-row gap-7 items-start'>
                     <OrderDetails data={result.order} />
-                    <OrderActions />
+                    <OrderActions orderId={Number(id)} orderItems={result.order.orderItems} status={result.order.status} />
                 </div>
                 {
                     result.order.orderItems.map((item) => (

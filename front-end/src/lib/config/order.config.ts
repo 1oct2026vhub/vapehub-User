@@ -194,6 +194,53 @@ export interface ORDER_DETAILS_RESPONSE {
    order: ORDER;
    user: USER_ADDRESS_RESPONSE;
 }
+export interface OrderItems {
+    id: number;
+    unit: string;
+    unit_price: string;
+    quantity: number;
+    discount_price: string | null;
+    total: string;
+    product: {
+        id: number;
+        name: string;
+        price: string;
+        slug: string;
+        ProductImages: {
+            image_url: string;
+        }[];
+    };
+    variant: {
+        id: number;
+        slug: string;
+        price: string;
+        variantAttributes: {
+            id: number;
+            variant_id: number;
+            attribute_id: number;
+            term_id: number;
+            is_visible: boolean;
+            used_in_variation: boolean;
+            updated_by: number;
+            created_at: string;
+            updated_at: string;
+            deleted_at: string | null;
+            attribute: {
+                id: number;
+                name: string;
+                type: string;
+            };
+            term: {
+                id: number;
+                name: string;
+                slug: string;
+            };
+        }[];
+        variantImages: {
+            image_url: string;
+        }[];
+    };
+}
 export interface ORDER {
     order_unique_id: string;
     total: string;
@@ -203,53 +250,7 @@ export interface ORDER {
     order_code: string;
     email: string;
     phone: string;
-    orderItems: {
-        id: number;
-        unit: string;
-        unit_price: string;
-        quantity: number;
-        discount_price: string | null;
-        total: string;
-        product: {
-            id: number;
-            name: string;
-            price: string;
-            slug: string;
-            ProductImages: {
-                image_url: string;
-            }[];
-        };
-        variant: {
-            id: number;
-            slug: string;
-            price: string;
-            variantAttributes: {
-                id: number;
-                variant_id: number;
-                attribute_id: number;
-                term_id: number;
-                is_visible: boolean;
-                used_in_variation: boolean;
-                updated_by: number;
-                created_at: string;
-                updated_at: string;
-                deleted_at: string | null;
-                attribute: {
-                    id: number;
-                    name: string;
-                    type: string;
-                };
-                term: {
-                    id: number;
-                    name: string;
-                    slug: string;
-                };
-            }[];
-            variantImages: {
-                image_url: string;
-            }[];
-        };
-    }[];
+    orderItems: OrderItems[];
     // shippingAddress: {
     //     name: string;
     //     last_name: string;
@@ -324,11 +325,31 @@ export enum ORDER_STATUS {
     FAIL = 'fail',
     CANCEL = 'cancel',
     CANCELLED = 'cancelled',
+    OUT_FOR_DELIVERY = 'out_for_delivery',
     RETURN_REQUESTED = 'return_requested',
     RETURN_APPROVED = 'return_approved',
     RETURN_RECEIVED = 'return_received',
-    REFUNDED = 'refunded'
+    REFUNDED = 'refunded', 
 }
+
+
+export const OrderStatus = [
+    { name: ORDER_STATUS.DRAFT, label: 'Draft' },
+    { name: ORDER_STATUS.PENDING, label: 'Pending' },
+    { name: ORDER_STATUS.PROCESSING, label: 'Processing' },
+    { name: ORDER_STATUS.SHIPPED, label: 'Shipped' },
+    { name: ORDER_STATUS.DELIVERED, label: 'Delivered' },
+    { name: ORDER_STATUS.COMPLETED, label: 'Completed' },
+    { name: ORDER_STATUS.FAIL, label: 'Failed' },
+    { name: ORDER_STATUS.CANCEL, label: 'Cancelled' },
+    { name: ORDER_STATUS.CANCELLED, label: 'Cancelled' },
+    { name: ORDER_STATUS.OUT_FOR_DELIVERY, label: 'Out for Delivery' },
+    { name: ORDER_STATUS.RETURN_REQUESTED, label: 'Return Requested' },
+    { name: ORDER_STATUS.RETURN_APPROVED, label: 'Return Approved' },
+    { name: ORDER_STATUS.RETURN_RECEIVED, label: 'Return Received' },
+    { name: ORDER_STATUS.REFUNDED, label: 'Refunded' }
+];
+
  
 export interface Coupon {
     id: number;
@@ -357,3 +378,95 @@ export interface CouponResponse {
     total: number;
     coupon: Coupon;
 }
+
+export interface REVIEW_ORDER_PAYLOAD {
+    order_id: number;
+    product_id: number;
+    company_name: string;
+    rating: number;
+    comment: string;
+} 
+export interface REVIEW_ORDER_PAYLOAD_UPDATE {
+    media_id: number;
+    company_name: string;
+    rating: number;
+    comment: string;
+    is_visible: boolean;
+}
+export interface REVIEW_ORDER_DATA {
+    rows: {
+    id: number;
+    user_id: number;
+    order_id: number;
+    product_id: number;
+    company_name: string;
+    rating: number;
+    comment: string;
+    is_visible: boolean;
+    created_at: string;
+    updated_at: string;
+    user: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        profile_pic_url: string | null;
+    };
+    order: {
+        id: number;
+        order_unique_id: string;
+    };
+    product: {
+        id: number;
+        name: string;
+        slug: string;
+    };
+    media: unknown[];
+    }[];
+    pagination: {
+        total: number;
+        page: number; 
+        totalPages: number;
+    };
+
+}
+export interface REVIEWS {
+    
+        id: number;
+        user_id: number;
+        order_id: number;
+        product_id: number;
+        company_name: string;
+        rating: number;
+        comment: string;
+        is_visible: boolean;
+        created_at: string;
+        updated_at: string;
+        user: {
+            id: number;
+            first_name: string;
+            last_name: string;
+            profile_pic_url: string | null;
+        };
+        order: {
+            id: number;
+            order_unique_id: string;
+        };
+        product: {
+            id: number;
+            name: string;
+            slug: string;
+        };
+        media: unknown[];
+    }
+export interface REVIEW_ORDER_RESPONSE {
+    reviews: REVIEWS[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+    average_rating: string;
+    total_reviews: number;
+}
+ 

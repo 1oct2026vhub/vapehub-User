@@ -7,7 +7,6 @@ import {
 import { getServerSessionData } from '@/lib/config/auth.config';
 import { handleUnauthorizedSession } from '@/lib/auth.actions';
 
-
 // * Types
 type HandleRequest<G> =
   | {
@@ -53,16 +52,19 @@ export const handleRequest = async <T, G>(
         body: buildRequestBody(requestData),
         cache: 'no-store',
       }, 3);   
-      
-      if (response.status === 401) {
-        throw new Error(UNAUTHORIZED_RESPONSE_NAME);
+      const responseJson = await response.json();
+
+      if (response.status === 401) {                
+        return {
+          status: ServerActionStatus.ERROR,
+          message: responseJson.error?.message ?? responseJson.message ??
+          UNAUTHORIZED_RESPONSE_NAME,  
+        }
       }
   
     //   if (response.status >= 500) {
     //     throw new Error(INTERNAL_SERVER_ERROR);
-    //   }
-  
-      const responseJson = await response.json();
+    //   }      
       
       return responseJson.success
         ? {

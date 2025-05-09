@@ -58,6 +58,10 @@ export const API_ROUTES = {
     DELETE_NOTIFICATION: (id: number) => buildRequestUrl(`/api/notifications/${id}`),
     GET_FOOTER_MENU: buildRequestUrl('/api/footer'),
     GET_HEADER_MEGA_MENU: buildRequestUrl('/api/menu'),
+    REVIEW_ORDER: buildRequestUrl('/api/review'),
+    GET_REVIEW_ORDER: (productId: number, userId: number) => buildRequestUrl(`/api/review?product_id=${productId}&user_id=${userId}&is_visible=true`),
+    GET_REVIEW_ORDER_BY_PRODUCT_ID: (productId: number) => buildRequestUrl(`/api/review/product/${productId}?page=1&limit=10&is_visible=true`),
+    UPDATE_REVIEW_ORDER: (orderId: number) => buildRequestUrl(`/api/review/${orderId}`),
 }
 
 // * Helper functions

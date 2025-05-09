@@ -1,16 +1,29 @@
 "use client"
 import { Card, CardBody,  Tab, Tabs } from '@nextui-org/react'
 // import Image from 'next/image'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import ReviewCard from './ReviewCard'; 
 import { ProductViewDetails } from '@/lib/config/product.config';
-import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
-import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
+import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
+import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'; 
+import { getReviewOrderByProductId } from '@/lib/server.actions';
+import { REVIEWS } from '@/lib/config/order.config';
+import EmptyPlaceholder from './ui/EmptyPlaceholder';
 type ProductContentProps = {
     product: ProductViewDetails;
 }
 
 const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement => {
+    const [reviews, setReviews] = useState<REVIEWS[]>([]);
+    useEffect(() => {
+        const fetchReviews = async () => {
+            const response = await getReviewOrderByProductId(product.id);
+            if(response.status === ServerActionStatus.SUCCESS) {
+                setReviews(response.data.reviews)
+            }
+        }
+        fetchReviews()
+    }, [product])
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-10 rounded-2.5xl shadow-card space-y-7.5'>
             <div className="flex w-full flex-col">
@@ -231,8 +244,16 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             <CardBody className='p-0'>
                                 <div className='flex flex-col gap-7.5 pb-2'>
                                     <h3 className='text-h5 lg:text-h3 primary-gradient-100 font-bold'>Reviews</h3>
-                                    <ReviewCard />
-                                    <ReviewCard />
+                                    {reviews.length > 0 ? (
+                                        reviews.map((review) => (
+                                            <ReviewCard key={review.id} review={review} />
+                                        ))
+                                    ) : (
+                                        <EmptyPlaceholder
+                                            title="No reviews found"
+                                            description="Be the first to review this product"
+                                        />
+                                    )}
                                 </div>
                             </CardBody>
                         </Card>

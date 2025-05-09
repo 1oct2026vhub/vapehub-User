@@ -1,4 +1,4 @@
-import { ORDER_STATUS } from "@/lib/config/order.config";
+import { ORDER_STATUS, OrderStatus } from "@/lib/config/order.config";
 import { cn } from "@/lib/utils";
 
 const OrderStatusBadge = ({status}: {status: ORDER_STATUS}) => {
@@ -17,11 +17,12 @@ const OrderStatusBadge = ({status}: {status: ORDER_STATUS}) => {
             "bg-skin-white border-skin-primary-400 text-skin-primary-400": status === ORDER_STATUS.RETURN_APPROVED,
             "bg-skin-white border-skin-primary2-400 text-skin-primary2-400": status === ORDER_STATUS.RETURN_RECEIVED,
             "bg-skin-base border-skin-neutral-100 text-skin-black": status === ORDER_STATUS.REFUNDED,
+            "bg-skin-base border-skin-neutral-100 text-primary-400": status === ORDER_STATUS.OUT_FOR_DELIVERY,
         }
     );
 
     return (
-        <div className={statusColor}>{status}</div>
+        <div className={statusColor}>{OrderStatus.find(item => item.name === status)?.label || status}</div>
     )
 }
 

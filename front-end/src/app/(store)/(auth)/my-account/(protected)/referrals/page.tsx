@@ -21,9 +21,10 @@ const AccountReferrals: NextPage = async (): Promise<AsyncReactElement> => {
                 <div>
                     <h3 className="text-title-3 md:text-title-2 font-semibold text-skin-neutral-400 mb-2">Referral Rewards</h3>
                     <p className="text-content-2 text-skin-neutral-300 mb-4 max-w-md">
-                        Earn points for every friend you refer! Share your referral link, and when your friends sign up and make their first purchase, you both get rewarded. Points can be redeemed for discounts and special offers.
+                    You have been invited to shop at VapeHub and you’ve got a 10% discount waiting for you! Use the coupon code to claim your offer.
+                    
                     </p>
-                    <div className="flex flex-wrap gap-6">
+                    {/* <div className="flex flex-wrap gap-6">
                         <div className="flex flex-col items-start">
                             <span className="text-skin-neutral-500 text-sm">Total Points</span>
                             <span className="text-title-2 font-bold text-skin-accent-400">{data.total_points}</span>
@@ -32,15 +33,12 @@ const AccountReferrals: NextPage = async (): Promise<AsyncReactElement> => {
                             <span className="text-skin-neutral-500 text-sm">Total Referrals</span>
                             <span className="text-title-2 font-bold">{data.recent_referrals.length}</span>
                         </div>
-                        {/* <div className="flex flex-col items-start">
-                            <span className="text-skin-neutral-500 text-sm">Registered & Purchased</span>
-                            <span className="text-title-2 font-bold">{data.total_referrals}</span>
-                        </div> */}
+                         
                         <div className="flex flex-col items-start">
                             <span className="text-skin-neutral-500 text-sm">Pending Referrals</span>
                             <span className="text-title-2 font-bold">{data.pending_referrals}</span>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="mt-6 md:mt-0 md:ml-8 flex-shrink-0">
                     <Link

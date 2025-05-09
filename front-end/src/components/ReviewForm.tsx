@@ -5,11 +5,14 @@ import { Textarea } from '@nextui-org/input';
 
 interface ReviewFormProps {
     onSubmit: (rating: number, review: string) => void;
+    isEditReview: boolean;
+    currentRating: number;
+    currentReview: string;
 }
 
-const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit }) => {
-    const [rating, setRating] = useState(0);
-    const [review, setReview] = useState('');
+const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, isEditReview, currentRating, currentReview }) => {
+    const [rating, setRating] = useState(isEditReview ? currentRating : 0);
+    const [review, setReview] = useState(isEditReview ? currentReview : '');
     const [hoverRating, setHoverRating] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
 

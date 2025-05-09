@@ -1,11 +1,11 @@
 "use client"
-import { Button } from '@nextui-org/react';
+import { Button, Link } from '@nextui-org/react';
 import { TrashIcon, DangerIcon } from '@/components/Icons';
 import { useCart } from '@/lib/context/CartContext';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
-import QuantitySelector from './QuantitySelector';
+import QuantitySelector from './QuantitySelector'; 
 
 type CartCardProps = {
   item?: CartItem;
@@ -42,9 +42,9 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
 
         <div className="flex flex-col gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 md:gap-8 justify-between">
-            <p className="text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
+            <Link href={`/${item.product_slug}`} className="cursor-pointer text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
               {item.name}
-            </p>
+            </Link>
 
             {/* Price Section */}
             <div className="text-right">

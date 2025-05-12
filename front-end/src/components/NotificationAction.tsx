@@ -108,7 +108,8 @@ const NotificationAction: React.FC = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm text-gray-900 truncate">{notification.title}</div>
-                        <div className="text-xs text-gray-600 truncate">{notification.message}</div>
+                        {/* after 3 lines, add ... */}
+                        <div className="text-xs text-gray-600 truncate whitespace-normal line-clamp-2">{notification.message}</div>
                         <div className="text-[11px] text-gray-400 mt-1">{new Date(notification.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</div>
                       </div>
                       {!notification.is_read && <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full" />}

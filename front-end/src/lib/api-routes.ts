@@ -62,6 +62,7 @@ export const API_ROUTES = {
     GET_REVIEW_ORDER: (productId: number, userId: number) => buildRequestUrl(`/api/review?product_id=${productId}&user_id=${userId}&is_visible=true`),
     GET_REVIEW_ORDER_BY_PRODUCT_ID: (productId: number) => buildRequestUrl(`/api/review/product/${productId}?page=1&limit=10&is_visible=true`),
     UPDATE_REVIEW_ORDER: (orderId: number) => buildRequestUrl(`/api/review/${orderId}`),
+    DELETE_REVIEW_ORDER: (orderId: number) => buildRequestUrl(`/api/review/${orderId}`),
 }
 
 // * Helper functions

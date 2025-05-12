@@ -1,7 +1,7 @@
+import NoImage from "@/components/NoImage";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { AttributeTerms } from "@/lib/config/product.config";
-import Image from "next/image";
 import React from "react";
 
 interface FeatureCardProps {
@@ -56,13 +56,8 @@ interface ProductFeaturesProps {
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, subtitle }) => (
     <div className="feature-card w-full flex basis-[1/6] min-h-24 md:max-w-xs">
-        <Image
-            src={imageSrc}
-            alt={altText}
-            width={58}
-            height={58}
-            className="max-w-9 lg:max-w-fit"
-        />
+        
+        <NoImage src={imageSrc} alt={altText} width={58} height={58} />
         <div className="text-content-2 md:text-title-2 xl:text-title-1 text-center">
             <h4 className="font-semibold text-skin-neutral-400 capitalize">{title}</h4>
             <h5 className="font-bold text-skin-primary-400">{subtitle}</h5>
@@ -81,7 +76,7 @@ const ProductFeatures: React.FC<ProductFeaturesProps> = ({ productFeatures }) =>
                     features?.[index] && (
                     <FeatureCard
                         key={index}
-                        imageSrc={features?.[index]?.imageSrc || ""}
+                        imageSrc={feature.attribute.image_url || ""}
                         altText={feature.attribute.name}
                         title={feature.attribute.name}
                         subtitle={feature.terms?.[0]?.name}

@@ -117,7 +117,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       price: item.variant.price || '0',
       discount_price: item.variant.discount_price || '0',
       variant_id: item.variant_id,
-      stock: item.variant.stock,
+      stock: item.variant.stock_status === 'in_stock' ? item.variant.stock : 0,
       slug: item.product.slug,
       description: item.variant.description,
       ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
@@ -137,7 +137,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       price: data.price,
       discount_price: data.discount_price,
       variant_id: variantId,
-      stock: data.stock,
+      stock: data.stock_status === 'in_stock' ? data.stock : 0,
       slug: data.slug,
       description: "",
       ProductImages: data.primary_image?.url || "",
@@ -174,7 +174,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       );
 
       // Check if there's enough stock available
-      const stockAvailable = data.stock || 0;
+      const stockAvailable = data.stock_status === 'in_stock' ? data.stock : 0;
       const requestedQuantity = existingItem ? existingItem.quantity + quantity : quantity;
 
       if (requestedQuantity > stockAvailable) {

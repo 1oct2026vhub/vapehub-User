@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_FORM_TYPE, APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
 import { applyCoupon } from '@/lib/server.actions'
-import { ServerActionStatus } from '@/lib/config/app.config'
+import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
 import { toast } from 'sonner'
 import { useState } from 'react'
 import { Form } from './ui/Form'
@@ -25,6 +25,7 @@ interface CouponFormProps {
 const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', cartTotal }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isApplied, setIsApplied] = useState(!!initialCouponCode);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const form = useForm<APPLY_COUPON_FORM_TYPE>({
         resolver: zodResolver(APPLY_COUPON_FORM_SCHEMA),
@@ -35,17 +36,23 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
     });
 
     const handleApplyCoupon = async (data: APPLY_COUPON_FORM_TYPE) => {
-
-        const response = await applyCoupon(data as unknown as APPLY_COUPON_PAYLOAD);
-        if (response.status === ServerActionStatus.SUCCESS) {
+        if (cartTotal < 100) {
+            setErrorMessage(`The minimum spend for this coupon is ${DEFAULT_CURRENCY_SYMBOL}100.00.`);
+            return;
+        } else {
+            setErrorMessage(null);
+        }
+        const response = await applyCoupon(data as APPLY_COUPON_PAYLOAD);
+        if (response.status === ServerActionStatus.SUCCESS) { 
             setIsApplied(true);
             setIsEditing(false);
+            const discountAmount = (cartTotal - response.data.total).toFixed(2);
             onCouponApplied({
                 value: cartTotal - response.data.total,
                 isApplied: true,
                 code: data.couponCode || null,
-                message: response.data.coupon.description,
-                discountValue: response.data.coupon.discount_value
+                message: response.data.referral_value_type === "percentage" ? `Extra ${response.data.referral_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.referral_value} off`,
+                discountValue: (discountAmount).toString()
             });
         } else {
             toast.error(response.message);
@@ -95,12 +102,11 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                             color="primary"
                             type='button'
                             className="btn shadow-button bg-skin-neutral-500 !text-skin-white !p-4 !w-fit !min-w-fit !rounded-10"
-                            startContent={<EditIcon2 />}
-                            onPress={() => handleEdit()}
-                            isLoading={form.formState.isSubmitting}
+                            isIconOnly
+                            onPress={() => handleEdit()} 
                             isDisabled={!isEditing ? false : !form.formState.isValid}
                         >
-                            Edit
+                            <EditIcon2 />
                         </Button>)
                         :
                         <Button
@@ -117,6 +123,9 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                         </Button>
                 }
             </form>
+            {errorMessage && (
+                <div className="text-red-600 mt-2 text-sm">{errorMessage}</div>
+            )}
         </Form>
     );
 };

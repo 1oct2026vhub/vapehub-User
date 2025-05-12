@@ -80,6 +80,7 @@ export interface productAttributeTerms {
     id: number;
     name: string;
     type: string;
+    image_url: string;
     is_visible: boolean;
     is_visible_page: boolean;
     used_in_variation: boolean;
@@ -226,6 +227,7 @@ export interface ProductVariant {
     term_id: number;
     term_name: string;
     term_slug: string;
+    attribute_image_url: string;
     }[];
     id: number;
     slug: string;

@@ -59,7 +59,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
     const product: ProductViewDetails = data?.product;
     const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;
-    const stock = isVariant && productVariant ? productVariant.stock : 0;
+
+    const stock = isVariant && productVariant ? productVariant.stock_status === 'in_stock' ? productVariant.stock : 0 : 0;
     const attributesName = isVariant ? productVariant?.attributes.map(attr => attr.term_name).join(', ') : '';
     const productName =  `${product?.name} ${attributesName ? ` - ${attributesName}` : ''}` 
     const availableAttributes: AttributeTerms[] = data.available_terms;

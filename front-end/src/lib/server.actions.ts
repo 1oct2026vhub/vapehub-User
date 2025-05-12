@@ -567,3 +567,11 @@ export const getReviewOrderByProductId = async (productId: number): Promise<Serv
     method: 'GET',
   });
 };
+
+// delete review order
+export const deleteReviewOrder = async (orderId: number): Promise<ServerActionResponse<{message: string}>> => {
+  return await handleRequest<{message: string}, unknown>({
+    endpoint: API_ROUTES.DELETE_REVIEW_ORDER(orderId),
+    method: 'DELETE',
+  });
+};

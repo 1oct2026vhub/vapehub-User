@@ -161,8 +161,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 </div>
                 {/* Title section mobile ends */}
 
-                <div className='space-y-4 w-full lg:w-fit '>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full lg:w-[400px] xl:w-[550px] h-fit'>
+                <div className='space-y-4 w-full lg:w-fit'>
+                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
                         <CustomImageMagnifier
                             src={mainImage?.url || ''}
                             alt={product?.name || ''}
@@ -185,7 +185,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         {
                             allImages.map((image, index) => (
                                 <div key={index}>
-                                    <div className='px-0.5 py-1.5 bg-skin-base flex items-center justify-center '>
+                                    <div className='px-0.5 py-1.5 bg-skin-base flex items-center justify-center'>
 
                                         <Button
                                             onPress={() => setMainImage(image)}

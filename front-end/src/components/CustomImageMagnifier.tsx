@@ -114,7 +114,7 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
           alt={alt}
           width={width}
           height={height}
-          className={className + ' min-h-[230px] max-h-[230px]'}
+          className={className + ' min-h-[230px]'}
         />
       </div>
     </div>

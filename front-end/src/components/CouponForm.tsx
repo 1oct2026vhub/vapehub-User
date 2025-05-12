@@ -22,7 +22,7 @@ interface CouponFormProps {
     cartTotal: number;
 }
 
-const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', cartTotal }) => {
+const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', cartTotal}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isApplied, setIsApplied] = useState(!!initialCouponCode);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -83,31 +83,28 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
     return (
         <Form {...form}>
             <form noValidate onSubmit={form.handleSubmit(handleApplyCoupon)} className='flex items-start gap-3'>
-                <InputForm
-                    type='text'
-                    label="Coupon Code"
-                    isRequired
-                    className='xl:min-w-[366px]'
-                    control={form.control}
-                    name='couponCode'
-                    isDisabled={isApplied && !isEditing}
-                />
+                <div className='flex flex-col w-full'>
+                    <InputForm
+                        type='text'
+                        label="Coupon Code"
+                        isRequired
+                        className='xl:min-w-[366px]'
+                        control={form.control}
+                        name='couponCode'
+                        isDisabled={isApplied && !isEditing}
+                    />
+                    
+                </div>
 
                 {
                     isApplied ? (
-
-                        <Button
-                            size="lg"
-                            radius="md"
-                            color="primary"
+                        <button                           
                             type='button'
-                            className="btn shadow-button bg-skin-neutral-500 !text-skin-white !p-4 !w-fit !min-w-fit !rounded-10"
-                            isIconOnly
-                            onPress={() => handleEdit()} 
-                            isDisabled={!isEditing ? false : !form.formState.isValid}
+                            className="btn shadow-button bg-skin-neutral-500 !text-skin-white !p-3 !w-fit !min-w-fit !rounded-10"
+                            onClick={() => handleEdit()}
                         >
                             <EditIcon2 />
-                        </Button>)
+                        </button>)
                         :
                         <Button
                             size="lg"
@@ -117,7 +114,6 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                             isLoading={form.formState.isSubmitting}
                             type='submit'
                             isDisabled={!form.formState.isValid}
-
                         >
                             Apply Code
                         </Button>

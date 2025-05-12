@@ -23,11 +23,29 @@ const CartTotal: React.FC = () => {
                     onCouponApplied={setCouponDiscount}
                     initialCouponCode={couponDiscount.code || ''}
                     cartTotal={cartTotal}
+                   
                 />
                 {couponDiscount.isApplied && (
                     <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
+                        <div className='flex flex-col'>
                         <p>{couponDiscount.message}</p>
+                        <p>Coupon: {couponDiscount.code}</p>
+                        </div>
+                        <div className='flex items-center'>
                         <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
+                        <button 
+                            className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
+                            onClick={() => setCouponDiscount({
+                                value: 0,
+                                isApplied: false,
+                                code: null,
+                                message: null,
+                                discountValue: ''
+                            })}
+                        >
+                            [Remove]
+                        </button>
+                        </div>
                     </div>
                 )}
                 <Divider className='border-2' />

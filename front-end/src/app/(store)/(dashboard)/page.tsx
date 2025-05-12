@@ -13,6 +13,10 @@ const DynamicHomeCarousel = dynamic(() => import('./_components/HomeCarousel'), 
   loading: () => <SuspenseLoader />
 });
 
+const DynamicWelcomeSection = dynamic(() => import('./_components/WelcomeSection'), {
+  loading: () => <SuspenseLoader />
+});
+
 const DynamicTrustPilotRatingCard = dynamic(() => import('./_components/TrustPilotRatingCard'), {
   loading: () => <SuspenseLoader />
 });
@@ -105,6 +109,10 @@ const Dashboard: NextPage<{searchParams: Promise<{referral_code: string}>}> = as
     <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
       <Suspense fallback={<SuspenseLoader />}>
         <DynamicHomeCarousel banners={data.carousel.status === ServerActionStatus.SUCCESS ? data.carousel.data : []} />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <DynamicWelcomeSection />
       </Suspense>
 
       <section className="flex flex-col gap-4.5 md:gap-10 max-md:mt-4.5">

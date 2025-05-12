@@ -7,10 +7,10 @@ const WelcomeSection = () => {
             <div className='space-y-4 text-neutral-900 text-content-1 md:text-title-2 font-medium'>
                 <h1 className='text-h4 lg:text-h2 font-bold'>Welcome to <span className='primary-gradient-600'>Vapehub</span></h1>
                 <p>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
                 </p>
                 <p>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s.
                 </p>
                 <p>
                     Lorem Ipsum is simply dummy text of the printing and typesetting industry. 

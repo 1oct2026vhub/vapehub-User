@@ -377,6 +377,8 @@ export interface CouponResponse {
     subTotal: number;
     total: number;
     coupon: Coupon;
+    referral_value: number;
+    referral_value_type: "percentage" | "fixed";
 }
 
 export interface REVIEW_ORDER_PAYLOAD {

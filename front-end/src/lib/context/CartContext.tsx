@@ -34,6 +34,8 @@ interface CartContextType {
   checkoutStockValidation: () => Promise<boolean>;
   stockValidationErrors: Array<{ itemId: number; message: string; isOutOfStock: boolean }>;
   stockValidationLoading: boolean;
+  isRemoveCoupon: boolean;
+  setIsRemoveCoupon: (isRemoveCoupon: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -56,7 +58,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     message: null,
     discountValue: ''
   });
-
+  const [isRemoveCoupon, setIsRemoveCoupon] = useState<boolean>(false);
   const [itemCount, setItemCount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -443,6 +445,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     checkoutStockValidation,
     stockValidationErrors,
     stockValidationLoading,
+    isRemoveCoupon,
+    setIsRemoveCoupon
   };
 
   return (

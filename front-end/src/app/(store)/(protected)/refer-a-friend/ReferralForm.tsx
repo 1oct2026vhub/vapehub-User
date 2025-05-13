@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,6 +11,9 @@ import { FacebookShareIcon, TwitterXIcon, WhatsAppIcon } from '@/components/Icon
 import { Button } from '@nextui-org/button';
 import InputForm from '@/components/InputForm';
 import { Form } from '@/components/ui/Form';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/routes';
 
 const emailSchema = z.object({
     email: z.string().email('Please enter a valid email address'),
@@ -27,7 +30,8 @@ export default function ReferralForm({ referralCode }: ReferralFormProps) {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
     const shareUrl = `${baseUrl}?referral_code=${referralCode}`;
     const shareMessage = encodeURIComponent(`Check out this awesome store! Use my referral code ${referralCode} for a discount on your first purchase.`);
-
+    const {status} = useSession();
+    const router = useRouter();
     const form = useForm<EmailFormData>({
         mode: 'all',
         resolver: zodResolver(emailSchema),
@@ -70,6 +74,11 @@ export default function ReferralForm({ referralCode }: ReferralFormProps) {
         }
     };
 
+    useEffect(() => {
+        if (status === 'unauthenticated') {
+             router.push(ROUTES.MY_ACCOUNT);
+        }
+    }, [status]);
     return (
         <div className="w-full flex flex-col gap-4">
 

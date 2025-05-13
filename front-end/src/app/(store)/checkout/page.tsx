@@ -28,11 +28,11 @@ const CheckoutPage: NextPage = (): ReactElement => {
     }, [status, router]);
 
     if (status === 'loading') {
-        return <div>Loading...</div>;
+        return <div className='text-center font-bold h-scree'>Loading...</div>;
     }
 
     if (status === 'unauthenticated') {
-        return <div>Redirecting to login...</div>;
+        return <div className='text-center font-bold h-screen'>Redirecting to login...</div>;
     }
 
     if (itemCount === 0) {

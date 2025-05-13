@@ -6,9 +6,10 @@ import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_FORM_TYPE, APPLY_COUPON_PAYLOAD 
 import { applyCoupon } from '@/lib/server.actions'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
 import { toast } from 'sonner'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Form } from './ui/Form'
 import InputForm from './InputForm'
+import { useCart } from '@/lib/context/CartContext'
 
 interface CouponFormProps {
     onCouponApplied: (discount: {
@@ -26,6 +27,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
     const [isEditing, setIsEditing] = useState(false);
     const [isApplied, setIsApplied] = useState(!!initialCouponCode);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { isRemoveCoupon, setIsRemoveCoupon } = useCart();
 
     const form = useForm<APPLY_COUPON_FORM_TYPE>({
         resolver: zodResolver(APPLY_COUPON_FORM_SCHEMA),
@@ -79,6 +81,15 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             discountValue: ''
         });
     };
+
+    useEffect(() => {
+        if (isRemoveCoupon) {
+            handleEdit();
+            form.reset({ couponCode: '', shippingMethodId: 0 });
+            setIsRemoveCoupon(false);
+
+        } 
+    }, [isRemoveCoupon]);
 
     return (
         <Form {...form}>

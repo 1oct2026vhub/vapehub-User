@@ -9,7 +9,7 @@ import React from 'react'
 import CouponForm from '@/components/CouponForm'
 
 const CartTotal: React.FC = () => {
-    const { cartTotal, itemCount, setCouponDiscount, couponDiscount } = useCart();
+    const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon } = useCart();
     const { selectedShippingMethod } = useCheckout();
 
     const shippingCost = selectedShippingMethod?.shipping_cost || 0;
@@ -35,13 +35,7 @@ const CartTotal: React.FC = () => {
                         <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
                         <button 
                             className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
-                            onClick={() => setCouponDiscount({
-                                value: 0,
-                                isApplied: false,
-                                code: null,
-                                message: null,
-                                discountValue: ''
-                            })}
+                            onClick={() => setIsRemoveCoupon(true)}
                         >
                             [Remove]
                         </button>

@@ -14,7 +14,7 @@ import { CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
 
 const CartDetails: React.FC = () => {
     const { status } = useSession();
-    const { cartTotal, itemCount, couponDiscount, setCouponDiscount, checkoutStockValidation, stockValidationLoading } = useCart();
+    const { cartTotal, itemCount, couponDiscount, setCouponDiscount, checkoutStockValidation, stockValidationLoading, setIsRemoveCoupon } = useCart();
     const router = useRouter();
 
     const handleCheckout = async () => {
@@ -48,13 +48,7 @@ const CartDetails: React.FC = () => {
                                 <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
                                 <button 
                                     className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
-                                    onClick={() => setCouponDiscount({
-                                        value: 0,
-                                        isApplied: false,
-                                        code: null,
-                                        message: null,
-                                        discountValue: ''
-                                    })}
+                                    onClick={() => setIsRemoveCoupon(true)}
                                 >
                                     [Remove]
                                 </button>

@@ -79,7 +79,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const response = await getCartItems();
 
         if (response.status === ServerActionStatus.SUCCESS) {
-          const cartItems: CartItem[] = response.data.map(bindCartItem);
+          const cartData = response.data.filter(item => item.product);
+          const cartItems: CartItem[] = cartData.map(bindCartItem);
           setCartItems(cartItems);
           calculateTotals(cartItems);
         }
@@ -377,7 +378,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await getCartItems();
 
       if (response.status === ServerActionStatus.SUCCESS) {
-        const cartItems: CartItem[] = response.data.map(bindCartItem);
+        const cartData = response.data.filter(item => item.product);
+        const cartItems: CartItem[] = cartData.map(bindCartItem);
         setCartItems(cartItems);
         calculateTotals(cartItems);
       } else {

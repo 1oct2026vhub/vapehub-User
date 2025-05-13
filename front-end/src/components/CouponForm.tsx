@@ -46,8 +46,13 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
         }
         const response = await applyCoupon(data as APPLY_COUPON_PAYLOAD);
         if (response.status === ServerActionStatus.SUCCESS) { 
+            if(!response.data?.referral_value) {
+                toast.error("Invalid coupon code");
+                return;
+
+            }
             setIsApplied(true);
-            setIsEditing(false);
+            setIsEditing(false);            
             const discountAmount = (cartTotal - response.data.total).toFixed(2);
             onCouponApplied({
                 value: cartTotal - response.data.total,

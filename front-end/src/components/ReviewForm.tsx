@@ -88,7 +88,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, isEditReview, current
                 className="w-full"
                 isDisabled={rating === 0 || !review.trim()}
             >
-                Submit Review
+                {isEditReview ? "Update Review" : "Submit Review"}
             </Button>
         </form>
     );

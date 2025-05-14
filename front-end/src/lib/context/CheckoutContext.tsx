@@ -2,18 +2,16 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS } from '@/lib/config/checkout.config';
-import { placeOrder } from '@/lib/server.actions';
-import { ServerActionStatus } from '@/lib/config/app.config'; 
 import { ROUTES } from '@/lib/routes';
 import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
 import { useWorldPay } from '@/lib/hooks/useWorldpay';
 import { toast } from 'sonner';
-import { SHIPPING_METHOD_DATA } from '../config/order.config';
+import { ORDER_RESPONSE_DATA, SHIPPING_METHOD_DATA } from '../config/order.config';
 
 interface CheckoutContextType {
     selectedShippingMethod: SHIPPING_METHOD_DATA | null;
     setSelectedShippingMethod: (method: SHIPPING_METHOD_DATA) => void;
-    handlePlaceOrder: (data: CHECKOUT_PAYLOAD) => Promise<void>;
+    handlePlaceOrder: (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => Promise<void>;
     isProcessing: boolean;
 }
 
@@ -37,12 +35,11 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
     const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
      
-    const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD) => { 
+    const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => { 
         try {
             setIsProcessing(true);
-            const response = await placeOrder(data); 
-            if (response.status === ServerActionStatus.SUCCESS) {
-                const orderData = response.data.data;
+           
+                const orderData = response.data;
                 if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
                     // Initiate Viva Wallet payment
                     await initiateVivaPayment({                        
@@ -56,7 +53,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                         orderReference: String(orderData.order_code),
                         customerEmail: data.email,
                         customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
-                        orderDescription: `Order #${response.data.message}`,
+                        orderDescription: `Order #${response.message}`,
                         returnUrl: `${window.location.origin}${ROUTES.PAYMENT_SUCCESS}`,
                         cancelUrl: `${window.location.origin}${ROUTES.PAYMENT_FAILED}`,
                         billingAddress: {
@@ -78,10 +75,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                     });
                 }
                 // clearCart();
-                
-            } else {
-                toast.error(response.message);
-            }
+                 
         } catch (error) {
             console.error('Place order error:', error);
             toast.error('An error occurred while placing your order. Please try again.');

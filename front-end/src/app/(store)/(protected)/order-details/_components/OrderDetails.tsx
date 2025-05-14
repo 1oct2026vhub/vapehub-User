@@ -1,12 +1,13 @@
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config'
-import { ORDER } from '@/lib/config/order.config'
+import { ORDER, REFERRAL } from '@/lib/config/order.config'
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils'
 import React from 'react'
 type OrderDetailsProps = {
-    data: ORDER
+    data: ORDER;
+    referral: REFERRAL
 }
 
-const OrderDetails: React.FC<OrderDetailsProps> = ({data}) => {
+const OrderDetails: React.FC<OrderDetailsProps> = ({data, referral}) => {
     return (
         <div className='flex flex-col gap-4 md:gap-6 max-md:pb-6 border-b md:border-r md:border-b-0 border-skin-neutral-200 w-full md:w-[50%] xl:w-[60%]'>
             <div className='space-y-2'>
@@ -56,6 +57,19 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data}) => {
                     <p>{data.shippingMethod?.shipping_method || ""}</p>
                 </div>
             </div>
+
+            {
+                    referral && (
+                    <div className='space-y-2'>
+                        <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Applied Coupon</h4>
+                        <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
+                            <p>{referral.coupon_code}</p>
+                           <p>{referral.coupon_type === "percentage" ? `Extra ${referral.coupon_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${referral.coupon_value} off`}</p>
+                           <p>Discount: -{referral.coupon_discount}</p>
+                        </div>
+                    </div>
+                )
+            }
 
             <div className='space-y-2'>
                 <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order ID</h4>

@@ -90,4 +90,15 @@ export type StockValidationResponse = {
     isOutOfStock: boolean;
 }
 
+export type UnAvailableItem = {
+  id: number;
+  name: string;
+  price: string;
+  quantity: number;
+  ProductImages: string;
+  isOutOfStock: boolean;
+  isInsufficientStock: boolean;
+  isDeleted: boolean;
+  errorMessage: string | null;
+}
 

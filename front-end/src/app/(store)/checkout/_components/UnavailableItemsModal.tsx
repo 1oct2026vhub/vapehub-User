@@ -15,19 +15,14 @@ const UnavailableItemsModal: React.FC<UnavailableItemsModalProps> = ({
   isOpen,
   onClose 
 }) => {
-  const { removeItem, unAvailableItems, checkoutStockValidation } = useCart();
+  const { removeItem, unAvailableItems } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Handle removal of an unavailable item
   const handleRemoveItem = async (itemId: number) => {
     setIsProcessing(true);
     await removeItem(itemId);
-    
-    // Check if any issues remain after removal
-    const isValid = await checkoutStockValidation();
-    if (isValid) {
-      onClose(); // Close modal if all issues are resolved
-    }
+    onClose();
     setIsProcessing(false);
   };
 

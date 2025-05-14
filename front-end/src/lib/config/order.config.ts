@@ -189,10 +189,18 @@ export interface ORDER_LIST_RESPONSE {
 
 }
 
+export interface REFERRAL {
+    coupon_code: string;
+    coupon_value: string;
+    coupon_type: string;
+    coupon_discount: number;
+}
 
 export interface ORDER_DETAILS_RESPONSE {
    order: ORDER;
    user: USER_ADDRESS_RESPONSE;
+   referral: REFERRAL;
+   
 }
 export interface OrderItems {
     id: number;

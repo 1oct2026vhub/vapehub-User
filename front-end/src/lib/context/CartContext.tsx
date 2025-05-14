@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem } from '../config/cart.config';
+import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, UnAvailableItem } from '../config/cart.config';
 import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation } from '../server.actions';
 import { getCookie, setCookie } from 'cookies-next';
 import { ServerActionStatus } from '../config/app.config';
@@ -36,6 +36,8 @@ interface CartContextType {
   stockValidationLoading: boolean;
   isRemoveCoupon: boolean;
   setIsRemoveCoupon: (isRemoveCoupon: boolean) => void;
+  validateCartItems: () => Promise<UnAvailableItem[]>;
+  unAvailableItems: UnAvailableItem[];
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -51,6 +53,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = status === 'authenticated';
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
   const [cartTotal, setCartTotal] = useState<number>(0);
+  const [unAvailableItems, setUnAvailableItems] = useState<UnAvailableItem[]>([]);
   const [couponDiscount, setCouponDiscount] = useState<CouponDiscount>({
     value: 0,
     isApplied: false,
@@ -79,7 +82,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const response = await getCartItems();
 
         if (response.status === ServerActionStatus.SUCCESS) {
-          const cartData = response.data.filter(item => item.product);
+          const cartData = response.data;
           const cartItems: CartItem[] = cartData.map(bindCartItem);
           setCartItems(cartItems);
           calculateTotals(cartItems);
@@ -352,7 +355,29 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
     return true;
   }
-
+ 
+  const validateCartItems = async () => {
+    const response = await getCartItems();
+    if (response.status === ServerActionStatus.SUCCESS) {
+      const cartData = response.data.filter(item => (item.product.deletedAt || item.variant.deleted_at));
+      const unAvailableItems: UnAvailableItem[] = cartData.map(item => ({
+        id: item.id,
+        name: item.product.name,
+        price: item.variant.price, 
+        quantity: item.quantity,       
+        ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
+        isOutOfStock: item.variant.stock_status === 'out_of_stock' || item.variant.stock === 0,
+        isInsufficientStock: item.variant.stock_status === 'in_stock' && item.variant.stock < item.quantity,
+        isDeleted: (item.product.deletedAt || item.variant.deleted_at) ? true : false,
+        errorMessage: item.variant.stock_status === 'out_of_stock' ? 'This item is out of stock' : item.variant.stock_status === 'in_stock' && item.variant.stock < item.quantity ? 'This item has insufficient stock' : item.product.deletedAt || item.variant.deleted_at ? 'This item is no longer available' : null
+     }));
+      setUnAvailableItems(unAvailableItems);
+      return unAvailableItems;
+    }
+    setUnAvailableItems([]);
+    return [];
+    
+  }
   // Add new useEffect to handle automatic cart sync on authentication
   useEffect(() => {
     const handleAuthChange = async () => {
@@ -378,7 +403,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await getCartItems();
 
       if (response.status === ServerActionStatus.SUCCESS) {
-        const cartData = response.data.filter(item => item.product);
+        const cartData = response.data
         const cartItems: CartItem[] = cartData.map(bindCartItem);
         setCartItems(cartItems);
         calculateTotals(cartItems);
@@ -448,7 +473,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     stockValidationErrors,
     stockValidationLoading,
     isRemoveCoupon,
-    setIsRemoveCoupon
+    setIsRemoveCoupon,
+    validateCartItems,
+    unAvailableItems
   };
 
   return (

@@ -7,7 +7,7 @@ import { CHECKOUT_FORM_SCHEMA, CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS, type 
 import InputForm from '@/components/InputForm';
 import CustomCheckbox from '@/components/FormCheckbox';
 import { CustomRadio } from '@/components/CustomRadio';
-import { Button, RadioGroup } from '@nextui-org/react';
+import { Button, RadioGroup, useDisclosure } from '@nextui-org/react';
 import { Form } from '@/components/ui/Form';
 import { useCheckout } from '@/lib/context/CheckoutContext';
 import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config';
@@ -18,17 +18,20 @@ import { Address } from '@/lib/config/user.config';
 import { useUserProfile } from '@/lib/hooks/useUserProfile';
 import Flag from '@/components/ui/Flag';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
-import { getShippingMethods } from '@/lib/server.actions';
+import { getShippingMethods, placeOrder } from '@/lib/server.actions';
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
+import { toast } from 'sonner';
+import UnavailableItemsModal from './UnavailableItemsModal';
 
 const CheckoutDetails: React.FC = () => {
     const { fetchProfile } = useUserProfile();
     const [shippingAsBilling, setShippingAsBilling] = useState(true);
     const [shippingMethods, setShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
     const [originalShippingMethods, setOriginalShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const form = useForm<CHECKOUT_FORM_TYPE>({
         resolver: zodResolver(CHECKOUT_FORM_SCHEMA(shippingAsBilling)),
         mode: 'all',
@@ -63,12 +66,20 @@ const CheckoutDetails: React.FC = () => {
         }
     });
     const { selectedShippingMethod, setSelectedShippingMethod, handlePlaceOrder, isProcessing } = useCheckout();
-    const { cartTotal, couponDiscount } = useCart();
+    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
 
 
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
+        // Validate cart items before proceeding with order
+        const isCartValid = await validateCartItems();
+         
+        if (isCartValid.length) {
+            // Display modal if there are validation errors
+            onOpen();
+            return;
+        }
 
         // Handle form submission
         if (!data) return;
@@ -108,10 +119,17 @@ const CheckoutDetails: React.FC = () => {
 
         };;
 
-        await handlePlaceOrder(orderPayload);
-        form.reset();
-        setSelectedShippingMethod(shippingMethods[0]);
-        setShowNewAddressForm(false);
+
+        const response = await placeOrder(orderPayload);
+        if (response.status == ServerActionStatus.SUCCESS) {
+            await handlePlaceOrder(orderPayload, response.data);
+            form.reset();
+            setSelectedShippingMethod(shippingMethods[0]);
+            setShowNewAddressForm(false);
+        } else {
+           toast.error(response.message);
+        }
+         
 
     };
 
@@ -170,6 +188,11 @@ const CheckoutDetails: React.FC = () => {
         form.setValue('billingRegion', place.region);
     }
 
+    // Custom modal close handler to refresh cart data
+    const handleModalClose = () => {
+        fetchCartItems(); // Refresh cart data after potential changes in the modal
+        onClose();
+    };
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -606,6 +629,12 @@ const CheckoutDetails: React.FC = () => {
                     </div>
                 </form>
             </Form>
+            
+            {/* Stock validation modal */}
+            <UnavailableItemsModal 
+                isOpen={isOpen} 
+                onClose={handleModalClose}  
+            />
         </div>
     );
 };

@@ -40,14 +40,6 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
           dots: true,
         },
       },
-      {
-        breakpoint: 390,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1, 
-          dots: true, 
-        },
-      },
     ],
   };
  
@@ -56,7 +48,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
   return (
     <Slider {...settings}>
       {products.map((product, index) => (
-        <div key={index} className="px-1 md:px-2 xl:px-5 py-4 first:pl-0">
+        <div key={index} className="px-2 xl:px-5 py-4 first:pl-0">
           <ProductCard
             title={product?.name} 
             imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ""}

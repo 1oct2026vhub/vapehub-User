@@ -53,7 +53,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
             </div>
           </div>
 
-          <div className="flex items-center gap-5 justify-between">
+          <div className="flex items-center gap-5 justify-between w-full">
             <div>
               {/* Quantity Selector */}
               <QuantitySelector item={item} />

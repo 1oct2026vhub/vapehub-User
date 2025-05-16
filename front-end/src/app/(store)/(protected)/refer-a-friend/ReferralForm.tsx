@@ -83,7 +83,7 @@ export default function ReferralForm({ referralCode }: ReferralFormProps) {
         <div className="w-full flex flex-col gap-4">
 
             <div className='flex gap-4 gap-1 justify-center items-center'>
-                <p className='text-content-1 font-semibold rounded-10 bg-skin-neutral-50 px-4 py-3'>{shareUrl}</p>
+                <p className='text-content-1 font-semibold rounded-10 bg-skin-neutral-50 px-4 py-3 truncate'>{shareUrl}</p>
                 <Button
                     radius="sm"
                     color="primary"
@@ -94,7 +94,7 @@ export default function ReferralForm({ referralCode }: ReferralFormProps) {
                 </Button>
 
             </div>
-            <div className='flex md:gap-4 gap-1 flex-wrap justify-center'>
+            <div className='flex gap-4 flex-wrap justify-center'>
                 <Button
                     variant='bordered'
                     color='default'
@@ -102,7 +102,7 @@ export default function ReferralForm({ referralCode }: ReferralFormProps) {
                     startContent={<FacebookShareIcon width={15} height={15} />}
                     onPress={() => window.open(socialLinks.facebook, '_blank')}
                 >
-                    Share via Facebook
+                    <span className='max-sm:hidden'>Share via Facebook</span>
                 </Button>
                 <Button
                     variant='bordered'
@@ -111,7 +111,7 @@ export default function ReferralForm({ referralCode }: ReferralFormProps) {
                     startContent={<TwitterXIcon width={15} height={15} />}
                     onPress={() => window.open(socialLinks.twitter, '_blank')}
                 >
-                    Share via X
+                    <span className='max-sm:hidden'>Share via X</span>
                 </Button>
                 <Button
                     variant='bordered'
@@ -120,7 +120,7 @@ export default function ReferralForm({ referralCode }: ReferralFormProps) {
                     startContent={<WhatsAppIcon width={15} height={15} />}
                     onPress={() => window.open(socialLinks.whatsapp, '_blank')}
                 >
-                    Share via WhatsApp
+                    <span className='max-sm:hidden'>Share via WhatsApp</span>
                 </Button>
 
             </div>

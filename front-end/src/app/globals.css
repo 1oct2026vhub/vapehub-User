@@ -454,11 +454,11 @@ input[type='search'] {
 
 
 .section-slider.blogs-slider .slick-prev {
-  @apply left-[32%] sm:left-[39%] xl:left-[43%]
+  @apply max-[390px]:left-[28%] left-[32%] sm:left-[39%] xl:left-[43%]
 }
 
 .section-slider.blogs-slider .slick-next {
-  @apply right-[32%] sm:right-[39%] xl:right-[43%]
+  @apply max-[390px]:right-[28%] right-[32%] sm:right-[39%] xl:right-[43%]
 }
 
 

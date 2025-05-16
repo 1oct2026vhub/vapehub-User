@@ -278,7 +278,7 @@ input[type='search'] {
 
 .section-slider .slick-prev,
 .section-slider .slick-next {
-  @apply top-auto max-[390px]:-bottom-[7.5%] -bottom-[7%] sm:-bottom-[17%] lg:-bottom-[19%] xl:-bottom-[15.5%] !important;
+  @apply top-auto max-[390px]:-bottom-[6.5%] -bottom-[7%] sm:-bottom-[17%] lg:-bottom-[19%] xl:-bottom-[15.5%] !important;
 }
 
 .section-slider .slick-prev {
@@ -348,12 +348,12 @@ input[type='search'] {
 
 .section-slider.deals-slider .slick-prev,
 .section-slider.deals-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-12.5%] bottom-[-11.5%] sm:bottom-[-15.5%] md:bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-12.8%] !important;
+  @apply top-auto bottom-[-11.5%] sm:bottom-[-15.5%] md:bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-12.8%] !important;
 }
 
 .section-slider.products-slider .slick-prev,
 .section-slider.products-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-6.3%] bottom-[-9.5%] sm:bottom-[-11.5%] md:bottom-[-10%] lg:bottom-[-11.5%] xl:bottom-[-10.2%] 2xl:bottom-[-9.6%] !important;
+  @apply top-auto max-[390px]:bottom-[-10%] bottom-[-9%] sm:bottom-[-11.5%] md:bottom-[-10%] lg:bottom-[-11.5%] xl:bottom-[-10.2%] 2xl:bottom-[-9.6%] !important;
 }
 
 @media screen and (min-width:1890px) {  
@@ -365,11 +365,19 @@ input[type='search'] {
 
 
 .section-slider.products-slider .slick-prev {
-  @apply max-[390px]:left-[18%]
+  @apply max-[390px]:left-[16%]
 }
 
 .section-slider.products-slider .slick-next {
-  @apply max-[390px]:right-[18%]
+  @apply max-[390px]:right-[16%]
+}
+
+.section-slider.deals-slider .slick-prev {
+  @apply max-[390px]:left-[26%]
+}
+
+.section-slider.deals-slider .slick-next {
+  @apply max-[390px]:right-[26%]
 }
 
 .quantity {
@@ -446,11 +454,11 @@ input[type='search'] {
 
 
 .section-slider.blogs-slider .slick-prev {
-  @apply left-[32%] sm:left-[39%] xl:left-[43%]
+  @apply max-[390px]:left-[28%] left-[32%] sm:left-[39%] xl:left-[43%]
 }
 
 .section-slider.blogs-slider .slick-next {
-  @apply right-[32%] sm:right-[39%] xl:right-[43%]
+  @apply max-[390px]:right-[28%] right-[32%] sm:right-[39%] xl:right-[43%]
 }
 
 

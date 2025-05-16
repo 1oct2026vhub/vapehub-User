@@ -89,23 +89,23 @@ const PaymentSuccessPage = () => {
                 </div>
 
                 <div className='py-5 border-t border-b border-skin-neutral-100 w-full space-y-3.5'>
-                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
-                        <p>Transaction ID</p>
-                        <p>{transactionDetails.id}</p>
+                    <div className='flex items-center justify-between gap-2 text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                        <p className='text-nowrap'>Transaction ID</p>
+                        <p className='break-all text-right'>{transactionDetails.id}</p>
                     </div>
-                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                    <div className='flex items-center justify-between gap-2 text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
                         <p>Amount Paid</p>
                         <p>£{transactionDetails.amount}</p>
                     </div>
-                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                    <div className='flex items-center justify-between gap-2 text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
                         <p>Payment Method</p>
                         <p>{transactionDetails.method}</p>
                     </div>
-                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                    <div className='flex items-center justify-between gap-2 text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
                         <p>Date</p>
                         <p>{transactionDetails.date}</p>
                     </div>
-                    <div className='flex items-center justify-between text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                    <div className='flex items-center justify-between gap-2 text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
                         <p>Time</p>
                         <p>{transactionDetails.time}</p>
                     </div>

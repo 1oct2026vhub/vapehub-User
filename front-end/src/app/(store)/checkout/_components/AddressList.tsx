@@ -93,7 +93,7 @@ const AddressList: FunctionComponent<AddressListProps> = ({ selectedAddressId, o
 
             color="primary"
             onPress={() => setShowAll(!showAll)}
-            className="w-fit float-right"
+            className="w-fit"
           >
             {showAll ? "Show Less" : `Show More Addresses (${addresses.length - 3} more)`}
           </Button>

@@ -125,7 +125,7 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
         <div className='space-y-3.5 w-full md:w-[50%] xl:w-[40%]'>
             <h3 className='text-title-2 md:text-h5 text-skin-neutral-400 font-semibold leading-none'>More Action</h3>
             <div className='space-y-3 w-full'>
-                <div className='flex items-center gap-4 justify-between w-full'>
+                <div className='flex items-center flex-wrap gap-4 justify-between w-full'>
                     <div className='flex items-center gap-1'>
                         <Image
                             src="/images/pdfthumb.svg"
@@ -133,7 +133,7 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
                             width={30}
                             height={30}
                         />
-                        <p className='text-skin-neutral-300 text-title-2 font-bold'>Download Invoice</p>
+                        <p className='text-skin-neutral-300 text-title-2 font-bold text-nowrap'>Download Invoice</p>
                     </div>
                     <Button
                         size='sm'

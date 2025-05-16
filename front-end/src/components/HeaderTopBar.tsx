@@ -92,7 +92,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                             <UserIcon />
                         </Link>
                         <Badge color="default" content={itemCount} shape="circle" variant='faded' className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
-                            <Button isIconOnly size="sm" aria-label="more than 99 cart items" radius="full" variant="light" onPress={onOpen}>
+                            <Button isIconOnly size="sm" aria-label="more than 99 cart items" radius="full" variant="light" className='!min-w-fit !w-fit !h-fit' onPress={onOpen}>
                                 <ShoppingCartIcon />
                             </Button>
                         </Badge> 

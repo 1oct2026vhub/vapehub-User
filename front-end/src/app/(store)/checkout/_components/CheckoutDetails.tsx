@@ -262,7 +262,7 @@ const CheckoutDetails: React.FC = () => {
                                     name="phone"
                                     label={
                                         <div className='flex items-center gap-4'>
-                                            <Flag className="group-data-[focus=true]:w-4" />
+                                            <Flag className="group-data-[focus=true]:w-4 group-data-[filled=true]:w-4" />
                                             <div>
                                                 Phone Number
                                                 <span className='text-skin-red-400'> *</span>

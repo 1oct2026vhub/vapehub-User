@@ -474,9 +474,9 @@ export const sendReferralCode = async (payload: {
 };
 
 // referral stats
-export const getReferralStats = async (): Promise<ServerActionResponse<ReferralStatsResponse>> => {
+export const getReferralStats = async (page: number, limit: number): Promise<ServerActionResponse<ReferralStatsResponse>> => {
   return await handleRequest<ReferralStatsResponse, unknown>({
-    endpoint: API_ROUTES.GET_REFERRAL_STATS,
+    endpoint: API_ROUTES.GET_REFERRAL_STATS(page, limit),
     method: 'GET',
   });
 };

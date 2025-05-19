@@ -1,10 +1,10 @@
 "use client"
-import { ReferralStatsResponse } from '@/lib/config/referral.config';
+import { RecentReferrals } from '@/lib/config/referral.config';
 import { Button } from '@nextui-org/button'
 import React, { useState } from 'react'
 
 interface ReferralCardProps {
-    referral: ReferralStatsResponse['recent_referrals']['data'][number];
+    referral: RecentReferrals;
 }
 
 const ReferralCard: React.FC<ReferralCardProps> = ({ referral }) => {

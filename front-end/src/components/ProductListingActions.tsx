@@ -120,7 +120,7 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
                 <DropdownTrigger>
                     <Button
                         variant="bordered"
-                        size="lg"
+                        size="md"
                         radius="md"
                         endContent={<DownArrowIcon />}
                         className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
@@ -140,7 +140,7 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
             </Dropdown>
             <Button
                 variant="bordered"
-                size="lg"
+                size="md"
                 radius="md"
                 endContent={<FilterIcon />}
                 onPress={onOpen}

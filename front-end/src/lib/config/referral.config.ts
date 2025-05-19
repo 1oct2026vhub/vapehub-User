@@ -5,6 +5,23 @@ export interface ReferralMethods {
   status: string;
   primary: boolean;
 }
+export interface RecentReferrals {
+   
+    id: string;
+    referrer_id: number;
+    referred_user_id: number | null;
+    referral_code: string;
+    referral_coupon_code: string;
+    status: "pending" | "completed" | "applied";
+    referral_value_type: "percentage" | "fixed";
+    referral_value: string | null;
+    referred_user: {
+      id: number;
+      name: string;
+      email: string;
+    } | null; 
+    
+}
 export interface ReferralStatsResponse {
   total_referrals: number;
   pending_referrals: number; 
@@ -26,21 +43,7 @@ export interface ReferralStatsResponse {
   } | null;
   referral_methods: ReferralMethods[];
   recent_referrals: {
-    data: {
-    id: string;
-    referrer_id: number;
-    referred_user_id: number | null;
-    referral_code: string;
-    referral_coupon_code: string;
-    status: "pending" | "completed" | "applied";
-    referral_value_type: "percentage" | "fixed";
-    referral_value: string | null;
-    referred_user: {
-      id: number;
-      name: string;
-      email: string;
-    } | null; 
-    }[];
+    data:  RecentReferrals[];
   pagination: {
     limit: number;
     page: number;

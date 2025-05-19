@@ -26,6 +26,7 @@ export interface ReferralStatsResponse {
   } | null;
   referral_methods: ReferralMethods[];
   recent_referrals: {
+    data: {
     id: string;
     referrer_id: number;
     referred_user_id: number | null;
@@ -39,6 +40,12 @@ export interface ReferralStatsResponse {
       name: string;
       email: string;
     } | null; 
-  
-  }[];
+    }[];
+  pagination: {
+    limit: number;
+    page: number;
+    total: number;
+    total_pages: number;
+  }
+  }
 }

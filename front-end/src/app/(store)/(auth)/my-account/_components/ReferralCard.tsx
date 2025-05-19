@@ -4,7 +4,7 @@ import { Button } from '@nextui-org/button'
 import React, { useState } from 'react'
 
 interface ReferralCardProps {
-    referral: ReferralStatsResponse['recent_referrals'][number];
+    referral: ReferralStatsResponse['recent_referrals']['data'][number];
 }
 
 const ReferralCard: React.FC<ReferralCardProps> = ({ referral }) => {

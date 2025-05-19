@@ -87,7 +87,7 @@ const PaymentFailedPage = () => {
                 </div>
 
                 <div className='py-5 border-t border-b border-skin-neutral-100 w-full space-y-3.5'>
-                    <div className='flex items-center justify-between gap-2 text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
+                    <div className='flex items-start justify-between gap-2 text-content-2 font-bold text-skin-neutral-300 leading-none capitalize'>
                         <p className='text-nowrap'>Transaction ID</p>
                         <p className='break-all text-right'>{transactionDetails.id}</p>
                     </div>

@@ -50,8 +50,8 @@ const NotificationAction: React.FC = () => {
   return (
     <Popover showArrow offset={25} isOpen={isPopoverOpen} onOpenChange={setIsPopoverOpen} placement="bottom" shadow="lg">
       <PopoverTrigger>
-        <Badge color="danger" content={unreadCount > 99 ? "99+" : unreadCount} shape="circle">
-          <Button isIconOnly aria-label="more than 99 notifications" radius="full" variant="light" className='!min-w-fit !w-fit !h-fit' onPress={() => setIsPopoverOpen((v) => !v)}>
+        <Badge color="danger" content={unreadCount > 99 ? "99+" : unreadCount} shape="circle" className='!border-0 max-sm:text-xs w-auto min-w-5 max-h-6 aspect-square'>
+          <Button isIconOnly aria-label="more than 99 notifications" radius="full" variant="light" className='!min-w-fit !w-fit !h-fit !items-end' onPress={() => setIsPopoverOpen((v) => !v)}>
             <BellIcon />
           </Button>
         </Badge>

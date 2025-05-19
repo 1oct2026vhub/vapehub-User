@@ -11,7 +11,7 @@ import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import MyReferrals from "../../_components/MyReferrals";
 import Pagination from "@/components/Pagination";
 import SuspenseLoader from "@/components/ui/SuspenseLoader";
-import { ReferralStatsResponse } from "@/lib/config/referral.config";
+import { ReferralStatsResponse, RecentReferrals } from "@/lib/config/referral.config";
 
 const AccountReferrals: NextPage = (): ReactElement | null => {
   const [page, setPage] = useState(1);
@@ -19,7 +19,7 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ReferralStatsResponse | null>(null);
   const [recentReferrals, setRecentReferrals] = useState<
-    ReferralStatsResponse["recent_referrals"]["data"]
+    RecentReferrals[]
   >([]);
 
   useEffect(() => {

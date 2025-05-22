@@ -162,7 +162,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit'>
-                    <div className='bg-skin-base border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
+                    <div className='bg-skin-white border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
                         <CustomImageMagnifier
                             src={mainImage?.url || ''}
                             alt={product?.name || ''}

@@ -72,6 +72,7 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
                 setCurrentRating(rating)
                 setCurrentReview(review)
                 setIsEditReview(false)
+                setCurrentReviewId(response.data.id)
             } else {
                 toast.error('Review submission failed')
             }

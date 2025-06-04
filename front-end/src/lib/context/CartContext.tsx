@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, UnAvailableItem } from '../config/cart.config';
-import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation } from '../server.actions';
+import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon } from '../server.actions';
 import { getCookie, setCookie } from 'cookies-next';
-import { ServerActionStatus } from '../config/app.config';
+import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '../config/app.config';
 import { useSession } from 'next-auth/react';
 import { ProductImage, ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
@@ -20,7 +20,7 @@ interface CartContextType {
   cartItems: CartItem[];
   isLoading: boolean;
   addItemToCart: (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => Promise<void>;
-  updateItemQuantity: (cartId: number, quantity: number) => Promise<void>;
+  updateItemQuantity: (cartId: number, quantity: number,productName: string) => Promise<void>;
   removeItem: (cartId: number) => Promise<void>;
   cartTotal: number;
   itemCount: number;
@@ -183,17 +183,17 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const stockAvailable = data.stock_status === 'in_stock' ? data.stock : 0;
       const requestedQuantity = existingItem ? existingItem.quantity + quantity : quantity;
 
-      if (requestedQuantity > stockAvailable) {
-        toast.error(`Only ${stockAvailable} items available in stock`);
-        setIsLoading(false);
-        return;
-      }
+      // if (requestedQuantity > stockAvailable) {
+      //   toast.error(`Only ${stockAvailable} items available in stock`);
+      //   setIsLoading(false);
+      //   return;
+      // }
 
       if (existingItem) {
         // If the item exists, update its quantity instead of adding a duplicate
         const newQuantity = existingItem.quantity + quantity;
-        await updateItemQuantity(existingItem.id, newQuantity);
-        toast.success(`${productName} quantity updated in cart`);
+        await updateItemQuantity(existingItem.id, newQuantity,productName);
+        // toast.success(`${productName} quantity updated in cart`);
         return;
       }
 
@@ -229,7 +229,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     cartAnalytics(actionEvent);
   };
 
-  const updateItemQuantity = async (cartId: number, quantity: number) => {
+  const updateItemQuantity = async (cartId: number, quantity: number,productName: string) => {
 
     const existingItem: CartItem | undefined = cartItems.find(item => item.id === cartId);
 
@@ -241,10 +241,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (isAuthenticated) {
         const response = await updateCartItem(cartId, quantity);
+        console.log("responsecartupdate", response);
+        
         if (response.status === ServerActionStatus.SUCCESS) {
           await loadCartItems();
+          toast.success(`${productName} quantity updated in cart`);
           // toast.success('Cart updated successfully');
         }
+          if (response.status === 'ERROR') {
+            toast.error(response.message);
+          }
       } else {
         // Handle as guest cart
         const updatedCart = cartItems.map(item =>
@@ -453,6 +459,65 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
     calculateTotals(cartItems);
   };
+
+  // Add revalidateCoupon function
+  const revalidateCoupon = async () => {
+    if (couponDiscount.isApplied && couponDiscount.code) {
+      const response = await applyCoupon({
+        couponCode: couponDiscount.code,
+        shippingMethodId: 0, // Adjust if you use shipping method
+      });
+      console.log("response", response);
+      
+      if (response.status === ServerActionStatus.SUCCESS && response.data) {
+        setCouponDiscount({
+          value: cartTotal - response.data.total,
+          isApplied: true,
+          code: couponDiscount.code,
+          message: response.data.referral_value_type === "percentage"
+            ? `Extra ${response.data.referral_value}% off`
+            : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.referral_value} off`,
+          discountValue: (cartTotal - response.data.total).toFixed(2),
+        });
+      } else {
+        setCouponDiscount({
+          value: 0,
+          isApplied: false,
+          code: null,
+          message: null,
+          discountValue: ''
+        });
+      }
+    }
+  };
+
+  // Revalidate coupon when cartTotal or itemCount changes
+  useEffect(() => {
+    revalidateCoupon();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartTotal, itemCount]);
+
+  // Restore couponDiscount from cookie on mount
+  useEffect(() => {
+    const storedCoupon = getCookie('couponDiscount');
+    if (storedCoupon) {
+      try {
+        const parsed = JSON.parse(storedCoupon as string);
+        if (parsed && typeof parsed === 'object' && parsed.code) {
+          setCouponDiscount(parsed);
+        }
+      } catch {}
+    }
+  }, []);
+
+  // Persist couponDiscount to cookie whenever it changes
+  useEffect(() => {
+    if (couponDiscount && couponDiscount.isApplied && couponDiscount.code) {
+      setCookie('couponDiscount', JSON.stringify(couponDiscount));
+    } else {
+      setCookie('couponDiscount', '', { maxAge: -1 }); // Remove cookie
+    }
+  }, [couponDiscount]);
 
   const value = {
     cartItems,

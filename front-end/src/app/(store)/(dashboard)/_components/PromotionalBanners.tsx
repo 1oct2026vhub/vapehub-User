@@ -35,9 +35,9 @@ interface PromotionalBannersProps {
 }
 
 const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners }) => {
-  if (!Array.isArray(banners) || banners.length === 0) {
-    return  <EmptyPlaceholder title='Uh, oh!' description='No banners available' />;
-  }
+  // if (!Array.isArray(banners) || banners.length === 0) {
+  //   return  <EmptyPlaceholder title='Uh, oh!' description='No banners available' />;
+  // }
 
   const sortedBanners = [...banners].sort((a, b) => a.display_order - b.display_order);
   

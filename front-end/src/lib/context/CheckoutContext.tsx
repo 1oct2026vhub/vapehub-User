@@ -46,33 +46,39 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                         orderReference: String(orderData.order_code)
                     });
                 } else if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
-                    // Initiate WorldPay Smart Checkout
-                    await initiateWorldPayPayment({
-                        amount: data.total,
-                        currency: 'EUR', // Adjust based on your needs
-                        orderReference: String(orderData.order_code),
-                        customerEmail: data.email,
-                        customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
-                        orderDescription: `Order #${response.message}`,
-                        returnUrl: `${window.location.origin}${ROUTES.PAYMENT_SUCCESS}`,
-                        cancelUrl: `${window.location.origin}${ROUTES.PAYMENT_FAILED}`,
-                        billingAddress: {
-                            address1: data.billing_address.address_line_1,
-                            address2: data.billing_address.address_line_2,
-                            city: data.billing_address.city,
-                            state: data.billing_address.region,
-                            postalCode: data.billing_address.post_code,
-                            country: data.billing_address.country,
-                        },
-                        shippingAddress: {
-                            address1: data.shipping_address.address_line_1,
-                            address2: data.shipping_address.address_line_2,
-                            city: data.shipping_address.city,
-                            state: data.shipping_address.region,
-                            postalCode: data.shipping_address.post_code,
-                            country: data.shipping_address.country,
-                        }
-                    });
+                    // // Initiate WorldPay Smart Checkout
+                    // await initiateWorldPayPayment({
+                    //     amount: data.total,
+                    //     currency: 'EUR', // Adjust based on your needs
+                    //     orderReference: String(orderData.order_code),
+                    //     customerEmail: data.email,
+                    //     customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
+                    //     orderDescription: `Order #${response.message}`,
+                    //     returnUrl: `${window.location.origin}${ROUTES.PAYMENT_SUCCESS}`,
+                    //     cancelUrl: `${window.location.origin}${ROUTES.PAYMENT_FAILED}`,
+                    //     billingAddress: {
+                    //         address1: data.billing_address.address_line_1,
+                    //         address2: data.billing_address.address_line_2,
+                    //         city: data.billing_address.city,
+                    //         state: data.billing_address.region,
+                    //         postalCode: data.billing_address.post_code,
+                    //         country: data.billing_address.country,
+                    //     },
+                    //     shippingAddress: {
+                    //         address1: data.shipping_address.address_line_1,
+                    //         address2: data.shipping_address.address_line_2,
+                    //         city: data.shipping_address.city,
+                    //         state: data.shipping_address.region,
+                    //         postalCode: data.shipping_address.post_code,
+                    //         country: data.shipping_address.country,
+                    //     }
+                    // });
+                  // Redirect to WorldPay URL from the API response
+                    if ('worldpay_url' in orderData) {
+                        window.location.href = orderData.worldpay_url;
+                    } else {
+                        toast.error('Worldpay payment URL not found. Please try again.');
+                    }
                 }
                 // clearCart();
                  

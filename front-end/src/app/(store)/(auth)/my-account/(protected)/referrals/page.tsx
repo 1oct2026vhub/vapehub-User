@@ -15,7 +15,7 @@ import { ReferralStatsResponse, RecentReferrals } from "@/lib/config/referral.co
 
 const AccountReferrals: NextPage = (): ReactElement | null => {
   const [page, setPage] = useState(1);
-  const limit = 2;
+  const limit = 10;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ReferralStatsResponse | null>(null);
   const [recentReferrals, setRecentReferrals] = useState<
@@ -39,24 +39,25 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
   const handlePagination = (page: number) => {
     setPage(page);
   };
-
    
-  if (!data || data.recent_referrals.data.length === 0) {
-    return (
-      <EmptyPlaceholder title="Uh, oh!" description="No referrals found" />
-    );
-  }
+  // if (!data || data.recent_referrals.data.length === 0) {
+  //   return (
+  //     <EmptyPlaceholder title="Uh, oh!" description="No referrals found" />
+  //   );
+  // }
 
   return (
     <main>
       {/* Rewards Section */}
       <div className="p-4 mb-6 bg-gradient-to-r from-skin-accent-50 to-skin-white rounded-14 shadow-card flex flex-col md:flex-row md:items-center md:justify-between border border-skin-neutral-50">
         <MyReferrals
-          referralMethods={data.referral_methods}
-          coupons={data.referred_coupon_code}
+        referredValue={data?.referred_user_method?.referral_value || ''}
+        referrerValue={data?.referrer_user_method?.referral_value || ''}
+          referralMethods={data?.referral_methods || []}
+          coupons={data?.referred_coupon_code || null}
           isReferral={
-            data.referrer?.status === "completed" ||
-            data.referrer?.status === "applied"
+            data?.referrer?.status === "completed" ||
+            data?.referrer?.status === "applied"
           }
         />
         <div className="mt-6 md:mt-0 md:ml-8 flex-shrink-0">
@@ -88,12 +89,12 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
             description="You haven't referred any friends yet. Share your referral link with your friends to earn rewards."
           />
         )}
-        {data?.recent_referrals.pagination.total_pages > 1 && (
+        {data?.recent_referrals?.pagination && data.recent_referrals.pagination.total_pages > 1 && (
           <div className="flex justify-center my-8">
             <Pagination
               total={data?.recent_referrals?.pagination?.total_pages}
               onPageChange={handlePagination}
-              currentPage={data?.recent_referrals?.pagination?.page}
+              currentPage={data?.recent_referrals?.pagination?.page || 1}
             />
           </div>
         )}

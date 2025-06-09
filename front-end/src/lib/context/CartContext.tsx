@@ -462,13 +462,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Add revalidateCoupon function
   const revalidateCoupon = async () => {
-    if (couponDiscount.isApplied && couponDiscount.code) {
+    if (couponDiscount.code) {
       const response = await applyCoupon({
         couponCode: couponDiscount.code,
         shippingMethodId: 0, // Adjust if you use shipping method
       });
-      console.log("response", response);
-      
+      console.log("rrr", response);
       if (response.status === ServerActionStatus.SUCCESS && response.data) {
         setCouponDiscount({
           value: cartTotal - response.data.total,
@@ -480,11 +479,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           discountValue: (cartTotal - response.data.total).toFixed(2),
         });
       } else {
+        // If revalidation fails, keep the code but deactivate the discount.
+        // This allows for re-application if cart conditions are met again.
+        // if (couponDiscount.isApplied) {
+        //   toast.info("Applied coupon was removed as cart conditions are no longer met.");
+        // }
         setCouponDiscount({
           value: 0,
           isApplied: false,
-          code: null,
-          message: null,
+          code: couponDiscount.code,
+          message: response.status === ServerActionStatus.ERROR ? response.message : null, // Store the reason for failure
           discountValue: ''
         });
       }

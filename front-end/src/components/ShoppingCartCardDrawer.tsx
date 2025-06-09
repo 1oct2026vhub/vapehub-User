@@ -4,7 +4,7 @@ import { useCart } from '@/lib/context/CartContext';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
-// import Link from 'next/link';
+import Link from 'next/link';
 import QuantitySelector from './QuantitySelector';
 
 type CartCardProps = {
@@ -19,11 +19,13 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
     await removeItem(item.id);
   };
 
+  const productUrl = `/${item.product_slug}`;
+
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">
         {/* Product Image */}
-        <div className="bg-skin-white p-1.5 rounded-10 shadow-brand-card min-w-[84px]">
+        <Link href={productUrl} className="bg-skin-white p-1.5 rounded-10 shadow-brand-card min-w-[84px]">
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
             <NoImage
               src={item.ProductImages}
@@ -32,13 +34,13 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem
               height={63}
             />
           </div>
-        </div>
+        </Link>
 
         <div className="flex flex-col items-start gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 justify-between w-full">
-            <h4 className="text-content-2 md:text-title-2 font-semibold text-skin-neutral-400 md:mr-5">
+            <Link href={productUrl} className="text-content-2 md:text-title-2 font-semibold text-skin-neutral-400 md:mr-5">
               {item.name}
-            </h4>
+            </Link>
 
             {/* Price Section */}
             <div className="text-right">

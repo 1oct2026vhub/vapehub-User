@@ -38,8 +38,7 @@ const MyReferrals = ({ referralMethods, coupons, isReferral,referredValue,referr
                     </p> :
                     <div className="flex flex-col gap-2">
                         <p className="text-content-2 text-skin-neutral-300 mb-4 max-w-md">
-                            You have been invited to shop at VapeHub and you've got a {referralDiscount(true)} discount waiting for you! Use the coupon code below to claim your offer.
-
+                            {`You have been invited to shop at VapeHub and you've got a ${referralDiscount(true)} discount waiting for you! Use the coupon code below to claim your offer.`}
                         </p>
                         <div className="flex items-center gap-2">
                             <h4 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">

@@ -45,6 +45,10 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             setErrorMessage(null);
         }
         const response = await applyCoupon(data as APPLY_COUPON_PAYLOAD);
+        if(response.status === 'SUCCESS') {
+          toast.success('Coupon Applied Successfully');
+        }
+        console.log("rrr",response);
         if (response.status === ServerActionStatus.SUCCESS) { 
             if(!response.data?.referral_value) {
                 toast.error("Invalid coupon code");

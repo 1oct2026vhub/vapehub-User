@@ -69,7 +69,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
      
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
     const [quantity, setQuantity] = useState(1);
-    const { addItemToCart, isLoading } = useCart();
+    const { addItemToCart } = useCart();
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [inputValue, setInputValue] = useState(quantity.toString());
     const [error, setError] = useState<string | null>(null);
 
@@ -118,7 +119,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         if (quantity <= 0 || quantity > stock) {
             return;
         }
-        await addItemToCart(product.id, productVariant?.id, quantity, productVariant, productName);
+        setIsAddingToCart(true);
+        try {
+            await addItemToCart(product.id, productVariant?.id, quantity, productVariant, productName);
+        } catch (err) {
+            console.error("Failed to add to cart:", err);
+        } finally {
+            setIsAddingToCart(false);
+        }
     };
     const scrollToTop = () => {
         window.scrollTo({
@@ -133,6 +141,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     useEffect(() => {
         setMainImage(isVariant ? data?.variants[0]?.primary_image : product?.primary_image);
     }, [isVariant, data, product]);
+console.log("product",product);
 
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
@@ -274,7 +283,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 color='primary'
                                 className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
                                 onPress={() => handleQuantityChange(quantity - 1)}
-                                isDisabled={isLoading || quantity <= 1 || stock === 0}
+                                isDisabled={isAddingToCart || quantity <= 1 || stock === 0}
                             >
                                 <MinusIcon />
                             </Button>
@@ -304,7 +313,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 color='primary'
                                 className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
                                 onPress={() => handleQuantityChange(quantity + 1)}
-                                isDisabled={isLoading || quantity >= stock || stock === 0}
+                                isDisabled={isAddingToCart || quantity >= stock || stock === 0}
                             >
                                 <PlusIcon />
                             </Button>
@@ -315,10 +324,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                             size="lg"
                             radius="md"
                             color="primary"
-                            isLoading={isLoading}
-                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isLoading || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            isLoading={isAddingToCart}
+                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isAddingToCart || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
-                            disabled={isLoading || quantity <= 0 || quantity > stock}
+                            disabled={isAddingToCart || quantity <= 0 || quantity > stock}
                         >
                             Add to Cart
                         </Button>

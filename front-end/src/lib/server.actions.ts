@@ -538,8 +538,8 @@ export const getHeaderMegaMenu = async (): Promise<ServerActionResponse<HeaderMe
   });
 };
 
-export const reviewOrder = async (payload: REVIEW_ORDER_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
-  return await handleRequest<{message: string}, unknown>({
+export const reviewOrder = async (payload: REVIEW_ORDER_PAYLOAD): Promise<ServerActionResponse<{message: string, id: number}>> => {
+  return await handleRequest<{message: string, id: number}, unknown>({
     endpoint: API_ROUTES.REVIEW_ORDER,
     payload,
     method: 'POST',

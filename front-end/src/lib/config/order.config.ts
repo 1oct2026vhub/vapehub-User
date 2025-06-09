@@ -127,9 +127,15 @@ export interface SHIPPING_METHOD {
 //     }
 // ]
 
+export interface WorldPayOrderData {
+    order_code: string;
+    worldpay_url: string;
+    // Include other properties from the nested 'data' object if needed
+}
+
 export interface ORDER_RESPONSE_DATA {
     message: string;
-    data: ORDER_LIST_RESPONSE;
+    data: ORDER_LIST_RESPONSE | WorldPayOrderData;
 }
 export interface Payment_Validate {
     order_id: number;

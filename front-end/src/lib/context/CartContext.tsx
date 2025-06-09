@@ -180,8 +180,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       );
 
       // Check if there's enough stock available
-      const stockAvailable = data.stock_status === 'in_stock' ? data.stock : 0;
-      const requestedQuantity = existingItem ? existingItem.quantity + quantity : quantity;
+      // const stockAvailable = data.stock_status === 'in_stock' ? data.stock : 0;
+      // const requestedQuantity = existingItem ? existingItem.quantity + quantity : quantity;
 
       // if (requestedQuantity > stockAvailable) {
       //   toast.error(`Only ${stockAvailable} items available in stock`);

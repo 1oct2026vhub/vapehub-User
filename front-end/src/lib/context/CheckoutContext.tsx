@@ -2,9 +2,9 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS } from '@/lib/config/checkout.config';
-import { ROUTES } from '@/lib/routes';
+// import { ROUTES } from '@/lib/routes';
 import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
-import { useWorldPay } from '@/lib/hooks/useWorldpay';
+// import { useWorldPay } from '@/lib/hooks/useWorldpay';
 import { toast } from 'sonner';
 import { ORDER_RESPONSE_DATA, SHIPPING_METHOD_DATA } from '../config/order.config';
 
@@ -33,7 +33,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     const [selectedShippingMethod, setSelectedShippingMethod] = useState<SHIPPING_METHOD_DATA | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
-    const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
+    // const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
      
     const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => { 
         try {

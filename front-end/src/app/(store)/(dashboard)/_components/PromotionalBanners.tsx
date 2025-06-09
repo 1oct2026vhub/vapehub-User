@@ -1,5 +1,5 @@
 import NoImage from '@/components/NoImage';
-import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
+// import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import { BannerResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 import React, { memo } from 'react';

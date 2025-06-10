@@ -6,7 +6,7 @@ import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
-import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { NotificationListResponse } from "./config/notification.config";
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE } from "./config/order.config";
@@ -573,5 +573,12 @@ export const deleteReviewOrder = async (orderId: number): Promise<ServerActionRe
   return await handleRequest<{message: string}, unknown>({
     endpoint: API_ROUTES.DELETE_REVIEW_ORDER(orderId),
     method: 'DELETE',
+  });
+};
+//List flash news
+export const getFlashNews = async (status?: boolean): Promise<ServerActionResponse<FlashNewsResponse>> => {
+  return await handleRequest<FlashNewsResponse, unknown>({
+    endpoint: API_ROUTES.GET_FLASH_NEWS(status),
+    method: 'GET',
   });
 };

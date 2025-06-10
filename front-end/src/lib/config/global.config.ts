@@ -56,3 +56,19 @@ export interface DynamicPageSlugResponse {
     entity_type: "category" |  "product" | "blog" | "blog_category";
     entity_id: number; 
 }
+
+export type FlashNewsResponse = FlashNewsItem[];
+
+export interface FlashNewsItem {
+    id: number;
+    label: string;
+    url: string;
+    status: boolean;
+    created_at: string;
+    updatedBy: UpdatedBy;
+}
+
+export interface UpdatedBy {
+    id: number;
+    name: string;
+}

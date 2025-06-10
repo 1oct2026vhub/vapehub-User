@@ -90,7 +90,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
         setInputValue(value);
-         
         // Only update quantity if the input is a valid number
         const numValue = parseInt(value);
         if (!isNaN(numValue)) {

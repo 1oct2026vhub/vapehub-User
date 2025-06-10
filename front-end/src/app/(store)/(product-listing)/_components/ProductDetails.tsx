@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { BenefitIcon, DealsIcon, DispatchIcon, ReviewStarFilled, MinusIcon, PlusIcon } from '@/components/Icons'
+import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
 import Image from 'next/image'
@@ -179,15 +179,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex gap-1">
-                            {Array.from({ length: 5 }, (_, i) => (
-                                <Image
-                                    key={i}
-                                    src='/images/review-star.svg'
-                                    alt='Review star'
-                                    width={16}
-                                    height={16}
-                                    className='md:w-5 md:h-5' />
-                            ))}
+                            {Array.from({ length: 5 }, (_, i) => {
+                                if (i < Math.round(reviewsData.averageRating)) {
+                                    return <RatingStarFilled key={i} className='w-4 h-4 md:w-5 md:h-5' />;
+                                }
+                                return <RatingStarEmpty key={i} className='w-4 h-4 md:w-5 md:h-5' />;
+                            })}
                         </div>
                         <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewsData.totalReviews} Reviews)</p>
                     </div>
@@ -252,9 +249,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex gap-1">
-                               {Array.from({ length: 5 }, (_, i) => (
-                                    <ReviewStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />
-                                ))}
+                                {Array.from({ length: 5 }, (_, i) => {
+                                    if (i < Math.round(reviewsData.averageRating)) {
+                                        return <RatingStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
+                                    }
+                                    return <RatingStarEmpty key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
+                                })}
                             </div>
                             <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewsData.totalReviews} Reviews)</p>
                         </div>
@@ -293,7 +293,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         productSlug={product?.slug} 
                         selectedVariant={selectedVariant} 
                         availableAttributes={availableAttributes ?? []} 
-                        // allVariants={data.variants ?? []}
+                        allVariants={data.variants ?? []}
                     />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {

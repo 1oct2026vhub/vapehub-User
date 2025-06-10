@@ -342,7 +342,7 @@ const CheckoutDetails: React.FC = () => {
                                         control={form.control}
                                         name="shippingAddress1"
                                         onPlaceSelect={handlePlaceSelect}
-                                        placeholder="Enter your street address"
+                                        placeholder="Start typing your address here..."
                                         label="Street Address"
                                         isRequired
                                         inputClassName="w-full"

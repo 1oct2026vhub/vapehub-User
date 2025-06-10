@@ -15,6 +15,10 @@ import ProductVariantFilter from './ProductVariantFilter'
 import NoImage from '@/components/NoImage'
 import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 
+import { REVIEWS } from '@/lib/config/order.config'
+import { ServerActionStatus } from '@/lib/config/app.config'
+import { getReviewOrderByProductId } from '@/lib/server.actions'
+
 type ProductViewProps = {
     data: ProductResponse;
     isVariant?: boolean;
@@ -73,6 +77,15 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [inputValue, setInputValue] = useState(quantity.toString());
     const [error, setError] = useState<string | null>(null);
+    const [reviewsData, setReviewsData] = useState<{
+        reviews: REVIEWS[];
+        averageRating: number;
+        totalReviews: number;
+    }>({
+        reviews: [],
+        averageRating: 0,
+        totalReviews: 0,
+    });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
@@ -140,9 +153,21 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     }, []);
     useEffect(() => {
         setMainImage(isVariant ? data?.variants[0]?.primary_image : product?.primary_image);
-    }, [isVariant, data, product]);
-console.log("product",product);
-
+    }, [isVariant, data, product]);    
+    useEffect(() => {
+        const fetchReviews = async () => {
+            if (!product?.id) return;
+            const response = await getReviewOrderByProductId(product.id);
+            if (response.status === ServerActionStatus.SUCCESS && response.data) {
+                setReviewsData({
+                    reviews: response.data.reviews || [],
+                    averageRating: parseFloat(response.data.average_rating) || 0,
+                    totalReviews: response.data.total_reviews || 0,
+                });
+            }
+        }
+        fetchReviews()
+    }, [product]);
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -163,9 +188,8 @@ console.log("product",product);
                                     height={16}
                                     className='md:w-5 md:h-5' />
                             ))}
-
                         </div>
-                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">(10 Reviews)</p>
+                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewsData.totalReviews} Reviews)</p>
                     </div>
                 </div>
                 {/* Title section mobile ends */}
@@ -228,11 +252,11 @@ console.log("product",product);
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex gap-1">
-                                {Array.from({ length: 5 }, (_, i) => (
+                               {Array.from({ length: 5 }, (_, i) => (
                                     <ReviewStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />
                                 ))}
                             </div>
-                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">(10 Reviews)</p>
+                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewsData.totalReviews} Reviews)</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
@@ -264,7 +288,13 @@ console.log("product",product);
                         </div>
                     </div>
                     <Divider className='max-lg:hidden' />
-                    <ProductVariantFilter attributeTerms={product?.attribute_terms} productSlug={product?.slug} selectedVariant={selectedVariant} availableAttributes={availableAttributes ?? []} />
+                    <ProductVariantFilter 
+                        attributeTerms={product?.attribute_terms} 
+                        productSlug={product?.slug} 
+                        selectedVariant={selectedVariant} 
+                        availableAttributes={availableAttributes ?? []} 
+                        // allVariants={data.variants ?? []}
+                    />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
                             stock > 0 ?

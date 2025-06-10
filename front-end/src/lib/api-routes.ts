@@ -63,6 +63,7 @@ export const API_ROUTES = {
     GET_REVIEW_ORDER_BY_PRODUCT_ID: (productId: number) => buildRequestUrl(`/api/review/product/${productId}?page=1&limit=10&is_visible=true`),
     UPDATE_REVIEW_ORDER: (orderId: number) => buildRequestUrl(`/api/review/${orderId}`),
     DELETE_REVIEW_ORDER: (orderId: number) => buildRequestUrl(`/api/review/${orderId}`),
+    GET_FLASH_NEWS: (status?: boolean) => buildRequestUrl(`/api/home/flash-news${status !== undefined ? `?status=${status}` : ''}`),
 }
 
 // * Helper functions

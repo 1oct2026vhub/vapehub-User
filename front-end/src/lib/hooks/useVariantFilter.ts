@@ -1,11 +1,13 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { AttributeTerms, AttributeProductTerms } from '@/lib/config/product.config';
+import { ProductVariant } from '@/lib/config/product.config';
 
 export const useVariantFilter = (
   productSlug: string, 
   availableVariants: AttributeTerms[],
-  currentVariant?: AttributeProductTerms
+  currentVariant?: AttributeProductTerms,
+  allVariants?: ProductVariant[]
 ) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -66,26 +68,37 @@ export const useVariantFilter = (
   );
 
   const getDefaultSelectedTerm = useCallback((attributeId: number): string | undefined => {
-    // Check if this attribute has a search param first
+    // 1. Check for an explicit selection in the search params first
     const searchParamValue = searchParams.get(attributeId.toString());
     if (searchParamValue) {
-        return searchParamValue; // Return the search param value directly
+      return searchParamValue;
     }
 
-    // Don't auto-select if this is the current variant's attribute
+    // 2. Check if the attribute corresponds to the current main variant in the path
     if (currentVariant?.attribute.id === attributeId) {
-        return currentVariant.terms.slug;
+      return currentVariant.terms.slug;
     }
 
-    // Only auto-select if we have a secondary slug and no search params
-    const pathSegments = pathname.split('/');
-    if (pathSegments.length > 2 && searchParams.toString() === '') {
-        const variantAttr = availableVariants.find(v => v.attribute.id === attributeId);
-        return variantAttr?.terms[0]?.slug;
+    // 3. If no explicit selection, find the first in-stock variant and use its term for this attribute.
+    if (allVariants) {
+      const inStockVariant = allVariants.find(v => v.is_in_stock);
+      if (inStockVariant) {
+        const termAttribute = inStockVariant.attributes.find(attr => attr.attribute_id === attributeId);
+        if (termAttribute) {
+          return termAttribute.term_slug;
+        }
+      }
+    }
+    
+    // 4. As a fallback, default to the first available term for this attribute
+    const variantAttr = availableVariants.find(v => v.attribute.id === attributeId);
+    if (variantAttr && variantAttr.terms.length > 0) {
+      return variantAttr.terms[0].slug;
     }
 
+    // 5. If all else fails, no selection
     return undefined;
-  }, [availableVariants, currentVariant, pathname, searchParams]);
+  }, [availableVariants, currentVariant, searchParams, allVariants]);
 
   return {
     handleVariantFilter,

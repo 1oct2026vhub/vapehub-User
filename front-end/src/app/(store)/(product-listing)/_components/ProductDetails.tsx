@@ -59,7 +59,6 @@ const settings: Settings = {
 
 };
 const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => { 
-     
     const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
     const product: ProductViewDetails = data?.product;
     const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;

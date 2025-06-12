@@ -104,6 +104,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
 
         } 
     }, [isRemoveCoupon]);
+console.log("errorMessage",errorMessage);
 
     return (
         <Form {...form}>

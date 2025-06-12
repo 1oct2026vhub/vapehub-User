@@ -490,7 +490,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           // Only update state if the coupon was previously applied to avoid loops
           if (couponDiscount.isApplied) {
-            toast.info("Applied coupon was removed as cart conditions are no longer met.");
+            // toast.info("Applied coupon was removed as cart conditions are no longer met.");
             setCouponDiscount({
               value: 0,
               isApplied: false,

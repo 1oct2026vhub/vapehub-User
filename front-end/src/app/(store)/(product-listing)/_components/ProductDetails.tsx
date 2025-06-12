@@ -59,7 +59,6 @@ const settings: Settings = {
 
 };
 const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => { 
-     
     const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
     const product: ProductViewDetails = data?.product;
     const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;
@@ -86,6 +85,20 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         averageRating: 0,
         totalReviews: 0,
     });
+
+    const handleReviewsClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const reviewsSection = document.getElementById('reviews');
+        if (reviewsSection) {
+            reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // The NextUI tab buttons have a data-key attribute.
+            const reviewsTabButton = reviewsSection.querySelector('[data-key="Reviews"]') as HTMLElement;
+            if (reviewsTabButton) {
+                reviewsTabButton.click();
+            }
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
@@ -176,7 +189,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                     <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                         Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.brand?.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.brand?.name}</Link>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
                         <div className="flex gap-1">
                             {Array.from({ length: 5 }, (_, i) => {
                                 if (i < Math.round(reviewsData.averageRating)) {
@@ -246,7 +259,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                             Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.brand?.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.brand?.name}</Link>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
                             <div className="flex gap-1">
                                 {Array.from({ length: 5 }, (_, i) => {
                                     if (i < Math.round(reviewsData.averageRating)) {

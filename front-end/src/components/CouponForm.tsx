@@ -104,6 +104,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
 
         } 
     }, [isRemoveCoupon]);
+console.log("errorMessage",errorMessage);
 
     return (
         <Form {...form}>
@@ -144,9 +145,9 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                         </Button>
                 }
             </form>
-            {errorMessage && (
+            {/* {errorMessage && (
                 <div className="text-red-600 mt-2 text-sm">{errorMessage}</div>
-            )}
+            )} */}
         </Form>
     );
 };

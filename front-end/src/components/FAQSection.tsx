@@ -60,7 +60,7 @@ const FAQSection: React.FC<FAQProps> = ({
             <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
                 {faqs.map((faq, index) => (
                     <AccordionItem key={index} aria-label={faq.question} title={faq.question}>
-                        {faq.answer}
+                        <div dangerouslySetInnerHTML={{ __html: faq.answer }} />
                     </AccordionItem>
                 //     <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">
                 //     {faq.question}

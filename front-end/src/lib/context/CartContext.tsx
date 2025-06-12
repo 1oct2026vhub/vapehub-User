@@ -1,9 +1,9 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, UnAvailableItem } from '../config/cart.config';
 import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon } from '../server.actions';
-import { getCookie, setCookie } from 'cookies-next';
+import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '../config/app.config';
 import { useSession } from 'next-auth/react';
 import { ProductImage, ProductVariant } from '../config/product.config';
@@ -48,7 +48,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stockValidationLoading, setStockValidationLoading] = useState(false);
-  const { status } = useSession();
+  const { status, data: session } = useSession();
+  const prevSessionRef = useRef(session);
   const [stockValidationErrors, setStockValidationErrors] = useState<Array<{ itemId: number; message: string; isOutOfStock: boolean }>>([]);
   const isAuthenticated = status === 'authenticated';
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
@@ -446,7 +447,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
     setCartTotal(0);
     setItemCount(0);
@@ -457,49 +458,56 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       message: null,
       discountValue: ''
     });
-    calculateTotals(cartItems);
-  };
+    deleteCookie('couponDiscount');
+  }, []);
 
-  // Add revalidateCoupon function
-  const revalidateCoupon = async () => {
-    if (couponDiscount.code) {
-      const response = await applyCoupon({
-        couponCode: couponDiscount.code,
-        shippingMethodId: 0, // Adjust if you use shipping method
-      });
-      console.log("rrr", response);
-      if (response.status === ServerActionStatus.SUCCESS && response.data) {
-        setCouponDiscount({
-          value: cartTotal - response.data.total,
-          isApplied: true,
-          code: couponDiscount.code,
-          message: response.data.referral_value_type === "percentage"
-            ? `Extra ${response.data.referral_value}% off`
-            : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.referral_value} off`,
-          discountValue: (cartTotal - response.data.total).toFixed(2),
-        });
-      } else {
-        // If revalidation fails, keep the code but deactivate the discount.
-        // This allows for re-application if cart conditions are met again.
-        // if (couponDiscount.isApplied) {
-        //   toast.info("Applied coupon was removed as cart conditions are no longer met.");
-        // }
-        setCouponDiscount({
-          value: 0,
-          isApplied: false,
-          code: couponDiscount.code,
-          message: response.status === ServerActionStatus.ERROR ? response.message : null, // Store the reason for failure
-          discountValue: ''
-        });
-      }
+  useEffect(() => {
+    if (prevSessionRef.current?.user?.id !== session?.user?.id) {
+      clearCart();
     }
-  };
+    prevSessionRef.current = session;
+  }, [session, clearCart]);
 
   // Revalidate coupon when cartTotal or itemCount changes
   useEffect(() => {
-    revalidateCoupon();
+    const revalidate = async () => {
+      if (couponDiscount.code) {
+        const response = await applyCoupon({
+          couponCode: couponDiscount.code,
+          shippingMethodId: 0, // Adjust if you use shipping method
+        });
+
+        if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.referral_value != null) {
+          setCouponDiscount({
+            value: cartTotal - response.data.total,
+            isApplied: true,
+            code: couponDiscount.code,
+            message: response.data.referral_value_type === "percentage"
+              ? `Extra ${response.data.referral_value}% off`
+              : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.referral_value} off`,
+            discountValue: (cartTotal - response.data.total).toFixed(2),
+          });
+        } else {
+          // Only update state if the coupon was previously applied to avoid loops
+          if (couponDiscount.isApplied) {
+            toast.info("Applied coupon was removed as cart conditions are no longer met.");
+            setCouponDiscount({
+              value: 0,
+              isApplied: false,
+              code: couponDiscount.code,
+              message: null,
+              discountValue: ''
+            });
+          }
+        }
+      }
+    };
+
+    if (!isLoading) {
+      revalidate();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartTotal, itemCount]);
+  }, [cartTotal, itemCount, isLoading, couponDiscount.code, couponDiscount.isApplied]);
 
   // Restore couponDiscount from cookie on mount
   useEffect(() => {
@@ -516,10 +524,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Persist couponDiscount to cookie whenever it changes
   useEffect(() => {
-    if (couponDiscount && couponDiscount.isApplied && couponDiscount.code) {
+    if (couponDiscount && couponDiscount.code) {
       setCookie('couponDiscount', JSON.stringify(couponDiscount));
     } else {
-      setCookie('couponDiscount', '', { maxAge: -1 }); // Remove cookie
+      deleteCookie('couponDiscount');
     }
   }, [couponDiscount]);
 

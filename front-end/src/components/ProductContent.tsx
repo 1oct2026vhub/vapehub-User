@@ -15,6 +15,7 @@ type ProductContentProps = {
 
 const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement => {
     const [reviews, setReviews] = useState<REVIEWS[]>([]);
+    const [selectedTab, setSelectedTab] = useState('Description');
     useEffect(() => {
         const fetchReviews = async () => {
             const response = await getReviewOrderByProductId(product.id);
@@ -25,11 +26,13 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
         fetchReviews()
     }, [product])
     return (
-        <section className='bg-skin-white p-4 md:p-6 xl:p-10 rounded-2.5xl shadow-card space-y-7.5'>
+        <section id="reviews" className='bg-skin-white p-4 md:p-6 xl:p-10 rounded-2.5xl shadow-card space-y-7.5'>
             <div className="flex w-full flex-col">
                 <Tabs aria-label="Options"
                     variant='bordered'
                     color='primary'
+                    selectedKey={selectedTab}
+                    onSelectionChange={(key) => setSelectedTab(key as string)}
                     classNames={{
                         base: "mb-5",
                         tabList: "gap-3 px-5 py-4 mx-auto border border-skin-neutral-100 rounded-xl !bg-skin-base",
@@ -179,7 +182,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                                             className='w-full min-h-[132px] rounded-10'
                                         />
                                         <h3 className='text-content-2 md:text-title-1 xl:text-h5 font-bold text-skin-neutral-500'>A dual 1.1 ohm mesh coil ensures brilliant flavour delivery combined with consistently satisfying throat hits with each draw.</h3>
-                                        <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-400'>Whether you’re seeking exotic fruits or desserts or simply a burst of berries in your e-cigarette flavours, the Hayati Pro Max has a flavour guaranteed to tantalise and captivate your taste buds! There are currently over 50 mouth-watering flavours in the Hayati Pro Max range, although this could further increase due to Hayati’s constant upgrades to the flavour range!</p>
+                                        <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-400'>Whether you're seeking exotic fruits or desserts or simply a burst of berries in your e-cigarette flavours, the Hayati Pro Max has a flavour guaranteed to tantalise and captivate your taste buds! There are currently over 50 mouth-watering flavours in the Hayati Pro Max range, although this could further increase due to Hayati's constant upgrades to the flavour range!</p>
 
                                     </div>
                                     <div className="space-y-4">
@@ -191,7 +194,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                                             className='w-full min-h-[132px] rounded-10'
                                         />
                                         <h3 className='text-content-1 md:text-title-1 xl:text-h5 font-semibold text-skin-neutral-500'>A massive range! Over 50 unique and tantalising flavours to choose from!</h3>
-                                        <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-400'>Featuring draw-activated power and flavoured e-liquid, this striking disposable device promises intense flavour with every puff. The device itself gives off a very striking and appealing appearance, mainly due to it’s crystal exterior. It’s not too bulky either, which means carrying the device in your pocket is seamless.</p>
+                                        <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-400'>Featuring draw-activated power and flavoured e-liquid, this striking disposable device promises intense flavour with every puff. The device itself gives off a very striking and appealing appearance, mainly due to it's crystal exterior. It's not too bulky either, which means carrying the device in your pocket is seamless.</p>
                                     </div>
                                     <div className="space-y-4">
                                         <Image
@@ -202,7 +205,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                                             className='w-full min-h-[132px] rounded-10'
                                         />
                                         <h3 className='text-content-1 md:text-title-1 xl:text-h5 font-bold text-skin-neutral-500'>As you can see, Hayati delivers top-level performance!</h3>
-                                        <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-400'>Whether you’re new to vaping or an experienced vaper, don’t miss out on what the Hayati Pro Max has to offer. Try it today and be amazed by its unique flavourful sensations – we guarantee that you won’t regret it! If you’re looking for absolute smooth and pure taste, and uncompromising performance, then the Hayati Pro Max is for you!</p>
+                                        <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-400'>Whether you're new to vaping or an experienced vaper, don't miss out on what the Hayati Pro Max has to offer. Try it today and be amazed by its unique flavourful sensations – we guarantee that you won't regret it! If you're looking for absolute smooth and pure taste, and uncompromising performance, then the Hayati Pro Max is for you!</p>
                                     </div>
                                     <div className="space-y-4">
                                         <Image

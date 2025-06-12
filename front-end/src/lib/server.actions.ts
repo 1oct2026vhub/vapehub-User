@@ -16,7 +16,7 @@ import { ReferralStatsResponse } from "./config/referral.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
 import { handleRequest } from "./request.config";
-import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD } from '@/lib/api-routes';
+import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD, WORLDPAY_PAYMENT_PAYLOAD, WORLDPAY_PAYMENT_SUCCESS_RESPONSE, WORLDPAY_PAYMENT_CANCEL_RESPONSE } from '@/lib/api-routes';
 
 export const signInAction = async (
     email: string,
@@ -580,5 +580,23 @@ export const getFlashNews = async (status?: boolean): Promise<ServerActionRespon
   return await handleRequest<FlashNewsResponse, unknown>({
     endpoint: API_ROUTES.GET_FLASH_NEWS(status),
     method: 'GET',
+  });
+};
+
+// Worldpay payment success
+export const worldpayPaymentSuccess = async (payload: WORLDPAY_PAYMENT_PAYLOAD): Promise<ServerActionResponse<WORLDPAY_PAYMENT_SUCCESS_RESPONSE>> => {
+  return await handleRequest<WORLDPAY_PAYMENT_SUCCESS_RESPONSE, WORLDPAY_PAYMENT_PAYLOAD>({
+    endpoint: API_ROUTES.WORLDPAY_PAYMENT_SUCCESS,
+    payload,
+    method: 'POST',
+  });
+};
+
+// Worldpay payment cancel
+export const worldpayPaymentCancel = async (payload: WORLDPAY_PAYMENT_PAYLOAD): Promise<ServerActionResponse<WORLDPAY_PAYMENT_CANCEL_RESPONSE>> => {
+  return await handleRequest<WORLDPAY_PAYMENT_CANCEL_RESPONSE, WORLDPAY_PAYMENT_PAYLOAD>({
+    endpoint: API_ROUTES.WORLDPAY_PAYMENT_CANCEL,
+    payload,
+    method: 'POST',
   });
 };

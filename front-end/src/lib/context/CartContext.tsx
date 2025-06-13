@@ -468,6 +468,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     prevSessionRef.current = session;
   }, [session, clearCart]);
 
+  // Clear coupon when cart is empty and not loading
+  useEffect(() => {
+    if (!isLoading && itemCount === 0) {
+      setCouponDiscount({
+        value: 0,
+        isApplied: false,
+        code: null,
+        message: null,
+        discountValue: '',
+      });
+    }
+  }, [itemCount, isLoading]);
+
   // Revalidate coupon when cartTotal or itemCount changes
   useEffect(() => {
     const revalidate = async () => {
@@ -490,7 +503,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           // Only update state if the coupon was previously applied to avoid loops
           if (couponDiscount.isApplied) {
-            toast.info("Applied coupon was removed as cart conditions are no longer met.");
+            // toast.info("Applied coupon was removed as cart conditions are no longer met.");
             setCouponDiscount({
               value: 0,
               isApplied: false,

@@ -1,17 +1,21 @@
-import Image from 'next/image';
-import React from 'react';
+"use client"
+// import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@nextui-org/button';
 // import Link from 'next/link';
-import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
+import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 import Link from 'next/link';
 import NoImage from './NoImage';
+import { getReviewOrderByProductId } from '@/lib/server.actions';
+import { REVIEWS } from '@/lib/config/order.config';
+import { RatingStarEmpty, RatingStarFilled } from './Icons';
 
 interface ProductCardProps {
   title: string;
   imageSrc: string;
   price: string;
   buttonText: string;
-  reviews: number;
+  productId: number;
   flavors?: number;
   totalPuffs?: string;
   link: string;
@@ -23,12 +27,41 @@ const ProductCard: React.FC<ProductCardProps> = ({
   imageSrc,
   price,
   buttonText,
-  reviews,
+  productId,
   flavors,
   totalPuffs,
   link,
   isNew
 }) => {
+  const [reviewsData, setReviewsData] = useState<{
+    reviews: REVIEWS[];
+    averageRating: number;
+    totalReviews: number;
+  }>({
+    reviews: [],
+    averageRating: 0,
+    totalReviews: 0,
+  });
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!productId) return;
+      try {
+        const response = await getReviewOrderByProductId(productId);
+        if (response.status === ServerActionStatus.SUCCESS && response.data) {
+          setReviewsData({
+            reviews: response.data.reviews || [],
+            averageRating: parseFloat(response.data.average_rating) || 0,
+            totalReviews: response.data.total_reviews || 0,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+      }
+    };
+    fetchReviews();
+  }, [productId]);
+
   return (
     <Link href={link} className="block">
       <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
@@ -63,11 +96,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
             <div className="flex items-center gap-1">
               <div className="flex items-center">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <Image key={i} src='/images/review-star.svg' alt='review star' width={12} height={12} className='w-3 md:w-4' />
-                ))}
+                {Array.from({ length: 5 }, (_, i) => {
+                  if (i < Math.round(reviewsData.averageRating)) {
+                    return <RatingStarFilled key={i} className='w-3 md:w-4' />;
+                  }
+                  return <RatingStarEmpty key={i} className='w-3 md:w-4' />;
+                })}
               </div>
-              <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5">({reviews} Reviews)</p>
+              <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5">({reviewsData.totalReviews} Reviews)</p>
             </div>
           </div>
           {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p> : null}

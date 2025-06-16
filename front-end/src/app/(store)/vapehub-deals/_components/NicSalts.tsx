@@ -7,6 +7,7 @@ import Slider, { Settings } from 'react-slick';
 
 const products = [
     {
+        id: 1,
         name: "VG Pro 6000 Prefilled Pods",
         slug: "vg-pro-6000",
         price: "12.99",
@@ -16,6 +17,7 @@ const products = [
         imageSrc: '/images/nicsalts-1.png'
     },
     {
+        id: 2,
         name: "VG Pro 6000 Prefilled Pods",
         slug: "elf-bar-5000",
         price: "10.99",
@@ -25,6 +27,7 @@ const products = [
         imageSrc: '/images/nicsalts-2.png'
     },
     {
+        id: 3,
         name: "VG Pro 6000 Prefilled Pods",
         slug: "vg-pro-6000",
         price: "12.99",
@@ -34,6 +37,7 @@ const products = [
         imageSrc: '/images/nicsalts-3.png'
     },
     {
+        id: 4,
         name: "VG Pro 6000 Prefilled Pods",
         slug: "elf-bar-5000",
         price: "10.99",
@@ -43,6 +47,7 @@ const products = [
         imageSrc: '/images/nicsalts-4.png'
     },
     {
+        id: 5,
         name: "VG Pro 6000 Prefilled Pods",
         slug: "vg-pro-6000",
         price: "12.99",
@@ -52,6 +57,7 @@ const products = [
         imageSrc: '/images/nicsalts-1.png'
     },
     {
+        id: 6,
         name: "VG Pro 6000 Prefilled Pods",
         slug: "elf-bar-5000",
         price: "10.99",
@@ -61,6 +67,7 @@ const products = [
         imageSrc: '/images/nicsalts-2.png'
     },
     {
+        id: 7,
         name: "VG Pro 6000 Prefilled Pods",
         slug: "vg-pro-6000",
         price: "12.99",
@@ -70,6 +77,7 @@ const products = [
         imageSrc: '/images/nicsalts-3.png'
     },
     {
+        id: 8,
         name: "VG Pro 6000 Prefilled Pods",
         slug: "elf-bar-5000",
         price: "10.99",
@@ -191,7 +199,7 @@ const NicSalts: React.FC = () => {
                                 imageSrc={product.imageSrc}
                                 price={product.price}
                                 buttonText={"3 for £30"}
-                                reviews={10}
+                                productId={product.id}
                                 flavors={product.Flavors}
                                 link={`/${product.slug}`}
                                 totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}

@@ -8,10 +8,12 @@ import EmptyPlaceholder from "./ui/EmptyPlaceholder";
  
 interface ProductProps {
   data: ProductResponseData;
+  isListing?: boolean;
 }
-const ProductsSlider: React.FC<ProductProps> = ({data}) => {
+const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false}) => {
   
   const products:Product[] = data?.products?.filter((product: Product) => product.Category !== null) ?? [];
+  console.log("landing page products", products);
   
   const settings: Settings = {
     dots: true,
@@ -27,7 +29,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
         settings: {
           slidesToShow: 3,
           slidesToScroll: 1,
-          infinite: products.length > 3,
+          infinite: products.length > (isListing ? 4: 3),
           dots: true,
         },
       },
@@ -36,7 +38,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1,
-          infinite: products.length > 2,
+          infinite: products.length > (isListing ? 3 : 2),
           dots: true,
         },
       },
@@ -54,7 +56,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data}) => {
             imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ""}
             price={product?.price}
             buttonText={"3 for £30"}
-            reviews={10}
+            productId={product.id}
             flavors={product?.Flavors?.length}
             link={`/${product.slug}`}
             totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}

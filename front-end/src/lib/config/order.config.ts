@@ -310,6 +310,10 @@ export interface ORDER {
         shipping_method: string;
         shipping_cost: number;
     };
+    paymentMethod: {
+        payment_method: string;
+        status: string;
+    } | null;
     coupon: null;
 }
 

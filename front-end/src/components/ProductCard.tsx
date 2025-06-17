@@ -47,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     const fetchReviews = async () => {
       if (!productId) return;
       try {
-        const response = await getReviewOrderByProductId(productId);
+        const response = await getReviewOrderByProductId(productId, 1, 1);
         if (response.status === ServerActionStatus.SUCCESS && response.data) {
           setReviewsData({
             reviews: response.data.reviews || [],

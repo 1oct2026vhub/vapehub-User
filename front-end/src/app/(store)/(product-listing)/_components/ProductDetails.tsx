@@ -169,7 +169,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     useEffect(() => {
         const fetchReviews = async () => {
             if (!product?.id) return;
-            const response = await getReviewOrderByProductId(product.id);
+            const response = await getReviewOrderByProductId(product.id,1,1);
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setReviewsData({
                     reviews: response.data.reviews || [],

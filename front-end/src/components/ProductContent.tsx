@@ -1,5 +1,5 @@
 "use client"
-import { Card, CardBody,  Tab, Tabs } from '@nextui-org/react'
+import { Card, CardBody,  Tab, Tabs, Pagination } from '@nextui-org/react'
 // import Image from 'next/image'
 import React, { ReactElement, useEffect, useState } from 'react'
 import ReviewCard from './ReviewCard'; 
@@ -16,16 +16,25 @@ type ProductContentProps = {
 const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement => {
     const [reviews, setReviews] = useState<REVIEWS[]>([]);
     const [selectedTab, setSelectedTab] = useState('Description');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+    const limit = 10;
+
     useEffect(() => {
         const fetchReviews = async () => {
-            const response = await getReviewOrderByProductId(product.id);
-            if(response.status === ServerActionStatus.SUCCESS) {
-                setReviews(response.data.reviews)
+            if (selectedTab !== 'Reviews') return;
+            setIsLoadingReviews(true);
+            const response = await getReviewOrderByProductId(product.id, currentPage, limit);
+            if(response.status === ServerActionStatus.SUCCESS && response.data) {
+                setReviews(response.data.reviews);
+                setTotalPages(response.data.pagination.totalPages);
             }
+            setIsLoadingReviews(false);
         }
         fetchReviews()
-    }, [product])
-    return (
+    }, [product.id, selectedTab, currentPage])
+        return (
         <section id="reviews" className='bg-skin-white p-4 md:p-6 xl:p-10 rounded-2.5xl shadow-card space-y-7.5'>
             <div className="flex w-full flex-col">
                 <Tabs aria-label="Options"
@@ -247,10 +256,24 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             <CardBody className='p-0'>
                                 <div className='flex flex-col gap-7.5 pb-2'>
                                     <h3 className='text-h5 lg:text-h3 primary-gradient-100 font-bold'>Reviews</h3>
-                                    {reviews.length > 0 ? (
-                                        reviews.map((review) => (
-                                            <ReviewCard key={review.id} review={review} />
-                                        ))
+                                    {isLoadingReviews ? (
+                                        <p>Loading reviews...</p>
+                                    ) : reviews.length > 0 ? (
+                                        <>
+                                            {reviews.map((review) => (
+                                                <ReviewCard key={review.id} review={review} />
+                                            ))}
+                                            {totalPages > 1 && (
+                                                <div className="flex justify-center mt-4">
+                                                    <Pagination
+                                                        total={totalPages}
+                                                        initialPage={1}
+                                                        page={currentPage}
+                                                        onChange={setCurrentPage}
+                                                    />
+                                                </div>
+                                            )}
+                                        </>
                                     ) : (
                                         <EmptyPlaceholder
                                             title="No reviews found"

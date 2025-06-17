@@ -3,15 +3,15 @@ import { Button } from '@nextui-org/button'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import ReviewForm from '@/components/ReviewForm'
-import { OrderItems, REVIEW_ORDER_PAYLOAD, ORDER_STATUS, REVIEW_ORDER_PAYLOAD_UPDATE } from '@/lib/config/order.config'
-import { deleteReviewOrder, getReviewOrder, reviewOrder, updateReviewOrder } from '@/lib/server.actions'
+import { OrderItems, REVIEW_ORDER_PAYLOAD, ORDER_STATUS, REVIEW_ORDER_PAYLOAD_UPDATE , REVIEWS } from '@/lib/config/order.config'
+import { deleteReviewOrder, getReviewByOrderId, reviewOrder, updateReviewOrder } from '@/lib/server.actions'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { toast } from 'sonner'
 import { RatingStarFilled, RatingStarEmpty } from '@/components/Icons'
 import { Accordion, AccordionItem } from '@nextui-org/react'
 import NoImage from '@/components/NoImage'
-import { useSession } from 'next-auth/react'
-import { User } from 'next-auth'
+// import { useSession } from 'next-auth/react'
+// import { User } from 'next-auth'
 import SuspenseLoader from '@/components/ui/SuspenseLoader'
 const itemClasses = {
     base: "w-full rounded-lg shadow-input border border-skin-neutral-100",
@@ -29,10 +29,27 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
     const [currentReview, setCurrentReview] = useState('')
     const [currentReviewId, setCurrentReviewId] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
-    const { data } = useSession();
-    const sessionUser = data?.user as unknown as User;
-    const userId: number = Number(sessionUser?.id);
+    const [orderReviews, setOrderReviews] = useState<REVIEWS[]>([]);
+    // const { data } = useSession();
+    // const sessionUser = data?.user as unknown as User;
+    // const userId: number = Number(sessionUser?.id);
     const isReviewEnabled = status === ORDER_STATUS.DELIVERED;
+
+    const fetchOrderReviews = async () => {
+        if (!isReviewEnabled) return;
+        setIsLoading(true);
+        const response = await getReviewByOrderId(orderId);
+        if (response.status === ServerActionStatus.SUCCESS) {
+            if (response.data.length > 0) {
+                setOrderReviews(response.data);
+            } else {
+                setOrderReviews([]);
+            }
+        } else {
+            toast.error('Failed to fetch reviews');
+        }
+        setIsLoading(false);
+    }
 
     const handleReviewSubmit = async (rating: number, review: string, productId: number) => {
         const payload: REVIEW_ORDER_PAYLOAD = {
@@ -68,6 +85,7 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
             const response = await reviewOrder(payload)
             if (response.status === ServerActionStatus.SUCCESS) {
                 toast.success('Review submitted successfully')
+                await fetchOrderReviews();
                 setIsReviewSubmitted(true)
                 setCurrentRating(rating)
                 setCurrentReview(review)
@@ -80,22 +98,20 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
         }
     }
 
-    const handleOpenReview = async (productId: number) => {
-        setIsLoading(true)
-        const response = await getReviewOrder(productId, userId)
-        if (response.status === ServerActionStatus.SUCCESS) {
-            if (response.data.rows.length > 0) {
-                setIsReviewSubmitted(true)
-                setCurrentRating(response.data.rows[0].rating)
-                setCurrentReview(response.data.rows[0].comment)
-                setCurrentReviewId(response.data.rows[0].id)
-            } else {
-                setIsReviewSubmitted(false)
-            }
+    const handleOpenReview = (productId: number) => {
+        const reviewForItem = orderReviews.find(r => r.product_id === productId);
+        if (reviewForItem) {
+            setIsReviewSubmitted(true)
+            setCurrentRating(reviewForItem.rating)
+            setCurrentReview(reviewForItem.comment)
+            setCurrentReviewId(reviewForItem.id)
         } else {
-            toast.error('Review submission failed')
+            setIsReviewSubmitted(false)
+            setCurrentRating(0)
+            setCurrentReview('')
+            setCurrentReviewId(0)
         }
-        setIsLoading(false)
+        setIsEditReview(false);
     }
 
     const handleEditReview = async () => {
@@ -105,11 +121,16 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
     }
 
     const handleDeleteReview = async (productId: number) => {
+        console.log("productId", productId);
         setIsLoading(true);
         const response = await deleteReviewOrder(currentReviewId)
         if (response.status === ServerActionStatus.SUCCESS) {
             toast.success('Review deleted successfully');
-            handleOpenReview(productId);
+            await fetchOrderReviews();
+            setIsReviewSubmitted(false);
+            setCurrentReviewId(0);
+            setCurrentRating(0);
+            setCurrentReview('');
         } else {
             toast.error('Review deletion failed');
         }
@@ -117,10 +138,16 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
     }
 
     useEffect(() => {
-        if (orderItems.length > 0 && userId && isReviewEnabled) {
+        if (orderId) {
+            fetchOrderReviews();
+        }
+    }, [orderId])
+
+    useEffect(() => {
+        if (orderItems.length > 0 && orderReviews.length > 0 && isReviewEnabled) {
             handleOpenReview(orderItems[0].product.id)
         }
-    }, [orderItems, userId, isReviewEnabled])
+    }, [orderItems, orderReviews, isReviewEnabled])
 
     return (
         <div className='space-y-3.5 w-full md:w-[50%] xl:w-[40%]'>

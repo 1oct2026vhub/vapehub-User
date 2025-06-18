@@ -71,8 +71,9 @@ const DynamicBlogsSection = dynamic(() => import('./_components/BlogsSection'), 
 
 export const revalidate = 60;
 
-const Dashboard: NextPage<{searchParams: Promise<{referral_code: string}>}> = async ({searchParams}) => {
-  const referralCode = (await searchParams).referral_code;
+const Dashboard: NextPage = async () => {
+  // const Dashboard: NextPage<{searchParams: Promise<{referral_code: string}>}> = async ({searchParams}) => {
+  // const referralCode = (await searchParams).referral_code;
    
   const data = await getDashboardData();
 

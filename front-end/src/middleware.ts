@@ -26,6 +26,28 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  const referralCode = request.nextUrl.searchParams.get('referral_code')
+  
+  // If we are on the register page, no need to redirect, just set the cookie and continue
+  if(request.nextUrl.pathname.includes('/my-account')){
+    const response = NextResponse.next();
+    if (referralCode && request.cookies.get('referral_code')?.value !== referralCode) {
+      response.cookies.set('referral_code', referralCode, { path: '/' });
+    }
+    return response;
+  }
+  
+  if (referralCode) {
+    const url = request.nextUrl.clone()
+    url.searchParams.delete('referral_code');
+    const response = NextResponse.redirect(url)
+    
+    if (request.cookies.get('referral_code')?.value !== referralCode) {
+      response.cookies.set('referral_code', referralCode, { path: '/' });
+    }
+    return response
+  }
+
   return NextResponse.next()
 }
 

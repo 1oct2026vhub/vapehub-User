@@ -5,14 +5,47 @@ import { Button } from '@nextui-org/button'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import SetReferralCode from './SetReferralCode'
 
-const ReferFriend: React.FC<{referralCode: string}> = async ({referralCode}) => {
+const ReferFriend: React.FC = async () => {
     
     const session = await getServerSessionData();
     const user = session?.user;
     if (!user) {
-        return <SetReferralCode referralCode={referralCode} />;
+        return (
+					<Link
+						href={ROUTES.MY_ACCOUNT}
+						className='xl:pt-24 xl:pb-12.5 xl:px-5 block'
+					>
+						<div className='bg-skin-white border border-skin-neutral-50 xl:pl-11 pt-7 flex flex-col xl:flex-row h-fit gap-2 shadow-card rounded-[36px] md:rounded-[50px] xl:max-h-[309px]'>
+							<div className='text-center xl:text-left'>
+								<div className='text-h4 md:text-h3 xl:text-55 font-bold'>
+									<h1 className='primary-gradient-100'>Refer a Friend &</h1>
+									<h1 className='primary-gradient-100'>
+										We will reward you both!
+									</h1>
+								</div>
+								<Button
+									as={"div"}
+									size='lg'
+									radius='sm'
+									color='primary'
+									className='btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !px-4 !py-2 !rounded-10 mt-4 xl:mt-8'
+									endContent={<RightArrowIcon stroke='#fff' className='ml-1' />}
+								>
+									Register Now
+								</Button>
+							</div>
+							<Image
+								src='/images/refer-friend.svg'
+								alt='Refer Friend'
+								width={533}
+								height={280}
+								loading='lazy'
+								className='mx-auto'
+							/>
+						</div>
+					</Link>
+				);
     }
     return (
         <section className='xl:pt-24 xl:pb-12.5 xl:px-5'>

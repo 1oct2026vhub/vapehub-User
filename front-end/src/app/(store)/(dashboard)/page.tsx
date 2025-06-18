@@ -163,7 +163,7 @@ const Dashboard: NextPage<{searchParams: Promise<{referral_code: string}>}> = as
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
-        <DynamicReferFriend referralCode={referralCode} />
+        <DynamicReferFriend />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>

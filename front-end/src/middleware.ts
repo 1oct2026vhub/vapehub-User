@@ -26,38 +26,25 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const referralCode = request.nextUrl.searchParams.get('referral_code')
-  
-  // If we are on the register page, no need to redirect, just set the cookie and continue
-  if(request.nextUrl.pathname.includes('/my-account')){
-    const response = NextResponse.next();
-    if (referralCode && request.cookies.get('referral_code')?.value !== referralCode) {
-      response.cookies.set('referral_code', referralCode, { path: '/' });
+  const response = NextResponse.next()
+  const url = request.nextUrl.clone()
+
+  // Check if 'referral_code' is in the query parameters
+  if (url.searchParams.has('referral_code')) {
+    const referralCode = url.searchParams.get('referral_code')
+    if (referralCode) {
+      // Set the cookie on the response
+      response.cookies.set('referral_code', referralCode, {
+        path: '/',
+        // Add other cookie options like maxAge, httpOnly, secure if needed
+      })
     }
-    return response;
-  }
-  
-  if (referralCode) {
-    const url = request.nextUrl.clone()
-    url.searchParams.delete('referral_code');
-    const response = NextResponse.redirect(url)
-    
-    if (request.cookies.get('referral_code')?.value !== referralCode) {
-      response.cookies.set('referral_code', referralCode, { path: '/' });
-    }
-    return response
   }
 
-  return NextResponse.next()
+  return response
 }
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: [
-    '/my-account/orders/:path*',
-    '/my-account/personal-info/:path*',
-    '/my-account/referrals/:path*',
-    '/my-account/addresses/:path*',
-    '/my-account/security/:path*',
-  ],
+  matcher: '/:path*',
 } 

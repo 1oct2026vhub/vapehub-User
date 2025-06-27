@@ -70,6 +70,7 @@ export interface DynamicPageSlugResponse {
     slug: string;
     entity_type: "category" |  "product" | "blog" | "blog_category";
     entity_id: number; 
+    seo: SeoData | null;
 }
 
 export type FlashNewsResponse = FlashNewsItem[];

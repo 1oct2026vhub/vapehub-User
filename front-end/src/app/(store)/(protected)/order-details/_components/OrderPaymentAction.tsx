@@ -65,7 +65,7 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
                     isLoading={isLoading}
                     isDisabled={isLoading}
                 >Pay Now</Button>
-                <Button
+                {/* <Button
                     size='md'
                     radius='sm'
                     color='danger'
@@ -73,7 +73,7 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
                     isLoading={isCancelLoading}
                     isDisabled={isCancelLoading}
                     className="!bg-skin-red-400"
-                >Cancel Order</Button>
+                >Cancel Order</Button> */}
             </div>
 
             <Modal isOpen={isOpen} onClose={onClose}>

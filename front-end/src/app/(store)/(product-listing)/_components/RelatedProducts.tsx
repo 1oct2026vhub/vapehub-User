@@ -37,7 +37,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
         <ViewAllLink href={viewAllHref} />
       </div>
       <div className="slider-container section-slider products-slider">
-        <ProductsSlider data={productResponse}/>
+        <ProductsSlider data={productResponse} isListing={true}/>
       </div>
     </section>
   );

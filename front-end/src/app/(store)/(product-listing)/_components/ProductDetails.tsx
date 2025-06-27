@@ -1,9 +1,9 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { BenefitIcon, DealsIcon, DispatchIcon, ReviewStarFilled, MinusIcon, PlusIcon } from '@/components/Icons'
+import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
-import Image from 'next/image'
+// import Image from 'next/image'
 import BundleProductCard from '@/components/BundleProductCard'
 import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant, ProductViewDetails } from '@/lib/config/product.config'
 import { ROUTES } from '@/lib/routes'
@@ -14,6 +14,10 @@ import Link from 'next/link'
 import ProductVariantFilter from './ProductVariantFilter'
 import NoImage from '@/components/NoImage'
 import CustomImageMagnifier from '@/components/CustomImageMagnifier'
+
+import { REVIEWS } from '@/lib/config/order.config'
+import { ServerActionStatus } from '@/lib/config/app.config'
+import { getReviewOrderByProductId } from '@/lib/server.actions'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -55,7 +59,6 @@ const settings: Settings = {
 
 };
 const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => { 
-     
     const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
     const product: ProductViewDetails = data?.product;
     const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;
@@ -69,14 +72,37 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
      
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
     const [quantity, setQuantity] = useState(1);
-    const { addItemToCart, isLoading } = useCart();
+    const { addItemToCart } = useCart();
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [inputValue, setInputValue] = useState(quantity.toString());
     const [error, setError] = useState<string | null>(null);
+    const [reviewsData, setReviewsData] = useState<{
+        reviews: REVIEWS[];
+        averageRating: number;
+        totalReviews: number;
+    }>({
+        reviews: [],
+        averageRating: 0,
+        totalReviews: 0,
+    });
+
+    const handleReviewsClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const reviewsSection = document.getElementById('reviews');
+        if (reviewsSection) {
+            reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // The NextUI tab buttons have a data-key attribute.
+            const reviewsTabButton = reviewsSection.querySelector('[data-key="Reviews"]') as HTMLElement;
+            if (reviewsTabButton) {
+                reviewsTabButton.click();
+            }
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
         setInputValue(value);
-         
         // Only update quantity if the input is a valid number
         const numValue = parseInt(value);
         if (!isNaN(numValue)) {
@@ -118,7 +144,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         if (quantity <= 0 || quantity > stock) {
             return;
         }
-        await addItemToCart(product.id, productVariant?.id, quantity, productVariant, productName);
+        setIsAddingToCart(true);
+        try {
+            await addItemToCart(product.id, productVariant?.id, quantity, productVariant, productName);
+        } catch (err) {
+            console.error("Failed to add to cart:", err);
+        } finally {
+            setIsAddingToCart(false);
+        }
     };
     const scrollToTop = () => {
         window.scrollTo({
@@ -132,8 +165,21 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     }, []);
     useEffect(() => {
         setMainImage(isVariant ? data?.variants[0]?.primary_image : product?.primary_image);
-    }, [isVariant, data, product]);
-
+    }, [isVariant, data, product]);    
+    useEffect(() => {
+        const fetchReviews = async () => {
+            if (!product?.id) return;
+            const response = await getReviewOrderByProductId(product.id,1,1);
+            if (response.status === ServerActionStatus.SUCCESS && response.data) {
+                setReviewsData({
+                    reviews: response.data.reviews || [],
+                    averageRating: parseFloat(response.data.average_rating) || 0,
+                    totalReviews: response.data.total_reviews || 0,
+                });
+            }
+        }
+        fetchReviews()
+    }, [product]);
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -143,20 +189,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                     <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                         Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.brand?.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.brand?.name}</Link>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
                         <div className="flex gap-1">
-                            {Array.from({ length: 5 }, (_, i) => (
-                                <Image
-                                    key={i}
-                                    src='/images/review-star.svg'
-                                    alt='Review star'
-                                    width={16}
-                                    height={16}
-                                    className='md:w-5 md:h-5' />
-                            ))}
-
+                            {Array.from({ length: 5 }, (_, i) => {
+                                if (i < Math.round(reviewsData.averageRating)) {
+                                    return <RatingStarFilled key={i} className='w-4 h-4 md:w-5 md:h-5' />;
+                                }
+                                return <RatingStarEmpty key={i} className='w-4 h-4 md:w-5 md:h-5' />;
+                            })}
                         </div>
-                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">(10 Reviews)</p>
+                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewsData.totalReviews} Reviews)</p>
                     </div>
                 </div>
                 {/* Title section mobile ends */}
@@ -217,13 +259,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                             Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.brand?.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.brand?.name}</Link>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
                             <div className="flex gap-1">
-                                {Array.from({ length: 5 }, (_, i) => (
-                                    <ReviewStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />
-                                ))}
+                                {Array.from({ length: 5 }, (_, i) => {
+                                    if (i < Math.round(reviewsData.averageRating)) {
+                                        return <RatingStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
+                                    }
+                                    return <RatingStarEmpty key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
+                                })}
                             </div>
-                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">(10 Reviews)</p>
+                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewsData.totalReviews} Reviews)</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
@@ -255,7 +300,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         </div>
                     </div>
                     <Divider className='max-lg:hidden' />
-                    <ProductVariantFilter attributeTerms={product?.attribute_terms} productSlug={product?.slug} selectedVariant={selectedVariant} availableAttributes={availableAttributes ?? []} />
+                    <ProductVariantFilter 
+                        attributeTerms={product?.attribute_terms} 
+                        productSlug={product?.slug} 
+                        selectedVariant={selectedVariant} 
+                        availableAttributes={availableAttributes ?? []} 
+                        allVariants={data.variants ?? []}
+                    />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
                             stock > 0 ?
@@ -274,7 +325,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 color='primary'
                                 className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
                                 onPress={() => handleQuantityChange(quantity - 1)}
-                                isDisabled={isLoading || quantity <= 1 || stock === 0}
+                                isDisabled={isAddingToCart || quantity <= 1 || stock === 0}
                             >
                                 <MinusIcon />
                             </Button>
@@ -304,7 +355,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 color='primary'
                                 className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
                                 onPress={() => handleQuantityChange(quantity + 1)}
-                                isDisabled={isLoading || quantity >= stock || stock === 0}
+                                isDisabled={isAddingToCart || quantity >= stock || stock === 0}
                             >
                                 <PlusIcon />
                             </Button>
@@ -315,10 +366,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                             size="lg"
                             radius="md"
                             color="primary"
-                            isLoading={isLoading}
-                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isLoading || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            isLoading={isAddingToCart}
+                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isAddingToCart || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
-                            disabled={isLoading || quantity <= 0 || quantity > stock}
+                            disabled={isAddingToCart || quantity <= 0 || quantity > stock}
                         >
                             Add to Cart
                         </Button>

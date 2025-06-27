@@ -6,17 +6,17 @@ import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
-import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse } from "./config/global.config";
+import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { NotificationListResponse } from "./config/notification.config";
-import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE } from "./config/order.config";
+import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { ReferralStatsResponse } from "./config/referral.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
 import { handleRequest } from "./request.config";
-import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD } from '@/lib/api-routes';
+import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD, WORLDPAY_PAYMENT_PAYLOAD, WORLDPAY_PAYMENT_SUCCESS_RESPONSE, WORLDPAY_PAYMENT_CANCEL_RESPONSE } from '@/lib/api-routes';
 
 export const signInAction = async (
     email: string,
@@ -538,8 +538,8 @@ export const getHeaderMegaMenu = async (): Promise<ServerActionResponse<HeaderMe
   });
 };
 
-export const reviewOrder = async (payload: REVIEW_ORDER_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
-  return await handleRequest<{message: string}, unknown>({
+export const reviewOrder = async (payload: REVIEW_ORDER_PAYLOAD): Promise<ServerActionResponse<{message: string, id: number}>> => {
+  return await handleRequest<{message: string, id: number}, unknown>({
     endpoint: API_ROUTES.REVIEW_ORDER,
     payload,
     method: 'POST',
@@ -553,6 +553,13 @@ export const getReviewOrder = async (productId: number, userId: number): Promise
   });
 };
 
+export const getReviewByOrderId = async (orderId: number): Promise<ServerActionResponse<REVIEWS[]>> => {
+  return await handleRequest<REVIEWS[], unknown>({
+    endpoint: API_ROUTES.GET_REVIEW_BY_ORDER_ID(orderId),
+    method: 'GET',
+  });
+};
+
 export const updateReviewOrder = async (orderId: number, payload: REVIEW_ORDER_PAYLOAD_UPDATE): Promise<ServerActionResponse<{message: string}>> => {
   return await handleRequest<{message: string}, unknown>({
     endpoint: API_ROUTES.UPDATE_REVIEW_ORDER(orderId),
@@ -561,9 +568,9 @@ export const updateReviewOrder = async (orderId: number, payload: REVIEW_ORDER_P
   });
 };
 
-export const getReviewOrderByProductId = async (productId: number): Promise<ServerActionResponse<REVIEW_ORDER_RESPONSE>> => {
+export const getReviewOrderByProductId = async (productId: number, page: number, limit: number): Promise<ServerActionResponse<REVIEW_ORDER_RESPONSE>> => {
   return await handleRequest<REVIEW_ORDER_RESPONSE, unknown>({
-    endpoint: API_ROUTES.GET_REVIEW_ORDER_BY_PRODUCT_ID(productId),
+    endpoint: API_ROUTES.GET_REVIEW_ORDER_BY_PRODUCT_ID(productId, page, limit),
     method: 'GET',
   });
 };
@@ -573,5 +580,30 @@ export const deleteReviewOrder = async (orderId: number): Promise<ServerActionRe
   return await handleRequest<{message: string}, unknown>({
     endpoint: API_ROUTES.DELETE_REVIEW_ORDER(orderId),
     method: 'DELETE',
+  });
+};
+//List flash news
+export const getFlashNews = async (status?: boolean): Promise<ServerActionResponse<FlashNewsResponse>> => {
+  return await handleRequest<FlashNewsResponse, unknown>({
+    endpoint: API_ROUTES.GET_FLASH_NEWS(status),
+    method: 'GET',
+  });
+};
+
+// Worldpay payment success
+export const worldpayPaymentSuccess = async (payload: WORLDPAY_PAYMENT_PAYLOAD): Promise<ServerActionResponse<WORLDPAY_PAYMENT_SUCCESS_RESPONSE>> => {
+  return await handleRequest<WORLDPAY_PAYMENT_SUCCESS_RESPONSE, WORLDPAY_PAYMENT_PAYLOAD>({
+    endpoint: API_ROUTES.WORLDPAY_PAYMENT_SUCCESS,
+    payload,
+    method: 'POST',
+  });
+};
+
+// Worldpay payment cancel
+export const worldpayPaymentCancel = async (payload: WORLDPAY_PAYMENT_PAYLOAD): Promise<ServerActionResponse<WORLDPAY_PAYMENT_CANCEL_RESPONSE>> => {
+  return await handleRequest<WORLDPAY_PAYMENT_CANCEL_RESPONSE, WORLDPAY_PAYMENT_PAYLOAD>({
+    endpoint: API_ROUTES.WORLDPAY_PAYMENT_CANCEL,
+    payload,
+    method: 'POST',
   });
 };

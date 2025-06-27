@@ -33,7 +33,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
     }
     setError(null);
     setInputValue(newQuantity.toString());
-    await updateItemQuantity(item.id, newQuantity);
+    await updateItemQuantity(item.id, newQuantity,item.name);
   }, [item.stock, item.id, updateItemQuantity]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +49,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
         setError(`Only ${item.stock} items available in stock`);
       } else {
         setError(null);
-        updateItemQuantity(item.id, numValue);
+        updateItemQuantity(item.id, numValue, item.name);
       }
     }
   };

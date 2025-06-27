@@ -60,9 +60,13 @@ export const API_ROUTES = {
     GET_HEADER_MEGA_MENU: buildRequestUrl('/api/menu'),
     REVIEW_ORDER: buildRequestUrl('/api/review'),
     GET_REVIEW_ORDER: (productId: number, userId: number) => buildRequestUrl(`/api/review?product_id=${productId}&user_id=${userId}&is_visible=true`),
-    GET_REVIEW_ORDER_BY_PRODUCT_ID: (productId: number) => buildRequestUrl(`/api/review/product/${productId}?page=1&limit=10&is_visible=true`),
+    GET_REVIEW_BY_ORDER_ID: (orderId: number) => buildRequestUrl(`/api/review/order/${orderId}`),
+    GET_REVIEW_ORDER_BY_PRODUCT_ID: (productId: number, page: number, limit: number) => buildRequestUrl(`/api/review/product/${productId}?page=${page}&limit=${limit}&is_visible=true`),
     UPDATE_REVIEW_ORDER: (orderId: number) => buildRequestUrl(`/api/review/${orderId}`),
     DELETE_REVIEW_ORDER: (orderId: number) => buildRequestUrl(`/api/review/${orderId}`),
+    GET_FLASH_NEWS: (status?: boolean) => buildRequestUrl(`/api/home/flash-news${status !== undefined ? `?status=${status}` : ''}`),
+    WORLDPAY_PAYMENT_SUCCESS: buildRequestUrl('/api/payment/worldpay/payment-success'),
+    WORLDPAY_PAYMENT_CANCEL: buildRequestUrl('/api/payment/worldpay/payment-cancel'),
 }
 
 // * Helper functions
@@ -89,5 +93,33 @@ export interface PRODUCT_VARIANT_PAYLOAD {
 export interface PRODUCT_VARIANT_ATTRIBUTE {
     attribute_id: number;
     term_id: number;
+}
 
+// Worldpay payment types
+export interface WORLDPAY_PAYMENT_PAYLOAD {
+    orderCode: string;
+    currency: string;
+    amount: number;
+}
+
+export interface WORLDPAY_PAYMENT_SUCCESS_RESPONSE {
+    message: string;
+    orderId: number;
+    orderCode: string;
+    status: string;
+}
+
+export interface WORLDPAY_PAYMENT_CANCEL_RESPONSE {
+    message: string;
+    data: {
+        order_code: string;
+        payment_method: string;
+        order_details: {
+            order_id: number;
+            order_unique_id: string;
+            order_code: string;
+            status: string;
+            amount: number;
+        };
+    };
 }

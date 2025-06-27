@@ -121,7 +121,9 @@ const PersonalInfo: NextPage = () => {
                          
                     </div>
                     <div className='space-y-3 md:space-y-4.5 sm:pr-4'>
-                        <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Mobile Number</h3>
+                        <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
+                          Mobile Number<span className="text-red-500"> *</span>
+                        </h3>
                         <InputField
                             control={form.control}
                             name='phone'

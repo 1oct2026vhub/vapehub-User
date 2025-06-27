@@ -26,16 +26,25 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next()
+  const response = NextResponse.next()
+  const url = request.nextUrl.clone()
+
+  // Check if 'referral_code' is in the query parameters
+  if (url.searchParams.has('referral_code')) {
+    const referralCode = url.searchParams.get('referral_code')
+    if (referralCode) {
+      // Set the cookie on the response
+      response.cookies.set('referral_code', referralCode, {
+        path: '/',
+        // Add other cookie options like maxAge, httpOnly, secure if needed
+      })
+    }
+  }
+
+  return response
 }
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: [
-    '/my-account/orders/:path*',
-    '/my-account/personal-info/:path*',
-    '/my-account/referrals/:path*',
-    '/my-account/addresses/:path*',
-    '/my-account/security/:path*',
-  ],
+  matcher: '/:path*',
 } 

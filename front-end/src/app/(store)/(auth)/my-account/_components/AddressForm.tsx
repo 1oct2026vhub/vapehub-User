@@ -86,7 +86,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
         control={form.control}
         name="street"
         onPlaceSelect={handlePlaceSelect}
-        placeholder="Enter your street address"
+        placeholder="Start typing your address here..."
         label="Street Address"
         isRequired
         inputClassName="w-full"

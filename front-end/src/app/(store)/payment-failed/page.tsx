@@ -8,7 +8,7 @@ import { Button } from '@nextui-org/button';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { ServerActionStatus } from '@/lib/config/app.config';
-import { getTransactionDetails } from '@/lib/server.actions';
+import { getTransactionDetails, worldpayPaymentCancel } from '@/lib/server.actions';
 
 const PaymentFailedPage = () => {
     const router = useRouter();
@@ -24,16 +24,44 @@ const PaymentFailedPage = () => {
 
     useEffect(() => {
         const verifyPayment = async () => {
-        try {
-        // Get transaction details from local storage
-        const transactionId = searchParams.get('t');
-        const sessionId = searchParams.get('s');
-        
-        if (!transactionId || !sessionId) {
-            throw new Error('Missing required payment parameters');
-        }
-        const response = await getTransactionDetails(transactionId);
-               
+            try {
+                // Get transaction details from URL parameters
+                const transactionId = searchParams.get('t');
+                const sessionId = searchParams.get('s');
+                const orderCode = searchParams.get('orderCode');
+                const currency = searchParams.get('currency');
+                const amount = searchParams.get('amount');
+                
+                if (!transactionId || !sessionId) {
+                    throw new Error('Missing required payment parameters');
+                }
+
+                // If Worldpay parameters are present, call Worldpay cancel API
+                if (orderCode && currency && amount) {
+                    const worldpayResponse = await worldpayPaymentCancel({
+                        orderCode,
+                        currency,
+                        amount: parseFloat(amount)
+                    });
+
+                    if (worldpayResponse.status === ServerActionStatus.SUCCESS) {
+                        setTransactionDetails(prev => ({
+                            ...prev,
+                            id: worldpayResponse.data.data.order_code,
+                            method: worldpayResponse.data.data.payment_method,
+                            amount: worldpayResponse.data.data.order_details.amount
+                        }));
+                        
+                        toast.error('Payment was cancelled');
+                        return;
+                    } else {
+                        throw new Error(worldpayResponse.message);
+                    }
+                }
+
+                // Fallback to existing transaction details API
+                const response = await getTransactionDetails(transactionId);
+                       
                 if (response.status === ServerActionStatus.SUCCESS) {
                     // Set transaction details
                     setTransactionDetails(prev => ({
@@ -47,9 +75,9 @@ const PaymentFailedPage = () => {
             } catch (error) {
                 console.error('Payment verification error:', error);
                 toast.error('Failed to verify payment. Please contact support.');
-                 
             }
         };
+        
         verifyPayment();
     }, [router, searchParams]);
 

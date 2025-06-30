@@ -134,6 +134,7 @@ export default Page;
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
+  console.log("seo response",response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -413,8 +414,8 @@ export async function generateMetadata({ params, searchParams }: {
       const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
       if (!data?.product || !data.product.category) return null;
 
-      return {
-        title: data.product.name,
+        return {
+          title: data.product.name,
         description: data.product.description,
         openGraph: {
           title: data.product.name,

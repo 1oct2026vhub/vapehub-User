@@ -134,6 +134,7 @@ export default Page;
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
+  console.log("seo response",response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -257,11 +258,11 @@ export async function generateMetadata({ params, searchParams }: {
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
     if(data &&!data.variants.length) {
        return {
-        title: data.product.name,
-        description: data.product.description,
+        title: dynamicPageSlug.seo?.title ?? data.product.name,
+        description: dynamicPageSlug.seo?.description ?? data.product.description,
         openGraph: {
-          title: data.product.name,
-          description: data.product.description,
+          title: dynamicPageSlug.seo?.title ?? data.product.name,
+          description: dynamicPageSlug.seo?.description ?? data.product.description,
           
         }
        };
@@ -273,11 +274,11 @@ export async function generateMetadata({ params, searchParams }: {
     }
      
     return {
-      title: variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name,
-      description: data.product.description,
+      title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
+      description: dynamicPageSlug.seo?.description ?? data.product.description,
       openGraph: {
-        title: variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name,
-        description: data.product.description,
+        title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
+        description: dynamicPageSlug.seo?.description ?? data.product.description,
         images: data.variants[0].primary_image?.url ? [{
           url: data.variants[0].primary_image?.url,
           width: 1200,
@@ -291,6 +292,21 @@ export async function generateMetadata({ params, searchParams }: {
 
   const metadataHandlers = {
     blog_category: async () => {
+      if (dynamicPageSlug.seo) {
+        return {
+          title: dynamicPageSlug.seo.title,
+          description: dynamicPageSlug.seo.description,
+          openGraph: {
+            title: dynamicPageSlug.seo.title,
+            description: dynamicPageSlug.seo.description,
+            images: dynamicPageSlug.seo.ogImage ? [{
+              url: dynamicPageSlug.seo.ogImage,
+              width: 1200,
+              height: 630
+            }] : undefined
+          }
+        };
+      }
       const blogs = await fetchBlogBySlug(primarySlug);
       if (!blogs) return null;
 
@@ -310,6 +326,21 @@ export async function generateMetadata({ params, searchParams }: {
     },
 
     blog: async () => {
+      if (dynamicPageSlug.seo) {
+        return {
+          title: dynamicPageSlug.seo.title,
+          description: dynamicPageSlug.seo.description,
+          openGraph: {
+            title: dynamicPageSlug.seo.title,
+            description: dynamicPageSlug.seo.description,
+            images: dynamicPageSlug.seo.ogImage ? [{
+              url: dynamicPageSlug.seo.ogImage,
+              width: 1200,
+              height: 630
+            }] : undefined
+          }
+        };
+      }
       const categoryBlogs = await fetchBlogByCategoryAndSlug(primarySlug);
       if (!categoryBlogs) return null;
 
@@ -329,6 +360,21 @@ export async function generateMetadata({ params, searchParams }: {
     },
 
     category: async () => {
+      if (dynamicPageSlug.seo) {
+        return {
+          title: dynamicPageSlug.seo.title,
+          description: dynamicPageSlug.seo.description,
+          openGraph: {
+            title: dynamicPageSlug.seo.title,
+            description: dynamicPageSlug.seo.description,
+            images: dynamicPageSlug.seo.ogImage ? [{
+              url: dynamicPageSlug.seo.ogImage,
+              width: 1200,
+              height: 630
+            }] : undefined
+          }
+        };
+      }
       const combinedParams = buildVariantParams(searchParamsData, defaultParams);
       const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
 
@@ -350,11 +396,26 @@ export async function generateMetadata({ params, searchParams }: {
     },
 
     product: async () => {
+      if (dynamicPageSlug.seo) {
+        return {
+          title: dynamicPageSlug.seo.title,
+          description: dynamicPageSlug.seo.description,
+          openGraph: {
+            title: dynamicPageSlug.seo.title,
+            description: dynamicPageSlug.seo.description,
+            images: dynamicPageSlug.seo.ogImage ? [{
+              url: dynamicPageSlug.seo.ogImage,
+              width: 1200,
+              height: 630
+            }] : undefined
+          }
+        };
+      }
       const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
       if (!data?.product || !data.product.category) return null;
 
-      return {
-        title: data.product.name,
+        return {
+          title: data.product.name,
         description: data.product.description,
         openGraph: {
           title: data.product.name,

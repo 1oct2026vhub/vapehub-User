@@ -1,45 +1,44 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/config/header.config';
+import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema, HeaderMegaMenu } from '@/lib/config/header.config';
 import { useForm } from 'react-hook-form';
 import InputField from "./InputField";
 import { SearchIcon } from "./Icons";
 import { Form } from '@/components/ui/Form';
 import Image from "next/image";
 import Link from 'next/link';
-import { SubCategory } from '@/lib/config/category.config';
+import { useMemo } from 'react';
 
-export const MegaMenu: React.FC<{isOpen: boolean}> = ({ isOpen }) => {
-    const staticSubCategories: SubCategory[] = [
-      { name: "Elux Legend 3500", slug: "#", feature: "Hot" },
-      { name: "Elf Bar", slug: "#", feature: "New" },
-      { name: "Elux", slug: "#" },
-      { name: "Hayati Pro Mini", slug: "#", feature: "Hot" },
-      { name: "Hayati Pro Max 4000", slug: "#", feature: "New" },
-      { name: "Hayati Twist 5000", slug: "#" },
-      { name: "Hayati", slug: "#" },
-      { name: "IVG Smart 5500", slug: "#", feature: "Hot" },
-      { name: "IVG", slug: "#", feature: "New" },
-      { name: "SKE Crystal Bar 600", slug: "#", feature: "Hot" },
-      { name: "SKE ", slug: "#", feature: "New" },
-      { name: "The Crystal Pro Max 4000", slug: "#", feature: "Hot" },
-      { name: "VNSN Quake 10000", slug: "#", feature: "Hot" },
-    ];
+export const MegaMenu: React.FC<{isOpen: boolean; menuItems: HeaderMegaMenu[]}> = ({ isOpen, menuItems }) => {
   
     const searchFromConfig = useForm<HeaderFormSchema>({
       resolver: zodResolver(HEADER_IN_SCHEMA),
       mode: 'onBlur',
     });
-  
-    const sortedSubCategories = staticSubCategories.sort((a, b) => a.name.localeCompare(b.name));
-    const groupedSubCategories = sortedSubCategories.reduce((acc, subCategory) => {
-      const firstLetter = subCategory.name[0].toUpperCase();
-      if (!acc[firstLetter]) acc[firstLetter] = [];
-      acc[firstLetter].push(subCategory);
-      return acc;
-    }, {} as Record<string, SubCategory[]>);
+
+    const getAllMenuItems = (items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
+        let allItems: HeaderMegaMenu[] = [];
+        for (const item of items) {
+            allItems.push(item);
+            if (item.children && item.children.length > 0) {
+                allItems = allItems.concat(getAllMenuItems(item.children));
+            }
+        }
+        return allItems;
+    };
+
+    const productItems = useMemo(() => {
+        const allItems = getAllMenuItems(menuItems);
+        return allItems.filter(item => 
+            item.entity_type === 'product' && 
+            item.show_image && 
+            item.entity_data &&
+            item.entity_data.ProductImages && 
+            item.entity_data.ProductImages.length > 0
+        ).slice(0, 3);
+    }, [menuItems]);
   
     return (
-      <div className={`absolute left-0 -bottom-[448px] w-full border-t border-skin-neutral-200 shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-300 min-h-[428px] max-h-[500px] overflow-y-auto flex items-start opacity-0 invisible transform translate-y-4 ${isOpen ? '!opacity-100 !visible !translate-y-0' : ''}`}>
+      <div className={`absolute left-0 -bottom-[420px] w-full border-t border-skin-neutral-200 shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-300 min-h-[428px] max-h-[500px] overflow-y-auto flex items-start opacity-0 invisible transform translate-y-4 ${isOpen ? '!opacity-100 !visible !translate-y-0' : ''}`}>
         <div className="w-[50%] 2xl:w-[60%] space-y-6 pr-7 border-r border-skin-neutral-200">
           <Form {...searchFromConfig}>
             <form noValidate className="w-full">
@@ -57,36 +56,60 @@ export const MegaMenu: React.FC<{isOpen: boolean}> = ({ isOpen }) => {
             </form>
           </Form>
           <div className="grid grid-cols-3 gap-9">
-            {Object.keys(groupedSubCategories).sort().map((letter, idx) => (
-              <div key={idx} className="mb-4">
+            {menuItems.map((menuItem) => (
+              <div key={menuItem.id} className="mb-4">
                 <div className="border-b border-skin-neutral-200 mb-2">
-                  <h3 className="text-title-2 font-bold text-skin-neutral-500">{letter}</h3>
+                  <h3 className="text-title-2 font-bold text-skin-neutral-500">{menuItem.label}</h3>
                 </div>
-                <ul>
-                  {groupedSubCategories[letter].map((subCategory, idx) => (
-                    <li key={idx} className="flex items-center gap-2">
-                      <Link href={subCategory.slug} className="block py-2 text-skin-neutral-300 font-bold text-content-1 leading-none hover:underline">
-                        {subCategory.name}
-                      </Link>
-                      {subCategory.feature && <span className={`text-skin-white font-medium text-[8px] py-0.5 px-1.5 rounded ${subCategory.feature === "Hot" ? "bg-red-gradient" : "bg-blue-gradient"}`}>{subCategory.feature}</span>}
-                    </li>
-                  ))}
-                </ul>
+                {menuItem.children && menuItem.children.length > 0 && (
+                  <ul>
+                    {menuItem.children.map((subItem) => (
+                      <li key={subItem.id}>
+                        <Link href={subItem.original || '#'} className="block py-2 text-skin-neutral-300 font-bold text-content-1 leading-none hover:underline">
+                          {subItem.label}
+                        </Link>
+                        {subItem.children && subItem.children.length > 0 && (
+                           <ul className="pl-4">
+                              {subItem.children.map(grandchild => (
+                                 <li key={grandchild.id}>
+                                    <Link href={grandchild.original || '#'} className="block py-1 text-skin-neutral-300 font-normal text-content-1 leading-none hover:underline">
+                                       {grandchild.label}
+                                    </Link>
+                                 </li>
+                              ))}
+                           </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>
         </div>
         <div className="space-y-8 pl-7">
           <div className="grid grid-cols-3 gap-3.5">
-            <Link href="#">
-              <Image src="/images/category-banner-1.jpg" alt="category-banner-1" width={183} height={130} className="rounded-10" />
-            </Link>
-            <Link href="#">
-              <Image src="/images/category-banner-2.jpg" alt="category-banner-2" width={183} height={130} className="rounded-10" />
-            </Link>
-            <Link href="#">
-              <Image src="/images/category-banner-3.jpg" alt="category-banner-3" width={183} height={130} className="rounded-10" />
-            </Link>
+            {productItems.map(product => (
+                <Link href={product.original || '#'} key={product.id}>
+                    <Image 
+                        src={product.entity_data?.ProductImages?.[0]?.image_url || '/images/no-image.png'} 
+                        alt={product.entity_data?.name || product.label} 
+                        width={183} 
+                        height={130} 
+                        className="rounded-10" 
+                    />
+                </Link>
+            ))}
+            {productItems.length < 3 && Array.from({ length: 3 - productItems.length }).map((_, i) => (
+                <Image
+                    key={`placeholder-${i}`}
+                    src="/images/no-image.png"
+                    alt="placeholder"
+                    width={183}
+                    height={130}
+                    className="rounded-10"
+                />
+            ))}
           </div>
           <ul className="space-y-2 text-skin-neutral-300 font-bold text-content-1">
             <h3 className="text-title-2 font-bold text-skin-neutral-500">

@@ -23,7 +23,6 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
   };
 
   if (!item) return null;
-
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">
@@ -49,11 +48,13 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
             {/* Price Section */}
             <div className="text-right">
               <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold">
-                {DEFAULT_CURRENCY_SYMBOL}{(Number(item.price) * item.quantity).toFixed(2)}
+                {/* {DEFAULT_CURRENCY_SYMBOL}{(Number(item.price) * item.quantity).toFixed(2)} */}
+                {DEFAULT_CURRENCY_SYMBOL}{item.total.toFixed(2)}
               </p>
               {item?.discount_price && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">
-                  {DEFAULT_CURRENCY_SYMBOL}{(Number(item.discount_price) * item.quantity).toFixed(2)}
+                  {/* {DEFAULT_CURRENCY_SYMBOL}{(Number(item.discount_price) * item.quantity).toFixed(2)} */}
+                  {DEFAULT_CURRENCY_SYMBOL}{item.subtotal.toFixed(2)}
                 </p>
               )}
             </div>

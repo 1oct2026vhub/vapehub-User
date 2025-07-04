@@ -12,7 +12,9 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
     const { initiatePayment } = useVivaWallet();
     const [isLoading, setIsLoading] = useState(false);
     const [isCancelLoading, setIsCancelLoading] = useState(false);
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen,
+      //  onOpen, 
+       onClose } = useDisclosure();
 
     const router = useRouter();
 
@@ -65,7 +67,7 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
                     isLoading={isLoading}
                     isDisabled={isLoading}
                 >Pay Now</Button>
-                <Button
+                {/* <Button
                     size='md'
                     radius='sm'
                     color='danger'
@@ -73,7 +75,7 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
                     isLoading={isCancelLoading}
                     isDisabled={isCancelLoading}
                     className="!bg-skin-red-400"
-                >Cancel Order</Button>
+                >Cancel Order</Button> */}
             </div>
 
             <Modal isOpen={isOpen} onClose={onClose}>

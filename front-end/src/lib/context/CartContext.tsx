@@ -23,6 +23,8 @@ interface CartContextType {
   updateItemQuantity: (cartId: number, quantity: number,productName: string) => Promise<void>;
   removeItem: (cartId: number) => Promise<void>;
   cartTotal: number;
+  cartSubtotal: number;
+  cartDiscount: number;
   itemCount: number;
   syncCookieCart: () => Promise<void>;
   error: string | null;
@@ -54,6 +56,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = status === 'authenticated';
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
   const [cartTotal, setCartTotal] = useState<number>(0);
+  const [cartSubtotal, setCartSubtotal] = useState<number>(0);
+  const [cartDiscount, setCartDiscount] = useState<number>(0);
   const [unAvailableItems, setUnAvailableItems] = useState<UnAvailableItem[]>([]);
   const [couponDiscount, setCouponDiscount] = useState<CouponDiscount>({
     value: 0,
@@ -73,6 +77,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       return sum + itemTotal;
     }, 0);
     setCartTotal(total);
+    setCartSubtotal(total);
+    setCartDiscount(0);
     setItemCount(items.length);
   };
 
@@ -81,19 +87,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (isAuthenticated) {
         const response = await getCartItems();
-
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartData = response.data;
-          const cartItems: CartItem[] = cartData.map(bindCartItem);
+          const cartItems: CartItem[] = cartData.items.map(bindCartItem);
           setCartItems(cartItems);
-          calculateTotals(cartItems);
+          if (cartData.summary) {
+            setCartTotal(cartData.summary.total);
+            setCartSubtotal(cartData.summary.subtotal);
+            setCartDiscount(cartData.summary.total_discount);
+            setItemCount(cartData.items.length);
+          } else {
+            calculateTotals(cartItems);
+          }
         }
       } else {
         // Load from cookie for guest users
         const cookieCart = getCookie(CART_COOKIE_NAME);
         if (cookieCart) {
-          setCartItems(JSON.parse(cookieCart as string));
-          calculateTotals(JSON.parse(cookieCart as string));
+          const parsedCart = JSON.parse(cookieCart as string);
+          setCartItems(parsedCart);
+          calculateTotals(parsedCart);
         }
       }
     } catch (error) {
@@ -101,14 +114,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       // Load from cookie as fallback
       const cookieCart = getCookie(CART_COOKIE_NAME);
       if (cookieCart) {
-        setCartItems(JSON.parse(cookieCart as string));
-        calculateTotals(JSON.parse(cookieCart as string));
+        const parsedCart = JSON.parse(cookieCart as string);
+        setCartItems(parsedCart);
+        calculateTotals(parsedCart);
       }
     } finally {
       setIsLoading(false);
     }
   }, [isAuthenticated]);
-
   // Load cart items on mount and when auth status changes
   useEffect(() => {
     loadCartItems();
@@ -128,7 +141,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       slug: item.product.slug,
       description: item.variant.description,
       ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
-      quantity: item.quantity
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      total: item.total
     };
   };
   const getPrimaryProductImage = (item: ProductImage[]): string => {
@@ -148,7 +163,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       slug: data.slug,
       description: "",
       ProductImages: data.primary_image?.url || "",
-      quantity: quantity
+      quantity: quantity,
+      subtotal: Number(data.price) * quantity,
+      total: Number(data.price) * quantity
     };
   };
 
@@ -241,9 +258,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       if (isAuthenticated) {
-        const response = await updateCartItem(cartId, quantity);
-        console.log("responsecartupdate", response);
-        
+        const response = await updateCartItem(cartId, quantity);        
         if (response.status === ServerActionStatus.SUCCESS) {
           await loadCartItems();
           toast.success(`${productName} quantity updated in cart`);
@@ -366,7 +381,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const validateCartItems = async () => {
     const response = await getCartItems();
     if (response.status === ServerActionStatus.SUCCESS) {
-      const cartData = response.data.filter(item => (item.product.deletedAt || item.variant.deleted_at));
+      const cartData = response.data.items.filter(item => (item.product.deletedAt || item.variant.deleted_at));
       const unAvailableItems: UnAvailableItem[] = cartData.map(item => ({
         id: item.id,
         name: item.product.name,
@@ -408,12 +423,18 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(true);
       setError(null);
       const response = await getCartItems();
-
       if (response.status === ServerActionStatus.SUCCESS) {
-        const cartData = response.data
-        const cartItems: CartItem[] = cartData.map(bindCartItem);
+        const cartData = response.data;
+        const cartItems: CartItem[] = cartData.items.map(bindCartItem);
         setCartItems(cartItems);
-        calculateTotals(cartItems);
+        if (cartData.summary) {
+          setCartTotal(cartData.summary.total);
+          setCartSubtotal(cartData.summary.subtotal);
+          setCartDiscount(cartData.summary.total_discount);
+          setItemCount(cartData.items.length);
+        } else {
+          calculateTotals(cartItems);
+        }
       } else {
         setError(response.message);
       }
@@ -450,6 +471,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const clearCart = useCallback(() => {
     setCartItems([]);
     setCartTotal(0);
+    setCartSubtotal(0);
+    setCartDiscount(0);
     setItemCount(0);
     setCouponDiscount({
       value: 0,
@@ -551,6 +574,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     updateItemQuantity,
     removeItem,
     cartTotal,
+    cartSubtotal,
+    cartDiscount,
     itemCount,
     syncCookieCart,
     error,

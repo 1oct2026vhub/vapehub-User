@@ -220,7 +220,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
                     title={product.name}
                     imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url}
                     price={product.price}
-                    buttonText={"3 for £30"}
+                    buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
                     flavors={product?.Flavors?.length}
                     productId={product.id}
                     link={`/${product.slug}`}

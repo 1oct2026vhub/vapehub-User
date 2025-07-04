@@ -30,7 +30,7 @@ const HeaderTopBar = ({ categories }: Props) => {
     
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
     const router = useRouter();
-    const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading } = useCart();
+    const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading, cartSubtotal } = useCart();
     const handleCheckout = async () => {
         const isValid = await checkoutStockValidation();
         if (isValid) {
@@ -148,7 +148,14 @@ const HeaderTopBar = ({ categories }: Props) => {
                                     <div className='space-y-3'>
                                         <div className='flex items-center justify-between text-black font-semibold'>
                                             <p className='text-content-2 md:text-title-1'>Total</p>
-                                            <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
+                                            <div className="text-right">
+                                                <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
+                                                {cartTotal !== cartSubtotal && (
+                                                    <p className="text-skin-neutral-300 text-content-3 md:text-title-2 line-through opacity-60 font-bold">
+                                                        {DEFAULT_CURRENCY_SYMBOL}{cartSubtotal.toFixed(2)}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
                                         <Button
                                             size="lg"

@@ -183,6 +183,9 @@ export interface Product {
     ProductImages: ProductImage[];
     Flavors: Flavor[];
     attributeTerms: AttributeTerms[];
+    deals: {
+        name: string;
+    }[];
 }
  
 export interface CategoryResponseData extends Category {

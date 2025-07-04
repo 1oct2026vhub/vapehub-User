@@ -3,7 +3,7 @@ import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
-import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartData, StockValidationResponse } from "./config/cart.config";
+import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";

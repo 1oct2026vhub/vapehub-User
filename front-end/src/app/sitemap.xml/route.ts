@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.vapehub.devateam.com/api';
 
-export async function GET(_: NextRequest) {
+// export async function GET(_: NextRequest) {
+export async function GET() {
   try {
     const response = await fetch(`${API_URL}/seo/sitemap.xml`, {
       headers: {
@@ -27,7 +28,6 @@ export async function GET(_: NextRequest) {
       },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Error fetching sitemap:', error);
     return new NextResponse('Error generating sitemap.', { status: 500 });
   }

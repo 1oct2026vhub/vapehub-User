@@ -12,7 +12,9 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
     const { initiatePayment } = useVivaWallet();
     const [isLoading, setIsLoading] = useState(false);
     const [isCancelLoading, setIsCancelLoading] = useState(false);
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen,
+      //  onOpen, 
+       onClose } = useDisclosure();
 
     const router = useRouter();
 

@@ -2,7 +2,7 @@ import React from 'react'
 import HeaderTopBar from "@/components/HeaderTopBar";
 import NavigationMenu from "@/components/NavigationMenu";
 import { FlashNewsItem } from '@/lib/config/global.config';
-import { Category } from '@/lib/config/category.config';
+// import { Category } from '@/lib/config/category.config';
 import { getCategoryList, getFlashNews } from '@/lib/server.actions';
 import PromotionBanner from "@/components/ui/PromotionBanner";
 import { getHeaderMegaMenu } from '@/lib/server.actions';
@@ -19,7 +19,7 @@ const Header = async () => {
     if (response.status !== ServerActionStatus.SUCCESS) {
         return <div>{response.message}</div>;
     }
-    const categories: Category[] = response.data;
+    // const categories: Category[] = response.data;
     const flashNewsResponse = await getFlashNews(true);
     let flashNews: FlashNewsItem[] = [];
     if (flashNewsResponse.status === ServerActionStatus.SUCCESS) {

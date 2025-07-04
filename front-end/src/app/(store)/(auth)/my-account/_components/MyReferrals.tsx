@@ -1,10 +1,10 @@
 "use client"
 
-import { ReferralMethods } from "@/lib/config/referral.config";
+import { ReferralMethods, ReferralStatsResponse } from "@/lib/config/referral.config";
 import { Button } from "@nextui-org/button";
 import { useState } from "react";
 
-const MyReferrals = ({ referralMethods, coupons, isReferral,referredValue,referrerValue }: { referralMethods: ReferralMethods[]; coupons: string | null, isReferral: boolean, referredValue: string, referrerValue: string }) => {
+const MyReferrals = ({ referralMethods, data, coupons, isReferral, referredValue, referrerValue }: { referralMethods: ReferralMethods[]; data: ReferralStatsResponse | null; coupons: string | null, isReferral: boolean, referredValue: string, referrerValue: string }) => {
 
     const [copied, setCopied] = useState(false);
 
@@ -20,10 +20,8 @@ const MyReferrals = ({ referralMethods, coupons, isReferral,referredValue,referr
 
     const referralDiscount = (primary: boolean) => {
         const referralMethod = referralMethods.find(method => method.primary === primary);
-        return referralMethod?.referral_value_type === 'percentage' ? referralMethod?.referral_value + '%' : '-' + referralMethod?.referral_value;
+        return referralMethod?.referral_value_type === 'percentage' ? referralMethod?.referral_value + '%' : '-' + referralMethod?.referral_value  + '%';
     }
-    console.log("referralDiscount", referralMethods);
-
     return (
         <div>
             <h3 className="text-title-3 md:text-title-2 font-semibold text-skin-neutral-400 mb-2">Referral Rewards</h3>
@@ -40,6 +38,8 @@ const MyReferrals = ({ referralMethods, coupons, isReferral,referredValue,referr
                         <p className="text-content-2 text-skin-neutral-300 mb-4 max-w-md">
                             {`You have been invited to shop at VapeHub and you've got a ${referralDiscount(true)} discount waiting for you! Use the coupon code below to claim your offer.`}
                         </p>
+
+                        {data?.referred_user_method !== null &&
                         <div className="flex items-center gap-2">
                             <h4 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
                                 {coupons}
@@ -53,6 +53,7 @@ const MyReferrals = ({ referralMethods, coupons, isReferral,referredValue,referr
                                 {copied ? 'Copied!' : 'Copy Code'}
                             </Button>
                         </div>
+}
                     </div>
             }
         </div>

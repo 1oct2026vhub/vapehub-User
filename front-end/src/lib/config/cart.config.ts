@@ -61,6 +61,28 @@ export interface CART_RESPONSE_DATA {
             is_primary: boolean;
         }[];
     };
+    subtotal: number;
+    total: number;
+    discount: number;
+    applied_deals: {
+        deal_id: number;
+        deal_name: string;
+        discount_amount: number;
+    }[];
+}
+
+export interface CartData {
+    items: CART_RESPONSE_DATA[];
+    summary: {
+        subtotal: number;
+        total: number;
+        total_discount: number;
+    };
+    deals: {
+        deal_id: number;
+        deal_name: string;
+        discount_amount: number;
+    }[];
 }
 
 export type CART_GET_PAYLOAD = {
@@ -82,6 +104,8 @@ export type CartItem = {
   description: string;
   ProductImages: string;
   quantity: number;
+  subtotal: number;
+  total: number;
 }
   
 export type StockValidationResponse = {

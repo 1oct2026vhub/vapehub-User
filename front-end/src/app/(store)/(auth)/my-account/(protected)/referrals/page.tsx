@@ -39,7 +39,6 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
   const handlePagination = (page: number) => {
     setPage(page);
   };
-   
   // if (!data || data.recent_referrals.data.length === 0) {
   //   return (
   //     <EmptyPlaceholder title="Uh, oh!" description="No referrals found" />
@@ -59,6 +58,7 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
             data?.referrer?.status === "completed" ||
             data?.referrer?.status === "applied"
           }
+          data={data}
         />
         <div className="mt-6 md:mt-0 md:ml-8 flex-shrink-0">
           <Link

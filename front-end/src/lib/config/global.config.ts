@@ -51,10 +51,26 @@ export interface FaqResponse {
     deletedAt: string | null;
 }
 
+export interface SeoData {
+    canonicalUrl: string;
+    createdAt: string;
+    description: string;
+    entityId: string;
+    entityType: string;
+    focusKeyword: string;
+    id: number;
+    noIndex: boolean;
+    ogImage: string;
+    slug: string;
+    title: string;
+    updatedAt: string;
+}
+
 export interface DynamicPageSlugResponse {
     slug: string;
     entity_type: "category" |  "product" | "blog" | "blog_category";
     entity_id: number; 
+    seo: SeoData | null;
 }
 
 export type FlashNewsResponse = FlashNewsItem[];

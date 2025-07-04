@@ -170,6 +170,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         const fetchReviews = async () => {
             if (!product?.id) return;
             const response = await getReviewOrderByProductId(product.id,1,1);
+            console.log("product Details", response);
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setReviewsData({
                     reviews: response.data.reviews || [],
@@ -273,12 +274,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
                         <p className='text-title-1 md:text-h5 xl:text-h4'>{DEFAULT_CURRENCY_SYMBOL}{price}</p>
-                        <p className='text-content-2 md:text-title-2'>or Mix & Match</p>
+                        <p className='text-content-2 md:text-title-2 cursor-default'>or Mix & Match</p>
                         <Button
                             size="sm"
                             radius="md"
                             color="primary"
-                            className="btn primary-btn shadow-input w-fit !min-w-fit text-content-2 md:text-content-1 !leading-none !tap-highlight-transparent !h-5 md:!h-8 xl:!h-9 !px-1.5 !py-1 md:!px-4 md:!py-2"
+                            className="btn primary-btn shadow-input w-fit cursor-default !min-w-fit text-content-2 md:text-content-1 !leading-none !tap-highlight-transparent !h-5 md:!h-8 xl:!h-9 !px-1.5 !py-1 md:!px-4 md:!py-2"
                         >
                             3 for £30
                         </Button>

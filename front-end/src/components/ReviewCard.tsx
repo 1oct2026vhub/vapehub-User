@@ -14,27 +14,39 @@ const ReviewCard: React.FC<{ review: REVIEWS }> = ({ review }) => {
     };
 
     const getDisplayName = () => {
+        const userName = review.user_name?.trim();
+
         const firstName = review.user?.first_name?.trim();
         const lastName = review.user?.last_name?.trim();
-        
-        if (!firstName || !lastName) {
-            return 'Anonymous';
+        let userObjectName;
+        if (firstName && lastName) {
+            userObjectName = `${firstName} ${lastName}`;
+        } else {
+            userObjectName = null;
         }
-        
-        return `${firstName} ${lastName}`;
+
+        if (review.verified_by) {
+            if (userName) return userName;
+            if (userObjectName) return userObjectName;
+        } else {
+            if (userObjectName) return userObjectName;
+            if (userName) return userName;
+        }
+
+        return 'Anonymous';
     };
 
     const getInitials = () => {
-        const firstName = review.user?.first_name?.trim();
-        const lastName = review.user?.last_name?.trim();
-    
-        if (!firstName && !lastName) {
+        const displayName = getDisplayName();
+
+        if (displayName === 'Anonymous') {
             return 'A';
         }
-    
-        const firstInitial = firstName ? firstName.charAt(0) : '';
-        const lastInitial = lastName ? lastName.charAt(0) : '';
-    
+
+        const nameParts = displayName.split(' ');
+        const firstInitial = nameParts[0]?.charAt(0) || '';
+        const lastInitial = nameParts.length > 1 ? nameParts[nameParts.length - 1]?.charAt(0) || '' : '';
+
         return `${firstInitial}${lastInitial}`.toUpperCase();
     };
 
@@ -69,7 +81,12 @@ const ReviewCard: React.FC<{ review: REVIEWS }> = ({ review }) => {
                     <p className='text-skin-blue-500 font-medium text-content-1'>{formatDate(review?.created_at)}</p>
                 </div>
             </div>
-            <h4 className='text-22 text-skin-blue-500 font-semibold capitalize'>{getDisplayName()}</h4>
+            <div className='flex items-center gap-3'>
+                <h4 className='text-22 text-skin-blue-500 font-semibold capitalize'>{getDisplayName()}</h4>
+                {review.verified_by && (
+                    <span className="text-sm font-medium text-[#02643E]">(Verified Owner)</span>
+                )}
+            </div>
             <p className='text-title-2 font-medium text-skin-neutral-500'>{review?.comment}</p>
         </div>
     )

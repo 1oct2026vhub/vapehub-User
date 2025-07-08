@@ -450,34 +450,35 @@ export interface REVIEW_ORDER_DATA {
 
 }
 export interface REVIEWS {
-    
+    id: number;
+    user_id: number | null;
+    order_id: number | null;
+    product_id: number;
+    company_name: string;
+    rating: number;
+    comment: string;
+    is_visible: boolean;
+    created_at: string;
+    updated_at: string;
+    user: {
         id: number;
-        user_id: number;
-        order_id: number;
-        product_id: number;
-        company_name: string;
-        rating: number;
-        comment: string;
-        is_visible: boolean;
-        created_at: string;
-        updated_at: string;
-        user: {
-            id: number;
-            first_name: string;
-            last_name: string;
-            profile_pic_url: string | null;
-        };
-        order: {
-            id: number;
-            order_unique_id: string;
-        };
-        product: {
-            id: number;
-            name: string;
-            slug: string;
-        };
-        media: unknown[];
-    }
+        first_name: string;
+        last_name: string;
+        profile_pic_url: string | null;
+    } | null;
+    order: {
+        id: number;
+        order_unique_id: string;
+    } | null;
+    product: {
+        id: number;
+        name: string;
+        slug: string;
+    };
+    media: unknown[];
+    verified_by: boolean;
+    user_name: string | null;
+}
 export interface REVIEW_ORDER_RESPONSE {
     reviews: REVIEWS[];
     pagination: {

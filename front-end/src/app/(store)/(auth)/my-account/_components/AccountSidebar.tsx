@@ -11,6 +11,7 @@ const menuItems = [
   { label: "Manage Addresses", path: "/my-account/addresses" },
   { label: "Security", path: "/my-account/security" },
   { label: "Referrals", path: "/my-account/referrals" },
+  { label: "Loyalty Points", path: "/my-account/loyalty-points" },
 ];
 
 const AccountSidebar: React.FC = () => {

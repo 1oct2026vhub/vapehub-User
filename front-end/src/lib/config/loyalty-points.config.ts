@@ -3,8 +3,8 @@ export interface LoyaltyPointsRedemptionResponse {
   minimum_points_required: number;
   can_redeem: boolean;
   points_needed: number;
-  redemption_amount: number;
+  redemption_amount: number | string;
   redemption_type: string;
   points_value: string;
-  total_points_value: number;
+  total_points_value: number | string;
 } 

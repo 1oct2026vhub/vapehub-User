@@ -131,8 +131,9 @@ export const APPLY_COUPON_FORM_SCHEMA = z.object({
 export type APPLY_COUPON_FORM_TYPE = z.infer<typeof APPLY_COUPON_FORM_SCHEMA>;
 
 export interface APPLY_COUPON_PAYLOAD {
-    couponCode: string;
+    couponCode?: string;
     shippingMethodId: number;
+    loyalty?: boolean;
 }
 
 export interface CHECKOUT_PAYLOAD {

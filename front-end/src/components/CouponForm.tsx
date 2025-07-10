@@ -26,7 +26,7 @@ interface CouponFormProps {
 const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', cartTotal}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isApplied, setIsApplied] = useState(!!initialCouponCode);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    // const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { isRemoveCoupon, setIsRemoveCoupon } = useCart();
 
     const form = useForm<APPLY_COUPON_FORM_TYPE>({
@@ -47,12 +47,12 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
         if(response.status === 'SUCCESS') {
           toast.success('Coupon Applied Successfully');
         }
-        if(response.status === 'ERROR') {
-            setErrorMessage(response.message);
-        }
-        else {
-            setErrorMessage(null);
-        }
+        // if(response.status === 'ERROR') {
+        //     setErrorMessage(response.message);
+        // }
+        // else {
+        //     setErrorMessage(null);
+        // }
         if (response.status === ServerActionStatus.SUCCESS) { 
             if(!response.data?.referral_value) {
                 toast.error("Invalid coupon code");

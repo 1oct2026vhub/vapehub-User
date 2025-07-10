@@ -612,6 +612,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       deleteCookie('couponDiscount');
     }
     if (loyaltyRedemption && loyaltyRedemption.isRedeemed) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { pointsData, ...rest } = loyaltyRedemption;
         setCookie(LOYALTY_COOKIE_NAME, JSON.stringify(rest));
     } else {

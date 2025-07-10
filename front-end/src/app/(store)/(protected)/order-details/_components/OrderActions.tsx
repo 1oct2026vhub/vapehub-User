@@ -1,6 +1,6 @@
 "use client"
 import { Button } from '@nextui-org/button'
-import Image from 'next/image'
+// import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import ReviewForm from '@/components/ReviewForm'
 import { OrderItems, REVIEW_ORDER_PAYLOAD, ORDER_STATUS, REVIEW_ORDER_PAYLOAD_UPDATE , REVIEWS } from '@/lib/config/order.config'

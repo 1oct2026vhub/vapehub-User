@@ -8,6 +8,7 @@ import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
+import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config";
 import { NotificationListResponse } from "./config/notification.config";
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
@@ -605,5 +606,12 @@ export const worldpayPaymentCancel = async (payload: WORLDPAY_PAYMENT_PAYLOAD): 
     endpoint: API_ROUTES.WORLDPAY_PAYMENT_CANCEL,
     payload,
     method: 'POST',
+  });
+};
+
+export const getLoyaltyPointsRedemption = async (): Promise<ServerActionResponse<LoyaltyPointsRedemptionResponse>> => {
+  return await handleRequest<LoyaltyPointsRedemptionResponse, unknown>({
+    endpoint: API_ROUTES.GET_LOYALTY_POINTS_REDEMPTION,
+    method: 'GET',
   });
 };

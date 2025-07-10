@@ -2,12 +2,13 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, UnAvailableItem } from '../config/cart.config';
-import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon } from '../server.actions';
+import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, getLoyaltyPointsRedemption } from '../server.actions';
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '../config/app.config';
 import { useSession } from 'next-auth/react';
 import { ProductImage, ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
+import { LoyaltyPointsRedemptionResponse } from '../config/loyalty-points.config';
 
 interface CouponDiscount {
   value: number;
@@ -15,6 +16,13 @@ interface CouponDiscount {
   code: string | null;
   message: string | null;
   discountValue: string;
+}
+
+interface LoyaltyRedemption {
+  isRedeemed: boolean;
+  pointsData: LoyaltyPointsRedemptionResponse | null;
+  discountValue: number;
+  message: string | null;
 }
 interface CartContextType {
   cartItems: CartItem[];
@@ -40,11 +48,14 @@ interface CartContextType {
   setIsRemoveCoupon: (isRemoveCoupon: boolean) => void;
   validateCartItems: () => Promise<UnAvailableItem[]>;
   unAvailableItems: UnAvailableItem[];
+  loyaltyRedemption: LoyaltyRedemption;
+  setLoyaltyRedemption: React.Dispatch<React.SetStateAction<LoyaltyRedemption>>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_COOKIE_NAME = 'guest_cart';
+const LOYALTY_COOKIE_NAME = 'loyalty_redemption';
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -65,6 +76,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     code: null,
     message: null,
     discountValue: ''
+  });
+  const [loyaltyRedemption, setLoyaltyRedemption] = useState<LoyaltyRedemption>({
+    isRedeemed: false,
+    pointsData: null,
+    discountValue: 0,
+    message: null,
   });
   const [isRemoveCoupon, setIsRemoveCoupon] = useState<boolean>(false);
   const [itemCount, setItemCount] = useState<number>(0);
@@ -122,6 +139,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     }
   }, [isAuthenticated]);
+  
+  useEffect(() => {
+    const fetchLoyaltyPoints = async () => {
+        if (isAuthenticated) {
+            const response = await getLoyaltyPointsRedemption();
+            if (response.status === ServerActionStatus.SUCCESS) {
+                setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));
+            }
+        }
+    };
+    fetchLoyaltyPoints();
+  }, [isAuthenticated]);
+
   // Load cart items on mount and when auth status changes
   useEffect(() => {
     loadCartItems();
@@ -481,11 +511,18 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       message: null,
       discountValue: ''
     });
+    setLoyaltyRedemption({
+      isRedeemed: false,
+      pointsData: null,
+      discountValue: 0,
+      message: null,
+    });
     deleteCookie('couponDiscount');
+    deleteCookie(LOYALTY_COOKIE_NAME);
   }, []);
 
   useEffect(() => {
-    if (prevSessionRef.current?.user?.id !== session?.user?.id) {
+    if (prevSessionRef.current?.user?.id && prevSessionRef.current.user.id !== session?.user?.id) {
       clearCart();
     }
     prevSessionRef.current = session;
@@ -556,6 +593,15 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch {}
     }
+    const storedLoyalty = getCookie(LOYALTY_COOKIE_NAME);
+    if (storedLoyalty) {
+        try {
+            const parsed = JSON.parse(storedLoyalty as string);
+            if (parsed && typeof parsed === 'object' && parsed.isRedeemed) {
+                setLoyaltyRedemption(prev => ({ ...prev, ...parsed}));
+            }
+        } catch {}
+    }
   }, []);
 
   // Persist couponDiscount to cookie whenever it changes
@@ -565,7 +611,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       deleteCookie('couponDiscount');
     }
-  }, [couponDiscount]);
+    if (loyaltyRedemption && loyaltyRedemption.isRedeemed) {
+        const { pointsData, ...rest } = loyaltyRedemption;
+        setCookie(LOYALTY_COOKIE_NAME, JSON.stringify(rest));
+    } else {
+        deleteCookie(LOYALTY_COOKIE_NAME);
+    }
+  }, [couponDiscount, loyaltyRedemption]);
 
   const value = {
     cartItems,
@@ -590,7 +642,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     isRemoveCoupon,
     setIsRemoveCoupon,
     validateCartItems,
-    unAvailableItems
+    unAvailableItems,
+    loyaltyRedemption,
+    setLoyaltyRedemption,
   };
 
   return (

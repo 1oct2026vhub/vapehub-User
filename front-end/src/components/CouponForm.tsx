@@ -38,13 +38,12 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
     });
 
     const handleApplyCoupon = async (data: APPLY_COUPON_FORM_TYPE) => {
-        // if (cartTotal < 100) {
-        //     setErrorMessage(`The minimum spend for this coupon is ${DEFAULT_CURRENCY_SYMBOL}100.00.`);
-        //     return;
-        // } else {
-        //     setErrorMessage(null);
-        // }
-        const response = await applyCoupon(data as APPLY_COUPON_PAYLOAD);
+        const payload: APPLY_COUPON_PAYLOAD = {
+            ...data,
+            shippingMethodId: 0
+        };
+        const response = await applyCoupon(payload);
+        console.log("apply coupon response from form", response);
         if(response.status === 'SUCCESS') {
           toast.success('Coupon Applied Successfully');
         }
@@ -54,7 +53,6 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
         else {
             setErrorMessage(null);
         }
-        console.log("rrr",response);
         if (response.status === ServerActionStatus.SUCCESS) { 
             if(!response.data?.referral_value) {
                 toast.error("Invalid coupon code");
@@ -104,7 +102,6 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
 
         } 
     }, [isRemoveCoupon]);
-console.log("errorMessage",errorMessage);
 
     return (
         <Form {...form}>

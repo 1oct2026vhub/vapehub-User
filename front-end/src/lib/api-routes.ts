@@ -67,6 +67,7 @@ export const API_ROUTES = {
     GET_FLASH_NEWS: (status?: boolean) => buildRequestUrl(`/api/home/flash-news${status !== undefined ? `?status=${status}` : ''}`),
     WORLDPAY_PAYMENT_SUCCESS: buildRequestUrl('/api/payment/worldpay/payment-success'),
     WORLDPAY_PAYMENT_CANCEL: buildRequestUrl('/api/payment/worldpay/payment-cancel'),
+    GET_LOYALTY_POINTS_REDEMPTION: buildRequestUrl('/api/loyalty-points/redemption'),
 }
 
 // * Helper functions

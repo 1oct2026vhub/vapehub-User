@@ -1,5 +1,6 @@
 import React from 'react';
 import { LoyaltyPointsRedemptionResponse } from '@/lib/config/loyalty-points.config';
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 
 interface LoyaltyPointsProps {
   data: LoyaltyPointsRedemptionResponse;
@@ -7,6 +8,10 @@ interface LoyaltyPointsProps {
 
 const LoyaltyPoints: React.FC<LoyaltyPointsProps> = ({ data }) => {
   console.log("loyalty points data", data);
+  const redemptionAmount = data.redemption_type === 'percentage'
+    ? `${data.redemption_amount}%`
+    : `${DEFAULT_CURRENCY_SYMBOL}${Number(data.redemption_amount).toFixed(2)}`;
+    
   return (
     <div className="bg-skin-base p-5 rounded-14 shadow-md">
       <h3 className="text-xl font-semibold mb-4 text-skin-primary-void">Your Loyalty Points</h3>
@@ -15,10 +20,10 @@ const LoyaltyPoints: React.FC<LoyaltyPointsProps> = ({ data }) => {
           <p className="text-content-2 text-skin-secondary">Your Points</p>
           <p className="text-title-3 font-bold text-skin-primary-void">{data.user_points}</p>
         </div>
-        <div className="bg-skin-white p-4 rounded-lg">
+        {/* <div className="bg-skin-white p-4 rounded-lg">
           <p className="text-content-2 text-skin-secondary">Total Value</p>
           <p className="text-title-3 font-bold text-skin-primary-void">£{Number(data.total_points_value).toFixed(2)}</p>
-        </div>
+        </div> */}
         <div className="bg-skin-white p-4 rounded-lg">
           <p className="text-content-2 text-skin-secondary">Minimum Points to Redeem</p>
           <p className="text-title-3 font-bold text-skin-primary-void">{data.minimum_points_required}</p>
@@ -29,7 +34,7 @@ const LoyaltyPoints: React.FC<LoyaltyPointsProps> = ({ data }) => {
         </div>
          <div className="bg-skin-white p-4 rounded-lg">
           <p className="text-content-2 text-skin-secondary">Redemption Amount</p>
-          <p className="text-title-3 font-bold text-skin-primary-void">£{Number(data.redemption_amount).toFixed(2)}</p>
+          <p className="text-title-3 font-bold text-skin-primary-void">{redemptionAmount}</p>
         </div>
         <div className="bg-skin-white p-4 rounded-lg">
           <p className="text-content-2 text-skin-secondary">Can You Redeem?</p>

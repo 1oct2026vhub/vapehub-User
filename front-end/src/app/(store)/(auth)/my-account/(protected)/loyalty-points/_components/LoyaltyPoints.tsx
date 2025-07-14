@@ -14,10 +14,10 @@ const LoyaltyPoints: React.FC<LoyaltyPointsProps> = ({ data }) => {
     
   return (
     <div className="bg-skin-base p-5 rounded-14 shadow-md">
-      <h3 className="text-xl font-semibold mb-4 text-skin-primary-void">Your Loyalty Points</h3>
+      <h3 className="text-xl font-semibold mb-4 text-skin-primary-void">My Loyalty Points</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <div className="bg-skin-white p-4 rounded-lg">
-          <p className="text-content-2 text-skin-secondary">Your Points</p>
+          <p className="text-content-2 text-skin-secondary">My Points</p>
           <p className="text-title-3 font-bold text-skin-primary-void">{data.user_points}</p>
         </div>
         {/* <div className="bg-skin-white p-4 rounded-lg">

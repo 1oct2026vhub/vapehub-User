@@ -29,10 +29,10 @@ export const defaultNavLinks:SubCategory[] = [
         name: "Blogs",
         slug: ROUTES.BLOGS,
     },
-    {
-        name: "Deals",
-        slug: ROUTES.DEALS,
-    }
+    // {
+    //     name: "Deals",
+    //     slug: ROUTES.DEALS,
+    // }
 
 ];
 

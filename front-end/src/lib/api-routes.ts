@@ -1,4 +1,5 @@
 import { BrandListPayload } from "./config/brand.config";
+import { CategoriesWithDealsPayload } from "./config/deal.config";
 
 const BASE_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL ?? 'https://api.vapehub.devateam.com/';
 
@@ -68,6 +69,9 @@ export const API_ROUTES = {
     WORLDPAY_PAYMENT_SUCCESS: buildRequestUrl('/api/payment/worldpay/payment-success'),
     WORLDPAY_PAYMENT_CANCEL: buildRequestUrl('/api/payment/worldpay/payment-cancel'),
     GET_LOYALTY_POINTS_REDEMPTION: buildRequestUrl('/api/loyalty-points/redemption'),
+    GET_CATEGORIES_WITH_DEALS: (payload?: CategoriesWithDealsPayload) => buildRequestUrl(`/api/product/categories-with-deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_DEALS_BY_CATEGORY: (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }) => buildRequestUrl(`/api/product/category/${categoryId}/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }) => buildRequestUrl(`/api/product/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
 }
 
 // * Helper functions

@@ -2,18 +2,33 @@
 
 import BreadCrumbs from '@/components/BreadCrumbs';
 import { NextPage } from 'next'
-import React from 'react'
-import Disposables from './_components/Disposables';
-import NicSalts from './_components/NicSalts';
-import ShortFills from './_components/ShortFills';
-import Pods from './_components/Pods';
+import React, { useEffect, useState } from 'react'
+import { getCategoriesWithDeals } from '@/lib/server.actions';
+import { CategoryWithDeals } from '@/lib/config/deal.config';
+import { ServerActionStatus } from '@/lib/config/app.config';
+import DealsCategory from './_components/DealsCategory';
 
 const VapehubDeals: NextPage = () => {
+
+    const [deals, setDeals] = useState<CategoryWithDeals[]>([]);
+
+    useEffect(() => {
+        const fetchDeals = async () => {
+            const dealsDataResponse = await getCategoriesWithDeals({ limit: 100 });
+            if (dealsDataResponse.status === ServerActionStatus.SUCCESS) {
+                const allCategories = dealsDataResponse?.data?.categories || [];
+                setDeals(allCategories);
+            }
+        };
+        fetchDeals();
+    }, []);
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Deals", href: "/vapehub-deals", isActive: true },
     ];
+
+    
 
     return (
         <main className='flex flex-col'>
@@ -32,10 +47,9 @@ const VapehubDeals: NextPage = () => {
                 </div>
             </section>
             <section className='border-t border-skin-neutral-200 product-listing-container flex flex-col !gap-7 lg:!gap-12.5'>
-                <Disposables />
-                <NicSalts/>
-                <ShortFills />
-                <Pods />
+                 {deals.map(category => (
+                    <DealsCategory key={category.id} category={category} />
+                 ))}
             </section>
         </main>
     )

@@ -10,7 +10,7 @@ interface ShopByDealsProps {
 
 const ShopByDeals: React.FC<ShopByDealsProps> = ({
     title = "Shop a Deal",
-    viewAllHref = "#",
+    viewAllHref = "/deals",
 }) => {
     return (
         <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">

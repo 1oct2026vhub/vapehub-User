@@ -2,12 +2,12 @@ import ProductList from '@/app/(store)/(product-listing)/_components/ProductList
 import React, { ReactElement } from 'react';
 import ProductListingContent from "@/components/ProductListingContent";
 import BreadCrumbs from "@/components/BreadCrumbs";
-import { CategoryResponseData, Product } from '@/lib/config/product.config';
+import { ProductResponseData } from '@/lib/config/product.config';
 import FAQSection from '@/components/FAQSection';
-import { Deal, DealsByCategoryResponse, ProductInDeal } from '@/lib/config/deal.config';
+import { Deal } from '@/lib/config/deal.config';
 
 type DealProps = {
-  data: DealsByCategoryResponse;
+  data: ProductResponseData;
   deal: Deal;
 }
 
@@ -23,21 +23,30 @@ const DealProduct: React.FC<DealProps> = ({ data, deal }): ReactElement => {
     description: deal.name,
     id: deal.id,
     slug: deal.slug,
+    logo_url: '',
+    is_active: true,
+    updated_by: null,
+    parent_id: null,
+    createdAt: '',
+    updatedAt: '',
+    deletedAt: null,
+    children: [],
+    subCategories: [],
   };
 
-  const productListData = {
-    ...data,
-    name: deal.name,
-    description: deal.name,
-  };
+  // const productListData = {
+  //   ...data,
+  //   name: deal.name,
+  //   description: deal.name,
+  // };
 
   return (
     <div>
       <section className="product-listing-container flex-col">
         <BreadCrumbs items={breadcrumbs} />
-        <ProductListingContent data={productListingData as any} />
+        <ProductListingContent data={productListingData} />
       </section>
-      <ProductList data={productListData as any} />
+      <ProductList data={data} />
       <section className="product-listing-container">
         <FAQSection type="common" id={deal.id} />
       </section>

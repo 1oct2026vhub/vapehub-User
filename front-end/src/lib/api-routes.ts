@@ -88,8 +88,8 @@ export interface PRODUCT_PAYLOAD  {
     variant?: string;
     sort_by?: 'id' | 'name' | 'price' | 'created_at' | 'stock';
     order?: 'ASC' | 'DESC';
-    limit: number;
-    offset: number;
+    limit?: number | string;
+    offset?: number | string;
     categoryId?: string;  
 } 
 export interface BLOG_PAYLOAD {

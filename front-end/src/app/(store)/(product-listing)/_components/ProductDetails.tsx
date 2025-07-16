@@ -19,7 +19,7 @@ import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { getReviewOrderByProductId } from '@/lib/server.actions'
 import { getDealsByCategory } from '@/lib/server.actions'
-import { ProductInDeal, DealsByCategoryResponse, Deal } from '@/lib/config/deal.config'
+import { ProductInDeal } from '@/lib/config/deal.config'
 
 type ProductViewProps = {
     data: ProductResponse;

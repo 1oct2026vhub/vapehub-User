@@ -3,18 +3,18 @@ import { ServerActionStatus } from "@/lib/config/app.config";
 import { notFound } from 'next/navigation';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
+import { Metadata } from "next";
 
 type PageProps = {
-  params: {
-    slug: string;
-  }
+  slug: string;
 };
 
 const Page = async ({ params, searchParams }: {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<PageProps>,
+  searchParams: Promise<Record<string, string>>
 }) => {
-  const { slug } = params;
+  const { slug } = await params;
+  const searchParamsData = await searchParams;
 
   const dealResponse = await getAllDeals();
   
@@ -29,24 +29,25 @@ const Page = async ({ params, searchParams }: {
   }
 
   const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
-  const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParams)), deal_id: deal.id };
+  const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParamsData)), deal_id: deal.id };
 
-  const productsResponse = await getProductList(combinedParams as any);
+  const productsResponse = await getProductList(combinedParams);
   
   if (productsResponse.status === ServerActionStatus.ERROR || !productsResponse.data?.products) {
     return notFound();
   }
   
-  return <DealProduct deal={deal} data={productsResponse.data as any} />;
+  return <DealProduct deal={deal} data={productsResponse.data} />;
 };
 
 export default Page;
 
 export async function generateMetadata({ params, searchParams }: {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const { slug } = params;
+  params: Promise<PageProps>,
+  searchParams: Promise<Record<string, string>>
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const searchParamsData = await searchParams;
 
   const dealResponse = await getAllDeals();
   
@@ -55,8 +56,8 @@ export async function generateMetadata({ params, searchParams }: {
 
     if (deal) {
       const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
-      const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParams)), deal_id: deal.id };
-      const productsResponse = await getProductList(combinedParams as any);
+      const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParamsData)), deal_id: deal.id };
+      const productsResponse = await getProductList(combinedParams);
       
       if (productsResponse.status === ServerActionStatus.SUCCESS) {
         return {

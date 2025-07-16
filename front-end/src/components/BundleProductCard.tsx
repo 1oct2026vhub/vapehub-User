@@ -1,11 +1,9 @@
 import { Button, Divider, Select, SelectItem } from '@nextui-org/react';
-import Image from 'next/image';
 import React from 'react';
 import { ProductInDeal } from '@/lib/config/deal.config';
 import NoImage from './NoImage';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 import Link from 'next/link';
-import { ROUTES } from '@/lib/routes';
 
 type BundleProductCardProps = {
 	product: ProductInDeal;

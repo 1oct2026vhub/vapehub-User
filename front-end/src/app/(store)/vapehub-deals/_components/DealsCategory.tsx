@@ -112,7 +112,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                     onClick={handleViewAllClick}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
-                            handleViewAllClick(e as any);
+                            handleViewAllClick(e as unknown as React.MouseEvent);
                         }
                     }}
                     className="cursor-pointer"

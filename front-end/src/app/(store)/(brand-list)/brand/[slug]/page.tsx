@@ -71,7 +71,7 @@ export async function generateMetadata({ params, searchParams }: {
   const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 } as const;
   const combinedParams = { ...defaultParams, ...await searchParams };
 
-  const brandProduct = await fetchBrandProduct(slug, combinedParams as any);
+  const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
     return {
       title: `${brandProduct.name} | VapeHub`,

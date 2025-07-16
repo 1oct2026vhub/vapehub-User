@@ -1,3 +1,5 @@
+import { Flavor } from "./product.config";
+
 export interface Deal {
     id: number;
     name: string;
@@ -11,7 +13,7 @@ export interface Deal {
     valid_from: string;
     valid_to: string;
     createdAt: string;
-    bundle_product_ids_json?: any;
+    bundle_product_ids_json?: number[] | null;
     updated_at?: string;
 }
 
@@ -24,7 +26,7 @@ export interface CategoryWithDeals {
     deals: Deal[];
     deal_count: number;
     product_count: number;
-    Products: any[];
+    Products: ProductInDeal[];
 }
 
 export interface AllDealsResponse {
@@ -92,7 +94,7 @@ export interface ProductInDeal {
         is_primary: boolean;
     } | null;
     deals: Deal[];
-    Flavors: any[];
+    Flavors: Flavor[];
     puff_count: number;
     ProductImages: { image_url: string }[];
 }

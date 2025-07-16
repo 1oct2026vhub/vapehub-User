@@ -46,11 +46,29 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
       if(response.status == ServerActionStatus.ERROR) {
         return (<p>{response.message}</p>);
       } 
+
+    const productListingData = {
+        name: searchParamsData.keyword?.toString() || "Shop",
+        description: `Showing results for "${searchParamsData.keyword?.toString() || 'all products'}"`,
+        id: 0,
+        slug: '',
+        updated_by: null,
+        parent_id: null,
+        logo_url: '',
+        is_active: true,
+        createdAt: '',
+        updatedAt: '',
+        deletedAt: null,
+        children: [],
+        subCategories: [],
+
+    };
+
     return (
         <div>
         <section className="product-listing-container flex-col">
           <BreadCrumbs items={breadcrumbs} />
-          <ProductListingContent data={response.data as any}/>
+          <ProductListingContent data={productListingData}/>
         </section>
         <ProductList data={response.data}/>
         </div>

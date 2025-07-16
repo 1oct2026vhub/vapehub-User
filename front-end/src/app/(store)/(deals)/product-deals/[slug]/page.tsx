@@ -22,7 +22,7 @@ const Page = async ({ params, searchParams }: {
     return notFound();
   }
 
-  const deal = dealResponse.data.deals.find((d: Deal) => d.slug === slug);
+  const deal = dealResponse.data.deals.find((d: Deal) => d.slug.replace(/ /g, '-') === slug);
   
   if (!deal) {
     return notFound();
@@ -51,7 +51,7 @@ export async function generateMetadata({ params, searchParams }: {
   const dealResponse = await getAllDeals();
   
   if (dealResponse.status === ServerActionStatus.SUCCESS) {
-    const deal = dealResponse.data.deals.find((d: Deal) => d.slug === slug);
+    const deal = dealResponse.data.deals.find((d: Deal) => d.slug.replace(/ /g, '-') === slug);
 
     if (deal) {
       const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;

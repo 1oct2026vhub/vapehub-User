@@ -43,7 +43,7 @@ const AllDealsPage: NextPage = () => {
                             title={deal.name}
                             imageSrc="/images/deal-1.png" // Placeholder image
                             altText={deal.name}
-                            href={`/vapehub-deals`}
+                            href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
                         />
                     ))}
                 </div>

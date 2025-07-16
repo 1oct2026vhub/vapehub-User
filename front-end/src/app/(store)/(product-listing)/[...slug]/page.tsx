@@ -57,7 +57,6 @@ const Page = async ({
         term_id: variant.terms.id
       });
     } 
-
     // Add search params payload
     if (searchParamsData) {
       Object.entries(searchParamsData).forEach(([attributeId, termSlug]) => {

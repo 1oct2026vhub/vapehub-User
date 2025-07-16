@@ -186,6 +186,7 @@ export interface Product {
     deals: {
         name: string;
     }[];
+    primary_image?: { url: string };
 }
  
 export interface CategoryResponseData extends Category {

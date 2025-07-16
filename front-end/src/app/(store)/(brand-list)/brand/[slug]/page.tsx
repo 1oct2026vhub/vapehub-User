@@ -16,7 +16,7 @@ const BrandPage: NextPage<Props> = async ({
   params,
   searchParams }): AsyncReactElement => {
   const slug = (await params).slug as string;
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 } as const;
   const searchParamsData = await searchParams;
   // Convert search params to variant structure
   const variantParams = Object.entries(searchParamsData)
@@ -54,6 +54,7 @@ export default BrandPage;
  
 const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
   const response = await getProductByBrand(slug, params);
+  console.log("Brand response", response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -67,10 +68,10 @@ export async function generateMetadata({ params, searchParams }: {
   searchParams: Promise<Record<string, string>>
 }) {
   const slug = (await params).slug as string;
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 };
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 } as const;
   const combinedParams = { ...defaultParams, ...await searchParams };
 
-  const brandProduct = await fetchBrandProduct(slug, combinedParams);
+  const brandProduct = await fetchBrandProduct(slug, combinedParams as any);
   if (brandProduct) {
     return {
       title: `${brandProduct.name} | VapeHub`,

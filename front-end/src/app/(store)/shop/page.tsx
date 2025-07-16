@@ -15,7 +15,7 @@ type SearchParams = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElement  => {
      
-    const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 };
+    const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
     const searchParamsData = await searchParams;
     const variantParams = Object.entries(searchParamsData)
     .reduce((acc: Record<string, unknown>, [key, value]) => {

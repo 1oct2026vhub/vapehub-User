@@ -43,6 +43,8 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
         return allItems;
     };
 
+    const isDealMenu = menuItems[0]?.entity_type === 'deal';
+
     const productItems = useMemo(() => {
         const allItems = getAllMenuItems(menuItems);
         return allItems.filter(item =>
@@ -72,29 +74,26 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                         />
                     </form>
                 </Form>
-                <div className="grid grid-cols-3 gap-9">
-                    {menuItems.map((menuItem) => (
-                        <div key={menuItem.id} className="mb-4">
-                            <div className="border-b border-skin-neutral-200 mb-2">
-                                {menuItem.parent?.label === "Deals" ?
-                                    <Link href="/vapehub-deals">
-                                        <h3 className="text-title-2 font-bold text-skin-neutral-500">{menuItem.label}</h3>
+                {isDealMenu ? (
+                     <div className="grid grid-cols-3 gap-9">
+                        <ul>
+                            {menuItems.map(menuItem => (
+                                <li key={menuItem.id}>
+                                    <Link href={`/product-deals${menuItem.original || ''}`} className="block py-2 text-skin-neutral-300 font-bold text-content-1 leading-none hover:underline">
+                                        {menuItem.label}
                                     </Link>
-                                    : <h3 className="text-title-2 font-bold text-skin-neutral-500">{menuItem.label}</h3>
-                                }
-                            </div>
-                            {menuItem.label === 'Deals' ? (
-                                <ul>
-                                    {menuItem.children.map((subItem) => (
-                                        <li key={subItem.id}>
-                                            <Link href={'/vapehub-deals'} className="block py-2 text-skin-neutral-300 font-bold text-content-1 leading-none hover:underline">
-                                                {subItem.label}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                menuItem.children && menuItem.children.length > 0 && (
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-3 gap-9">
+                        {menuItems.map((menuItem) => (
+                            <div key={menuItem.id} className="mb-4">
+                                <div className="border-b border-skin-neutral-200 mb-2">
+                                    <h3 className="text-title-2 font-bold text-skin-neutral-500">{menuItem.label}</h3>
+                                </div>
+                                {menuItem.children && menuItem.children.length > 0 && (
                                     <ul>
                                         {menuItem.children.map((subItem) => (
                                             <li key={subItem.id}>
@@ -115,11 +114,11 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                                             </li>
                                         ))}
                                     </ul>
-                                )
-                            )}
-                        </div>
-                    ))}
-                </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
             <div className="space-y-8 pl-7">
                 <div className="grid grid-cols-3 gap-3.5">
@@ -150,7 +149,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                         Multibuy Deals
                     </h3>
                     {deals.map((deal) => (
-                        <li key={deal.id}><Link href="/vapehub-deals" className="hover:underline">{deal.name}</Link></li>
+                        <li key={deal.id}><Link href={`/product-deals/${deal.slug}`} className="hover:underline">{deal.name}</Link></li>
                     ))}
                 </ul>
             </div>

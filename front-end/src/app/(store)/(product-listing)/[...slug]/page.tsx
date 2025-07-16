@@ -23,7 +23,7 @@ const Page = async ({
 }) => {
 
   const slug = (await params).slug;
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 };
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
@@ -104,6 +104,7 @@ const Page = async ({
     category: async () => {
       const combinedParams = buildVariantParams(searchParamsData, defaultParams);
       const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
+      console.log("Category response", category);
       return category && <CategoryProducts data={category} />;
     },
     product: async () => {
@@ -210,7 +211,7 @@ export async function generateMetadata({ params, searchParams }: {
   const slug = (await params).slug;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 };
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
 
 

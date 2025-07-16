@@ -79,8 +79,15 @@ function buildRequestUrl(url: string) {
     return `${BASE_URL}${url}`;
 }
 export interface PRODUCT_PAYLOAD  {
-    sort_by: string;
-    order: string;
+    keyword?: string;
+    price_range?: string;
+    is_new?: boolean;
+    categories?: string;
+    brand?: string;
+    deal_id?: number;
+    variant?: string;
+    sort_by?: 'id' | 'name' | 'price' | 'created_at' | 'stock';
+    order?: 'ASC' | 'DESC';
     limit: number;
     offset: number;
     categoryId?: string;  

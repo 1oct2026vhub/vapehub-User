@@ -18,6 +18,8 @@ import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { getReviewOrderByProductId } from '@/lib/server.actions'
+import { getDealsByCategory } from '@/lib/server.actions'
+import { ProductInDeal, DealsByCategoryResponse, Deal } from '@/lib/config/deal.config'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -86,6 +88,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         averageRating: 0,
         totalReviews: 0,
     });
+    const [bundleProducts, setBundleProducts] = useState<ProductInDeal[]>([]);
 
     const handleReviewsClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -181,6 +184,24 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
             }
         }
         fetchReviews()
+    }, [product]);
+
+    useEffect(() => {
+        const fetchBundleProducts = async () => {
+            if (!product?.category) return;
+            const category = product.category;
+            const response = await getDealsByCategory(category.id, { limit: 4, offset: 0 });
+
+            if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
+                // Exclude the current product from the list
+                const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id !== product.id);
+                setBundleProducts(filteredProducts.slice(0, 2));
+            }
+        };
+
+        if (product?.id) {
+            fetchBundleProducts();
+        }
     }, [product]);
     console.log("product", product);
     return (
@@ -386,13 +407,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 </div>
             </div>
             <Divider />
-            <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
-                <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
-                <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
-                    <BundleProductCard />
-                    <BundleProductCard />
+            {bundleProducts.length > 0 && (
+                <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
+                    <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
+                    <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
+                        {bundleProducts.map((bundleProduct) => (
+                            <BundleProductCard key={bundleProduct.id} product={bundleProduct} />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </section>
     )
 }

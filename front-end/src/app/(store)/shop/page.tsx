@@ -4,6 +4,7 @@ import { getProductList } from '@/lib/server.actions';
 import { Metadata, NextPage } from 'next'; 
 import ProductList from '../(product-listing)/_components/ProductList';
 import { ROUTES } from '@/lib/routes';
+import ProductListingContent from '@/components/ProductListingContent';
 
 export const metadata: Metadata = {
   title: "Shop | VapeHub",
@@ -49,7 +50,7 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
         <div>
         <section className="product-listing-container flex-col">
           <BreadCrumbs items={breadcrumbs} />
-          {/* <ProductListingContent data={data}/> */}
+          <ProductListingContent data={response.data as any}/>
         </section>
         <ProductList data={response.data}/>
         </div>

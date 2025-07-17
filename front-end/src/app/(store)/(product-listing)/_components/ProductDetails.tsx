@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
-import { Divider } from '@nextui-org/react'
+import { Chip, Divider } from '@nextui-org/react'
 // import Image from 'next/image'
 import BundleProductCard from '@/components/BundleProductCard'
 import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant, ProductViewDetails } from '@/lib/config/product.config'
@@ -301,15 +301,17 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         {mixAndMatchDeal && (
                             <>
                                 <p className='text-content-2 md:text-title-2 cursor-default'>or Mix & Match</p>
-                                <Button
+                                <Chip
                                     size="sm"
                                     radius="md"
-                                    color="primary"
-                                    className="btn primary-btn shadow-input w-fit cursor-default !min-w-fit text-content-2 md:text-content-1 !leading-none !tap-highlight-transparent !h-5 md:!h-8 xl:!h-9 !px-1.5 !py-1 md:!px-4 md:!py-2"
+                                    classNames={{
+                                        base: "btn primary-btn w-fit cursor-default !min-w-fit text-content-2 md:text-content-1 !leading-none !tap-highlight-transparent !h-5 md:!h-8 xl:!h-9 !px-1.5 !py-1 md:!px-4 md:!py-2",
+                                        content: "text-white"
+                                    }}
                                 >
                                   {mixAndMatchDeal?.name}
                                     {/* {`${mixAndMatchDeal.required_qty} for ${DEFAULT_CURRENCY_SYMBOL}${Number(mixAndMatchDeal.fixed_price).toFixed(0)}`} */}
-                                </Button>
+                                </Chip>
                             </>
                         )}
                     </div>

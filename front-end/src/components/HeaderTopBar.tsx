@@ -26,6 +26,9 @@ const HeaderTopBar = ({ categories }: Props) => {
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
         mode: 'onBlur',
+        defaultValues: {
+            search: ''
+        }
     });
     
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
@@ -35,6 +38,7 @@ const HeaderTopBar = ({ categories }: Props) => {
     const handleSearch = (data: HeaderFormSchema) => {
         if (data.search) {
             router.push(`${ROUTES.SHOP}?keyword=${data.search}`);
+            searchFromConfig.reset({ search: '' })
         }
     };
 

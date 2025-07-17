@@ -6,6 +6,7 @@ interface DealCardProps {
     imageSrc: string;
     altText: string;
     href: string;
+    title: string;
     width?: number;
     height?: number;
 }
@@ -14,6 +15,7 @@ const DealCard: React.FC<DealCardProps> = ({
     imageSrc,
     altText,
     href,
+    title,
     width = 312,
     height = 258,
 }) => {
@@ -21,7 +23,7 @@ const DealCard: React.FC<DealCardProps> = ({
         <Link href={href} className="block bg-skin-white max-w-60 md:max-w-full rounded-xl shadow-deal-card-mob xl:shadow-deal-card hover:shadow-brand-card  transition-all duration-300">
             <Image src={imageSrc} alt={altText} width={width} height={height} className="rounded-t-xl w-full" loading="lazy"/>
             <div className="p-3.5 md:p-5">
-                <h3 className="text-lg md:text-title-1 xl:text-h5 text-skin-neutral-500 font-semibold">3 for £10 ELF BAR V2 & more</h3>
+                <h3 className="text-lg md:text-title-1 xl:text-h5 text-skin-neutral-500 font-semibold">{title}</h3>
             </div>
         </Link >
     );

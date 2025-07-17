@@ -61,17 +61,18 @@ const settings: Settings = {
 
 };
 const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => { 
-    const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
+    const isUniqueVariantSelected = isVariant && data?.variants?.length === 1;
+    const allImages: productAllImages[] = isUniqueVariantSelected ? data?.variants[0]?.all_images : data?.product?.all_images;
     const product: ProductViewDetails = data?.product;
-    const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;
+    const productVariant: ProductVariant | null = isUniqueVariantSelected ? data?.variants[0] : null;
     const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
 
-    const stock = isVariant && productVariant ? productVariant.stock_status === 'in_stock' ? productVariant.stock : 0 : 0;
-    const attributesName = isVariant ? productVariant?.attributes.map(attr => attr.term_name).join(', ') : '';
+    const stock = isUniqueVariantSelected && productVariant ? productVariant.stock_status === 'in_stock' ? productVariant.stock : 0 : 0;
+    const attributesName = isUniqueVariantSelected ? productVariant?.attributes?.map(attr => attr.term_name).join(', ') : '';
     const productName =  `${product?.name} ${attributesName ? ` - ${attributesName}` : ''}` 
     const availableAttributes: AttributeTerms[] = data.available_terms;
     const minQuantity = 1; 
-    const price = isVariant ? data?.variants[0]?.price: (productVariant?.price ?? data?.variants[0]?.price);    
+    const price = isUniqueVariantSelected ? data?.variants[0]?.price: (productVariant?.price ?? data?.variants[0]?.price);    
      
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
     const [quantity, setQuantity] = useState(1);
@@ -168,8 +169,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         scrollToTop();
     }, []);
     useEffect(() => {
-        setMainImage(isVariant ? data?.variants[0]?.primary_image : product?.primary_image);
-    }, [isVariant, data, product]);    
+        setMainImage(isUniqueVariantSelected ? data?.variants[0]?.primary_image : product?.primary_image);
+    }, [isUniqueVariantSelected, data, product]);    
     useEffect(() => {
         const fetchReviews = async () => {
             if (!product?.id) return;
@@ -249,7 +250,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
 
                     <Slider {...settings} className='grid items-center gap-4 product-details'>
                         {
-                            allImages.map((image, index) => (
+                            allImages?.map((image, index) => (
                                 <div key={index}>
                                     <div className='px-0.5 py-1.5 bg-skin-base flex items-center justify-center'>
 
@@ -338,9 +339,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                     />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
-                            stock > 0 ?
+                           isUniqueVariantSelected && ( stock > 0 ?
                                 <p className='text-content-2 md:text-title-2 font-bold primary-gradient-100'>In stock</p> :
-                                isVariant && <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>
+                                <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>)
                         }
                     </div>
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
@@ -396,9 +397,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                             radius="md"
                             color="primary"
                             isLoading={isAddingToCart}
-                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isAddingToCart || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isAddingToCart || !isUniqueVariantSelected || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
-                            disabled={isAddingToCart || quantity <= 0 || quantity > stock}
+                            disabled={isAddingToCart || !isUniqueVariantSelected || quantity <= 0 || quantity > stock}
                         >
                             Add to Cart
                         </Button>
@@ -411,7 +412,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
                     <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
                     <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
-                        {bundleProducts.map((bundleProduct) => (
+                        {bundleProducts?.map((bundleProduct) => (
                             <BundleProductCard key={bundleProduct.id} product={bundleProduct} />
                         ))}
                     </div>

@@ -130,18 +130,18 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
         allVariants
     );
 
-    useEffect(() => {
-        if (!selectedVariant && attributeTermData.length > 0) {
-            const firstAttribute = attributeTermData[0];
-            const defaultTermSlug = getDefaultSelectedTerm(firstAttribute.attribute.id);
-            if (defaultTermSlug) {
-                const termToSelect = firstAttribute.terms.find((t) => t.slug === defaultTermSlug);
-                if (termToSelect) {
-                    handleVariantFilter(firstAttribute, termToSelect);
-                }
-            }
-        }
-    }, [selectedVariant, attributeTermData, getDefaultSelectedTerm, handleVariantFilter]);
+    // useEffect(() => {
+    //     if (!selectedVariant && attributeTermData.length > 0) {
+    //         const firstAttribute = attributeTermData[0];
+    //         const defaultTermSlug = getDefaultSelectedTerm(firstAttribute.attribute.id);
+    //         if (defaultTermSlug) {
+    //             const termToSelect = firstAttribute.terms.find((t) => t.slug === defaultTermSlug);
+    //             if (termToSelect) {
+    //                 handleVariantFilter(firstAttribute, termToSelect);
+    //             }
+    //         }
+    //     }
+    // }, [selectedVariant, attributeTermData, getDefaultSelectedTerm, handleVariantFilter]);
 
 
     return (

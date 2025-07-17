@@ -6,6 +6,7 @@ import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
+import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config";
@@ -614,4 +615,25 @@ export const getLoyaltyPointsRedemption = async (): Promise<ServerActionResponse
     endpoint: API_ROUTES.GET_LOYALTY_POINTS_REDEMPTION,
     method: 'GET',
   });
+};
+
+export const getCategoriesWithDeals = async (payload?: CategoriesWithDealsPayload): Promise<ServerActionResponse<CategoriesWithDealsResponse>> => {
+    return await handleRequest<CategoriesWithDealsResponse, unknown>({
+        endpoint: API_ROUTES.GET_CATEGORIES_WITH_DEALS(payload),
+        method: 'GET',
+    });
+};
+
+export const getDealsByCategory = async (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }): Promise<ServerActionResponse<DealsByCategoryResponse>> => {
+    return await handleRequest<DealsByCategoryResponse, unknown>({
+        endpoint: API_ROUTES.GET_DEALS_BY_CATEGORY(categoryId, payload),
+        method: 'GET',
+    });
+};
+
+export const getAllDeals = async (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }): Promise<ServerActionResponse<AllDealsResponse>> => {
+    return await handleRequest<AllDealsResponse, unknown>({
+        endpoint: API_ROUTES.GET_ALL_DEALS(payload),
+        method: 'GET',
+    });
 };

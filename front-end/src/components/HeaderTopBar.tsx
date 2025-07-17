@@ -31,6 +31,13 @@ const HeaderTopBar = ({ categories }: Props) => {
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
     const router = useRouter();
     const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading, cartSubtotal } = useCart();
+
+    const handleSearch = (data: HeaderFormSchema) => {
+        if (data.search) {
+            router.push(`${ROUTES.SHOP}?keyword=${data.search}`);
+        }
+    };
+
     const handleCheckout = async () => {
         const isValid = await checkoutStockValidation();
         if (isValid) {
@@ -45,7 +52,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                 <Logo className='max-xl:max-w-64' />
                 <div className="flex flex-1 flex-shrink justify-center items-center">
                     <Form {...searchFromConfig}>
-                        <form noValidate className="w-full max-w-[650px] ">
+                        <form noValidate className="w-full max-w-[650px] " onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
                             <InputField
                                 control={searchFromConfig.control}
                                 name="search"
@@ -101,7 +108,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                 <div className="flex flex-1 flex-shrink justify-center items-center">
 
                     <Form {...searchFromConfig}>
-                        <form noValidate className="w-full">
+                        <form noValidate className="w-full" onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
                             <InputField
                                 control={searchFromConfig.control}
                                 name="search"

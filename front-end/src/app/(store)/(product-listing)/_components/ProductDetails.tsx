@@ -18,6 +18,8 @@ import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { getReviewOrderByProductId } from '@/lib/server.actions'
+import { getDealsByCategory } from '@/lib/server.actions'
+import { ProductInDeal } from '@/lib/config/deal.config'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -62,6 +64,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     const allImages: productAllImages[] = isVariant ? data?.variants[0]?.all_images : data?.product?.all_images;
     const product: ProductViewDetails = data?.product;
     const productVariant: ProductVariant | null = isVariant ? data?.variants[0] : null;
+    const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
 
     const stock = isVariant && productVariant ? productVariant.stock_status === 'in_stock' ? productVariant.stock : 0 : 0;
     const attributesName = isVariant ? productVariant?.attributes.map(attr => attr.term_name).join(', ') : '';
@@ -85,6 +88,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         averageRating: 0,
         totalReviews: 0,
     });
+    const [bundleProducts, setBundleProducts] = useState<ProductInDeal[]>([]);
 
     const handleReviewsClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -181,6 +185,25 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         }
         fetchReviews()
     }, [product]);
+
+    useEffect(() => {
+        const fetchBundleProducts = async () => {
+            if (!product?.category) return;
+            const category = product.category;
+            const response = await getDealsByCategory(category.id, { limit: 4, offset: 0 });
+
+            if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
+                // Exclude the current product from the list
+                const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id !== product.id);
+                setBundleProducts(filteredProducts.slice(0, 2));
+            }
+        };
+
+        if (product?.id) {
+            fetchBundleProducts();
+        }
+    }, [product]);
+    console.log("product", product);
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -274,15 +297,20 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
                         <p className='text-title-1 md:text-h5 xl:text-h4'>{DEFAULT_CURRENCY_SYMBOL}{price}</p>
-                        <p className='text-content-2 md:text-title-2 cursor-default'>or Mix & Match</p>
-                        <Button
-                            size="sm"
-                            radius="md"
-                            color="primary"
-                            className="btn primary-btn shadow-input w-fit cursor-default !min-w-fit text-content-2 md:text-content-1 !leading-none !tap-highlight-transparent !h-5 md:!h-8 xl:!h-9 !px-1.5 !py-1 md:!px-4 md:!py-2"
-                        >
-                            3 for £30
-                        </Button>
+                        {mixAndMatchDeal && (
+                            <>
+                                <p className='text-content-2 md:text-title-2 cursor-default'>or Mix & Match</p>
+                                <Button
+                                    size="sm"
+                                    radius="md"
+                                    color="primary"
+                                    className="btn primary-btn shadow-input w-fit cursor-default !min-w-fit text-content-2 md:text-content-1 !leading-none !tap-highlight-transparent !h-5 md:!h-8 xl:!h-9 !px-1.5 !py-1 md:!px-4 md:!py-2"
+                                >
+                                  {mixAndMatchDeal?.name}
+                                    {/* {`${mixAndMatchDeal.required_qty} for ${DEFAULT_CURRENCY_SYMBOL}${Number(mixAndMatchDeal.fixed_price).toFixed(0)}`} */}
+                                </Button>
+                            </>
+                        )}
                     </div>
                     <div className='space-y-4 max-md:order-4'>
                         <div className='bg-skin-white border border-skin-neutral-100 rounded-xl shadow-product-offer p-3.5 space-y-2.5'>
@@ -379,13 +407,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 </div>
             </div>
             <Divider />
-            <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
-                <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
-                <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
-                    <BundleProductCard />
-                    <BundleProductCard />
+            {bundleProducts.length > 0 && (
+                <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
+                    <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
+                    <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
+                        {bundleProducts.map((bundleProduct) => (
+                            <BundleProductCard key={bundleProduct.id} product={bundleProduct} />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </section>
     )
 }

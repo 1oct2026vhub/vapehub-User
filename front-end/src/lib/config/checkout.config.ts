@@ -168,4 +168,5 @@ export interface CHECKOUT_PAYLOAD {
         method: string;
     };
     total: number;
+    loyalty?: boolean;
 }

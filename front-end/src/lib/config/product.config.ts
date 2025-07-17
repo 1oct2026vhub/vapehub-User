@@ -186,6 +186,7 @@ export interface Product {
     deals: {
         name: string;
     }[];
+    primary_image?: { url: string };
 }
  
 export interface CategoryResponseData extends Category {
@@ -274,7 +275,13 @@ export interface productAllImages {
     url: string;
     is_primary: boolean;
 }
-   
+
+export interface Deal {
+  name: string;
+  deal_type: string;
+  required_qty: number;
+  fixed_price: string;
+}
 
 export interface ProductViewDetails {
 
@@ -287,7 +294,8 @@ export interface ProductViewDetails {
     createdAt: string;
     primary_image: productAllImages;
     all_images: productAllImages[];
-    attribute_terms: AttributeTerms[]
+    attribute_terms: AttributeTerms[];
+    deals: Deal[];
 };
 
 export interface AppliedFilters {

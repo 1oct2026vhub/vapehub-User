@@ -66,7 +66,7 @@ const CheckoutDetails: React.FC = () => {
         }
     });
     const { selectedShippingMethod, setSelectedShippingMethod, handlePlaceOrder, isProcessing } = useCheckout();
-    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems } = useCart();
+    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
 
@@ -111,11 +111,12 @@ const CheckoutDetails: React.FC = () => {
             },
             useShippingAsBilling: !data.useShippingAsBilling,
             couponCode: couponDiscount.code || undefined,
+            loyalty: loyaltyRedemption.isRedeemed,
             shipping_method_id: Number(selectedShippingMethod?.id) || 0,
             payment_method: {
                 method: data.paymentMethod
             },
-            total: (cartTotal + (selectedShippingMethod?.shipping_cost || 0)) - couponDiscount.value
+            total: (cartTotal + (selectedShippingMethod?.shipping_cost || 0)) - couponDiscount.value - (loyaltyRedemption.discountValue || 0)
 
         };;
 

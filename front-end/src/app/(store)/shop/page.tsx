@@ -4,6 +4,7 @@ import { getProductList } from '@/lib/server.actions';
 import { Metadata, NextPage } from 'next'; 
 import ProductList from '../(product-listing)/_components/ProductList';
 import { ROUTES } from '@/lib/routes';
+import ProductListingContent from '@/components/ProductListingContent';
 
 export const metadata: Metadata = {
   title: "Shop | VapeHub",
@@ -15,7 +16,7 @@ type SearchParams = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElement  => {
      
-    const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 };
+    const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
     const searchParamsData = await searchParams;
     const variantParams = Object.entries(searchParamsData)
     .reduce((acc: Record<string, unknown>, [key, value]) => {
@@ -45,11 +46,29 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
       if(response.status == ServerActionStatus.ERROR) {
         return (<p>{response.message}</p>);
       } 
+
+    const productListingData = {
+        name: searchParamsData.keyword?.toString() || "Shop",
+        description: `Showing results for "${searchParamsData.keyword?.toString() || 'all products'}"`,
+        id: 0,
+        slug: '',
+        updated_by: null,
+        parent_id: null,
+        logo_url: '',
+        is_active: true,
+        createdAt: '',
+        updatedAt: '',
+        deletedAt: null,
+        children: [],
+        subCategories: [],
+
+    };
+
     return (
         <div>
         <section className="product-listing-container flex-col">
           <BreadCrumbs items={breadcrumbs} />
-          {/* <ProductListingContent data={data}/> */}
+          <ProductListingContent data={productListingData}/>
         </section>
         <ProductList data={response.data}/>
         </div>

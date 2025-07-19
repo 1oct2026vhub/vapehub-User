@@ -10,7 +10,7 @@ type OrderDetailsProps = {
 const OrderDetails: React.FC<OrderDetailsProps> = ({data, referral}) => {
   
     return (
-        <div className='flex flex-col gap-4 md:gap-6 max-md:pb-6 border-b md:border-r md:border-b-0 border-skin-neutral-200 w-full md:w-[50%] xl:w-[60%]'>
+        <div className='grid grid-cols-2 justify-between max-md:pb-6 w-full'>
             <div className='space-y-2'>
                 <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order Total</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>

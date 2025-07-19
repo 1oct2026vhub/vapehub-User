@@ -43,7 +43,7 @@ console.log("result", result);
             <section className='flex flex-col gap-4'>
                 <div className='bg-skin-white p-4 shadow-card rounded-14 flex flex-col md:flex-row gap-7 items-start'>
                     <OrderDetails data={result.order} referral={result.referral} />
-                    <OrderActions orderId={Number(id)} orderItems={result.order.orderItems} status={result.order.status} />
+                    {/* <OrderActions orderId={Number(id)} orderItems={result.order.orderItems} status={result.order.status} /> */}
                 </div>
                 {
                     result.order.orderItems.map((item) => (

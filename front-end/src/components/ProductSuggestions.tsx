@@ -11,12 +11,11 @@ interface ProductSuggestionsProps {
     isLoading: boolean;
     onViewAll: () => void;
     onClose: () => void;
-    className?: string;
 }
 
-const ProductSuggestions: React.FC<ProductSuggestionsProps> = ({ suggestions, isLoading, onViewAll, onClose, className }) => {
+const ProductSuggestions: React.FC<ProductSuggestionsProps> = ({ suggestions, isLoading, onViewAll, onClose }) => {
     return (
-        <div className={`absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 ${className}`}>
+        <div className={`absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50`}>
             {isLoading ? (
                 <div className="flex justify-center items-center p-4">
                     <Spinner />

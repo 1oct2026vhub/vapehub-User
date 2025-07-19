@@ -6,9 +6,9 @@ import { Button } from '@nextui-org/button';
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 import Link from 'next/link';
 import NoImage from './NoImage';
-import { getReviewOrderByProductId } from '@/lib/server.actions';
 import { REVIEWS } from '@/lib/config/order.config';
 import { RatingStarEmpty, RatingStarFilled } from './Icons';
+import { reviewService } from '@/lib/services/review.service';
 
 interface ProductCardProps {
   title: string;
@@ -47,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     const fetchReviews = async () => {
       if (!productId) return;
       try {
-        const response = await getReviewOrderByProductId(productId, 1, 1);
+        const response = await reviewService.getReview(productId);
         if (response.status === ServerActionStatus.SUCCESS && response.data) {
           setReviewsData({
             reviews: response.data.reviews || [],

@@ -44,11 +44,11 @@ const HeaderTopBar = ({ categories }: Props) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     const searchTerm = useWatch({ control: searchFromConfig.control, name: 'search' });
-    const debouncedSearchTerm = useDebounce(searchTerm, 300);
+    const debouncedSearchTerm = useDebounce(searchTerm, 150);
 
     useEffect(() => {
         const fetchSuggestions = async () => {
-            if (debouncedSearchTerm && debouncedSearchTerm.length > 2) {
+            if (debouncedSearchTerm && debouncedSearchTerm.length >= 1) {
                 setIsSuggestionLoading(true);
                 const response = await getProductList({ keyword: debouncedSearchTerm, limit: 5 });
                 if (response.status === ServerActionStatus.SUCCESS) {
@@ -93,9 +93,9 @@ const HeaderTopBar = ({ categories }: Props) => {
         <>
             <div className="hidden lg:flex items-center justify-between gap-10">
                 <Logo className='max-xl:max-w-64' />
-                <div className="flex flex-1 flex-shrink justify-center items-center">
+                <div className="relative flex-1 flex-shrink justify-center items-center max-w-[650px] mx-auto">
                     <Form {...searchFromConfig}>
-                        <form noValidate className="w-full max-w-[650px] " onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
+                        <form noValidate className="w-full" onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
                             <InputField
                                 control={searchFromConfig.control}
                                 name="search"
@@ -115,7 +115,6 @@ const HeaderTopBar = ({ categories }: Props) => {
                             isLoading={isSuggestionLoading}
                             onViewAll={handleViewAll}
                             onClose={() => setShowSuggestions(false)}
-                            className="max-w-[650px]"
                         />
                    )}
                 </div>
@@ -157,8 +156,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                         </Badge> 
                     </div>
                 </div>
-                <div className="flex flex-1 flex-shrink justify-center items-center">
-
+                <div className="relative flex flex-1 flex-shrink justify-center items-center">
                     <Form {...searchFromConfig}>
                         <form noValidate className="w-full" onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
                             <InputField
@@ -171,6 +169,14 @@ const HeaderTopBar = ({ categories }: Props) => {
                             />
                         </form>
                     </Form>
+                    {showSuggestions && searchTerm && (
+                        <ProductSuggestions
+                            suggestions={suggestions}
+                            isLoading={isSuggestionLoading}
+                            onViewAll={handleViewAll}
+                            onClose={() => setShowSuggestions(false)}
+                        />
+                    )}
                 </div>
             </div>
             <Drawer isOpen={isOpen} onOpenChange={onOpenChange} className='filter-drawer rounded-l-32 md:!w-[637px] max-w-[90%] md:!max-w-[637px]'>

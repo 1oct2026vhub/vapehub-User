@@ -1,13 +1,13 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { AttributeTerms, AttributeProductTerms } from '@/lib/config/product.config';
-import { ProductVariant } from '@/lib/config/product.config';
+// import { ProductVariant } from '@/lib/config/product.config';
 
 export const useVariantFilter = (
-  productSlug: string, 
+  // productSlug: string, 
   availableVariants: AttributeTerms[],
   currentVariant?: AttributeProductTerms,
-  allVariants?: ProductVariant[]
+  // allVariants?: ProductVariant[]
 ) => {
   const router = useRouter();
   const pathname = usePathname();

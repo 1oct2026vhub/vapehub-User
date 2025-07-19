@@ -1,7 +1,7 @@
 import React from 'react';
 import { getLoyaltyPointsRedemption } from '@/lib/server.actions';
 import LoyaltyPoints from './_components/LoyaltyPoints';
-import UiError from '@/components/ui/UiError';
+// import UiError from '@/components/ui/UiError';
 import { ServerActionStatus } from '@/lib/config/app.config';
 
 const LoyaltyPointsPage = async () => {

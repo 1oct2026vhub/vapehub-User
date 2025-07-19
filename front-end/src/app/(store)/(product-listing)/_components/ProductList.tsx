@@ -12,6 +12,7 @@ import { BrandByProductResponse, CategoryResponseData, ProductResponseData, Attr
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FunctionComponent, ReactElement, useState } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
+// import { li } from "framer-motion/client";
 // import { motion } from "framer-motion";
 
 type ProductListProps = {
@@ -30,7 +31,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
 
   const productAttributeTerms: AttributeTerms[] = data?.attributes.filter(attr => attr.attribute.is_visible === true);
   const appliedFilters = getAppliedFilters(productAttributeTerms);
-
+console.log("appliedFilters", appliedFilters);
   const handleRemoveFilter = (attributeId: number, type: string) => {
     setIsLoading(true);
     removeFilter(attributeId, productAttributeTerms, type);
@@ -42,7 +43,6 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
   const onFilterChange = (attributeId: string, value: string, isSelect: boolean) => {
     setIsLoading(true);
     const currentFilters = getFilterParams();
-     
     if (!currentFilters.variants) {
       currentFilters.variants = {};
     } 
@@ -171,6 +171,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
     }
     router.replace(`${pathname}?${params.toString()}`, { scroll: true });
   };
+console.log("filter data", data);
 
   return (
 
@@ -218,14 +219,14 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElemen
                   <ProductCard
                     key={index}
                     title={product.name}
-                    imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url}
+                    imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ''}
                     price={product.price}
                     buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
                     flavors={product?.Flavors?.length}
                     productId={product.id}
                     link={`/${product.slug}`}
                     totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs` : ""}
-                    isNew={isLessThanOneMonth(product?.createdAt) ? "New" : ""}
+                    isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
                   />
                 ))}
               </div>

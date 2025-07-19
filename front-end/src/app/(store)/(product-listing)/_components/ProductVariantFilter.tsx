@@ -1,5 +1,5 @@
 import { Button, Select, SelectItem } from '@nextui-org/react'
-import { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent } from 'react';
 import { AttributeTerms, AttributeProductTerms, ProductVariant } from '@/lib/config/product.config';
 import { useVariantFilter } from '@/lib/hooks/useVariantFilter';
 
@@ -124,10 +124,8 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     );
 
     const { handleVariantFilter, isFiltering, getDefaultSelectedTerm } = useVariantFilter(
-        productSlug,
         availableAttributes,
-        selectedVariant,
-        allVariants
+        selectedVariant
     );
 
     // useEffect(() => {

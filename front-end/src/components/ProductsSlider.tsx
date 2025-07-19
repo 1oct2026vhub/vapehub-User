@@ -60,7 +60,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false}) => {
             flavors={product?.Flavors?.length}
             link={`/${product.slug}`}
             totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}
-            isNew={isLessThanOneMonth(product?.createdAt) ? "New" : ""} 
+            isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""} 
           />
         </div>
       ))}

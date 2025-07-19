@@ -1,5 +1,5 @@
 import { Button, Select, SelectItem } from '@nextui-org/react'
-import { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent } from 'react';
 import { AttributeTerms, AttributeProductTerms, ProductVariant } from '@/lib/config/product.config';
 import { useVariantFilter } from '@/lib/hooks/useVariantFilter';
 
@@ -124,24 +124,22 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     );
 
     const { handleVariantFilter, isFiltering, getDefaultSelectedTerm } = useVariantFilter(
-        productSlug,
         availableAttributes,
-        selectedVariant,
-        allVariants
+        selectedVariant
     );
 
-    useEffect(() => {
-        if (!selectedVariant && attributeTermData.length > 0) {
-            const firstAttribute = attributeTermData[0];
-            const defaultTermSlug = getDefaultSelectedTerm(firstAttribute.attribute.id);
-            if (defaultTermSlug) {
-                const termToSelect = firstAttribute.terms.find((t) => t.slug === defaultTermSlug);
-                if (termToSelect) {
-                    handleVariantFilter(firstAttribute, termToSelect);
-                }
-            }
-        }
-    }, [selectedVariant, attributeTermData, getDefaultSelectedTerm, handleVariantFilter]);
+    // useEffect(() => {
+    //     if (!selectedVariant && attributeTermData.length > 0) {
+    //         const firstAttribute = attributeTermData[0];
+    //         const defaultTermSlug = getDefaultSelectedTerm(firstAttribute.attribute.id);
+    //         if (defaultTermSlug) {
+    //             const termToSelect = firstAttribute.terms.find((t) => t.slug === defaultTermSlug);
+    //             if (termToSelect) {
+    //                 handleVariantFilter(firstAttribute, termToSelect);
+    //             }
+    //         }
+    //     }
+    // }, [selectedVariant, attributeTermData, getDefaultSelectedTerm, handleVariantFilter]);
 
 
     return (

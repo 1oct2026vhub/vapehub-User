@@ -104,89 +104,19 @@ export interface AttributeTerms {
     terms: productAttributesTerms[];
 }
 export interface Product {
-    variants: {
-        id: number;
-        product_id: number;
-        slug: string;
-        price: string;
-        discount_price: string;
-        purchase_price: string;
-        weight: number | null;
-        length: number | null;
-        width: number | null;
-        height: number | null;
-        description: string;
-        barcode: string | null;
-        stock: number;
-        low_stock_threshold: number;
-        stock_status: string;
-        status: string;
-        updated_by: number;
-        created_at: string;
-        updated_at: string;
-        deleted_at: string | null;
-        variantAttributes: {
-            id: number;
-            variant_id: number;
-            attribute_id: number;
-            term_id: number;
-            is_visible: boolean;
-            used_in_variation: boolean;
-            updated_by: number;
-            created_at: string;
-            updated_at: string;
-            deleted_at: string | null;
-            attribute: {
-                id: number;
-                name: string;
-                type: string;
-            };
-            term: productAttributesTerms;
-        }[];
-        variantImages: {
-            id: number;
-            variant_id: number;
-            image_url: string;
-            is_primary: boolean;
-        }[];
-    };
-    productAttributeTerms: productAttributeTerms[];
     id: number;
-    updated_by: number | null;
     name: string;
     slug: string;
-    description: string;
     price: string;
-    discount_price: string;
-    stock_quantity: number;
-    puff_count: number;
-    is_new: boolean;
-    battery_capacity: string;
-    coil_style: string;
-    device_style: string;
-    eliquid_capacity: string;
-    pod_coil_style: string;
-    pod_fill_style: string;
-    power_supply: string;
-    nicotine_strength: string;
-    nicotine_type: string;
-    vg_ratio: string;
-    vaping_style: string;
-    bottle_size: string;
-    category_id: number;
-    brand_id: number;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: string | null;
-    Category: Category | null;
-    Brand: BrandConfig;
-    ProductImages: ProductImage[];
-    Flavors: Flavor[];
-    attributeTerms: AttributeTerms[];
-    deals: {
-        name: string;
-    }[];
     primary_image?: { url: string };
+    
+    // Properties required by ProductList.tsx
+    Category?: Category | null;
+    ProductImages?: ProductImage[];
+    deals?: { name: string }[];
+    Flavors?: Flavor[];
+    puff_count?: number | string;
+    createdAt?: string;
 }
  
 export interface CategoryResponseData extends Category {

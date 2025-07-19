@@ -9,15 +9,20 @@ import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
 import ShippingProgress from './ShippingProgress';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/config/header.config';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { Form } from '@/components/ui/Form';
 import MobileMenu from './MobileMenu';
 import { useCart } from '@/lib/context/CartContext';
 import { ROUTES } from '@/lib/routes';
-import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
+import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 import { useRouter } from 'next/navigation';
 import { Category } from '@/lib/config/category.config';
 import NotificationAction from './NotificationAction';
+import { useEffect, useState } from "react";
+import { getProductList } from "@/lib/server.actions";
+import { Product } from "@/lib/config/product.config";
+import ProductSuggestions from './ProductSuggestions';
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 type Props = {
     categories: Category[]
@@ -26,17 +31,55 @@ const HeaderTopBar = ({ categories }: Props) => {
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
         mode: 'onBlur',
+        defaultValues: {
+            search: ''
+        }
     });
     
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
     const router = useRouter();
     const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading, cartSubtotal } = useCart();
+    const [suggestions, setSuggestions] = useState<Product[]>([]);
+    const [isSuggestionLoading, setIsSuggestionLoading] = useState(false);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const searchTerm = useWatch({ control: searchFromConfig.control, name: 'search' });
+    const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (debouncedSearchTerm && debouncedSearchTerm.length > 2) {
+                setIsSuggestionLoading(true);
+                const response = await getProductList({ keyword: debouncedSearchTerm, limit: 5 });
+                if (response.status === ServerActionStatus.SUCCESS) {
+                    setSuggestions(response.data.products);
+                } else {
+                    setSuggestions([]);
+                }
+                setIsSuggestionLoading(false);
+                setShowSuggestions(true);
+            } else {
+                setShowSuggestions(false);
+            }
+        };
+        fetchSuggestions();
+    }, [debouncedSearchTerm]);
 
     const handleSearch = (data: HeaderFormSchema) => {
         if (data.search) {
             router.push(`${ROUTES.SHOP}?keyword=${data.search}`);
+            setShowSuggestions(false);
+            searchFromConfig.reset({ search: '' });
         }
     };
+
+    const handleViewAll = () => {
+        if (searchTerm) {
+            router.push(`${ROUTES.SHOP}?keyword=${searchTerm}`);
+            setShowSuggestions(false);
+            searchFromConfig.reset({ search: '' });
+        }
+    }
 
     const handleCheckout = async () => {
         const isValid = await checkoutStockValidation();
@@ -66,6 +109,15 @@ const HeaderTopBar = ({ categories }: Props) => {
                             />
                         </form>
                     </Form>
+                   {showSuggestions && searchTerm && (
+                        <ProductSuggestions
+                            suggestions={suggestions}
+                            isLoading={isSuggestionLoading}
+                            onViewAll={handleViewAll}
+                            onClose={() => setShowSuggestions(false)}
+                            className="max-w-[650px]"
+                        />
+                   )}
                 </div>
 
                 <div className="flex items-center gap-6">

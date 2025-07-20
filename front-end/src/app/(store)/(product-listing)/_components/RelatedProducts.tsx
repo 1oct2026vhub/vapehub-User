@@ -4,7 +4,7 @@ import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
 import { getMoreLikeThis } from "@/lib/server.actions";
 import { AsyncReactElement, ServerActionStatus } from "@/lib/config/app.config";
-import { Product, ProductResponseData } from "@/lib/config/product.config";
+import { Product, ProductResponseData, SimilarProduct } from "@/lib/config/product.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 interface RelatedProductsProps {
@@ -25,7 +25,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
   }
     
   const productResponse: ProductResponseData = {
-    products: response.data.similar_products.map((p: any) => ({
+    products: response.data.similar_products.map((p: SimilarProduct) => ({
       ...p,
       price: p.price ?? "0.00",
       ProductImages: p.primary_image ? [{

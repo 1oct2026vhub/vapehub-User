@@ -223,7 +223,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 return <RatingStarEmpty key={i} className='w-4 h-4 md:w-5 md:h-5' />;
                             })}
                         </div>
-                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewsData.totalReviews} Reviews)</p>
+                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewsData.totalReviews} {reviewsData.totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
                     </div>
                 </div>
                 {/* Title section mobile ends */}
@@ -293,7 +293,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                     return <RatingStarEmpty key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
                                 })}
                             </div>
-                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewsData.totalReviews} Reviews)</p>
+                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewsData.totalReviews} {reviewsData.totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>

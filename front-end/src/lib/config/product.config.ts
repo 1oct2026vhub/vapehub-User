@@ -109,10 +109,11 @@ export interface Product {
     slug: string;
     price: string;
     primary_image?: { url: string };
+    deleted_at?: string | null;
     
     // Properties required by ProductList.tsx
     Category?: Category | null;
-    ProductImages?: ProductImage[];
+    ProductImages: ProductImage[];
     deals?: { name: string }[];
     Flavors?: Flavor[];
     puff_count?: number | string;

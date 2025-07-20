@@ -136,7 +136,8 @@ const Dashboard: NextPage = async () => {
 
       <Suspense fallback={<SuspenseLoader />}>
         <DynamicNewProducts 
-          products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse} 
+          products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse}
+          reviews={data.newProductsReviews}
           viewAllHref={ROUTES.SHOP} 
         />
       </Suspense>
@@ -147,14 +148,16 @@ const Dashboard: NextPage = async () => {
 
       <Suspense fallback={<SuspenseLoader />}>
         <DynamicMostPopularVapes 
-          products={data.popularVapes.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularVapes.data) : emptyProductResponse} 
+          products={data.popularVapes.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularVapes.data) : emptyProductResponse}
+          reviews={data.popularVapesReviews}
           viewAllHref="disposables" 
         />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
         <DynamicMostPopularSalts 
-          products={data.popularSalts.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularSalts.data) : emptyProductResponse} 
+          products={data.popularSalts.status === ServerActionStatus.SUCCESS ? transformCategoryToProductResponse(data.popularSalts.data) : emptyProductResponse}
+          reviews={data.popularSaltsReviews}
           viewAllHref="nic-salts" 
         />
       </Suspense>

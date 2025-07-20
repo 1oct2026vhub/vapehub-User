@@ -4,17 +4,21 @@ import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
 import { ProductResponseData } from "@/lib/config/product.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
+import { ServerActionResponse } from "@/lib/config/app.config";
+import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
 interface MostPopularProps {
   title?: string;
   viewAllHref?: string;
   products: ProductResponseData;
+  reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
 }
 
 export const MostPopularVapes: React.FC<MostPopularProps> = ({
   title = "Most Popular Disposable Vapes",
   viewAllHref = "#",
-  products
+  products,
+  reviews
 }) => {
    
     
@@ -26,7 +30,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = ({
       </div>
       <div className="slider-container section-slider products-slider">
         {
-          products.products.length > 0 ? <ProductsSlider data={products}/> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
+          products.products.length > 0 ? <ProductsSlider data={products} reviews={reviews} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         }
       </div>
     </section>
@@ -36,7 +40,8 @@ export const MostPopularVapes: React.FC<MostPopularProps> = ({
 export const MostPopularSalts: React.FC<MostPopularProps> = ({
   title = "Most Popular Nic Salts",
   viewAllHref = "#",
-  products
+  products,
+  reviews
 }) => {
 
     
@@ -48,7 +53,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = ({
       </div>
       <div className="slider-container section-slider products-slider">
         {
-          products.products.length > 0 ? <ProductsSlider data={products}/> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
+          products.products.length > 0 ? <ProductsSlider data={products} reviews={reviews} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         }
       </div>
     </section>

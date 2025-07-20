@@ -1,7 +1,7 @@
 import { NextPage } from 'next'
 import React from 'react'
 import OrderDetails from '../_components/OrderDetails'
-import OrderActions from '../_components/OrderActions'
+// import OrderActions from '../_components/OrderActions'
 import OrderDetailCard from '../_components/OrderDetailCard'
 import { getOrderById } from '@/lib/server.actions';
 import { notFound } from 'next/navigation';

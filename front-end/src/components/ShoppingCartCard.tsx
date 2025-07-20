@@ -4,15 +4,18 @@ import { TrashIcon, DangerIcon } from '@/components/Icons';
 import { useCart } from '@/lib/context/CartContext';
 import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
-import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
+import { DEFAULT_CURRENCY_SYMBOL, ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config';
 import QuantitySelector from './QuantitySelector'; 
+import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
+import { RatingStarEmpty, RatingStarFilled } from './Icons';
 
 type CartCardProps = {
   item?: CartItem;
   showAddMoreItem?: boolean;
+  reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
 };
 
-const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
+const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = false, reviews = [] }) => {
 
   const { removeItem, isLoading, stockValidationErrors } = useCart();
   const error = stockValidationErrors.find(error => error.itemId === item?.id);
@@ -23,6 +26,11 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
   };
 
   if (!item) return null;
+
+  const review = reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews.find(review => review.product_id === item.product_id));
+  const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
+  const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
+
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">
@@ -58,6 +66,18 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
                 </p>
               )}
             </div>
+          </div>
+
+          <div className='flex items-center gap-1'>
+            <div className="flex items-center">
+              {Array.from({ length: 5 }, (_, i) => {
+                if (i < Math.round(averageRating)) {
+                  return <RatingStarFilled key={i} className='w-3 md:w-4' />;
+                }
+                return <RatingStarEmpty key={i} className='w-3 md:w-4' />;
+              })}
+            </div>
+            <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5">({totalReviews} Reviews)</p>
           </div>
 
           <div className="flex items-center gap-5 justify-between w-full">

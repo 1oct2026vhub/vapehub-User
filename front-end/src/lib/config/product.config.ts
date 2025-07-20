@@ -119,6 +119,37 @@ export interface Product {
     puff_count?: number | string;
     createdAt?: string;
 }
+
+export interface MoreLikeThisResponse {
+    source_product: {
+        id: number;
+        name: string;
+        slug: string;
+        categories: {
+            id: number;
+            name: string;
+            slug: string;
+        }[];
+        attributes: {
+            attribute: {
+                id: number;
+                name: string;
+                type: string;
+            };
+            term: {
+                id: number;
+                name: string;
+                slug: string;
+            };
+        }[];
+    };
+    similar_products: Product[];
+    pagination: Pagination;
+    summary: {
+        total_similar_products: number;
+        average_similarity_score: number;
+    };
+}
  
 export interface CategoryResponseData extends Category {
     products: Product[];

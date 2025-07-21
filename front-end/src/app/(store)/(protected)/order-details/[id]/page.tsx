@@ -10,6 +10,8 @@ import { AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder'
 import { ORDER_STATUS } from '@/lib/config/order.config'
 import OrderPaymentAction from '../_components/OrderPaymentAction'
+import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 
 const OrdersListingPage: NextPage<{ params: Promise<{ id: string }> }> = async ({ params }): AsyncReactElement => {
     const { id } = await params;
@@ -43,6 +45,14 @@ console.log("result", result);
             <section className='flex flex-col gap-4'>
                 <div className='bg-skin-white p-4 shadow-card rounded-14 flex flex-col md:flex-row gap-7 items-start'>
                     <OrderDetails data={result.order} referral={result.referral} />
+                    <div className='mt-6 md:mt-0 md:ml-8 flex-shrink-0'>
+                <Link
+                    href={ROUTES.REFERRAL}
+                    className="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-skin-accent-500 transition-colors duration-200"
+                >
+                    Refer a Friend
+                </Link>
+            </div>
                     {/* <OrderActions orderId={Number(id)} orderItems={result.order.orderItems} status={result.order.status} /> */}
                 </div>
                 {

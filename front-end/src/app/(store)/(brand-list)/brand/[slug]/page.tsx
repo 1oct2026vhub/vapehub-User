@@ -1,10 +1,11 @@
-import { AsyncReactElement, RouteParams, ServerActionStatus } from '@/lib/config/app.config';
+import { AsyncReactElement, RouteParams, ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config';
 import { NextPage } from 'next';
 import React from 'react';
 import BrandProducts from '../_components/BrandProducts';
-import { getProductByBrand } from '@/lib/server.actions';
+import { getProductByBrand, getReviewOrderByProductId } from '@/lib/server.actions';
 import { notFound } from 'next/navigation';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
+import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 
 
 interface Props {
@@ -41,8 +42,12 @@ const BrandPage: NextPage<Props> = async ({
 
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
+    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = brandProduct.products ? await Promise.all(
+        brandProduct.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+    ) : [];
+
     return (
-      <BrandProducts data={brandProduct} />
+      <BrandProducts data={brandProduct} reviews={reviews} />
     );
   }
   notFound();

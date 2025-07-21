@@ -29,9 +29,9 @@ const Footer = async (): AsyncReactElement => {
     .filter(menu => menu.links.length > 0); // Only keep sections with active links
 
   const socialMediaLinks = [
-    { icon: <InstagramIcon className='max-sm:max-w-9' />, href: '#' },
-    { icon: <FacebookIcon className='max-sm:max-w-9' />, href: '#' },
-    { icon: <TwitterIcon className='max-sm:max-w-9' />, href: '#' },
+    { icon: <InstagramIcon className='max-sm:max-w-9' />, href: process.env.INSTAGRAM_LINK || '#' },
+    { icon: <FacebookIcon className='max-sm:max-w-9' />, href: process.env.FACEBOOK_LINK || '#' },
+    { icon: <TwitterIcon className='max-sm:max-w-9' />, href: process.env.TWITTER_LINK || '#' },
   ];
 
   return (
@@ -60,7 +60,7 @@ const Footer = async (): AsyncReactElement => {
 
         {/* Mobile Section */}
         <div className='w-full md:hidden'>
-          <FooterMobile footerMenu={sortedFooterMenu} />
+          <FooterMobile footerMenu={sortedFooterMenu} socialMediaLinks={socialMediaLinks} />
         </div>
 
         {/* Right Section */}
@@ -74,9 +74,9 @@ const Footer = async (): AsyncReactElement => {
                 customerservices@vapehub.co.uk
               </a>
             </div>
-            <div className="flex items-center gap-4.5 justify-center md:justify-end mt-4 xl:mt-5.5">
+            <div className="hidden md:flex items-center gap-4.5 justify-center md:justify-end mt-4 xl:mt-5.5">
               {socialMediaLinks.map((link, idx) => (
-                <a key={idx} href={link.href}>
+                <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer">
                   {link.icon}
                 </a>
               ))}

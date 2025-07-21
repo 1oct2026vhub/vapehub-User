@@ -5,17 +5,21 @@ import ProductsSlider from "@/components/ProductsSlider";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
+import { ServerActionResponse } from "@/lib/config/app.config";
+import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
 interface NewProductsProps {
   title?: string;
   viewAllHref?: string;
   products: ProductResponseData;
+  reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
 }
 
 const NewProducts: React.FC<NewProductsProps> = ({
   title = "New Products",
   viewAllHref = "/",
-  products
+  products,
+  reviews
 }) => {
   const newProducts:Product[] = products?.products?.filter((product: Product) => product.Category !== null) ?? [];
  
@@ -27,7 +31,7 @@ const NewProducts: React.FC<NewProductsProps> = ({
       </div>
       <div className="slider-container section-slider products-slider">
         {newProducts.length > 0 ? (
-          <ProductsSlider data={products}/>
+          <ProductsSlider data={products} reviews={reviews} />
         ) : (
           <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         )}

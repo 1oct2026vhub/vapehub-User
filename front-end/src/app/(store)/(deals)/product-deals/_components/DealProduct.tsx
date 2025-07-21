@@ -5,13 +5,16 @@ import BreadCrumbs from "@/components/BreadCrumbs";
 import { ProductResponseData } from '@/lib/config/product.config';
 import FAQSection from '@/components/FAQSection';
 import { Deal } from '@/lib/config/deal.config';
+import { ServerActionResponse } from '@/lib/config/app.config';
+import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 
 type DealProps = {
   data: ProductResponseData;
   deal: Deal;
+  reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]
 }
 
-const DealProduct: React.FC<DealProps> = ({ data, deal }): ReactElement => {
+const DealProduct: React.FC<DealProps> = ({ data, deal, reviews }): ReactElement => {
   const breadcrumbs = [
     { label: "Home", href: "/" },
     { label: "Deals", href: "/vapehub-deals" },
@@ -46,7 +49,7 @@ const DealProduct: React.FC<DealProps> = ({ data, deal }): ReactElement => {
         <BreadCrumbs items={breadcrumbs} />
         <ProductListingContent data={productListingData} />
       </section>
-      <ProductList data={data} />
+      <ProductList data={data} reviews={reviews} />
       <section className="product-listing-container">
         <FAQSection type="common" id={deal.id} />
       </section>

@@ -113,10 +113,10 @@ const ButtonAttributeTerms = ({
 
 const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     attributeTerms,
-    productSlug,
+    // productSlug,
     selectedVariant,
     availableAttributes,
-    allVariants
+    // allVariants
 }) => {
     // Filter out attributes that are not used in variation and not used in
     const attributeTermData = attributeTerms.filter(

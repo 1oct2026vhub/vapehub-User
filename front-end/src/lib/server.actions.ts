@@ -13,7 +13,7 @@ import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config"
 import { NotificationListResponse } from "./config/notification.config";
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
-import { BrandByProductResponse, CategoryResponseData, Product, ProductResponseData, ProductResponse } from "./config/product.config";
+import { BrandByProductResponse, CategoryResponseData, MoreLikeThisResponse, Product, ProductResponseData, ProductResponse } from "./config/product.config";
 import { ReferralStatsResponse } from "./config/referral.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
@@ -634,6 +634,13 @@ export const getDealsByCategory = async (categoryId: number, payload?: { limit?:
 export const getAllDeals = async (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }): Promise<ServerActionResponse<AllDealsResponse>> => {
     return await handleRequest<AllDealsResponse, unknown>({
         endpoint: API_ROUTES.GET_ALL_DEALS(payload),
+        method: 'GET',
+    });
+};
+
+export const getMoreLikeThis = async (payload: { product_id: number; limit?: number; offset?: number }): Promise<ServerActionResponse<MoreLikeThisResponse>> => {
+    return await handleRequest<MoreLikeThisResponse, unknown>({
+        endpoint: API_ROUTES.GET_MORE_LIKE_THIS(payload),
         method: 'GET',
     });
 };

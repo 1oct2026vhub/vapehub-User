@@ -12,14 +12,17 @@ import { BrandByProductResponse, CategoryResponseData, ProductResponseData, Attr
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FunctionComponent, ReactElement, useState } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
+import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
+import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 // import { li } from "framer-motion/client";
 // import { motion } from "framer-motion";
 
 type ProductListProps = {
-  data: CategoryResponseData | BrandByProductResponse | ProductResponseData
+  data: CategoryResponseData | BrandByProductResponse | ProductResponseData,
+  reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]
 }
 
-const ProductList: FunctionComponent<ProductListProps> = ({ data }): ReactElement => {
+const ProductList: FunctionComponent<ProductListProps> = ({ data, reviews = [] }): ReactElement => {
  
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -215,20 +218,28 @@ console.log("filter data", data);
           ) :
             <>
               <div className={`grid grid-cols-2  ${isFilterVisible ? 'md:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-3 xl:grid-cols-4'} transition-all duration-600 ease-in-out gap-3 md:gap-5 xl:gap-10 products-slider`}>
-                {products.map((product, index) => (
-                  <ProductCard
-                    key={index}
-                    title={product.name}
-                    imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ''}
-                    price={product.price}
-                    buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
-                    flavors={product?.Flavors?.length}
-                    productId={product.id}
-                    link={`/${product.slug}`}
-                    totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs` : ""}
-                    isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
-                  />
-                ))}
+                {products.map((product, index) => {
+                  const review = reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews.find(review => review.product_id === product.id));
+                  const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
+                  const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
+
+                  return (
+                    <ProductCard
+                      key={index}
+                      title={product.name}
+                      imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ''}
+                      price={product.price}
+                      buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
+                      flavors={product?.Flavors?.length}
+                      productId={product.id}
+                      link={`/${product.slug}`}
+                      totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs` : ""}
+                      isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
+                      averageRating={averageRating}
+                      totalReviews={totalReviews}
+                    />
+                  )
+                })}
               </div>
 
               <div className="flex items-center gap-3 justify-between pl-5">

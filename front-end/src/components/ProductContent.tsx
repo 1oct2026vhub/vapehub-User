@@ -18,8 +18,19 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
     const [selectedTab, setSelectedTab] = useState('Description');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [totalReviews, setTotalReviews] = useState(0);
     const [isLoadingReviews, setIsLoadingReviews] = useState(false);
     const limit = 10;
+
+    useEffect(() => {
+        const getReviewCount = async () => {
+            const response = await getReviewOrderByProductId(product.id, 1, 1);
+            if(response.status === ServerActionStatus.SUCCESS && response.data) {
+                setTotalReviews(response.data.total_reviews);
+            }
+        }
+        getReviewCount();
+    }, [product.id]);
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -29,11 +40,12 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
             if(response.status === ServerActionStatus.SUCCESS && response.data) {
                 setReviews(response.data.reviews);
                 setTotalPages(response.data.pagination.totalPages);
+                setTotalReviews(response.data.total_reviews);
             }
             setIsLoadingReviews(false);
         }
         fetchReviews()
-    }, [product.id, selectedTab, currentPage])
+    }, [product.id, selectedTab, currentPage, limit]);
         return (
         <section id="reviews" className='bg-skin-white p-4 md:p-6 xl:p-10 rounded-2.5xl shadow-card space-y-7.5'>
             <div className="flex w-full flex-col">
@@ -249,7 +261,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             </CardBody>
                         </Card>
                     </Tab>
-                    <Tab key="Reviews" title="Reviews">
+                    <Tab key="Reviews" title={`Reviews (${totalReviews})`}>
                         <Card classNames={{
                             base: "!bg-transparent border-none shadow-none p-0"
                         }}>

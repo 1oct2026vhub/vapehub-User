@@ -5,8 +5,9 @@ import { isLessThanOneMonth } from "@/lib/config/app.config";
 import ProductCard from '@/components/ProductCard';
 import Slider, { Settings } from 'react-slick';
 import { CategoryWithDeals, ProductInDeal } from '@/lib/config/deal.config';
-import { getDealsByCategory } from '@/lib/server.actions';
-import { ServerActionStatus } from '@/lib/config/app.config';
+import { getDealsByCategory, getReviewOrderByProductId } from '@/lib/server.actions';
+import { ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config';
+import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 
 interface DealsCategoryProps {
     category: CategoryWithDeals;
@@ -16,6 +17,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
 
     const [selectedValues, setSelectedValues] = useState<string[]>([]);
     const [products, setProducts] = useState<ProductInDeal[]>([]);
+    const [reviews, setReviews] = useState<ServerActionResponse<REVIEW_ORDER_RESPONSE>[]>([]);
 
     const fetchProducts = async (dealId?: number) => {
         const payload: { limit: number; offset: number; deal_id?: number } = {
@@ -30,6 +32,13 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
         const productResponse = await getDealsByCategory(category.id, payload);
         if (productResponse.status === ServerActionStatus.SUCCESS && productResponse.data) {
             setProducts(productResponse.data.products || []);
+            if (productResponse.data.products && productResponse.data.products.length > 0) {
+                const reviewPromises = productResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1));
+                const reviewResponses = await Promise.all(reviewPromises);
+                setReviews(reviewResponses);
+            } else {
+                setReviews([]);
+            }
         }
     };
 
@@ -164,21 +173,29 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
             </Select>
             <div className="slider-container section-slider products-slider">
                 {products.length > 0 ? <Slider {...settings}>
-                    {products.map((product, index) => (
-                        <div key={index} className="px-1 md:px-2 xl:px-5 py-4 first:pl-0">
-                            <ProductCard
-                                title={product.name}
-                                imageSrc={product.primary_image?.url ?? product.ProductImages?.[0]?.image_url ?? '/images/disposable-1.png'}
-                                price={product.price}
-                                buttonText={product.deals?.[0]?.name ?? "View Details"}
-                                productId={product.id}
-                                flavors={product?.Flavors?.length || 0}
-                                link={`/${product.slug}`}
-                                totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs` : ""}
-                                isNew={isLessThanOneMonth(product.created_at) ? "New" : ""}
-                            />
-                        </div>
-                    ))}
+                    {products.map((product, index) => {
+                        const review = reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews?.find(review => review.product_id === product.id));
+                        const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
+                        const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
+                        
+                        return (
+                            <div key={index} className="px-1 md:px-2 xl:px-5 py-4 first:pl-0">
+                                <ProductCard
+                                    title={product.name}
+                                    imageSrc={product.primary_image?.url ?? product.ProductImages?.[0]?.image_url ?? '/images/disposable-1.png'}
+                                    price={product.price}
+                                    buttonText={product.deals?.[0]?.name ?? "View Details"}
+                                    productId={product.id}
+                                    flavors={product?.Flavors?.length || 0}
+                                    link={`/${product.slug}`}
+                                    totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs` : ""}
+                                    isNew={isLessThanOneMonth(product.created_at) ? "New" : ""}
+                                    averageRating={averageRating}
+                                    totalReviews={totalReviews}
+                                />
+                            </div>
+                        )
+                    })}
                 </Slider> : <div className="flex items-center justify-center h-40">
                     <p className="text-skin-neutral-400">No products found.</p>
                 </div>}

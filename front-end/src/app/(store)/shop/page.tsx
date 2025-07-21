@@ -1,10 +1,11 @@
 import BreadCrumbs from '@/components/BreadCrumbs';
-import {  AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
-import { getProductList } from '@/lib/server.actions';
+import {  AsyncReactElement, ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config';
+import { getProductList, getReviewOrderByProductId } from '@/lib/server.actions';
 import { Metadata, NextPage } from 'next'; 
 import ProductList from '../(product-listing)/_components/ProductList';
 import { ROUTES } from '@/lib/routes';
 import ProductListingContent from '@/components/ProductListingContent';
+import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 
 export const metadata: Metadata = {
   title: "Shop | VapeHub",
@@ -47,6 +48,10 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
         return (<p>{response.message}</p>);
       } 
 
+    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = response.status === ServerActionStatus.SUCCESS && response.data.products ? await Promise.all(
+        response.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+    ) : [];
+
     const productListingData = {
         name: searchParamsData.keyword?.toString() || "Shop",
         description: `Showing results for "${searchParamsData.keyword?.toString() || 'all products'}"`,
@@ -70,7 +75,7 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
           <BreadCrumbs items={breadcrumbs} />
           <ProductListingContent data={productListingData}/>
         </section>
-        <ProductList data={response.data}/>
+        <ProductList data={response.data} reviews={reviews} />
         </div>
     );
 };

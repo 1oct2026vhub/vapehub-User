@@ -1,9 +1,10 @@
-import { getAllDeals, getProductList } from "@/lib/server.actions";
-import { ServerActionStatus } from "@/lib/config/app.config";
+import { getAllDeals, getProductList, getReviewOrderByProductId } from "@/lib/server.actions";
+import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { notFound } from 'next/navigation';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
 import { Metadata } from "next";
+import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
 type PageProps = {
   slug: string;
@@ -36,8 +37,12 @@ const Page = async ({ params, searchParams }: {
   if (productsResponse.status === ServerActionStatus.ERROR || !productsResponse.data?.products) {
     return notFound();
   }
+
+  const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = productsResponse.status === ServerActionStatus.SUCCESS && productsResponse.data.products ? await Promise.all(
+    productsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+  ) : [];
   
-  return <DealProduct deal={deal} data={productsResponse.data} />;
+  return <DealProduct deal={deal} data={productsResponse.data} reviews={reviews} />;
 };
 
 export default Page;

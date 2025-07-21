@@ -110,7 +110,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     <InputForm
                         type='text'
                         label="Coupon Code"
-                        isRequired
+                        // isRequired
                         className='xl:min-w-[366px]'
                         control={form.control}
                         name='couponCode'

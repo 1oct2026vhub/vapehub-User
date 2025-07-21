@@ -3,8 +3,14 @@ import { useState } from 'react';
 import { DownArrowIcon } from '@/components/Icons';
 import ShoppingCartCard from '@/components/ShoppingCartCard';
 import { useCart } from '@/lib/context/CartContext';
+import { ServerActionResponse } from '@/lib/config/app.config';
+import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 
-const ProductList: React.FC = () => {
+interface ProductListProps {
+    reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+}
+
+const ProductList: React.FC<ProductListProps> = ({ reviews }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const { cartItems } = useCart(); 
     return (
@@ -18,7 +24,7 @@ const ProductList: React.FC = () => {
             {isExpanded && (
                 <div className='space-y-4 md:space-y-6'>
                     {cartItems.map((item, idx) => (
-                        <ShoppingCartCard key={idx} item={item} showAddMoreItem={false} />
+                        <ShoppingCartCard key={idx} item={item} showAddMoreItem={false} reviews={reviews} />
                     ))}
                 </div>
             )}

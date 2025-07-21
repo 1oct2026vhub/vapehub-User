@@ -1,13 +1,13 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { AttributeTerms, AttributeProductTerms } from '@/lib/config/product.config';
-import { ProductVariant } from '@/lib/config/product.config';
+// import { ProductVariant } from '@/lib/config/product.config';
 
 export const useVariantFilter = (
-  productSlug: string, 
+  // productSlug: string, 
   availableVariants: AttributeTerms[],
   currentVariant?: AttributeProductTerms,
-  allVariants?: ProductVariant[]
+  // allVariants?: ProductVariant[]
 ) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -78,27 +78,10 @@ export const useVariantFilter = (
     if (currentVariant?.attribute.id === attributeId) {
       return currentVariant.terms.slug;
     }
-
-    // 3. If no explicit selection, find the first in-stock variant and use its term for this attribute.
-    if (allVariants) {
-      const inStockVariant = allVariants.find(v => v.is_in_stock);
-      if (inStockVariant) {
-        const termAttribute = inStockVariant.attributes.find(attr => attr.attribute_id === attributeId);
-        if (termAttribute) {
-          return termAttribute.term_slug;
-        }
-      }
-    }
     
-    // 4. As a fallback, default to the first available term for this attribute
-    const variantAttr = availableVariants.find(v => v.attribute.id === attributeId);
-    if (variantAttr && variantAttr.terms.length > 0) {
-      return variantAttr.terms[0].slug;
-    }
-
-    // 5. If all else fails, no selection
+    // 3. If all else fails, no selection
     return undefined;
-  }, [availableVariants, currentVariant, searchParams, allVariants]);
+  }, [currentVariant, searchParams]);
 
   return {
     handleVariantFilter,

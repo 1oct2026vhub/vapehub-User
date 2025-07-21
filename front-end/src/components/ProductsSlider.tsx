@@ -3,14 +3,16 @@ import React from "react";
 import Slider, { Settings } from "react-slick";
 import ProductCard from "./ProductCard"; 
 import { Product, ProductResponseData } from "@/lib/config/product.config";
-import { isLessThanOneMonth } from "@/lib/config/app.config";
+import { isLessThanOneMonth, ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import EmptyPlaceholder from "./ui/EmptyPlaceholder";
+import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
  
 interface ProductProps {
   data: ProductResponseData;
   isListing?: boolean;
+  reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
 }
-const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false}) => {
+const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, reviews = []}) => {
   
   const products:Product[] = data?.products?.filter((product: Product) => product.Category !== null) ?? [];
   console.log("landing page products", products);
@@ -49,21 +51,29 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false}) => {
 
   return (
     <Slider {...settings}>
-      {products.map((product, index) => (
-        <div key={index} className="px-2 xl:px-5 py-4 first:pl-0">
-          <ProductCard
-            title={product?.name} 
-            imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ""}
-            price={product?.price}
-            buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
-            productId={product.id}
-            flavors={product?.Flavors?.length}
-            link={`/${product.slug}`}
-            totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}
-            isNew={isLessThanOneMonth(product?.createdAt) ? "New" : ""} 
-          />
-        </div>
-      ))}
+      {products.map((product, index) => {
+        const review = reviews && reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews?.find(review => review.product_id === product.id));
+        const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
+        const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
+
+        return (
+          <div key={index} className="px-2 xl:px-5 py-4 first:pl-0">
+            <ProductCard
+              title={product?.name} 
+              imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ""}
+              price={product?.price}
+              buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
+              productId={product.id}
+              flavors={product?.Flavors?.length}
+              link={`/${product.slug}`}
+              totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}
+              isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
+              averageRating={averageRating}
+              totalReviews={totalReviews}
+            />
+          </div>
+        )
+      })}
     </Slider>
   );
 };

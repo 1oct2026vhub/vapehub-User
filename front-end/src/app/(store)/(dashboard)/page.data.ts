@@ -5,15 +5,17 @@ import {
   getCategoryList,
   getCarouselList,
   getPromotionBanner,
-  getBlogList
+  getBlogList,
+  getReviewOrderByProductId
 } from "@/lib/server.actions";
 import { CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
 import { BrandListResponse } from "@/lib/config/brand.config";
 import { Category } from "@/lib/config/category.config";
 import { CarouselConfig } from "@/lib/config/carousel.config";
 import { BannerResponse } from "@/lib/config/global.config";
-import { ServerActionResponse } from "@/lib/config/app.config";
+import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { BlogResponse } from "@/lib/config/blog.config";
+import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
 type DashboardData = {
   popularVapes: ServerActionResponse<CategoryResponseData>;
@@ -24,6 +26,9 @@ type DashboardData = {
   carousel: ServerActionResponse<CarouselConfig[]>;
   promotions: ServerActionResponse<BannerResponse[]>;
   blogs: ServerActionResponse<BlogResponse[]>;
+  newProductsReviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+  popularVapesReviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+  popularSaltsReviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
 }
 
 export const getDashboardData = async (): Promise<DashboardData> => {
@@ -47,6 +52,18 @@ export const getDashboardData = async (): Promise<DashboardData> => {
     getBlogList("")
   ]);
 
+  const newProductsReviews = newProductsResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
+    newProductsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+  ) : [];
+
+  const popularVapesReviews = popularVapesResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
+    popularVapesResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+  ) : [];
+
+  const popularSaltsReviews = popularSaltsResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
+    popularSaltsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+  ) : [];
+
   return {
     popularVapes: popularVapesResponse,
     popularSalts: popularSaltsResponse,
@@ -55,6 +72,9 @@ export const getDashboardData = async (): Promise<DashboardData> => {
     categories: categoriesResponse,
     carousel: carouselResponse,
     promotions: promotionResponse,
-    blogs: blogsResponse
+    blogs: blogsResponse,
+    newProductsReviews,
+    popularVapesReviews,
+    popularSaltsReviews
   };
 } 

@@ -1,6 +1,6 @@
-import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID } from "@/lib/server.actions";
+import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getReviewOrderByProductId } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
-import { ServerActionStatus } from "@/lib/config/app.config";
+import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { notFound, redirect, RedirectType } from 'next/navigation';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
@@ -9,6 +9,7 @@ import { AttributeProductTerms, AttributeTerms, CategoryResponseData, ProductRes
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
 import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
+import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
 type PageProps = {
   slug: string[];
@@ -104,7 +105,13 @@ const Page = async ({
       const combinedParams = buildVariantParams(searchParamsData, defaultParams);
       const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
       console.log("Category response", category);
-      return category && <CategoryProducts data={category} />;
+      if (category) {
+        const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = category.products ? await Promise.all(
+          category.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+        ) : [];
+        return <CategoryProducts data={category} reviews={reviews} />;
+      }
+      return null;
     },
     product: async () => {
       const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);

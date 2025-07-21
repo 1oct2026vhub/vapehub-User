@@ -2,9 +2,9 @@ import React from "react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
-import { getProductByCategory } from "@/lib/server.actions";
+import { getMoreLikeThis } from "@/lib/server.actions";
 import { AsyncReactElement, ServerActionStatus } from "@/lib/config/app.config";
-import { Product, ProductResponseData } from "@/lib/config/product.config";
+import { Product, ProductResponseData, SimilarProduct } from "@/lib/config/product.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 
 interface RelatedProductsProps {
@@ -18,18 +18,30 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
   viewAllHref = "#", 
   currentProductId
 }): AsyncReactElement => {
-  const response = await getProductByCategory(viewAllHref, {sort_by: "id", order: "ASC", limit: 10, offset: 0});
+  const response = await getMoreLikeThis({product_id: currentProductId, limit: 10, offset: 0});
+  console.log("Product response", response);
   if (response.status === ServerActionStatus.ERROR) {
     return <EmptyPlaceholder title='Uh, oh!' description={response.message} />
   }
     
-  const categoryProduct = response.data;
   const productResponse: ProductResponseData = {
-    ...categoryProduct,
-    category: categoryProduct.category || [],
-    products: categoryProduct.products.filter(x => currentProductId !== x.id)
+    products: response.data.similar_products.map((p: SimilarProduct) => ({
+      ...p,
+      price: p.price ?? "0.00",
+      ProductImages: p.primary_image ? [{
+        id: p.primary_image.id,
+        image_url: p.primary_image.url,
+        is_primary: p.primary_image.is_primary,
+      }] : [],
+    })),
+    pagination: response.data.pagination,
+    attributes: [],
+    price_ranges: [],
+    brand: [],
+    category: []
   };
   
+  // console.log("productResponse", productResponse);
   return (
     <section className="space-y-4.5 md:space-y-7.5">
       <div className="flex items-center justify-between">

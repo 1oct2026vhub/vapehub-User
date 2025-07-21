@@ -54,7 +54,7 @@ const CartTotal: React.FC = () => {
         if (!loyaltyPoints) return "";
     
         const { user_points, redemption_amount, redemption_type } = loyaltyPoints;
-        const pointsPrefix = `You are eligible to use your ${user_points} loyalty points for`;
+        const pointsPrefix = `You're eligible to use ${user_points} of your ${user_points} loyalty points to get`;
     
         if (redemption_type === 'percentage') {
             return `${pointsPrefix} a ${redemption_amount}% discount`;

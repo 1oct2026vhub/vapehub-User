@@ -87,7 +87,7 @@ const PersonalInfo: NextPage = () => {
                     <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='space-y-4 md:space-y-6'>
                         <div className="grid sm:grid-cols-2 gap-2.5 md:gap-4">
                             <div className='space-y-3 md:space-y-4.5'>
-                            <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">First Name</h3>
+                            <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">First Name<span className="text-red-500"> *</span></h3>
                             <InputField
                                 control={form.control}
                                 name='first_name'
@@ -98,7 +98,7 @@ const PersonalInfo: NextPage = () => {
                              
                         </div>
                         <div className='space-y-3 md:space-y-4.5'>
-                            <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Last Name</h3>
+                            <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Last Name<span className="text-red-500"> *</span></h3>
                             <InputField
                                 control={form.control}
                                 name='last_name'

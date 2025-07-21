@@ -14,18 +14,31 @@ import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { ROUTES } from '@/lib/routes'
+import { getReviewOrderByProductId } from '@/lib/server.actions'
+import { ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config'
+import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config'
 
 const CheckoutPage: NextPage = (): ReactElement => {
 
-    const { itemCount } = useCart();
+    const { itemCount, cartItems } = useCart();
     const { status } = useSession();
     const router = useRouter();
+    const [reviews, setReviews] = React.useState<ServerActionResponse<REVIEW_ORDER_RESPONSE>[]>([]);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
             router.replace(ROUTES.MY_ACCOUNT);
         }
     }, [status, router]);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            const reviewPromises = cartItems.map(item => getReviewOrderByProductId(item.product_id, 1, 1));
+            const reviewResponses = await Promise.all(reviewPromises);
+            setReviews(reviewResponses.filter(r => r.status === ServerActionStatus.SUCCESS));
+        }
+        if(cartItems.length > 0) fetchReviews();
+    }, [cartItems]);
 
     if (status === 'loading') {
         return <div className='text-center font-bold h-scree'>Loading...</div>;
@@ -60,7 +73,7 @@ const CheckoutPage: NextPage = (): ReactElement => {
                         <CheckoutDetails />
                         <div className='flex flex-col gap-6 md:gap-7 w-full xl:max-w-[584px]'>
                             {/* product list */}
-                            <ProductList />
+                            <ProductList reviews={reviews} />
                             <CartTotal />
                         </div>
                     </section>

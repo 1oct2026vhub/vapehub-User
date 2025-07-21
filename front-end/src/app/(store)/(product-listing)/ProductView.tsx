@@ -27,6 +27,18 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = fal
         { label: data.product.name, href: data.product.slug, isActive: true },
     ];
 
+    const categoryId = data?.product?.category?.id;
+    const brandId = data?.product?.brand?.id;
+    
+    let viewAllHref = "/shop";
+    if (categoryId && brandId) {
+        viewAllHref = `/shop?categories=${categoryId}&brand=${brandId}`;
+    } else if (categoryId) {
+        viewAllHref = `/shop?categories=${categoryId}`;
+    } else if (brandId) {
+        viewAllHref = `/shop?brand=${brandId}`;
+    }
+
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
@@ -48,7 +60,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = fal
             <FAQSection type="product" id={data.product.id} />
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-64'/>}>
-            <RelatedProducts viewAllHref={data?.product?.category?.slug || ""} currentProductId={data.product.id}/>
+            <RelatedProducts viewAllHref={viewAllHref} currentProductId={data.product.id}/>
             </Suspense>
             <Suspense fallback={<SuspenseLoader height='h-24'/>}>
             <Subscription className="mt-5 md:mt-10"/>

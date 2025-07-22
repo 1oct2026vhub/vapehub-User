@@ -65,7 +65,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 value: cartTotal - response.data.total,
                 isApplied: true,
                 code: data.couponCode || null,
-                message: response.data.referral_value_type === "percentage" ? `Extra ${response.data.referral_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.referral_value} off`,
+                message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
                 discountValue: (discountAmount).toString()
             });
         } else {

@@ -114,7 +114,7 @@ export interface Product {
     // Properties required by ProductList.tsx
     Category?: Category | null;
     ProductImages: ProductImage[];
-    deals?: { name: string }[];
+    deals?: { id: number, name: string, required_qty: number }[];
     Flavors?: Flavor[];
     puff_count?: number | string;
     createdAt?: string;
@@ -253,6 +253,17 @@ export interface Deal {
   fixed_price: string;
 }
 
+export interface LoyaltySettings {
+  program_name: string;
+  points_value: number;
+  loyalty_amount: string;
+  loyalty_amount_type: string;
+  minimum_points_redemption: number;
+  minimum_purchase_amount: string;
+  min_amount_for_loyalty_points: string;  
+  status: boolean;
+}
+
 export interface ProductViewDetails {
 
     id: number;
@@ -261,11 +272,13 @@ export interface ProductViewDetails {
     description: string;
     category: Category | null;
     brand: BrandConfig | null;
+    product_brands: BrandConfig[];
     createdAt: string;
     primary_image: productAllImages;
     all_images: productAllImages[];
     attribute_terms: AttributeTerms[];
     deals: Deal[];
+    loyaltySettings: LoyaltySettings | null;
 };
 
 export interface AppliedFilters {

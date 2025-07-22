@@ -64,10 +64,15 @@ export interface CART_RESPONSE_DATA {
     subtotal: number;
     total: number;
     discount: number;
-    applied_deals: {
+    applied_deals: AppliedDeal[];
+    show_deal_toast: boolean;
+    deal_required_qty: number | null;
+    deal_qty_needed: number | null;
+    deals: {
         deal_id: number;
         deal_name: string;
         discount_amount: number;
+        required_qty: number;
     }[];
 }
 
@@ -83,6 +88,12 @@ export interface CartData {
         deal_name: string;
         discount_amount: number;
     }[];
+    subtotal: number;
+    total: number;
+    applied_deals?: AppliedDeal[];
+    show_deal_toast?: boolean;
+    deal_required_qty?: number | null;
+    deal_qty_needed?: number | null;
 }
 
 export type CART_GET_PAYLOAD = {
@@ -106,6 +117,11 @@ export type CartItem = {
   quantity: number;
   subtotal: number;
   total: number;
+  applied_deals: AppliedDeal[];
+  show_deal_toast: boolean;
+  deal_required_qty: number | null;
+  deal_qty_needed: number | null;
+  deals: { id: number, name: string, required_qty: number }[];
 }
   
 export type StockValidationResponse = {
@@ -124,5 +140,11 @@ export type UnAvailableItem = {
   isInsufficientStock: boolean;
   isDeleted: boolean;
   errorMessage: string | null;
+}
+
+export interface AppliedDeal {
+    deal_id: number;
+    deal_name: string;
+    discount_amount: number;
 }
 

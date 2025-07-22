@@ -60,20 +60,43 @@ const settings: Settings = {
     ],
 
 };
-const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => { 
-    const isUniqueVariantSelected = isVariant && data?.variants?.length === 1;
-    const allImages: productAllImages[] = isUniqueVariantSelected ? data?.variants[0]?.all_images : data?.product?.all_images;
-    const product: ProductViewDetails = data?.product;
-    const productVariant: ProductVariant | null = isUniqueVariantSelected ? data?.variants[0] : null;
+const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => {
+    const { product } = data;
+
+    const hasFilteredTerms = (data.filtered_attribute_terms?.length ?? 0) > 0;
+    const hasAvailableTerms = (data.available_terms?.length ?? 0) > 0;
+
+    // A variant is ready to be added when all of its attributes have been selected.
+    // This state is signified by `available_terms` being empty while `filtered_attribute_terms` is not.
+    const isReadyVariant = hasFilteredTerms && !hasAvailableTerms && data.variants?.length === 1;
+
+    // A product is simple if it has no attributes to filter by from the start.
+    const isSimpleProduct = !hasFilteredTerms && !hasAvailableTerms;
+
+    const canAddToCart = isSimpleProduct || isReadyVariant;
+
+    // If a variant is ready, that's our selected variant.
+    const productVariant: ProductVariant | null = isReadyVariant ? data.variants[0] : null;
+
+    // For simple products, the API provides the necessary details in the first entry of the variants array.
+    const simpleProductVariant = isSimpleProduct && data.variants.length > 0 ? data.variants[0] : null;
+
+    // This is the definitive entity (either a selected variant or a simple product's variant) to be used for cart operations.
+    const cartEntity = productVariant ?? simpleProductVariant;
+
+    const allImages: productAllImages[] = cartEntity?.all_images ?? product?.all_images ?? [];
     const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
 
-    const stock = isUniqueVariantSelected && productVariant ? productVariant.stock_status === 'in_stock' ? productVariant.stock : 0 : 0;
-    const attributesName = isUniqueVariantSelected ? productVariant?.attributes?.map(attr => attr.term_name).join(', ') : '';
-    const productName =  `${product?.name} ${attributesName ? ` - ${attributesName}` : ''}` 
+    const stock = cartEntity?.stock ?? 0;
+    const price = cartEntity?.price ?? (product as any)?.price ?? 0;
+
+    const productName = productVariant
+        ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`
+        : product?.name;
+
     const availableAttributes: AttributeTerms[] = data.available_terms;
-    const minQuantity = 1; 
-    const price = isUniqueVariantSelected ? data?.variants[0]?.price: (productVariant?.price ?? data?.variants[0]?.price);    
-     
+    const minQuantity = 1;
+
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
     const [quantity, setQuantity] = useState(1);
     const { addItemToCart } = useCart();
@@ -122,7 +145,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         }
     };
 
-    
+
   const handleBlur = () => {
     // Reset to current quantity if input is invalid
     const numValue = parseInt(inputValue);
@@ -131,9 +154,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
       setError(null);
     }
   };
-  
+
     const handleQuantityChange = (newQuantity: number) => {
-        if (!productVariant) return;
+        if (!cartEntity) return;
         if (newQuantity < minQuantity) {
             setError(`Minimum quantity is ${minQuantity}`);
             return;
@@ -145,13 +168,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     };
 
     const handleAddToCart = async () => {
-        if (!productVariant) return;
+        if (!canAddToCart || !cartEntity) {
+            // This is a safeguard; the button should be disabled if this is the case.
+            return;
+        }
         if (quantity <= 0 || quantity > stock) {
             return;
         }
         setIsAddingToCart(true);
         try {
-            await addItemToCart(product.id, productVariant?.id, quantity, productVariant, productName);
+            await addItemToCart(product.id, cartEntity.id, quantity, cartEntity, productName);
         } catch (err) {
             console.error("Failed to add to cart:", err);
         } finally {
@@ -169,8 +195,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
         scrollToTop();
     }, []);
     useEffect(() => {
-        setMainImage(isUniqueVariantSelected ? data?.variants[0]?.primary_image : product?.primary_image);
-    }, [isUniqueVariantSelected, data, product]);    
+        setMainImage(cartEntity?.primary_image ?? product?.primary_image);
+    }, [cartEntity, product]);
     useEffect(() => {
         const fetchReviews = async () => {
             if (!product?.id) return;
@@ -204,7 +230,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
             fetchBundleProducts();
         }
     }, [product]);
-    console.log("product", product);
+    // console.log("product", product);
+    console.log("data", data);
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -212,7 +239,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                 <div className='space-y-2 lg:hidden'>
                     <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold'>{product?.name}</h1>
                     <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
-                        Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.brand?.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.brand?.name}</Link>
+                        Brand:
+                        {product?.product_brands?.map((brand, index) => (
+                            <Link key={brand.id} href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>
+                                {brand.name}
+                                {index < product.product_brands.length - 1 && ', '}
+                            </Link>
+                        ))}
                     </div>
                     <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
                         <div className="flex gap-1">
@@ -282,7 +315,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
 
                         <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>{productName}</h1>
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
-                            Brand: <Link href={ROUTES.BRAND.replace(':slug', product?.brand?.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>{product?.brand?.name}</Link>
+                            Brand:
+                            {product?.product_brands?.map((brand, index) => (
+                                <Link key={brand.id} href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>
+                                    {brand.name}
+                                    {index < product.product_brands.length - 1 && ', '}
+                                </Link>
+                            ))}
                         </div>
                         <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
                             <div className="flex gap-1">
@@ -321,10 +360,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 <DispatchIcon />
                                 <p className='text-content-2 md:text-content-1 font-bold red-gradient-100'>Same day dispatch for orders before 3pm!</p>
                             </div>
-                            <div className='flex gap-1 items-center'>
-                                <BenefitIcon />
-                                <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-500'>Earn at least 12 loyalty points with this purchase!</p>
-                            </div>
+                            {product?.loyaltySettings && product.loyaltySettings.status && product.loyaltySettings.points_value > 0 && (
+                                <div className='flex gap-1 items-center'>
+                                    <BenefitIcon />
+                                    <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-500'>
+                                        Earn at least {product.loyaltySettings.points_value} loyalty points with this purchase!
+                                    </p>
+                                </div>
+                            )}
                             {mixAndMatchDeal && (
                                 <div className='flex gap-1 items-center'>
                                     <DealsIcon />
@@ -334,16 +377,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                         </div>
                     </div>
                     <Divider className='max-lg:hidden' />
-                    <ProductVariantFilter 
-                        attributeTerms={product?.attribute_terms} 
-                        productSlug={product?.slug} 
-                        selectedVariant={selectedVariant} 
-                        availableAttributes={availableAttributes ?? []} 
+                    <ProductVariantFilter
+                        attributeTerms={product?.attribute_terms}
+                        productSlug={product?.slug}
+                        selectedVariant={selectedVariant}
+                        availableAttributes={availableAttributes ?? []}
                         allVariants={data.variants ?? []}
                     />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
-                           isUniqueVariantSelected && ( stock > 0 ?
+                           cartEntity && ( stock > 0 ?
                                 <p className='text-content-2 md:text-title-2 font-bold primary-gradient-100'>In stock</p> :
                                 <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>)
                         }
@@ -359,7 +402,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 color='primary'
                                 className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
                                 onPress={() => handleQuantityChange(quantity - 1)}
-                                isDisabled={isAddingToCart || quantity <= 1 || stock === 0}
+                                isDisabled={isAddingToCart || quantity <= 1 || !cartEntity}
                             >
                                 <MinusIcon />
                             </Button>
@@ -370,7 +413,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 onBlur={handleBlur}
                                 pattern="[0-9]*"
                                 inputMode="numeric"
-                                disabled={stock === 0}
+                                disabled={!cartEntity}
                                 className='w-9 max-w-9 !border-none text-title-1 !outline-none placeholder:text-skin-neutral-500 bg-transparent text-center'
                             />
                             {/* <input
@@ -389,7 +432,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                                 color='primary'
                                 className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
                                 onPress={() => handleQuantityChange(quantity + 1)}
-                                isDisabled={isAddingToCart || quantity >= stock || stock === 0}
+                                isDisabled={isAddingToCart || quantity >= stock || !cartEntity}
                             >
                                 <PlusIcon />
                             </Button>
@@ -401,9 +444,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
                             radius="md"
                             color="primary"
                             isLoading={isAddingToCart}
-                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isAddingToCart || !isUniqueVariantSelected || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
-                            disabled={isAddingToCart || !isUniqueVariantSelected || quantity <= 0 || quantity > stock}
+                            disabled={isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock}
                         >
                             Add to Cart
                         </Button>

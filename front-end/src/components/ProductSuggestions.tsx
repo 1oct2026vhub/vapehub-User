@@ -14,6 +14,16 @@ interface ProductSuggestionsProps {
 }
 
 const ProductSuggestions: React.FC<ProductSuggestionsProps> = ({ suggestions, isLoading, onViewAll, onClose }) => {
+    const getImageUrl = (url: string | undefined | null): string => {
+        if (!url) {
+            return '/images/no-image.png';
+        }
+        if (url.startsWith('http')) {
+            return url;
+        }
+        return `/${url.replace(/^\//, '')}`;
+    };
+
     return (
         <div className={`absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50`}>
             {isLoading ? (
@@ -24,8 +34,8 @@ const ProductSuggestions: React.FC<ProductSuggestionsProps> = ({ suggestions, is
                 <ul className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
                     {suggestions.map(product => (
                         <li key={product.id} className="p-2 hover:bg-gray-100">
-                            <Link href={`${product.slug}`} className="flex items-center gap-4" onClick={onClose}>
-                                <Image src={product.primary_image?.url || '/images/no-image.png'} alt={product.name} width={40} height={40} className="object-cover rounded" />
+                            <Link href={`/${product.slug}`} className="flex items-center gap-4" onClick={onClose}>
+                                <Image src={getImageUrl(product.ProductImages[0]?.image_url)} alt={product.name} width={40} height={40} className="object-cover rounded" />
                                 <div className="flex-1">
                                     <p className="font-semibold text-sm">{product.name}</p>
                                     <p className="text-xs text-gray-500">{DEFAULT_CURRENCY_SYMBOL}{product.price}</p>

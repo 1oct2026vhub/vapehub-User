@@ -104,6 +104,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (isAuthenticated) {
         const response = await getCartItems();
+        console.log("getCartItemsresponse", response);
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartData = response.data;
           const cartItems: CartItem[] = cartData.items.map(bindCartItem);
@@ -173,7 +174,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
       quantity: item.quantity,
       subtotal: item.subtotal,
-      total: item.total
+      total: item.total,
+      applied_deals: item.applied_deals,
+      show_deal_toast: item.show_deal_toast,
+      deal_required_qty: item.deal_required_qty,
+      deal_qty_needed: item.deal_qty_needed,
+      deals: item.product.deals || [],
     };
   };
   const getPrimaryProductImage = (item: ProductImage[]): string => {
@@ -195,7 +201,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       ProductImages: data.primary_image?.url || "",
       quantity: quantity,
       subtotal: Number(data.price) * quantity,
-      total: Number(data.price) * quantity
+      total: Number(data.price) * quantity,
+      applied_deals: [],
+      show_deal_toast: false,
+      deal_required_qty: null,
+      deal_qty_needed: null,
+      deals: [],
     };
   };
 
@@ -555,9 +566,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             value: cartTotal - response.data.total,
             isApplied: true,
             code: couponDiscount.code,
-            message: response.data.referral_value_type === "percentage"
-              ? `Extra ${response.data.referral_value}% off`
-              : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.referral_value} off`,
+            // 
+             message:response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
             discountValue: (cartTotal - response.data.total).toFixed(2),
           });
         } else {

@@ -5,7 +5,7 @@ import { Button } from '@nextui-org/button'
 import { Chip, Divider } from '@nextui-org/react'
 // import Image from 'next/image'
 import BundleProductCard from '@/components/BundleProductCard'
-import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant, ProductViewDetails } from '@/lib/config/product.config'
+import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant } from '@/lib/config/product.config'
 import { ROUTES } from '@/lib/routes'
 import { DEFAULT_CURRENCY_SYMBOL, isLessThanOneMonth } from '@/lib/config/app.config'
 import Slider, { Settings } from 'react-slick'
@@ -23,7 +23,6 @@ import { ProductInDeal } from '@/lib/config/deal.config'
 
 type ProductViewProps = {
     data: ProductResponse;
-    isVariant?: boolean;
     selectedVariant?: AttributeProductTerms
 }
 const settings: Settings = {
@@ -60,7 +59,7 @@ const settings: Settings = {
     ],
 
 };
-const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, selectedVariant }) => {
+const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) => {
     const { product } = data;
 
     const hasFilteredTerms = (data.filtered_attribute_terms?.length ?? 0) > 0;
@@ -88,7 +87,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, isVariant = false, s
     const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
 
     const stock = cartEntity?.stock ?? 0;
-    const price = cartEntity?.price ?? (product as any)?.price ?? 0;
+    const price = cartEntity?.price ?? (product as { price?: number })?.price ?? 0;
 
     const productName = productVariant
         ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`

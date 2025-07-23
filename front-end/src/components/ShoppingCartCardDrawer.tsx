@@ -9,10 +9,9 @@ import QuantitySelector from './QuantitySelector';
 
 type CartCardProps = {
   item: CartItem;
-  showAddMoreItem?: boolean;
 };
 
-const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item, showAddMoreItem = false }) => {
+const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
   const { removeItem, isLoading, stockValidationErrors, updateItemQuantity } = useCart();
   const error = stockValidationErrors.find(error => error.itemId === item.id);
   const handleRemove = async () => {

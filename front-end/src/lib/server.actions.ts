@@ -1,5 +1,5 @@
 import { ServerActionResponse } from "./config/app.config";
-import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia, ContactInfoResponse, SocialMediaResponse } from "./config/auth.config";
+import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";

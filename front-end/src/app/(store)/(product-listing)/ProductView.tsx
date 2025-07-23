@@ -18,7 +18,7 @@ type ProductViewProps = {
     selectedVariant?: AttributeProductTerms;
 }
 
-const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = false, selectedVariant}): ReactElement => {
+const ProductView: FunctionComponent<ProductViewProps> = ({data, selectedVariant}): ReactElement => {
     
     const productFeatures = data?.product?.attribute_terms.filter((attrTerm: AttributeTerms) => (attrTerm.attribute.is_visible_page && !attrTerm.attribute.used_in_variation));
     const breadcrumbs = [
@@ -42,7 +42,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({data, isVariant = fal
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
-            <ProductDetails data={data} isVariant={isVariant} selectedVariant={selectedVariant}/>
+            <ProductDetails data={data}  selectedVariant={selectedVariant}/>
             <Suspense fallback={<SuspenseLoader/>}>
             <OrderCard />
             </Suspense>

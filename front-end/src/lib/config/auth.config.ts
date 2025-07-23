@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { NEXT_AUTH_OPTIONS } from '@/app/api/auth/[...nextauth]/auth-options';
 import { ROUTES } from '../routes';
 import { permanentRedirect, RedirectType } from 'next/navigation';
+import { ServerActionStatus } from './app.config';
 // import { ROUTES } from '@/lib/routes';
 // import { permanentRedirect, RedirectType } from 'next/navigation';
 
@@ -29,6 +30,39 @@ export interface SignInResponse extends User {
     message: string;
     signInResponse: SignInResponse;
   }
+
+export interface ContactInfo {
+    id: number;
+    send_us_a_message: string;
+    call_us: string;
+    social_media: string;
+    facebook: string;
+    whatsapp: string;
+    instagram: string;
+    email: string;
+    phone_number: string;
+}
+
+export interface ContactInfoResponse {
+    status: ServerActionStatus;
+    message: string;
+    data?: ContactInfo;
+}
+
+export interface SocialMedia {
+    instagram: string;
+    whatsapp: string;
+    facebook: string;
+    email: string;
+    phone_number: string;
+}
+
+export interface SocialMediaResponse {
+    status: ServerActionStatus;
+    message: string;
+    data?: SocialMedia;
+}
+
 // * Helper functions
 
 /*

@@ -201,7 +201,7 @@ const MobileMenu = ({ categories }: Props) => {
                         <div className='space-y-5 my-3'>
                             {cartItems.length > 0 ? (
                                 cartItems.map((item, idx) => (
-                                    <ShoppingCartCardDrawer key={idx} item={item} showAddMoreItem />
+                                    <ShoppingCartCardDrawer key={idx} item={item} />
                                 ))
                             ) : (
                                 <div className="flex flex-col items-center justify-center gap-4 py-8">

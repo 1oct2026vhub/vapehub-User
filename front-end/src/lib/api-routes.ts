@@ -4,12 +4,41 @@ import { CategoriesWithDealsPayload } from "./config/deal.config";
 const BASE_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL ?? 'https://api.vapehub.devateam.com/';
 
 
+export const WEB_ROUTES = {
+    AUTH: {
+        SIGN_IN: '/login',
+        REGISTER: '/register',
+        VERIFY_EMAIL: '/verify-email',
+        FORGOT_PASSWORD: "/forgot-password",
+        RESET_PASSWORD: '/reset-password',
+    },
+    ORDERS: {
+        MY_ORDERS: '/orders/my-orders',
+        ORDER_DETAILS: '/orders/order-details',
+        DOWNLOAD_INVOICE: '/orders/download-invoice'
+    },
+    CONTACT: {
+        CONTACT_US: '/contact-us',
+        SOCIAL_MEDIA: '/social-media',
+    }
+}
+
 export const API_ROUTES = {
-    SIGN_IN: buildRequestUrl('/api/auth/login'),
-    REGISTER: (referralCode: string) => buildRequestUrl(referralCode ? `/api/auth/register?referral_code=${referralCode}` : '/api/auth/register'),
-    GET_VERIFY_EMAIL: (token: string | string[]) => buildRequestUrl(`/api/auth/verify-email?token=${token}`),
-    FORGOT_PASSWORD: buildRequestUrl("/api/auth/forgot-password"),
-    RESET_PASSWORD: buildRequestUrl('api/auth/reset-password'),
+    AUTH: {
+        SIGN_IN: buildRequestUrl('/api/auth/login'),
+        REGISTER: (referralCode: string) => buildRequestUrl(referralCode ? `/api/auth/register?referral_code=${referralCode}` : '/api/auth/register'),
+        GET_VERIFY_EMAIL: (token: string | string[]) => buildRequestUrl(`/api/auth/verify-email?token=${token}`),
+        FORGOT_PASSWORD: buildRequestUrl("/api/auth/forgot-password"),
+        RESET_PASSWORD: buildRequestUrl('api/auth/reset-password'),
+        VALIDATE_USER: '/users/validate',
+        LOYALTY_POINTS: '/users/loyalty-points',
+        USER_NOTIFICATION: 'users/notifications',
+        USER_NOTIFICATION_COUNT: 'users/notifications-count'
+    },
+    CONTACT: {
+        CONTACT_US: buildRequestUrl('/api/users/contact-us'),
+        SOCIAL_MEDIA: buildRequestUrl('/api/users/contact-social-info'),
+    },
     GET_CATEGORY_LIST: buildRequestUrl('/api/category'),
     GET_BRAND_LIST: (payload?: BrandListPayload) => buildRequestUrl(`/api/brands/list/paginated${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
@@ -46,6 +75,9 @@ export const API_ROUTES = {
     ORDERS: buildRequestUrl('/api/order'),
     CANCEL_ORDER: (orderId: number) => buildRequestUrl(`/api/order/cancel/${orderId}`),
     UPDATE_ORDER_STATUS: (orderReference: string) => `/api/orders/${orderReference}/status`,
+    REVIEWS: (payload: { page: number, limit: number, product_id?: number, user_id?: number }) => buildRequestUrl(`/api/review?${new URLSearchParams(payload as never).toString()}`),
+    GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }) => buildRequestUrl(`/api/product/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_MORE_LIKE_THIS: (payload: { product_id: number; limit?: number; offset?: number }) => buildRequestUrl(`/api/product/more-like-this?${new URLSearchParams(payload as never).toString()}`),
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
@@ -71,15 +103,13 @@ export const API_ROUTES = {
     GET_LOYALTY_POINTS_REDEMPTION: buildRequestUrl('/api/loyalty-points/redemption'),
     GET_CATEGORIES_WITH_DEALS: (payload?: CategoriesWithDealsPayload) => buildRequestUrl(`/api/product/categories-with-deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_DEALS_BY_CATEGORY: (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }) => buildRequestUrl(`/api/product/category/${categoryId}/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
-    GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }) => buildRequestUrl(`/api/product/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
-    GET_MORE_LIKE_THIS: (payload: { product_id: number; limit?: number; offset?: number }) => buildRequestUrl(`/api/product/more-like-this?${new URLSearchParams(payload as never).toString()}`),
-}
+};
 
 // * Helper functions
 function buildRequestUrl(url: string) {
     return `${BASE_URL}${url}`;
 }
-export interface PRODUCT_PAYLOAD  {
+export interface PRODUCT_PAYLOAD {
     keyword?: string;
     price_range?: string;
     is_new?: boolean;
@@ -91,8 +121,8 @@ export interface PRODUCT_PAYLOAD  {
     order?: 'ASC' | 'DESC';
     limit?: number | string;
     offset?: number | string;
-    categoryId?: string;  
-} 
+    categoryId?: string;
+}
 export interface BLOG_PAYLOAD {
     categoryId?: string;
     limit: number;

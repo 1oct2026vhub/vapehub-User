@@ -15,7 +15,7 @@ import MobileMenu from './MobileMenu';
 import { useCart } from '@/lib/context/CartContext';
 import { ROUTES } from '@/lib/routes';
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Category } from '@/lib/config/category.config';
 import NotificationAction from './NotificationAction';
 import { useEffect, useState } from "react";
@@ -38,6 +38,7 @@ const HeaderTopBar = ({ categories }: Props) => {
     
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
     const router = useRouter();
+    const pathname = usePathname();
     const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading, cartSubtotal } = useCart();
     const [suggestions, setSuggestions] = useState<Product[]>([]);
     const [isSuggestionLoading, setIsSuggestionLoading] = useState(false);
@@ -64,6 +65,12 @@ const HeaderTopBar = ({ categories }: Props) => {
         };
         fetchSuggestions();
     }, [debouncedSearchTerm]);
+
+    useEffect(() => {
+        // Clear search and hide suggestions on route change
+        setShowSuggestions(false);
+        searchFromConfig.reset({ search: '' });
+    }, [pathname]);
 
     const handleSearch = (data: HeaderFormSchema) => {
         if (data.search) {

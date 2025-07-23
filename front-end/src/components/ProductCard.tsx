@@ -80,7 +80,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5">({totalReviews} {totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
             </div>
           </div>
-          {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} Flavours</p> : null}
+          {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} {flavors > 1 ? 'Flavours' : 'Flavour'}</p> : null}
           <div className="flex items-center justify-between gap-2">
             <p className="text-content-1 sm:text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
             {buttonText && (

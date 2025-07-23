@@ -1,0 +1,31 @@
+import BreadCrumbs from '@/components/BreadCrumbs'
+import { getContactUs } from '@/lib/server.actions'
+import { ServerActionStatus } from '@/lib/config/app.config'
+
+const SocialMedia = async () => {
+    const response = await getContactUs();
+    const socialMediaInfo = response.status === ServerActionStatus.SUCCESS ? response.data : null;
+    return (
+        <main>
+            <BreadCrumbs
+                items={[
+                    {
+                        label: "Home",
+                        href: "/",
+                    },
+                    {
+                        label: `Social Media`,
+                        href: ``,
+                    },
+                ]}
+            />
+            <section className="container-sm my-10 lg:my-20">
+                <div className="space-y-4 text-title-2 text-skin-neutral-500"
+                    dangerouslySetInnerHTML={{ __html: socialMediaInfo?.social_media || '' }}
+                />
+            </section>
+        </main>
+    )
+}
+
+export default SocialMedia 

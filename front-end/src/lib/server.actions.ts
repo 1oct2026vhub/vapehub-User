@@ -1,5 +1,5 @@
 import { ServerActionResponse } from "./config/app.config";
-import { SignInResponse, VerifyUserEmailResponse } from "./config/auth.config";
+import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia, ContactInfoResponse, SocialMediaResponse } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
@@ -30,7 +30,7 @@ export const signInAction = async (
     return await handleRequest<SignInResponse, 
     {email: string;password: string; resendVerificationEmail: boolean}
     >({
-      endpoint: API_ROUTES.SIGN_IN,
+      endpoint: API_ROUTES.AUTH.SIGN_IN,
       payload: {
         email,
         password,
@@ -50,7 +50,7 @@ export const signInAction = async (
       password
     };
     return await handleRequest<{message: string}, typeof payload>({
-      endpoint: API_ROUTES.REGISTER(referralCode),
+      endpoint: API_ROUTES.AUTH.REGISTER(referralCode),
       payload,
       method: 'POST',
     });
@@ -61,7 +61,7 @@ export const signInAction = async (
   ): Promise<ServerActionResponse<VerifyUserEmailResponse>> => {
     
     return await handleRequest<VerifyUserEmailResponse, unknown>({
-      endpoint: API_ROUTES.GET_VERIFY_EMAIL(token),
+      endpoint: API_ROUTES.AUTH.GET_VERIFY_EMAIL(token),
       method: 'GET',
     });
   };
@@ -71,7 +71,7 @@ export const forgotPasswordAction = async (
   email: string
 ): Promise<ServerActionResponse<{ message: string }>> => {
   return await handleRequest<{ message: string }, { email: string }>({
-    endpoint: API_ROUTES.FORGOT_PASSWORD,
+    endpoint: API_ROUTES.AUTH.FORGOT_PASSWORD,
     payload: { email },
     method: 'POST',
   });
@@ -86,7 +86,7 @@ export const resetPasswordAction = async (
   { message: string },
     { token: string; password: string }
   >({
-    endpoint: API_ROUTES.RESET_PASSWORD,
+    endpoint: API_ROUTES.AUTH.RESET_PASSWORD,
     payload: { token, password},
     method: 'POST',
   });
@@ -644,3 +644,17 @@ export const getMoreLikeThis = async (payload: { product_id: number; limit?: num
         method: 'GET',
     });
 };
+
+export const getContactUs = async (): Promise<ServerActionResponse<ContactInfo>> => {
+    return await handleRequest<ContactInfo, unknown>({
+      endpoint: API_ROUTES.CONTACT.CONTACT_US,
+      method: 'GET',
+    });
+  };
+  
+  export const getSocialMedia = async (): Promise<ServerActionResponse<SocialMedia>> => {
+    return await handleRequest<SocialMedia, unknown>({
+      endpoint: API_ROUTES.CONTACT.SOCIAL_MEDIA,
+      method: 'GET',
+    });
+  };

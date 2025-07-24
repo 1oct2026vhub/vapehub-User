@@ -63,9 +63,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }
 
         </div>
-        <div className="flex flex-col gap-2.5 md:gap-3.5">
+        <div className="flex flex-col space-y-2.5 md:space-y-3.5">
           <div className="flex flex-col justify-between gap-1">
-            <div className='min-h-[40px] xl:min-h-[78px]'>
+            <div className='min-h-[45px] xl:min-h-[60px]'>
               <p className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</p>
             </div>
             <div className="flex items-center gap-1">
@@ -80,7 +80,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5">({totalReviews} {totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
             </div>
           </div>
-          {flavors ? <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold">{flavors} {flavors > 1 ? 'Flavours' : 'Flavour'}</p> : null}
+          <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold h-3 md:h-4 xl:h-5">
+            {flavors ? `${flavors} ${flavors > 1 ? 'Flavours' : 'Flavour'}` : null}
+          </p>
           <div className="flex items-center justify-between gap-2">
             <p className="text-content-1 sm:text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
             {buttonText && (

@@ -358,6 +358,25 @@ export const deleteUserAccount = async (): Promise<ServerActionResponse<{message
     method: 'DELETE',
   });
 };
+
+// toggle mail subscription
+export const toggleMailSubscription = async (): Promise<ServerActionResponse<{
+  message: string;
+  user_id: number;
+  email: string;
+  subscribed: boolean;
+}>> => {
+  return await handleRequest<{
+    message: string;
+    user_id: number;
+    email: string;
+    subscribed: boolean;
+  }, unknown>({
+    endpoint: API_ROUTES.TOGGLE_MAIL_SUBSCRIPTION,
+    payload: {},
+    method: 'POST',
+  });
+};
 // get user addresses
 export const getUserAddresses = async (): Promise<ServerActionResponse<USER_ADDRESS_RESPONSE>> => {
   return await handleRequest<USER_ADDRESS_RESPONSE, unknown>({

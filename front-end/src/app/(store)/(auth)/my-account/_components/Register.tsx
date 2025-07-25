@@ -6,7 +6,7 @@ import { Button } from "@nextui-org/button";
 import { Checkbox } from "@nextui-org/react";
 import { SIGN_UP_FORM_CONFIG, SIGN_UP_SCHEMA, SignUpFormSchema } from "@/lib/config/register.config";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Form } from "@/components/ui/Form";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { signUpAction } from "@/lib/server.actions";
@@ -22,13 +22,28 @@ const Register: FunctionComponent = (): ReactElement => {
         mode: 'all',
         resolver: zodResolver(SIGN_UP_SCHEMA),
         defaultValues: {
-            email: "", password:"", confirmPassword:""
+            email: "", 
+            password:"", 
+            confirmPassword:"",
+            mail_subscription: false
         },
     });
     const handleFormSubmit = async (fieldValue: SignUpFormSchema) => {
-        const response = await signUpAction({...fieldValue, referralCode: referralCode ?? ""});          
+        const payload = {
+            ...fieldValue, 
+            referralCode: referralCode ?? "",
+            mail_subscription: fieldValue.mail_subscription || false
+        };
+        console.log("Registration Payload:", payload);
+        
+        const response = await signUpAction(payload);          
         if (response.status === ServerActionStatus.SUCCESS) {
-            signUpFormConfig.reset({ email: "", password:"", confirmPassword:"" });
+            signUpFormConfig.reset({ 
+                email: "", 
+                password:"", 
+                confirmPassword:"",
+                mail_subscription: false
+            });
             deleteCookie('referral_code');
             return toast.success(response?.data?.message ?? 'Registration Success'); 
           }
@@ -102,13 +117,23 @@ const Register: FunctionComponent = (): ReactElement => {
                         <p>Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our <a href="#" className="hover:underline">privacy policy.</a></p>
                     </div>
                     <div className="flex justify-start items-center">
-                        <Checkbox
-                            classNames={{
-                                base: "",
-                                wrapper: "after:bg-primary-gradient-100",
-                                label: "!text-content-1 text-skin-neutral-300 font-bold",
-                            }}
-                        >I want to receive updates about products and promotions.</Checkbox>
+                        <Controller
+                            name="mail_subscription"
+                            control={signUpFormConfig.control}
+                            render={({ field }) => (
+                                <Checkbox
+                                    isSelected={field.value}
+                                    onValueChange={field.onChange}
+                                    classNames={{
+                                        base: "",
+                                        wrapper: "after:bg-primary-gradient-100",
+                                        label: "!text-content-1 text-skin-neutral-300 font-bold",
+                                    }}
+                                >
+                                    I want to receive updates about products and promotions.
+                                </Checkbox>
+                            )}
+                        />
                     </div>
                 </div>
                 <Button

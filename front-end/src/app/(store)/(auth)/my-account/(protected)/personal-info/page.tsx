@@ -51,7 +51,7 @@ const PersonalInfo: NextPage = () => {
     }
     useEffect(() => {        
         loadProfile()
-    }, [])
+    }, [loadProfile])
 
     const onSubmit = async (data: UserProfileFormData) => {
         const result = await updateProfile(data)
@@ -63,7 +63,7 @@ const PersonalInfo: NextPage = () => {
         }
     }
 
-    const handleNewsletterToggle = async (checked: boolean) => {
+    const handleNewsletterToggle = async () => {
         try {
             const result = await toggleMailSubscription()
             if (result?.status === ServerActionStatus.SUCCESS) {
@@ -72,7 +72,7 @@ const PersonalInfo: NextPage = () => {
             } else {
                 toast.error('Failed to update newsletter subscription')
             }
-        } catch (error) {
+        } catch {
             toast.error('Failed to update newsletter subscription')
         }
     }
@@ -239,7 +239,7 @@ const PersonalInfo: NextPage = () => {
                                 </div>
                                 <Switch
                                     isSelected={newsletterSubscribed}
-                                    onValueChange={handleNewsletterToggle}
+                                    onValueChange={() => handleNewsletterToggle()}
                                     color="primary"
                                     size="lg"
                                 />

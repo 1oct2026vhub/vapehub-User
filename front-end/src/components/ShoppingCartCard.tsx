@@ -11,18 +11,24 @@ import { RatingStarEmpty, RatingStarFilled } from './Icons';
 
 type CartCardProps = {
   item?: CartItem;
-  showAddMoreItem?: boolean;
   reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
 };
 
-const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = false, reviews = [] }) => {
+const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
 
-  const { removeItem, isLoading, stockValidationErrors } = useCart();
+  const { removeItem, isLoading, stockValidationErrors, updateItemQuantity } = useCart();
   const error = stockValidationErrors.find(error => error.itemId === item?.id);
 
   const handleRemove = async () => {
     if (!item?.id) return;
     await removeItem(item.id);
+  };
+
+  const handleAddNow = async () => {
+    if (item && item.deal_qty_needed && item.deal_qty_needed > 0) {
+      const newQuantity = item.quantity + item.deal_qty_needed;
+      await updateItemQuantity(item.id, newQuantity, item.name);
+    }
   };
 
   if (!item) return null;
@@ -117,25 +123,29 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, showAddMoreItem = fal
       </div>
 
       {/* Add More Item (Conditionally Rendered) */}
-      {showAddMoreItem && (
-        <div className="bg-[#FB6767]/30 border border-skin-white shadow-sm p-1.5 md:p-3 flex items-center gap-4 justify-between rounded-10">
-          <div className="flex gap-2 items-center">
-            <DangerIcon />
-            <p className="text-content-3 md:text-content-1 font-semibold text-skin-neutral-500">
-              Add 2 or more items to activate the 3 for £25 multibuy.
-            </p>
+      {
+        item.show_deal_toast && item.deal_qty_needed && item.deal_qty_needed > 0 && (
+          <div className="bg-[#FB6767]/30 border border-skin-white shadow-sm p-1.5 md:p-3 flex items-center gap-4 justify-between rounded-10">
+            <div className="flex gap-2 items-center">
+              <DangerIcon />
+              <p className="text-content-3 md:text-content-1 font-semibold text-skin-neutral-500">
+                Add {item.deal_qty_needed} more items to activate the {item.deals?.[0]?.name} multibuy.
+              </p>
+            </div>
+            <Button
+              size="md"
+              radius="md"
+              color="default"
+              variant="bordered"
+              className="!py-2 !px-4 bg-skin-neutral-500 border-skin-white shadow-button text-skin-white !rounded-10 !text-content-2 md:!text-content-1 font-semibold !max-h-9 min-w-fit"
+              onPress={handleAddNow}
+              disabled={isLoading}
+            >
+              Add Now
+            </Button>
           </div>
-          <Button
-            size="md"
-            radius="md"
-            color="default"
-            variant="bordered"
-            className="!py-2 !px-4 bg-skin-neutral-500 border-skin-white shadow-button text-skin-white !rounded-10 !text-content-2 md:!text-content-1 font-semibold !max-h-9 min-w-fit"
-          >
-            Add Now
-          </Button>
-        </div>
-      )}
+        )
+      }
     </div>
   );
 };

@@ -233,7 +233,7 @@ console.log("filter data", data);
                       flavors={product?.Flavors?.length}
                       productId={product.id}
                       link={`/${product.slug}`}
-                      totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs` : ""}
+                      totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
                       isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
                       averageRating={averageRating}
                       totalReviews={totalReviews}

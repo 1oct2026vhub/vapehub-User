@@ -202,7 +202,7 @@ const Disposables: React.FC = () => {
                                 productId={product.id}
                                 flavors={product.Flavors}
                                 link={`/${product.slug}`}
-                                totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs`: ""}
+                                totalPuffs={product?.puff_count ? `${product?.puff_count}`: ""}
                                 isNew={isLessThanOneMonth(product.createdAt) ? "New" : ""}
                             />
                         </div>

@@ -206,6 +206,7 @@ export interface ProductVariant {
     id: number;
     slug: string;
     price: string;
+    regular_price: string;
     discount_price: string;
     stock: number;
     stock_status: string;

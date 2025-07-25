@@ -188,7 +188,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                                     productId={product.id}
                                     flavors={product?.Flavors?.length || 0}
                                     link={`/${product.slug}`}
-                                    totalPuffs={product?.puff_count ? `${product?.puff_count} Puffs` : ""}
+                                    totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
                                     isNew={isLessThanOneMonth(product.created_at) ? "New" : ""}
                                     averageRating={averageRating}
                                     totalReviews={totalReviews}

@@ -24,7 +24,7 @@ const ProductList: React.FC<ProductListProps> = ({ reviews }) => {
             {isExpanded && (
                 <div className='space-y-4 md:space-y-6'>
                     {cartItems.map((item, idx) => (
-                        <ShoppingCartCard key={idx} item={item} showAddMoreItem={false} reviews={reviews} />
+                        <ShoppingCartCard key={idx} item={item} reviews={reviews} />
                     ))}
                 </div>
             )}

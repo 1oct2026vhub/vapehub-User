@@ -65,6 +65,7 @@ export const API_ROUTES = {
     APPLY_COUPON: buildRequestUrl('/api/checkout/apply-coupon'),
     GET_USER_PROFILE: buildRequestUrl('/api/users/profile'),
     DELETE_USER_ACCOUNT: buildRequestUrl('/api/users/delete-account'),
+    TOGGLE_MAIL_SUBSCRIPTION: buildRequestUrl('/api/mailSubscription/toggle'),
     GET_USER_ADDRESSES: buildRequestUrl('/api/users/user-address'),
     ADD_USER_ADDRESS: buildRequestUrl('/api/users/user-address'),
     UPDATE_USER_ADDRESS: (id: number) => buildRequestUrl(`/api/users/user-address/${id}`),

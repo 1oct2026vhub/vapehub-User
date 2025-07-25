@@ -19,6 +19,7 @@ export const SIGN_UP_SCHEMA = z
       })
       .min(1, ValidationMessage.CONFIRM_PASSWORD)
       .max(16, "Confirm Password must be less than 16 characters"),
+    mail_subscription: z.boolean().optional().default(false),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords does not match',

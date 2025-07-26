@@ -61,7 +61,6 @@ const settings: Settings = {
 };
 const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) => {
     const { product } = data;
-
     const hasFilteredTerms = (data.filtered_attribute_terms?.length ?? 0) > 0;
     const hasAvailableTerms = (data.available_terms?.length ?? 0) > 0;
 
@@ -88,6 +87,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
 
     const stock = cartEntity?.stock ?? 0;
     const price = cartEntity?.price ?? (product as { price?: number })?.price ?? 0;
+    const regularPrice = cartEntity?.regular_price ?? (product as { regular_price?: number })?.regular_price ?? 0;
+
 
     const productName = productVariant
         ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`
@@ -229,7 +230,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             fetchBundleProducts();
         }
     }, [product]);
-    // console.log("product", product);
+    console.log("product", product);
     console.log("data", data);
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
@@ -353,6 +354,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             </>
                         )}
                     </div>
+                    <p className='text-content-2 md:text-title-2 font-bold text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
                     <div className='space-y-4 max-md:order-4'>
                         <div className='bg-skin-white border border-skin-neutral-100 rounded-xl shadow-product-offer p-3.5 space-y-2.5'>
                             <div className='flex gap-1 items-center'>

@@ -48,7 +48,11 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
         }
     }, [category.id]);
 
-    const priceOptions = category.deals.map(deal => ({
+    // Only show unique deals by name in the filter
+    const uniqueDeals = category.deals.filter(
+        (deal, idx, arr) => arr.findIndex(d => d.name === deal.name) === idx
+    );
+    const priceOptions = uniqueDeals.map(deal => ({
         label: deal.name,
         value: deal.id.toString()
     }));
@@ -115,19 +119,21 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
         <div className='space-y-4'>
             <div className="flex items-end md:items-center justify-between">
                 <h2 className='text-h5 md:text-h4 font-bold leading-none text-skin-neutral-500'>{category.name}</h2>
-                <div
-                    role="link"
-                    tabIndex={0}
-                    onClick={handleViewAllClick}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            handleViewAllClick(e as unknown as React.MouseEvent);
-                        }
-                    }}
-                    className="cursor-pointer"
-                >
-                    <ViewAllLink href="#" />
-                </div>
+                {uniqueDeals.length > 1 && (
+                    <div
+                        role="link"
+                        tabIndex={0}
+                        onClick={handleViewAllClick}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                handleViewAllClick(e as unknown as React.MouseEvent);
+                            }
+                        }}
+                        className="cursor-pointer"
+                    >
+                        <ViewAllLink href="#" />
+                    </div>
+                )}
             </div>
             <Select
                 size="sm"

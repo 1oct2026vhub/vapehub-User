@@ -7,7 +7,7 @@ import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure
 import LogoutButton from '../../_components/LogoutButton'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { userProfileSchema, UserProfileFormData } from '@/lib/config/user.config'
+import { userProfileSchema, UserProfileFormData, UserProfileResponse } from '@/lib/config/user.config'
 import { useUserProfile } from '@/lib/hooks/useUserProfile'
 import { toast } from 'sonner'
 import { ServerActionStatus } from '@/lib/config/app.config'
@@ -23,7 +23,9 @@ const PersonalInfo: NextPage = () => {
     const { isOpen, onClose, onOpen, onOpenChange } = useDisclosure()
     const { fetchProfile, updateProfile, deleteProfile, isLoading } = useUserProfile();
     const [loading, setLoading] = useState(true);
-     const form = useForm<UserProfileFormData>({
+    const [profileData, setProfileData] = useState<UserProfileResponse | null>(null)
+    
+    const form = useForm<UserProfileFormData>({
         resolver: zodResolver(userProfileSchema),
         mode: 'all',
         defaultValues: {
@@ -33,8 +35,11 @@ const PersonalInfo: NextPage = () => {
             phone: ''
         }
     })
+
     const loadProfile = async () => {
         const result = await fetchProfile(); 
+        console.log("Profile result:", result);
+        setProfileData(result)
         if (result) {
             form.reset({
                 first_name: result.first_name || '',
@@ -42,16 +47,24 @@ const PersonalInfo: NextPage = () => {
                 email: result.email || '',
                 phone: result.phone || ''
             })
-            // Set newsletter subscription status if available
-            if (result && 'mail_subscription' in result && result.mail_subscription !== undefined) {
-                setNewsletterSubscribed(Boolean(result.mail_subscription))
+            // Set newsletter subscription status from nested subscription object
+            if (result?.subscription && 'subscribed' in result.subscription) {
+                console.log("Setting newsletter subscribed to:", result.subscription.subscribed);
+                setNewsletterSubscribed(Boolean(result.subscription.subscribed))
+            } else {
+                console.log("No subscription.subscribed field found in result");
             }
             setLoading(false)
         }
     }
+
     useEffect(() => {        
         loadProfile()
-    }, [loadProfile])
+    }, [])
+
+    useEffect(() => {
+        console.log("newsletterSubscribed state changed to:", newsletterSubscribed);
+    }, [newsletterSubscribed])
 
     const onSubmit = async (data: UserProfileFormData) => {
         const result = await updateProfile(data)
@@ -64,10 +77,20 @@ const PersonalInfo: NextPage = () => {
     }
 
     const handleNewsletterToggle = async () => {
+        console.log("Current newsletterSubscribed state:", newsletterSubscribed);
         try {
             const result = await toggleMailSubscription()
+            console.log("Toggle result:", result);
             if (result?.status === ServerActionStatus.SUCCESS) {
                 setNewsletterSubscribed(result.data.subscribed)
+                // Update subscription in profileData
+                setProfileData(prev => prev ? {
+                    ...prev,
+                    subscription: {
+                        ...prev.subscription,
+                        subscribed: result.data.subscribed
+                    }
+                } : null)
                 toast.success(result.data.message)
             } else {
                 toast.error('Failed to update newsletter subscription')
@@ -85,7 +108,8 @@ const PersonalInfo: NextPage = () => {
             signOut({ callbackUrl: ROUTES.MY_ACCOUNT }); 
         }  
     }
-    if(loading) {
+
+    if (loading) {
         return <p>Loading..</p>
     }
 
@@ -166,7 +190,7 @@ const PersonalInfo: NextPage = () => {
                                             radius="md"
                                             color="primary"
                                             className="btn !text-content-2 md:!text-content-1 max-md:h-10 rounded-10 primary-outline-btn !font-extrabold"
-                                            onPress={() => {setShowButtons(false); loadProfile()}}
+                                            onPress={() => { setShowButtons(false); loadProfile() }}
                                         >
                                             Cancel
                                         </Button>
@@ -238,6 +262,7 @@ const PersonalInfo: NextPage = () => {
                                     </p>
                                 </div>
                                 <Switch
+                                    key={`newsletter-${newsletterSubscribed}`}
                                     isSelected={newsletterSubscribed}
                                     onValueChange={() => handleNewsletterToggle()}
                                     color="primary"

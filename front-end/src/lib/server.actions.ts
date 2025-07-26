@@ -6,7 +6,7 @@ import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
-import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse } from "./config/deal.config";
+import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config";
@@ -661,11 +661,11 @@ export const getDealProducts = async (dealId: number, payload?: { limit?: number
         get_qty: number;
         fixed_price: number;
         discount_percent: number;
-        tiered_qty_json: any;
+        tiered_qty_json: { min: number; discount: number }[] | null;
         valid_from: string;
         valid_to: string;
     };
-    products: any[];
+    products: ProductInDeal[];
     pagination: {
         total_count: number;
         total_pages: number;
@@ -687,11 +687,11 @@ export const getDealProducts = async (dealId: number, payload?: { limit?: number
             get_qty: number;
             fixed_price: number;
             discount_percent: number;
-            tiered_qty_json: any;
+            tiered_qty_json: { min: number; discount: number }[] | null;
             valid_from: string;
             valid_to: string;
         };
-        products: any[];
+        products: ProductInDeal[];
         pagination: {
             total_count: number;
             total_pages: number;

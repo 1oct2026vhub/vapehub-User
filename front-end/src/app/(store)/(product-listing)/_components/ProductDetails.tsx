@@ -18,7 +18,7 @@ import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { getReviewOrderByProductId } from '@/lib/server.actions'
-import { getDealsByCategory, getDealProducts } from '@/lib/server.actions'
+import { getDealProducts } from '@/lib/server.actions'
 import { ProductInDeal } from '@/lib/config/deal.config'
 
 type ProductViewProps = {
@@ -220,7 +220,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
 
             if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
                 // Exclude the current product from the list
-                const filteredProducts = response.data.products.filter((p: any) => p.id !== product.id);
+                const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id !== product.id);
                 setBundleProducts(filteredProducts.slice(0, 2));
             }
         };

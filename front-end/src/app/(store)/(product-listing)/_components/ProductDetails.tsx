@@ -113,6 +113,17 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
         totalReviews: 0,
     });
     const [bundleProducts, setBundleProducts] = useState<ProductInDeal[]>([]);
+    const [bundlePagination, setBundlePagination] = useState<{
+        total_count: number;
+        total_pages: number;
+        current_page: number;
+        limit: number;
+        offset: number;
+        has_next: boolean;
+        has_prev: boolean;
+    } | null>(null);
+    const [isLoadingBundles, setIsLoadingBundles] = useState(false);
+    const [currentBundlePage, setCurrentBundlePage] = useState(1);
     console.log("bundleProducts", bundleProducts);
     const handleReviewsClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -214,21 +225,29 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     }, [product]);
 
     useEffect(() => {
-        const fetchBundleProducts = async () => {
+        const fetchBundleProducts = async (page = 1) => {
             if (!mixAndMatchDeal?.id) return;
-            const response = await getDealProducts(mixAndMatchDeal.id, { limit: 4, offset: 0 });
-
+            setIsLoadingBundles(true);
+            const limit = 2;
+            const offset = (page - 1) * limit;
+            const response = await getDealProducts(mixAndMatchDeal.id, { limit, offset });
             if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
-                // Exclude the current product from the list
-                const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id !== product.id);
-                setBundleProducts(filteredProducts.slice(0, 2));
+                const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id);
+                setBundleProducts(filteredProducts);
+                setBundlePagination(response.data.pagination);
             }
+            setIsLoadingBundles(false);
         };
-
         if (mixAndMatchDeal?.id) {
-            fetchBundleProducts();
+            fetchBundleProducts(currentBundlePage);
         }
-    }, [mixAndMatchDeal?.id, product.id]);
+    }, [mixAndMatchDeal?.id, product.id, currentBundlePage]);
+
+    const handleBundlePageChange = (page: number) => {
+        if (page !== currentBundlePage) {
+            setCurrentBundlePage(page);
+        }
+    };
     console.log("product", product);
     console.log("data", data);
     return (
@@ -467,6 +486,78 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             <BundleProductCard key={bundleProduct.id} product={bundleProduct} />
                         ))}
                     </div>
+                    {isLoadingBundles && (
+                        <div className='flex justify-center'><span>Loading...</span></div>
+                    )}
+                            {bundlePagination && bundlePagination.total_pages > 1 && bundleProducts.length > 0 && (
+            <div className="flex justify-center items-center gap-1 mt-4">
+                {/* Previous button */}
+                {bundlePagination.has_prev && (
+                    <Button
+                        size="sm"
+                        radius="full"
+                        variant="light"
+                        className="w-7 h-7 min-w-0 px-0 text-xs"
+                        onPress={() => handleBundlePageChange(currentBundlePage - 1)}
+                        disabled={isLoadingBundles}
+                    >
+                        ‹
+                    </Button>
+                )}
+
+                {/* Page numbers with dots */}
+                {(() => {
+                    const totalPages = bundlePagination.total_pages;
+                    const current = currentBundlePage;
+                    const pages = [];
+
+                    if (totalPages <= 5) {
+                        for (let i = 1; i <= totalPages; i++) pages.push(i);
+                    } else {
+                        pages.push(1);
+                        if (current > 3) pages.push('...');
+                        for (let i = Math.max(2, current - 1); i <= Math.min(totalPages - 1, current + 1); i++) {
+                            if (i > 1 && i < totalPages) pages.push(i);
+                        }
+                        if (current < totalPages - 2) pages.push('...');
+                        pages.push(totalPages);
+                    }
+
+                    return pages.map((page, idx) =>
+                        page === '...' ? (
+                            <span key={idx} className="text-skin-neutral-400 text-xs px-1">…</span>
+                        ) : (
+                            <Button
+                                key={page}
+                                size="sm"
+                                radius="full"
+                                variant={page === current ? "solid" : "light"}
+                                color={page === current ? "primary" : "default"}
+                                className={`w-7 h-7 min-w-0 px-0 text-xs font-semibold ${page === current ? '!bg-skin-primary2-500 text-white' : ''}`}
+                                onPress={() => handleBundlePageChange(page as number)}
+                                disabled={isLoadingBundles}
+                            >
+                                {page}
+                            </Button>
+                        )
+                    );
+                })()}
+
+                {/* Next button */}
+                {bundlePagination.has_next && (
+                    <Button
+                        size="sm"
+                        radius="full"
+                        variant="light"
+                        className="w-7 h-7 min-w-0 px-0 text-xs"
+                        onPress={() => handleBundlePageChange(currentBundlePage + 1)}
+                        disabled={isLoadingBundles}
+                    >
+                        ›
+                    </Button>
+                )}
+            </div>
+        )}
                 </div>
             )}
         </section>

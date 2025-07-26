@@ -241,10 +241,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                         Brand:
                         {product?.product_brands?.map((brand, index) => (
-                            <Link key={brand.id} href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>
-                                {brand.name}
-                                {index < product.product_brands.length - 1 && ', '}
-                            </Link>
+                            <React.Fragment key={brand.id}>
+                                <Link href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>
+                                    {brand.name}
+                                </Link>
+                                {index < product.product_brands.length - 1 && <span className="ml-1">, </span>}
+                            </React.Fragment>
                         ))}
                     </div>
                     <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
@@ -317,10 +319,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                         <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
                             Brand:
                             {product?.product_brands?.map((brand, index) => (
-                                <Link key={brand.id} href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>
-                                    {brand.name}
-                                    {index < product.product_brands.length - 1 && ', '}
-                                </Link>
+                                <React.Fragment key={brand.id}>
+                                    <Link href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>
+                                        {brand.name}
+                                    </Link>
+                                    {index < product.product_brands.length - 1 && <span className="ml-1">, </span>}
+                                </React.Fragment>
                             ))}
                         </div>
                         <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>

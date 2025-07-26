@@ -13,7 +13,7 @@ const AllDealsPage: NextPage = () => {
 
     useEffect(() => {
         const fetchDeals = async () => {
-            const response = await getAllDeals({ limit: 50, offset: 0 });
+            const response = await getAllDeals({ limit: 50, offset: 0,deal_type:'BUY_N_FOR_FIXED' });
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setDeals(response.data.deals);
             }

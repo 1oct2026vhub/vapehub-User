@@ -248,6 +248,7 @@ export interface productAllImages {
 }
 
 export interface Deal {
+  id: number;
   name: string;
   deal_type: string;
   required_qty: number;

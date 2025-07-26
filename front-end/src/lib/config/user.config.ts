@@ -10,7 +10,10 @@ export interface UserProfileResponse {
       referral_code: string;
       referred_by: string | null;
       referral_points: number;
-      mail_subscription?: boolean;
+      subscribed?: boolean;
+      subscription?: {
+        subscribed: boolean;
+      }
   }
 
 

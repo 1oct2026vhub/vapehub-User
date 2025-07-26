@@ -343,7 +343,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (isAuthenticated) {
         const response = await removeFromCart(cartId);
         if (response.status === ServerActionStatus.SUCCESS) {
-          await loadCartItems();
+          // Update local state immediately instead of reloading from server
+          const updatedCart = cartItems.filter(item => item.id !== cartId);
+          setCartItems(updatedCart);
+          calculateTotals(updatedCart);
           toast.error(`${itemToRemove?.name || 'Item'} removed from cart`);
         }
       } else {

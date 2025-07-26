@@ -110,7 +110,7 @@ export interface Product {
     price: string;
     primary_image?: { url: string };
     deleted_at?: string | null;
-    
+    flavor_count?: number | string;
     // Properties required by ProductList.tsx
     Category?: Category | null;
     ProductImages: ProductImage[];

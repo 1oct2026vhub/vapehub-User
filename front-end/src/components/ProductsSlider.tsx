@@ -64,7 +64,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, review
               price={product?.price}
               buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
               productId={product.id}
-              flavors={product?.Flavors?.length}
+              flavors={product.flavor_count ? Number(product.flavor_count) : 0}
               link={`/${product.slug}`}
               totalPuffs={product?.puff_count ? `${product?.puff_count}`: ""}
               isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}

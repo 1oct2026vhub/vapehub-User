@@ -7,7 +7,7 @@ import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure
 import LogoutButton from '../../_components/LogoutButton'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { userProfileSchema, UserProfileFormData, UserProfileResponse } from '@/lib/config/user.config'
+import { userProfileSchema, UserProfileFormData } from '@/lib/config/user.config'
 import { useUserProfile } from '@/lib/hooks/useUserProfile'
 import { toast } from 'sonner'
 import { ServerActionStatus } from '@/lib/config/app.config'
@@ -23,7 +23,6 @@ const PersonalInfo: NextPage = () => {
     const { isOpen, onClose, onOpen, onOpenChange } = useDisclosure()
     const { fetchProfile, updateProfile, deleteProfile, isLoading } = useUserProfile();
     const [loading, setLoading] = useState(true);
-    const [profileData, setProfileData] = useState<UserProfileResponse | null>(null)
     
     const form = useForm<UserProfileFormData>({
         resolver: zodResolver(userProfileSchema),
@@ -39,7 +38,6 @@ const PersonalInfo: NextPage = () => {
     const loadProfile = async () => {
         const result = await fetchProfile(); 
         console.log("Profile result:", result);
-        setProfileData(result)
         if (result) {
             form.reset({
                 first_name: result.first_name || '',
@@ -83,15 +81,18 @@ const PersonalInfo: NextPage = () => {
             console.log("Toggle result:", result);
             if (result?.status === ServerActionStatus.SUCCESS) {
                 setNewsletterSubscribed(result.data.subscribed)
-                // Update subscription in profileData
-                setProfileData(prev => prev ? {
-                    ...prev,
-                    subscription: {
-                        ...prev.subscription,
-                        subscribed: result.data.subscribed
-                    }
-                } : null)
-                toast.success(result.data.message)
+                // setProfileData(prev => prev ? {
+                //     ...prev,
+                //     subscription: {
+                //         ...prev.subscription,
+                //         subscribed: result.data.subscribed
+                //     }
+                // } : null)
+                if (result.data.subscribed) {
+                    toast.success(result.data.message)
+                } else {
+                    toast.error(result.data.message)
+                }
             } else {
                 toast.error('Failed to update newsletter subscription')
             }

@@ -10,8 +10,11 @@ type BundleProductCardProps = {
 };
 
 const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
-	const { name, primary_image, price, discount_price, slug } = product;
+	const { name, primary_image, image, price, discount_price, regular_price, slug } = product;
 	const productLink = `/${slug}`;
+	
+	// Handle both old and new image structure
+	const imageUrl = image?.image_url || primary_image?.url;
 
 	return (
 		<>
@@ -23,7 +26,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 							// className="bg-skin-base border border-skin-neutral-100 rounded p-3 shadow"
 						>
 							<NoImage
-								src={primary_image?.url}
+								src={imageUrl}
 								alt={name}
 								width={104}
 								height={100}
@@ -59,10 +62,10 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 							{DEFAULT_CURRENCY_SYMBOL}
 							{price}
 						</p>
-						{discount_price && (
+						{regular_price && (
 							<p className="text-skin-neutral-300 text-title-2 xl:text-title-1 line-through font-bold">
 								{DEFAULT_CURRENCY_SYMBOL}
-								{discount_price}
+								{regular_price}
 							</p>
 						)}
 					</div>
@@ -87,7 +90,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 						className="bg-skin-neutral-50 border border-skin-primary-100 rounded-lg p-3 shadow-md"
 					>
 						<NoImage
-							src={primary_image?.url}
+							src={imageUrl}
 							alt={name}
 							width={104}
 							height={100}
@@ -107,7 +110,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 						{discount_price && (
 							<p className="text-content-2 sm:text-content-1 text-skin-neutral-300 line-through font-normal">
 								{DEFAULT_CURRENCY_SYMBOL}
-								{discount_price}
+								{regular_price}
 							</p>
 						)}
 					</div>

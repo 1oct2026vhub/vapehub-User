@@ -104,6 +104,7 @@ export const API_ROUTES = {
     GET_LOYALTY_POINTS_REDEMPTION: buildRequestUrl('/api/loyalty-points/redemption'),
     GET_CATEGORIES_WITH_DEALS: (payload?: CategoriesWithDealsPayload) => buildRequestUrl(`/api/product/categories-with-deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_DEALS_BY_CATEGORY: (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }) => buildRequestUrl(`/api/product/category/${categoryId}/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_DEAL_PRODUCTS: (dealId: number, payload?: { limit?: number; offset?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
 };
 
 // * Helper functions

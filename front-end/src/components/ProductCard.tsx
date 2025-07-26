@@ -81,7 +81,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
           <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold h-3 md:h-4 xl:h-5">
-            {flavors ? `${flavors} ${flavors > 1 ? 'Flavours' : 'Flavour'}` : `${0} Flavour`}
+            {flavors ? `${flavors} ${flavors > 1 ? 'Flavours' : 'Flavour'}` : ''}
           </p>
           <div className="flex items-center justify-between gap-2">
             <p className="text-content-1 sm:text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>

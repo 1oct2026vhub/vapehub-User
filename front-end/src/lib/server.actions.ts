@@ -6,7 +6,7 @@ import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
-import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse } from "./config/deal.config";
+import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config";
@@ -646,6 +646,63 @@ export const getCategoriesWithDeals = async (payload?: CategoriesWithDealsPayloa
 export const getDealsByCategory = async (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }): Promise<ServerActionResponse<DealsByCategoryResponse>> => {
     return await handleRequest<DealsByCategoryResponse, unknown>({
         endpoint: API_ROUTES.GET_DEALS_BY_CATEGORY(categoryId, payload),
+        method: 'GET',
+    });
+};
+
+export const getDealProducts = async (dealId: number, payload?: { limit?: number; offset?: number }): Promise<ServerActionResponse<{
+    deal: {
+        id: number;
+        name: string;
+        slug: string;
+        image_url: string;
+        deal_type: string;
+        required_qty: number;
+        get_qty: number;
+        fixed_price: number;
+        discount_percent: number;
+        tiered_qty_json: { min: number; discount: number }[] | null;
+        valid_from: string;
+        valid_to: string;
+    };
+    products: ProductInDeal[];
+    pagination: {
+        total_count: number;
+        total_pages: number;
+        current_page: number;
+        limit: number;
+        offset: number;
+        has_next: boolean;
+        has_prev: boolean;
+    };
+}>> => {
+    return await handleRequest<{
+        deal: {
+            id: number;
+            name: string;
+            slug: string;
+            image_url: string;
+            deal_type: string;
+            required_qty: number;
+            get_qty: number;
+            fixed_price: number;
+            discount_percent: number;
+            tiered_qty_json: { min: number; discount: number }[] | null;
+            valid_from: string;
+            valid_to: string;
+        };
+        products: ProductInDeal[];
+        pagination: {
+            total_count: number;
+            total_pages: number;
+            current_page: number;
+            limit: number;
+            offset: number;
+            has_next: boolean;
+            has_prev: boolean;
+        };
+    }, unknown>({
+        endpoint: API_ROUTES.GET_DEAL_PRODUCTS(dealId, payload),
         method: 'GET',
     });
 };

@@ -18,7 +18,7 @@ import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { getReviewOrderByProductId } from '@/lib/server.actions'
-import { getDealsByCategory } from '@/lib/server.actions'
+import { getDealsByCategory, getDealProducts } from '@/lib/server.actions'
 import { ProductInDeal } from '@/lib/config/deal.config'
 
 type ProductViewProps = {
@@ -113,7 +113,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
         totalReviews: 0,
     });
     const [bundleProducts, setBundleProducts] = useState<ProductInDeal[]>([]);
-
+    console.log("bundleProducts", bundleProducts);
     const handleReviewsClick = (e: React.MouseEvent) => {
         e.preventDefault();
         const reviewsSection = document.getElementById('reviews');
@@ -215,21 +215,20 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
 
     useEffect(() => {
         const fetchBundleProducts = async () => {
-            if (!product?.category) return;
-            const category = product.category;
-            const response = await getDealsByCategory(category.id, { limit: 4, offset: 0 });
+            if (!mixAndMatchDeal?.id) return;
+            const response = await getDealProducts(mixAndMatchDeal.id, { limit: 4, offset: 0 });
 
             if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
                 // Exclude the current product from the list
-                const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id !== product.id);
+                const filteredProducts = response.data.products.filter((p: any) => p.id !== product.id);
                 setBundleProducts(filteredProducts.slice(0, 2));
             }
         };
 
-        if (product?.id) {
+        if (mixAndMatchDeal?.id) {
             fetchBundleProducts();
         }
-    }, [product]);
+    }, [mixAndMatchDeal?.id, product.id]);
     console.log("product", product);
     console.log("data", data);
     return (

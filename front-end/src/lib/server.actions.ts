@@ -650,6 +650,63 @@ export const getDealsByCategory = async (categoryId: number, payload?: { limit?:
     });
 };
 
+export const getDealProducts = async (dealId: number, payload?: { limit?: number; offset?: number }): Promise<ServerActionResponse<{
+    deal: {
+        id: number;
+        name: string;
+        slug: string;
+        image_url: string;
+        deal_type: string;
+        required_qty: number;
+        get_qty: number;
+        fixed_price: number;
+        discount_percent: number;
+        tiered_qty_json: any;
+        valid_from: string;
+        valid_to: string;
+    };
+    products: any[];
+    pagination: {
+        total_count: number;
+        total_pages: number;
+        current_page: number;
+        limit: number;
+        offset: number;
+        has_next: boolean;
+        has_prev: boolean;
+    };
+}>> => {
+    return await handleRequest<{
+        deal: {
+            id: number;
+            name: string;
+            slug: string;
+            image_url: string;
+            deal_type: string;
+            required_qty: number;
+            get_qty: number;
+            fixed_price: number;
+            discount_percent: number;
+            tiered_qty_json: any;
+            valid_from: string;
+            valid_to: string;
+        };
+        products: any[];
+        pagination: {
+            total_count: number;
+            total_pages: number;
+            current_page: number;
+            limit: number;
+            offset: number;
+            has_next: boolean;
+            has_prev: boolean;
+        };
+    }, unknown>({
+        endpoint: API_ROUTES.GET_DEAL_PRODUCTS(dealId, payload),
+        method: 'GET',
+    });
+};
+
 export const getAllDeals = async (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }): Promise<ServerActionResponse<AllDealsResponse>> => {
     return await handleRequest<AllDealsResponse, unknown>({
         endpoint: API_ROUTES.GET_ALL_DEALS(payload),

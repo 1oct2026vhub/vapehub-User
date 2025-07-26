@@ -74,6 +74,7 @@ export interface ProductInDeal {
     slug: string;
     description: string;
     price: string;
+    regular_price: string;
     discount_price: string;
     stock_quantity: number | null;
     created_at: string;
@@ -93,6 +94,12 @@ export interface ProductInDeal {
         url: string;
         is_primary: boolean;
     } | null;
+    image?: {
+        id: number;
+        image_url: string;
+        is_primary: boolean;
+        product_id: number;
+    };
     deals: Deal[];
     Flavors: Flavor[];
     puff_count: number;

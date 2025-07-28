@@ -40,7 +40,7 @@ const MyAccountOrders: NextPage<{searchParams: Promise<{page: string}>}> = async
                 </div>
                 }
             </div>
-            <div className="flex md:hidden bg-skin-white p-4 rounded-14 shadow-card w-full mt-4">
+            <div className="flex md:hidden bg-skin-white p-4 rounded-14 shadow-card w-full mt-4 items-center justify-center">
                 <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 text-content-1 bg-skin-white font-semibold" />
             </div>
         </main>

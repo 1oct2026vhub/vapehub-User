@@ -230,7 +230,8 @@ console.log("filter data", data);
                       imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ''}
                       price={product.price}
                       buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
-                      flavors={product?.Flavors?.length}
+                      // flavors={product?.Flavors?.length}
+                      flavors={product.flavor_count ? Number(product.flavor_count) : 0}
                       productId={product.id}
                       link={`/${product.slug}`}
                       totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}

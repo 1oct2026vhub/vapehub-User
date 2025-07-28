@@ -192,7 +192,8 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                                     price={product.price}
                                     buttonText={product.deals?.[0]?.name ?? "View Details"}
                                     productId={product.id}
-                                    flavors={product?.Flavors?.length || 0}
+                                    // flavors={product?.Flavors?.length || 0}
+                                    flavors={product.flavor_count ? Number(product.flavor_count) : 0}
                                     link={`/${product.slug}`}
                                     totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
                                     isNew={isLessThanOneMonth(product.created_at) ? "New" : ""}

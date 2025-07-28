@@ -1,4 +1,4 @@
-import { ServerActionResponse } from "./config/app.config";
+import { ServerActionResponse, ServerActionStatus } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
@@ -8,7 +8,7 @@ import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";
-import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
+import { FooterMenu, FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config";
 import { NotificationListResponse } from "./config/notification.config";
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS } from "./config/order.config";
@@ -544,11 +544,21 @@ export const deleteNotification = async (id: number): Promise<ServerActionRespon
   });
 };
 // get footer menu
-export const getFooterMenu = async (): Promise<ServerActionResponse<FooterMenuResponse[]>> => {
-  return await handleRequest<FooterMenuResponse[], unknown>({
-    endpoint: API_ROUTES.GET_FOOTER_MENU,
-    method: 'GET',
-  });
+export const getFooterMenu = async (): Promise<FooterMenuResponse> => {
+  try {
+  
+    const response = await fetch(API_ROUTES.GET_FOOTER_MENU);
+    const data = await response.json();    
+    return data;
+  } catch (error) {
+    console.error("Error fetching footer menu:", error);
+    return {
+      data: [],
+      socialLinks: {},
+      status: ServerActionStatus.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
 };
 
 // get header mega menu

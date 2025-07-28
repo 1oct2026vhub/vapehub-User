@@ -10,29 +10,40 @@ import { FooterMenu } from '@/lib/config/header.config';
 const Footer = async (): AsyncReactElement => {
   const footerMenuResponse = await getFooterMenu();   
 
-  if (footerMenuResponse.status !== ServerActionStatus.SUCCESS) {
+  if (footerMenuResponse.status === ServerActionStatus.ERROR) {
     return <div>{footerMenuResponse.message}</div>;
   }
 
-  const footerMenu: FooterMenu[] = footerMenuResponse.data;
+  // Add safe checks for data and socialLinks
+  const footerMenu = footerMenuResponse.data || [];
+  const socialLinks = footerMenuResponse.socialLinks || {};
 
-  // Sort footer menu items by order and filter active items
-  const sortedFooterMenu = footerMenu
-    .filter(menu => menu.is_active)
-    .sort((a, b) => a.order - b.order)
-    .map(menu => ({
+  // Add safe checks for filtering and sorting
+  const sortedFooterMenu = (footerMenu || [])
+    .filter((menu: FooterMenu) => menu?.is_active)
+    .sort((a: FooterMenu, b: FooterMenu) => (a?.order || 0) - (b?.order || 0))
+    .map((menu: FooterMenu) => ({
       ...menu,
-      links: menu.links
-        .filter(link => link.is_active)
-        .sort((a, b) => a.order - b.order)
+      links: (menu?.links || [])
+        .filter((link: any) => link?.is_active)
+        .sort((a: any, b: any) => (a?.order || 0) - (b?.order || 0))
     }))
-    .filter(menu => menu.links.length > 0); // Only keep sections with active links
+    .filter((menu: FooterMenu) => menu?.links?.length > 0); // Only keep sections with active links
 
   const socialMediaLinks = [
-    { icon: <InstagramIcon className='max-sm:max-w-9' />, href: process.env.INSTAGRAM_LINK || '#' },
-    { icon: <FacebookIcon className='max-sm:max-w-9' />, href: process.env.FACEBOOK_LINK || '#' },
-    { icon: <TwitterIcon className='max-sm:max-w-9' />, href: process.env.TWITTER_LINK || '#' },
-  ];
+    { 
+      icon: <InstagramIcon className='max-sm:max-w-9' />, 
+      href: socialLinks.instagram || '#' 
+    },
+    { 
+      icon: <FacebookIcon className='max-sm:max-w-9' />, 
+      href: socialLinks.facebook || '#' 
+    },
+    { 
+      icon: <TwitterIcon className='max-sm:max-w-9' />, 
+      href: socialLinks.twitter || '#' 
+    },
+  ].filter(link => link.href !== '#'); // Remove links that are not set
 
   return (
     <footer className="bg-footer-gradient space-y-6 mt-auto">
@@ -70,8 +81,8 @@ const Footer = async (): AsyncReactElement => {
             <h4 className="text-title-2 font-bold">Customer Services</h4>
             <div className='text-content-2 lg:text-content-1 font-normal'>
               Email us: 
-              <a href='mailto:customerservices@vapehub.co.uk' className="whitespace-nowrap hover:underline ml-1">
-                customerservices@vapehub.co.uk
+              <a href={`mailto:${socialLinks.email || 'customerservices@vapehub.co.uk'}`} className="whitespace-nowrap hover:underline ml-1">
+                {socialLinks.email || 'customerservices@vapehub.co.uk'}
               </a>
             </div>
             <div className="hidden md:flex items-center gap-4.5 justify-center md:justify-end mt-4 xl:mt-5.5">

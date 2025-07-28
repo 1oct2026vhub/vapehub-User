@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ServerActionStatus } from './app.config';
 
 // * Zod Form Schemas
 export const HEADER_IN_SCHEMA = z.object({
@@ -41,7 +42,18 @@ interface FooterMenuLinks {
   deleted_at: string | null;
 }
 // * Footer Menu Response
-export type FooterMenuResponse = FooterMenu;
+export interface FooterMenuResponse {
+  data: FooterMenu[];
+  socialLinks: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    phone_number?: string;
+    email?: string;
+  };
+  status?: ServerActionStatus;
+  message?: string;
+}
 
 
 // * Header Mega Menu

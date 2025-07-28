@@ -79,6 +79,7 @@ export interface ProductInDeal {
     stock_quantity: number | null;
     created_at: string;
     updated_at: string;
+    flavor_count: number;
     category: {
         id: number;
         name: string;

@@ -6,7 +6,7 @@ const SocialMedia = async () => {
     const response = await getContactUs();
     const socialMediaInfo = response.status === ServerActionStatus.SUCCESS ? response.data : null;
     return (
-        <main>
+        <main className='p-10'>
             <BreadCrumbs
                 items={[
                     {

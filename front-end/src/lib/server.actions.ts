@@ -767,3 +767,30 @@ export const getContactUs = async (): Promise<ServerActionResponse<ContactInfo>>
       method: 'GET',
     });
   };
+
+export const getMailSubscriptionSettings = async (): Promise<ServerActionResponse<{
+  id: number;
+  email_frequency: string;
+  product_updates: boolean;
+  discount_notifications: boolean;
+  discount_amount: string;
+  discount_type: string;
+  status: boolean;
+  createdAt: string;
+  updatedAt: string;
+}>> => {
+  return await handleRequest<{
+    id: number;
+    email_frequency: string;
+    product_updates: boolean;
+    discount_notifications: boolean;
+    discount_amount: string;
+    discount_type: string;
+    status: boolean;
+    createdAt: string;
+    updatedAt: string;
+  }, unknown>({
+    endpoint: API_ROUTES.GET_MAIL_SUBSCRIPTION_SETTINGS,
+    method: 'GET',
+  });
+};

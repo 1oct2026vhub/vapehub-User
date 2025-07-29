@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { getFooterMenu } from '@/lib/server.actions';
 import { AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
 import FooterMobile from './FooterMobile';
-import { FooterMenu } from '@/lib/config/header.config';
+import { FooterMenu, FooterMenuLink } from '@/lib/config/header.config';
 
 const Footer = async (): AsyncReactElement => {
   const footerMenuResponse = await getFooterMenu();   
@@ -25,8 +25,8 @@ const Footer = async (): AsyncReactElement => {
     .map((menu: FooterMenu) => ({
       ...menu,
       links: (menu?.links || [])
-        .filter((link: any) => link?.is_active)
-        .sort((a: any, b: any) => (a?.order || 0) - (b?.order || 0))
+        .filter((link: FooterMenuLink) => link?.is_active)
+        .sort((a: FooterMenuLink, b: FooterMenuLink) => (a?.order || 0) - (b?.order || 0))
     }))
     .filter((menu: FooterMenu) => menu?.links?.length > 0); // Only keep sections with active links
 

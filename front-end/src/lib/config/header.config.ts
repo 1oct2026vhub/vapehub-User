@@ -19,18 +19,7 @@ export const Header_FORM_CONFIG = {
   
 };
 // * Footer Menu
-export interface FooterMenu {
-  id: number;
-  title: string;
-  order: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null; 
-  links: FooterMenuLinks[];
-}
-// * Footer Menu Links
-interface FooterMenuLinks {
+export interface FooterMenuLink {
   id: number;
   section_id: number;
   label: string;
@@ -40,6 +29,17 @@ interface FooterMenuLinks {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+}
+
+export interface FooterMenu {
+  id: number;
+  title: string;
+  order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  links: FooterMenuLink[];
 }
 // * Footer Menu Response
 export interface FooterMenuResponse {

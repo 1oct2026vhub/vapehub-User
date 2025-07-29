@@ -112,7 +112,7 @@ const MobileMenu = ({ categories }: Props) => {
                         </div>
                         <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                         <div className="flex items-center gap-1">
-                            <Link href={ROUTES.MY_ACCOUNT}>
+                            <Link href={ROUTES.MY_ACCOUNT} onClick={handleMenuClose}>
                                 <UserIcon />
                             </Link>
                             <Badge color="default" content={itemCount} shape="circle" variant='faded' className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">

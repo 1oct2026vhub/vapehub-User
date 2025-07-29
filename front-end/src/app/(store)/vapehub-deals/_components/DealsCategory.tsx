@@ -158,7 +158,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                 {priceOptions.map(({ label, value }) => (
                     <SelectItem key={value} textValue={label}>
                         <div
-                            className="flex items-center gap-2"
+                            className="flex items-start gap-2"
                             onClick={(e) => e.stopPropagation()} // Prevents Select from closing
                         >
                             <Checkbox
@@ -172,7 +172,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                                     label: "!text-content-2 text-nowrap",
                                 }}
                             />
-                            <span className="text-skin-neutral-300 font-normal text-nowrap">{label}</span>
+                            <span className="text-skin-neutral-300 font-normal text-wrap">{label}</span>
                         </div>
                     </SelectItem>
                 ))}

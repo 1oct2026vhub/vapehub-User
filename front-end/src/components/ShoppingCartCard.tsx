@@ -54,14 +54,14 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
         </div>
 
         <div className="flex flex-col gap-2.5 md:gap-5 w-full">
-          <div className="flex items-start gap-4 md:gap-8 justify-between">
-            <Link href={`/${item.product_slug}`} className="cursor-pointer text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400 mr-5">
+          <div className="flex items-start gap-4 w-full justify-between shrink">
+            <Link href={`/${item.product_slug}`} className="cursor-pointer text-wrap text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400">
               {item.name}
             </Link>
 
             {/* Price Section */}
             <div className="text-right">
-              <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold">
+              <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold min-w-fit">
                 {/* {DEFAULT_CURRENCY_SYMBOL}{(Number(item.price) * item.quantity).toFixed(2)} */}
                 {DEFAULT_CURRENCY_SYMBOL}{item.total.toFixed(2)}
               </p>

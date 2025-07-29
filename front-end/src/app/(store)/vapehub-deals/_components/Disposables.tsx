@@ -170,7 +170,7 @@ const Disposables: React.FC = () => {
                 {priceOptions.map(({ label, count, value }) => (
                     <SelectItem key={value} textValue={value}>
                         <div
-                            className="flex items-center gap-2"
+                            className="flex items-start gap-2"
                             onClick={(e) => e.stopPropagation()} // Prevents Select from closing
                         >
                             <Checkbox
@@ -184,7 +184,7 @@ const Disposables: React.FC = () => {
                                     label: "!text-content-2 text-nowrap",
                                 }}
                             />
-                            <span className="text-skin-neutral-300 font-normal text-nowrap">{label}</span>
+                            <span className="text-skin-neutral-300 font-normal text-wrap">{label}</span>
                             <span className="text-skin-neutral-500 font-medium">  ({count}) </span>
                         </div>
                     </SelectItem>

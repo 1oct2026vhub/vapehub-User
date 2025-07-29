@@ -33,10 +33,10 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
       message: "Last name cannot be only whitespace"
     }),
     shippingAddress1: z.string()
-    .min(1, 'Address line 1 is required')
-    .max(255, 'Address line 1 must not exceed 255 characters')
+    .min(1, 'Street address is required')
+    .max(255, 'Street address must not exceed 255 characters')
     .refine((val) => val.trim().length > 0, {
-      message: "Address line 1 cannot be only whitespace"
+      message: "Street address cannot be only whitespace"
     }),
     shippingAddress2: z.string().optional(),
     shippingAddress3: z.string().optional(),

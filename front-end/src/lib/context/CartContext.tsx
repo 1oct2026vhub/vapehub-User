@@ -348,6 +348,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           setCartItems(updatedCart);
           calculateTotals(updatedCart);
           toast.error(`${itemToRemove?.name || 'Item'} removed from cart`);
+          
+          // Reset loyalty points if cart becomes empty
+          if (updatedCart.length === 0) {
+            setLoyaltyRedemption({
+              isRedeemed: false,
+              pointsData: loyaltyRedemption.pointsData,
+              discountValue: 0,
+              message: null,
+            });
+          }
         }
       } else {
         // Handle as guest cart
@@ -356,6 +366,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
         calculateTotals(updatedCart);
         toast.error(`${itemToRemove?.name || 'Item'} removed from cart`);
+        
+        // Reset loyalty points if cart becomes empty
+        if (updatedCart.length === 0) {
+          setLoyaltyRedemption({
+            isRedeemed: false,
+            pointsData: loyaltyRedemption.pointsData,
+            discountValue: 0,
+            message: null,
+          });
+        }
       }
     } catch (error) {
       console.error('Error removing item from cart:', error);
@@ -365,6 +385,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setCartItems(updatedCart);
       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
       calculateTotals(updatedCart);
+      
+      // Reset loyalty points if cart becomes empty
+      if (updatedCart.length === 0) {
+        setLoyaltyRedemption({
+          isRedeemed: false,
+          pointsData: loyaltyRedemption.pointsData,
+          discountValue: 0,
+          message: null,
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -527,13 +557,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
     setLoyaltyRedemption({
       isRedeemed: false,
-      pointsData: null,
+      pointsData: loyaltyRedemption.pointsData, // Preserve points data
       discountValue: 0,
       message: null,
     });
     deleteCookie('couponDiscount');
     deleteCookie(LOYALTY_COOKIE_NAME);
-  }, []);
+  }, [loyaltyRedemption.pointsData]);
 
   useEffect(() => {
     if (prevSessionRef.current?.user?.id && prevSessionRef.current.user.id !== session?.user?.id) {

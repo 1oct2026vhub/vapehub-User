@@ -1,4 +1,4 @@
-import { ServerActionResponse } from "./config/app.config";
+import { ServerActionResponse, ServerActionStatus } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
@@ -544,11 +544,21 @@ export const deleteNotification = async (id: number): Promise<ServerActionRespon
   });
 };
 // get footer menu
-export const getFooterMenu = async (): Promise<ServerActionResponse<FooterMenuResponse[]>> => {
-  return await handleRequest<FooterMenuResponse[], unknown>({
-    endpoint: API_ROUTES.GET_FOOTER_MENU,
-    method: 'GET',
-  });
+export const getFooterMenu = async (): Promise<FooterMenuResponse> => {
+  try {
+  
+    const response = await fetch(API_ROUTES.GET_FOOTER_MENU);
+    const data = await response.json();    
+    return data;
+  } catch (error) {
+    console.error("Error fetching footer menu:", error);
+    return {
+      data: [],
+      socialLinks: {},
+      status: ServerActionStatus.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
 };
 
 // get header mega menu
@@ -650,8 +660,47 @@ export const getDealsByCategory = async (categoryId: number, payload?: { limit?:
     });
 };
 
-export const getDealProducts = async (dealId: number, payload?: { limit?: number; offset?: number }): Promise<ServerActionResponse<{
-    deal: {
+export const getDealProducts = async (
+  dealId: number, 
+  params?: { 
+    limit?: number; 
+    offset?: number; 
+    product_id?: number 
+  }
+): Promise<ServerActionResponse<{
+  deal: {
+    id: number;
+    name: string;
+    slug: string;
+    image_url: string;
+    deal_type: string;
+    required_qty: number;
+    get_qty: number;
+    fixed_price: number;
+    discount_percent: number;
+    tiered_qty_json: { min: number; discount: number }[] | null;
+    valid_from: string;
+    valid_to: string;
+  };
+  products: ProductInDeal[];
+  pagination: {
+    total_count: number;
+    total_pages: number;
+    current_page: number;
+    limit: number;
+    offset: number;
+    has_next: boolean;
+    has_prev: boolean;
+  };
+}>> => {
+  try {
+    console.log("Fetching Deal Products:", {
+      dealId,
+      params: JSON.stringify(params)
+    });
+
+    const response = await handleRequest<{
+      deal: {
         id: number;
         name: string;
         slug: string;
@@ -664,9 +713,9 @@ export const getDealProducts = async (dealId: number, payload?: { limit?: number
         tiered_qty_json: { min: number; discount: number }[] | null;
         valid_from: string;
         valid_to: string;
-    };
-    products: ProductInDeal[];
-    pagination: {
+      };
+      products: ProductInDeal[];
+      pagination: {
         total_count: number;
         total_pages: number;
         current_page: number;
@@ -674,37 +723,21 @@ export const getDealProducts = async (dealId: number, payload?: { limit?: number
         offset: number;
         has_next: boolean;
         has_prev: boolean;
-    };
-}>> => {
-    return await handleRequest<{
-        deal: {
-            id: number;
-            name: string;
-            slug: string;
-            image_url: string;
-            deal_type: string;
-            required_qty: number;
-            get_qty: number;
-            fixed_price: number;
-            discount_percent: number;
-            tiered_qty_json: { min: number; discount: number }[] | null;
-            valid_from: string;
-            valid_to: string;
-        };
-        products: ProductInDeal[];
-        pagination: {
-            total_count: number;
-            total_pages: number;
-            current_page: number;
-            limit: number;
-            offset: number;
-            has_next: boolean;
-            has_prev: boolean;
-        };
+      };
     }, unknown>({
-        endpoint: API_ROUTES.GET_DEAL_PRODUCTS(dealId, payload),
-        method: 'GET',
+      endpoint: API_ROUTES.GET_DEAL_PRODUCTS(dealId, params),
+      method: 'GET',
     });
+
+    console.log("Deal Products Response:", JSON.stringify(response, null, 2));
+    return response;
+  } catch (error) {
+    console.error("Error fetching deal products:", error);
+    return {
+      status: ServerActionStatus.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error fetching deal products'
+    };
+  }
 };
 
 export const getAllDeals = async (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }): Promise<ServerActionResponse<AllDealsResponse>> => {

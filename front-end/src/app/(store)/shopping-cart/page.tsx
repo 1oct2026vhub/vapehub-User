@@ -37,7 +37,7 @@ const ShoppingCartPage: NextPage = (): ReactElement => {
                 <div className='flex flex-col gap-3.5 md:gap-7.5 w-full'>
                     {
                         cartItems.map((item, idx) => (
-                            <ShoppingCartCard key={idx} />
+                            <ShoppingCartCard key={item.id || idx} item={item} />
                         ))
                     }
                     

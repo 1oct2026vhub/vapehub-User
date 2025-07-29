@@ -230,7 +230,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             setIsLoadingBundles(true);
             const limit = 2;
             const offset = (page - 1) * limit;
-            const response = await getDealProducts(mixAndMatchDeal.id, { limit, offset });
+            const response = await getDealProducts(mixAndMatchDeal.id, {
+                limit,
+                offset,
+                product_id: product.id  // Exclude current product from bundle
+            });
             if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
                 const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id);
                 setBundleProducts(filteredProducts);

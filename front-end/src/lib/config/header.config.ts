@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ServerActionStatus } from './app.config';
 
 // * Zod Form Schemas
 export const HEADER_IN_SCHEMA = z.object({
@@ -18,18 +19,7 @@ export const Header_FORM_CONFIG = {
   
 };
 // * Footer Menu
-export interface FooterMenu {
-  id: number;
-  title: string;
-  order: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null; 
-  links: FooterMenuLinks[];
-}
-// * Footer Menu Links
-interface FooterMenuLinks {
+export interface FooterMenuLink {
   id: number;
   section_id: number;
   label: string;
@@ -40,8 +30,30 @@ interface FooterMenuLinks {
   updated_at: string;
   deleted_at: string | null;
 }
+
+export interface FooterMenu {
+  id: number;
+  title: string;
+  order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  links: FooterMenuLink[];
+}
 // * Footer Menu Response
-export type FooterMenuResponse = FooterMenu;
+export interface FooterMenuResponse {
+  data: FooterMenu[];
+  socialLinks: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    phone_number?: string;
+    email?: string;
+  };
+  status?: ServerActionStatus;
+  message?: string;
+}
 
 
 // * Header Mega Menu

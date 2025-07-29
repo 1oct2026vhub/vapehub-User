@@ -23,6 +23,18 @@ const CartTotal: React.FC = () => {
         }
     }, [couponDiscount, setLoyaltyRedemption]);
 
+    useEffect(() => {
+        if (itemCount === 0) {
+            // Reset loyalty points when cart becomes empty
+            setLoyaltyRedemption(prev => ({ 
+                ...prev, 
+                isRedeemed: false,
+                discountValue: 0,
+                message: null
+            }));
+        }
+    }, [itemCount, setLoyaltyRedemption]);
+
     const handleRedeemToggle = async (checked: boolean) => {
         setIsApplyingLoyalty(true);
         const payload: APPLY_COUPON_PAYLOAD = {

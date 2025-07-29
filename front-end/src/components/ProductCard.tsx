@@ -38,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   return (
     <Link href={link} className="block">
-      <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
+      <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 content-stretch shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
         <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-white rounded-10">
           <NoImage
             src={imageSrc}
@@ -90,7 +90,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 size="md"
                 radius="md"
                 color="primary"
-                className="btn primary-btn shadow-input w-fit !min-w-fit text-content-2 sm:text-content-1 !leading-none max-sm:h-6 sm:max-h-max !px-2 sm:!px-4 !py-2"
+                className="btn primary-btn shadow-input text-content-2 max-w-36 whitespace-pre-wrap sm:text-content-1 !leading-none max-sm:h-6 sm:max-h-max !px-2 sm:!px-4 !py-2"
               >
                 {buttonText}
               </Button>

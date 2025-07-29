@@ -9,6 +9,7 @@ import { Button } from '@nextui-org/button'
 import { FunctionComponent, ReactElement, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 
 interface SubscriptionProps {
     className?: string;
@@ -16,7 +17,7 @@ interface SubscriptionProps {
 
 const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): ReactElement => {
     const [discountAmount, setDiscountAmount] = useState('10');
-    const [discountType, setDiscountType] = useState('percentage');
+    const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
 
     useEffect(() => {
         const fetchSubscriptionSettings = async () => {
@@ -24,10 +25,14 @@ const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): Reac
             
             if (response.status === ServerActionStatus.SUCCESS) {
                 const { discount_amount, discount_type } = response.data;
+                
+                // Validate and set discount type
+                const validDiscountType = discount_type === 'fixed' ? 'fixed' : 'percentage';
+                setDiscountType(validDiscountType);
+
                 // Round the discount amount to the nearest whole number
                 const roundedDiscount = Math.round(parseFloat(discount_amount)).toString();
                 setDiscountAmount(roundedDiscount);
-                setDiscountType(discount_type);
             }
         };
 
@@ -49,11 +54,20 @@ const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): Reac
         subscribeFromConfig.reset({ email: '' });
     }
 
+    // Format discount display based on type
+    const formatDiscount = () => {
+        if (discountType === 'percentage') {
+            return `${discountAmount}%`;
+        }
+        return `${DEFAULT_CURRENCY_SYMBOL}${discountAmount}`;
+    };
+
     return (
         <section className={`bg-subscription-banner-mob xl:bg-subscription-banner bg-no-repeat bg-top xl:bg-right-bottom bg-cover shadow-subscription rounded-3xl px-5.5 pt-14 pb-7 md:py-12 md:px-9 ${className}`}>
             <div className='lg:max-w-[50%] space-y-5.5 lg:space-y-10'>
                 <h3 className='!text-skin-white text-title-2 md:text-h4 font-semibold'>
-                    <span className='text-[3.875rem] md:text-[7rem] leading-none'>{discountAmount}%</span><span> off, especially for you</span>
+                    <span className='text-[3.875rem] md:text-[7rem] leading-none'>{formatDiscount()}</span>
+                    <span> off, especially for you</span>
                 </h3>
                 <p className='!text-content-2 md:!text-title-1 !text-skin-white font-bold'>
                     Sign up to receive your exclusive Vapehub discount, and keep up to date on our latest products & offers!
@@ -78,7 +92,7 @@ const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): Reac
                             isLoading={subscribeFromConfig.formState.isSubmitting}
                             className="btn !rounded-10 bg-skin-neutral-500 !text-skin-white border-skin-white shadow-input text-content-1 md:text-title-2 !px-3.5 !py-2 md:!px-6 md:!py-6"
                         >
-                            Save {discountAmount}%
+                            Save {formatDiscount()}
                         </Button>
                     </form>
                 </Form>

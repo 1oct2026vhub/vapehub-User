@@ -230,7 +230,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             setIsLoadingBundles(true);
             const limit = 2;
             const offset = (page - 1) * limit;
-            const response = await getDealProducts(mixAndMatchDeal.id, { limit, offset });
+            const response = await getDealProducts(mixAndMatchDeal.id, {
+                limit,
+                offset,
+                product_id: product.id  // Exclude current product from bundle
+            });
             if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
                 const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id);
                 setBundleProducts(filteredProducts);
@@ -376,7 +380,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             </>
                         )}
                     </div>
-                    <p className='text-content-2 md:text-title-2 font-bold text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
+                    <p className='text-content-2 md:text-title-2 text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
                     <div className='space-y-4 max-md:order-4'>
                         <div className='bg-skin-white border border-skin-neutral-100 rounded-xl shadow-product-offer p-3.5 space-y-2.5'>
                             <div className='flex gap-1 items-center'>

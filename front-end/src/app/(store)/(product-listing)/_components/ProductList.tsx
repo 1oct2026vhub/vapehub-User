@@ -8,21 +8,49 @@ import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import { isLessThanOneMonth } from "@/lib/config/app.config";
-import { BrandByProductResponse, CategoryResponseData, ProductResponseData, AttributeTerms, NON_VARIANT_FILTERS } from "@/lib/config/product.config";
+import { 
+  ProductResponseData, 
+  CategoryResponseData, 
+  BrandByProductResponse, 
+  Product, 
+  PriceRange, 
+  AttributeTerms, 
+  NON_VARIANT_FILTERS 
+} from '@/lib/config/product.config';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FunctionComponent, ReactElement, useState } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+// import { getAllDeals } from "@/lib/server.actions";
 // import { li } from "framer-motion/client";
 // import { motion } from "framer-motion";
 
-type ProductListProps = {
-  data: CategoryResponseData | BrandByProductResponse | ProductResponseData,
-  reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]
-}
+type ProductListData = Partial<ProductResponseData & CategoryResponseData & BrandByProductResponse> & {
+  products?: Product[];
+  category?: {id: number, name: string, product_count: number}[];
+  brand?: {id: number, name: string, product_count: number}[];
+  deal?: {id: number, name: string, slug: string, product_count: number}[];
+  attributes?: AttributeTerms[];
+  price_ranges?: PriceRange[];
+  pagination?: {
+    total_count: number;
+    total_pages: number;
+    current_page: number;
+    limit: number;
+    offset: number;
+  };
+};
 
-const ProductList: FunctionComponent<ProductListProps> = ({ data, reviews = [] }): ReactElement => {
+type DealOption = {
+  id: number;
+  name: string;
+  slug: string;
+  product_count: number;
+};
+
+const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]}> = ({ data, reviews = [] }): ReactElement => {
+ console.log("FFFFFFdata", data);
  
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +59,27 @@ const ProductList: FunctionComponent<ProductListProps> = ({ data, reviews = [] }
   const searchParams = useSearchParams();
   const { getFilterParams, getAppliedFilters, removeFilter, updateFilters, clearAllFilters } = useProductFilters();
 
+  // const [deals, setDeals] = useState<{id: number, name: string, slug: string}[]>([]);
 
-  const productAttributeTerms: AttributeTerms[] = data?.attributes.filter(attr => attr.attribute.is_visible === true);
+  // useEffect(() => {
+  //   const fetchDeals = async () => {
+  //     try {
+  //       const response = await getAllDeals();
+  //       if (response.status === ServerActionStatus.SUCCESS) {
+  //         setDeals(response.data.deals);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching deals:', error);
+  //     }
+  //   };
+
+  //   fetchDeals();
+  // }, []);
+
+console.log("Attribute Terms", data);
+
+  const productAttributeTerms: AttributeTerms[] = (data?.attributes || [])
+    .filter(attr => attr.attribute?.is_visible === true);
   const appliedFilters = getAppliedFilters(productAttributeTerms);
 console.log("appliedFilters", appliedFilters);
   const handleRemoveFilter = (attributeId: number, type: string) => {
@@ -91,6 +138,7 @@ console.log("appliedFilters", appliedFilters);
   const priceOptions = data?.price_ranges ?? []; 
   const categoryOptions = data?.category ?? [];
   const brandOptions = data?.brand ?? [];
+  const dealOptions = (data as any)?.deal as DealOption[] ?? [];  // Type assertion to bypass type checking
   
    const filterOptions = [
     { 
@@ -101,6 +149,7 @@ console.log("appliedFilters", appliedFilters);
         onChange={(value) => onFilterChange("price_range", value, false)} 
       /> 
     },
+    
     ...(categoryOptions.length > 0 ? [{
       title: "Categories",
       content: <FilterCheckboxGroup
@@ -114,6 +163,7 @@ console.log("appliedFilters", appliedFilters);
         isDisabled={isLoading}
       />
     }] : []),
+    
     ...(brandOptions.length > 0 ? [{
       title: "Brands",
       content: <FilterCheckboxGroup
@@ -127,6 +177,21 @@ console.log("appliedFilters", appliedFilters);
         isDisabled={isLoading}
       />
     }] : []),
+    
+    ...(dealOptions.length > 0 ? [{
+      title: "Deals",
+      content: <FilterCheckboxGroup
+        options={dealOptions.map((deal: DealOption) => ({
+          label: deal.name,
+          value: deal.slug,
+          count: deal.product_count
+        }))}
+        defaultValues={searchParams.get("deal")?.split(",") || []}
+        onChange={(values) => onFilterChange("deal", values.join(","), true)}
+        isDisabled={isLoading}
+      />
+    }] : []),
+    
     ...productAttributeTerms.map(attr => ({
       title: attr.attribute.name,
       content: attr.attribute.type === "select" ? (

@@ -1,7 +1,12 @@
-import { AppliedFilters, AttributeTerms, NON_VARIANT_FILTERS } from "@/lib/config/product.config";
+import { AppliedFilters, AttributeTerms, NON_VARIANT_FILTERS as EXISTING_NON_VARIANT_FILTERS } from "@/lib/config/product.config";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { ProductFilters } from "@/lib/config/product.config";
+
+export const NON_VARIANT_FILTERS = [
+  ...EXISTING_NON_VARIANT_FILTERS,
+  'deal'  // Add deal filter
+];
 
 export const useProductFilters = () => {
   const router = useRouter();
@@ -67,8 +72,9 @@ export const useProductFilters = () => {
 
     // Add static filters
     if (filters.nonVariants?.brand) applied.push({attributeId: 0, attribute: "Brand", count: 1, value: filters.nonVariants.brand, type: "brand"});
-    if (filters.nonVariants?.categories) applied.push({attributeId: 0, attribute: "categories", count: 1, value: filters.nonVariants.categories, type: "categories"});
+    if (filters.nonVariants?.categories) applied.push({attributeId: 0, attribute: "Categories", count: 1, value: filters.nonVariants.categories, type: "categories"});
     if (filters.nonVariants?.price_range) applied.push({attributeId: 0, attribute: "Price Range", count: 1, value: filters.nonVariants.price_range, type: "price"});
+    if (filters.nonVariants?.deal) applied.push({attributeId: 0, attribute: "Deals", count: 1, value: filters.nonVariants.deal, type: "deal"});
 
     // Add dynamic variant filters
     Object.entries(filters.variants || {}).forEach(([attributeId, values]) => {
@@ -81,8 +87,13 @@ export const useProductFilters = () => {
             const term = attribute.terms.find(t => t.id.toString() === value);
             return term?.name || value;
           });
-          // applied.push(`${attribute.attribute.name} (${termNames.length} ${termNames.length > 1 ?  "items" : "item"})`);
-          applied.push({attributeId: attribute.attribute.id, attribute: attribute.attribute.name, count: termNames.length, value: termNames.join(","), type: attribute.attribute.type}) 
+          applied.push({
+            attributeId: attribute.attribute.id, 
+            attribute: attribute.attribute.name, 
+            count: termNames.length, 
+            value: termNames.join(","), 
+            type: attribute.attribute.type
+          });
         }
       }
     });
@@ -104,6 +115,10 @@ export const useProductFilters = () => {
     } else if (type === "price") {
       if (filters.nonVariants) {
         delete filters.nonVariants.price_range;
+      }
+    } else if (type === "deal") {
+      if (filters.nonVariants) {
+        delete filters.nonVariants.deal;
       }
     } else {
       // Find attribute by name

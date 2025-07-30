@@ -162,15 +162,14 @@ console.log("appliedFilters", appliedFilters);
     
     ...(dealOptions.length > 0 ? [{
       title: "Deals",
-      content: <FilterCheckboxGroup
+      content: <FilterRadioGroup
         options={dealOptions.map((deal: DealOption) => ({
           label: deal.name,
-          value: deal.slug,
+          value: deal.id.toString(),
           count: deal.product_count
         }))}
-        defaultValues={searchParams.get("deal")?.split(",") || []}
-        onChange={(values) => onFilterChange("deal", values.join(","), true)}
-        isDisabled={isLoading}
+        defaultValues={searchParams.get("deal") || ""}
+        onChange={(value) => onFilterChange("deal", value, false)}
       />
     }] : []),
     

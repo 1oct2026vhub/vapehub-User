@@ -52,11 +52,13 @@ export const signInAction = async (
   export const signUpAction = async ({
     email,
     password,
+    mail_subscription,
     referralCode
   }: SignUpFormSchema & { referralCode: string }): Promise<ServerActionResponse<{message: string}>> => {
     const payload = {
       email,
-      password
+      password,
+      mail_subscription
     };
     return await handleRequest<{message: string}, typeof payload>({
       endpoint: API_ROUTES.AUTH.REGISTER(referralCode),

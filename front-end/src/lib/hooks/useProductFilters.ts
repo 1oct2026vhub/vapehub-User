@@ -5,7 +5,7 @@ import { ProductFilters } from "@/lib/config/product.config";
 
 export const NON_VARIANT_FILTERS = [
   ...EXISTING_NON_VARIANT_FILTERS,
-  'deal'  // Add deal filter
+  'deal_id'  // Add deal filter
 ];
 
 export const useProductFilters = () => {
@@ -74,7 +74,7 @@ export const useProductFilters = () => {
     if (filters.nonVariants?.brand) applied.push({attributeId: 0, attribute: "Brand", count: 1, value: filters.nonVariants.brand, type: "brand"});
     if (filters.nonVariants?.categories) applied.push({attributeId: 0, attribute: "Categories", count: 1, value: filters.nonVariants.categories, type: "categories"});
     if (filters.nonVariants?.price_range) applied.push({attributeId: 0, attribute: "Price Range", count: 1, value: filters.nonVariants.price_range, type: "price"});
-    if (filters.nonVariants?.deal) applied.push({attributeId: 0, attribute: "Deals", count: 1, value: filters.nonVariants.deal, type: "deal"});
+    if (filters.nonVariants?.deal_id) applied.push({attributeId: 0, attribute: "Deals", count: 1, value: filters.nonVariants.deal_id, type: "deal"});
 
     // Add dynamic variant filters
     Object.entries(filters.variants || {}).forEach(([attributeId, values]) => {

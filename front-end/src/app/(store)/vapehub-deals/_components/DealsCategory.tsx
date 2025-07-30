@@ -94,7 +94,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
         if (selectedValues.length > 0) {
             // If deal is selected, include both category and deal
             params.append('categories', category.id.toString());
-            params.append('deal', selectedValues[0]); // Use the first selected deal
+            params.append('deal_id', selectedValues[0]); // Use the first selected deal
         } else {
             // If no deal selected, only include category
             params.append('categories', category.id.toString());

@@ -20,7 +20,8 @@ import {
   ProductResponseData, 
   CategoryResponseData, 
   BrandByProductResponse,
-  MoreLikeThisResponse
+  MoreLikeThisResponse,
+  ProductResponse
 } from '@/lib/config/product.config';
 import { ReferralStatsResponse } from "./config/referral.config";
 import { SignUpFormSchema } from "./config/register.config";
@@ -156,8 +157,8 @@ export const getProductById = async (
   });
 };
  
-export const getProductVariantByID = async (payload: PRODUCT_VARIANT_PAYLOAD): Promise<ServerActionResponse<ProductResponseData>> => {
-  return await handleRequest<ProductResponseData, unknown>({
+export const getProductVariantByID = async (payload: PRODUCT_VARIANT_PAYLOAD): Promise<ServerActionResponse<ProductResponse>> => {
+  return await handleRequest<ProductResponse, unknown>({
     endpoint: API_ROUTES.GET_PRODUCT_VARIANT_BY_ID,
     payload,
     method: 'POST',

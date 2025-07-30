@@ -130,6 +130,7 @@ export interface SimilarProduct extends Product {
 
 export interface MoreLikeThisResponse {
     products: Product[];
+    similar_products: SimilarProduct[];
     pagination: {
         total_count: number;
         total_pages: number;

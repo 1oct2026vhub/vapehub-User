@@ -26,7 +26,7 @@ import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 // import { li } from "framer-motion/client";
 // import { motion } from "framer-motion";
 
-type ProductListData = Partial<ProductResponseData & CategoryResponseData & BrandByProductResponse> & {
+type ProductListData = Partial<ProductResponseData & Omit<CategoryResponseData, 'updated_by'> & Omit<BrandByProductResponse, 'updated_by'>> & {
   products?: Product[];
   category?: {id: number, name: string, product_count: number}[];
   brand?: {id: number, name: string, product_count: number}[];
@@ -40,6 +40,7 @@ type ProductListData = Partial<ProductResponseData & CategoryResponseData & Bran
     limit: number;
     offset: number;
   };
+  updated_by?: number | string | null;
 };
 
 type DealOption = {
@@ -49,32 +50,13 @@ type DealOption = {
   product_count: number;
 };
 
-const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]}> = ({ data, reviews = [] }): ReactElement => {
- console.log("FFFFFFdata", data);
- 
+const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]}> = ({ data, reviews = [] }): ReactElement => { 
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { getFilterParams, getAppliedFilters, removeFilter, updateFilters, clearAllFilters } = useProductFilters();
-
-  // const [deals, setDeals] = useState<{id: number, name: string, slug: string}[]>([]);
-
-  // useEffect(() => {
-  //   const fetchDeals = async () => {
-  //     try {
-  //       const response = await getAllDeals();
-  //       if (response.status === ServerActionStatus.SUCCESS) {
-  //         setDeals(response.data.deals);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching deals:', error);
-  //     }
-  //   };
-
-  //   fetchDeals();
-  // }, []);
 
 console.log("Attribute Terms", data);
 
@@ -138,7 +120,7 @@ console.log("appliedFilters", appliedFilters);
   const priceOptions = data?.price_ranges ?? []; 
   const categoryOptions = data?.category ?? [];
   const brandOptions = data?.brand ?? [];
-  const dealOptions = (data as any)?.deal as DealOption[] ?? [];  // Type assertion to bypass type checking
+  const dealOptions = (data?.deal as DealOption[]) ?? [];
   
    const filterOptions = [
     { 

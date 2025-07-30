@@ -28,7 +28,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
       return;
     }
     if (newQuantity > item.stock) {
-      setError(`Only ${item.stock} items available in stock`);
+      setError("Out of stock");
       return;
     }
     setError(null);
@@ -46,7 +46,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
       if (numValue < 1) {
         setError(`Minimum quantity is 1`);
       } else if (numValue > item.stock) {
-        setError(`Only ${item.stock} items available in stock`);
+        setError(`Out of stock`);
       } else {
         setError(null);
         updateItemQuantity(item.id, numValue, item.name);

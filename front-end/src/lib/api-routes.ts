@@ -105,6 +105,7 @@ export const API_ROUTES = {
     GET_CATEGORIES_WITH_DEALS: (payload?: CategoriesWithDealsPayload) => buildRequestUrl(`/api/product/categories-with-deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_DEALS_BY_CATEGORY: (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }) => buildRequestUrl(`/api/product/category/${categoryId}/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_DEAL_PRODUCTS: (dealId: number, params?: { limit?: number; offset?: number; product_id?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
+    GET_PRODUCTS_BY_DEAL_SLUG: (slug: string, params?: Record<string, unknown>) => buildRequestUrl(`/api/deals/slug/${slug}${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
     GET_MAIL_SUBSCRIPTION_SETTINGS: buildRequestUrl('/api/mailSubscription/settings'),
 };
 

@@ -9,7 +9,14 @@ import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 
 type DealProps = {
-  data: ProductResponseData;
+  data: {
+    products: ProductResponseData['products'];
+    category: ProductResponseData['category'];
+    brand: ProductResponseData['brand'];
+    attributes: ProductResponseData['attributes'];
+    price_ranges: ProductResponseData['price_ranges'];
+    pagination?: ProductResponseData['pagination'];
+  };
   deal: Deal;
   reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]
 }
@@ -37,19 +44,17 @@ const DealProduct: React.FC<DealProps> = ({ data, deal, reviews }): ReactElement
     subCategories: [],
   };
 
-  // const productListData = {
-  //   ...data,
-  //   name: deal.name,
-  //   description: deal.name,
-  // };
-
   return (
     <div>
       <section className="product-listing-container flex-col">
         <BreadCrumbs items={breadcrumbs} />
         <ProductListingContent data={productListingData} />
       </section>
-      <ProductList data={data} reviews={reviews} />
+      <ProductList data={{
+        ...data,
+        category: data.category || [],
+        brand: data.brand || [],
+      }} reviews={reviews} />
       <section className="product-listing-container">
         <FAQSection type="common" id={deal.id} />
       </section>

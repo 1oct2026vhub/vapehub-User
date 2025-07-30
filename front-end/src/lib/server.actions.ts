@@ -13,7 +13,16 @@ import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config"
 import { NotificationListResponse } from "./config/notification.config";
 import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
-import { BrandByProductResponse, CategoryResponseData, MoreLikeThisResponse, Product, ProductResponseData, ProductResponse } from "./config/product.config";
+import { 
+  Product, 
+  AttributeTerms, 
+  PriceRange, 
+  ProductResponseData, 
+  CategoryResponseData, 
+  BrandByProductResponse,
+  MoreLikeThisResponse,
+  ProductResponse
+} from '@/lib/config/product.config';
 import { ReferralStatsResponse } from "./config/referral.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
@@ -791,6 +800,55 @@ export const getMailSubscriptionSettings = async (): Promise<ServerActionRespons
     updatedAt: string;
   }, unknown>({
     endpoint: API_ROUTES.GET_MAIL_SUBSCRIPTION_SETTINGS,
+    method: 'GET',
+  });
+};
+
+export const getProductsByDealSlug = async (
+  slug: string, 
+  params?: {
+    keyword?: string;
+    price_range?: string;
+    is_new?: boolean;
+    categories?: string;
+    brand?: string;
+    flavours?: string;
+    variants?: Record<string, number[]>;
+    sort_by?: string;
+    order?: 'ASC' | 'DESC';
+    limit?: number;
+    offset?: number;
+    productId?: number;
+  }
+): Promise<ServerActionResponse<{
+  products: Product[];
+  category_items: {id: number, name: string, slug: string, product_count: number}[];
+  brand_items: {id: number, name: string, slug: string, product_count: number}[];
+  attributes: AttributeTerms[];
+  price_ranges: PriceRange[];
+  pagination: {
+    total_count: number;
+    total_pages: number;
+    current_page: number;
+    limit: number;
+    offset: number;
+  };
+}>> => {
+  return await handleRequest<{
+    products: Product[];
+    category_items: {id: number, name: string, slug: string, product_count: number}[];
+    brand_items: {id: number, name: string, slug: string, product_count: number}[];
+    attributes: AttributeTerms[];
+    price_ranges: PriceRange[];
+    pagination: {
+      total_count: number;
+      total_pages: number;
+      current_page: number;
+      limit: number;
+      offset: number;
+    };
+  }, unknown>({
+    endpoint: API_ROUTES.GET_PRODUCTS_BY_DEAL_SLUG(slug, params),
     method: 'GET',
   });
 };

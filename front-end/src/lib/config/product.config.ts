@@ -129,33 +129,14 @@ export interface SimilarProduct extends Product {
 }
 
 export interface MoreLikeThisResponse {
-    source_product: {
-        id: number;
-        name: string;
-        slug: string;
-        categories: {
-            id: number;
-            name: string;
-            slug: string;
-        }[];
-        attributes: {
-            attribute: {
-                id: number;
-                name: string;
-                type: string;
-            };
-            term: {
-                id: number;
-                name: string;
-                slug: string;
-            };
-        }[];
-    };
+    products: Product[];
     similar_products: SimilarProduct[];
-    pagination: Pagination;
-    summary: {
-        total_similar_products: number;
-        average_similarity_score: number;
+    pagination: {
+        total_count: number;
+        total_pages: number;
+        current_page: number;
+        limit: number;
+        offset: number;
     };
 }
  
@@ -180,10 +161,10 @@ interface CATEGORY {
     product_count: number;
     slug: string;
 }
-interface PriceRange {
+export interface PriceRange {
     label: string;
-    count: number;
     value: string;
+    count: number;
 }
 
 export interface BrandByProductResponse extends BrandConfig {
@@ -291,4 +272,9 @@ export interface AppliedFilters {
     type: string;
 }
 
-export const NON_VARIANT_FILTERS = ['brand', 'categories', 'price_range', 'order', 'offset'];
+export const NON_VARIANT_FILTERS = [
+    'brand', 
+    'categories', 
+    'price_range', 
+    'deal'  // Add deal filter
+];

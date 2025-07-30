@@ -1,4 +1,4 @@
-import { getAllDeals, getProductList, getReviewOrderByProductId } from "@/lib/server.actions";
+import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { notFound } from 'next/navigation';
 import { Deal } from "@/lib/config/deal.config";
@@ -30,9 +30,9 @@ const Page = async ({ params, searchParams }: {
   }
 
   const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
-  const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParamsData)), deal_id: deal.id };
+  const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParamsData)) };
 
-  const productsResponse = await getProductList(combinedParams);
+  const productsResponse = await getProductsByDealSlug(slug, combinedParams);
   
   if (productsResponse.status === ServerActionStatus.ERROR || !productsResponse.data?.products) {
     return notFound();
@@ -42,7 +42,18 @@ const Page = async ({ params, searchParams }: {
     productsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
   ) : [];
   
-  return <DealProduct deal={deal} data={productsResponse.data} reviews={reviews} />;
+  return <DealProduct 
+    deal={deal} 
+    data={{
+      products: productsResponse.data.products,
+      category: productsResponse.data.category_items,
+      brand: productsResponse.data.brand_items,
+      attributes: productsResponse.data.attributes,
+      price_ranges: productsResponse.data.price_ranges,
+      pagination: productsResponse.data.pagination
+    }} 
+    reviews={reviews} 
+  />;
 };
 
 export default Page;
@@ -61,8 +72,8 @@ export async function generateMetadata({ params, searchParams }: {
 
     if (deal) {
       const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
-      const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParamsData)), deal_id: deal.id };
-      const productsResponse = await getProductList(combinedParams);
+      const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParamsData)) };
+      const productsResponse = await getProductsByDealSlug(slug, combinedParams);
       
       if (productsResponse.status === ServerActionStatus.SUCCESS) {
         return {

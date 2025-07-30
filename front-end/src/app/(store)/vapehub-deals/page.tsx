@@ -47,7 +47,9 @@ const VapehubDeals: NextPage = () => {
                 </div>
             </section>
             <section className='border-t border-skin-neutral-200 product-listing-container flex flex-col !gap-7 lg:!gap-12.5'>
-                 {deals.map(category => (
+                 {deals
+                    .filter(category => category.deals && category.deals.length > 0)
+                    .map(category => (
                     <DealsCategory key={category.id} category={category} />
                  ))}
             </section>

@@ -2,6 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { Category } from '@/lib/config/category.config';
 import { BrandConfig } from '@/lib/config/brand.config';
+import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 
 const banners = [
@@ -12,9 +13,17 @@ const banners = [
 
 type CategoryProps = {
     data: Category | BrandConfig;
+    dynamicPageSlug?: DynamicPageSlugResponse;
 }
 
-const ProductListingContent: React.FC<CategoryProps> = ({data}) => {
+const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug}) => {
+    // Use dynamic deals data if available, otherwise fall back to static banners
+    const dynamicBanners = (dynamicPageSlug?.deals?.map((deal, index) => ({
+        src: deal.image_url || '/images/no-image.png',
+        alt: deal.name,
+        deal: deal
+    })) || banners).slice(0, 3);
+
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
@@ -24,12 +33,12 @@ const ProductListingContent: React.FC<CategoryProps> = ({data}) => {
                         {'description' in data ? data.description : ''}
                     </p>
                     <p>
-                        Get the most for your money with our amazing 3 for £10 deal and 3 for £30 offer on disposable vapes from leading brands! Mix & Match to find the perfect combination of devices, or just stock up on great deals. They’re not our only multibuy deals, we have plenty more!
+                        {dynamicPageSlug?.deals_text || "Get the most for your money with our amazing 3 for £10 deal and 3 for £30 offer on disposable vapes from leading brands! Mix & Match to find the perfect combination of devices, or just stock up on great deals. They're not our only multibuy deals, we have plenty more!"}
                     </p>
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-            {banners.map((banner, index) => (
+            {dynamicBanners.map((banner, index) => (
                     <Link href="#" key={index} aria-label={`View details of ${banner.alt}`}>
                         <Image
                             src={banner.src}

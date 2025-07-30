@@ -71,6 +71,24 @@ export interface DynamicPageSlugResponse {
     entity_type: "category" |  "product" | "blog" | "blog_category";
     entity_id: number; 
     seo: SeoData | null;
+    deals?: Array<{
+        id: number;
+        name: string;
+        slug: string;
+        deal_type: string;
+        required_qty: number;
+        get_qty?: number;
+        fixed_price: string;
+        discount_percent?: number;
+        tiered_qty_json?: { min: number; discount: number }[] | null;
+        valid_from: string;
+        valid_to: string;
+        image_url?: string | null;
+        product_count: number;
+        bundle_product_ids_json?: string | null;
+        createdAt: string;
+    }>;
+    deals_text?: string;
 }
 
 export type FlashNewsResponse = FlashNewsItem[];

@@ -168,8 +168,8 @@ console.log("appliedFilters", appliedFilters);
           value: deal.id.toString(),
           count: deal.product_count
         }))}
-        defaultValues={searchParams.get("deal") || ""}
-        onChange={(value) => onFilterChange("deal", value, false)}
+        defaultValues={searchParams.get("deal_id") || ""}
+        onChange={(value) => onFilterChange("deal_id", value, false)}
       />
     }] : []),
     

@@ -276,5 +276,5 @@ export const NON_VARIANT_FILTERS = [
     'brand', 
     'categories', 
     'price_range', 
-    'deal'  // Add deal filter
+    'deal_id'  // Add deal filter
 ];

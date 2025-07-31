@@ -18,7 +18,7 @@ type CategoryProps = {
 
 const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug}) => {
     // Use dynamic deals data if available, otherwise fall back to static banners
-    const dynamicBanners = (dynamicPageSlug?.deals?.map((deal, index) => ({
+    const dynamicBanners = (dynamicPageSlug?.deals?.map((deal) => ({
         src: deal.image_url || '/images/no-image.png',
         alt: deal.name,
         deal: deal

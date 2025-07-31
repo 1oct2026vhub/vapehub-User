@@ -10,6 +10,7 @@ const protectedRoutes = [
   ROUTES.MY_ACCOUNT_REFERRALS,
   ROUTES.MY_ACCOUNT_ADDRESSES,
   ROUTES.MY_ACCOUNT_SECURITY,
+  ROUTES.MY_ACCOUNT_LOYALTY_POINTS, // Add loyalty points route
 ]
 
 export async function middleware(request: NextRequest) {

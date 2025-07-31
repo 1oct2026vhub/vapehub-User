@@ -84,12 +84,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
 
     const allImages: productAllImages[] = cartEntity?.all_images ?? product?.all_images ?? [];
     const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
-
-    const stock = cartEntity?.stock ?? 0;
+    const stock = cartEntity?.stock && cartEntity?.stock_status === 'in_stock' ? cartEntity?.stock : 0;
     const price = cartEntity?.price ?? (product as { price?: number })?.price ?? 0;
     const regularPrice = cartEntity?.regular_price ?? (product as { regular_price?: number })?.regular_price ?? 0;
-
-
     const productName = productVariant
         ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`
         : product?.name;
@@ -484,7 +481,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             <Divider />
             {bundleProducts.length > 0 && (
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
-                    <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Bundle together and save 5%</h2>
+                    <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Bundle together</h2>
                     <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
                         {bundleProducts?.map((bundleProduct) => (
                             <BundleProductCard key={bundleProduct.id} product={bundleProduct} />

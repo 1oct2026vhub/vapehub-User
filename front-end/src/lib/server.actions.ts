@@ -836,6 +836,17 @@ export const getProductsByDealSlug = async (
     offset: number;
   };
 }>> => {
+  // Log the API call with parameters
+  const apiUrl = API_ROUTES.GET_PRODUCTS_BY_DEAL_SLUG(slug, params);
+  console.log('🔗 Backend API Call:', {
+    url: apiUrl,
+    slug: slug,
+    params: params,
+    queryString: apiUrl.split('?')[1] || 'No query params',
+    fullUrl: apiUrl,
+    timestamp: new Date().toISOString()
+  });
+
   return await handleRequest<{
     products: Product[];
     category_items: {id: number, name: string, slug: string, product_count: number}[];

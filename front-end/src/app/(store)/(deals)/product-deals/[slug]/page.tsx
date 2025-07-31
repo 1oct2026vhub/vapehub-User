@@ -30,10 +30,40 @@ const Page = async ({ params, searchParams }: {
   }
 
   const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
-  const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParamsData)) };
+  
+  // Process search parameters with proper attribute filter handling
+  const variantParams = Object.entries(searchParamsData)
+    .reduce((acc: Record<string, unknown>, [key, value]) => {
+      if (key.startsWith('attribute_')) {
+        const attributeId = key.replace('attribute_', '');
+        const values = value.split(',').map(Number);
+
+        // Build variant object
+        const variantObj = acc.variant ? JSON.parse(acc.variant as string) : {};
+        variantObj[attributeId] = values;
+
+        // Encode variant object as URL parameter
+        acc.variant = JSON.stringify(variantObj);
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, { ...defaultParams });
+    
+  const combinedParams = { ...defaultParams, ...variantParams };
+
+  // Log the parameters being passed to the API
+  console.log('📋 Product Deals Page - API Parameters:', {
+    slug: slug,
+    searchParamsData: searchParamsData,
+    defaultParams: defaultParams,
+    variantParams: variantParams,
+    combinedParams: combinedParams,
+    fullUrl: `${process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL}/api/deals/slug/${slug}?${new URLSearchParams(Object.fromEntries(Object.entries(combinedParams).map(([key, value]) => [key, String(value)]))).toString()}`
+  });
 
   const productsResponse = await getProductsByDealSlug(slug, combinedParams);
-  
+  console.log("Products response deals", productsResponse);
   if (productsResponse.status === ServerActionStatus.ERROR || !productsResponse.data?.products) {
     return notFound();
   }
@@ -72,7 +102,27 @@ export async function generateMetadata({ params, searchParams }: {
 
     if (deal) {
       const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
-      const combinedParams = { ...defaultParams, ...Object.fromEntries(Object.entries(searchParamsData)) };
+      
+      // Process search parameters with proper attribute filter handling for metadata
+      const variantParams = Object.entries(searchParamsData)
+        .reduce((acc: Record<string, unknown>, [key, value]) => {
+          if (key.startsWith('attribute_')) {
+            const attributeId = key.replace('attribute_', '');
+            const values = value.split(',').map(Number);
+
+            // Build variant object
+            const variantObj = acc.variant ? JSON.parse(acc.variant as string) : {};
+            variantObj[attributeId] = values;
+
+            // Encode variant object as URL parameter
+            acc.variant = JSON.stringify(variantObj);
+          } else {
+            acc[key] = value;
+          }
+          return acc;
+        }, { ...defaultParams });
+        
+      const combinedParams = { ...defaultParams, ...variantParams };
       const productsResponse = await getProductsByDealSlug(slug, combinedParams);
       
       if (productsResponse.status === ServerActionStatus.SUCCESS) {

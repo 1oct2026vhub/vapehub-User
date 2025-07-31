@@ -1,6 +1,6 @@
 import React from "react";
 import SectionHeading from "@/components/ui/SectionHeading";
-import ViewAllLink from "@/components/ui/ViewAllLink";
+// import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
 import { getMoreLikeThis } from "@/lib/server.actions";
 import { AsyncReactElement, ServerActionStatus } from "@/lib/config/app.config";
@@ -15,7 +15,7 @@ interface RelatedProductsProps {
 
 const RelatedProducts: React.FC<RelatedProductsProps> = async ({
   title = "More Like This",
-  viewAllHref = "#", 
+  // viewAllHref = "#", 
   currentProductId
 }): AsyncReactElement => {
   const response = await getMoreLikeThis({product_id: currentProductId, limit: 10, offset: 0});
@@ -46,7 +46,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
     <section className="space-y-4.5 md:space-y-7.5">
       <div className="flex items-center justify-between">
         <SectionHeading title={title} />
-        <ViewAllLink href={viewAllHref} />
+        {/* <ViewAllLink href={viewAllHref} /> */}
       </div>
       <div className="slider-container section-slider products-slider">
         <ProductsSlider data={productResponse} isListing={true}/>

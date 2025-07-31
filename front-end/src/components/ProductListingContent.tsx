@@ -29,9 +29,9 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
             <div className='space-y-4'>
                 <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>{data.name}</h1>
                 <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">
-                    <p>
+                    {/* <p>
                         {'description' in data ? data.description : ''}
-                    </p>
+                    </p> */}
                     <p>
                         {dynamicPageSlug?.deals_text || "Get the most for your money with our amazing 3 for £10 deal and 3 for £30 offer on disposable vapes from leading brands! Mix & Match to find the perfect combination of devices, or just stock up on great deals. They're not our only multibuy deals, we have plenty more!"}
                     </p>

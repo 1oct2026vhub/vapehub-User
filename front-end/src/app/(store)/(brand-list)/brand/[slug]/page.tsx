@@ -2,10 +2,11 @@ import { AsyncReactElement, RouteParams, ServerActionResponse, ServerActionStatu
 import { NextPage } from 'next';
 import React from 'react';
 import BrandProducts from '../_components/BrandProducts';
-import { getProductByBrand, getReviewOrderByProductId } from '@/lib/server.actions';
+import { getProductByBrand, getReviewOrderByProductId, getDynamicPageSlug } from '@/lib/server.actions';
 import { notFound } from 'next/navigation';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
+import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 
 
 interface Props {
@@ -19,6 +20,12 @@ const BrandPage: NextPage<Props> = async ({
   const slug = (await params).slug as string;
   const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 } as const;
   const searchParamsData = await searchParams;
+  
+  // Fetch dynamic page slug data
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
+  if (!dynamicPageSlug) {
+    return notFound();
+  }
   // Convert search params to variant structure
   const variantParams = Object.entries(searchParamsData)
     .reduce((acc: Record<string, unknown>, [key, value]) => {
@@ -47,7 +54,7 @@ const BrandPage: NextPage<Props> = async ({
     ) : [];
 
     return (
-      <BrandProducts data={brandProduct} reviews={reviews} />
+      <BrandProducts data={brandProduct} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
     );
   }
   notFound();
@@ -57,6 +64,14 @@ const BrandPage: NextPage<Props> = async ({
 
 export default BrandPage;
  
+const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
+  const response = await getDynamicPageSlug(slug);
+  if (response.status === ServerActionStatus.ERROR) {
+    return null;
+  }
+  return response.data;
+};
+
 const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
   const response = await getProductByBrand(slug, params);
   console.log("Brand response", response);

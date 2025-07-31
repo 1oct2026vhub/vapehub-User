@@ -109,7 +109,7 @@ const Page = async ({
         const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = category.products ? await Promise.all(
           category.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
         ) : [];
-        return <CategoryProducts data={category} reviews={reviews} />;
+        return <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />;
       }
       return null;
     },

@@ -118,7 +118,7 @@ export const useProductFilters = () => {
       }
     } else if (type === "deal") {
       if (filters.nonVariants) {
-        delete filters.nonVariants.deal;
+        delete filters.nonVariants.deal_id;
       }
     } else {
       // Find attribute by name

@@ -6,14 +6,17 @@ import { CategoryResponseData } from '@/lib/config/product.config';
 import FAQSection from '@/components/FAQSection';
 import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
+import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 
 type CategoryProps = {
   data: CategoryResponseData;
   reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+  dynamicPageSlug?: DynamicPageSlugResponse;
 }
 
 
-const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews }): ReactElement => {
+const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageSlug }): ReactElement => {
+  console.log("dynamicPageSlug", dynamicPageSlug);
   
   const breadcrumbs = [
     { label: "Home", href: "/" },
@@ -23,7 +26,7 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews }): ReactElem
     <div>
       <section className="product-listing-container flex-col">
         <BreadCrumbs items={breadcrumbs} />
-        <ProductListingContent data={data} />
+        <ProductListingContent data={data} dynamicPageSlug={dynamicPageSlug} />
       </section>
       <ProductList data={data} reviews={reviews} />
       <section className="product-listing-container">

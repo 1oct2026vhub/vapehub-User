@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import MobileSubMenu from './MobileSubMenu';
 import { useCart } from '@/lib/context/CartContext';
 import { ROUTES } from '@/lib/routes';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Category, defaultNavLinks } from '@/lib/config/category.config';
 
 type Props = {
@@ -32,6 +32,11 @@ const MobileMenu = ({ categories }: Props) => {
     const [isFooterVisible, setFooterVisible] = useState(true);
     const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading } = useCart();
     const router = useRouter();
+    const pathname = usePathname();
+    
+    // Check if we're on the verification email page
+    const isVerificationPage = pathname.includes('/verify-email');
+    
     const itemClasses = {
         base: "w-full rounded-lg shadow-input border border-skin-neutral-100",
         title: "text-title-2 font-bold uppercase",
@@ -112,15 +117,18 @@ const MobileMenu = ({ categories }: Props) => {
                         </div>
                         <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                         <div className="flex items-center gap-1">
-                            <Link href={ROUTES.MY_ACCOUNT} onClick={handleMenuClose}>
-                                <UserIcon />
-                            </Link>
-                            <Badge color="default" content={itemCount} shape="circle" variant='faded' className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
-                                <Button isIconOnly size="sm" aria-label="more than 99 cart items" radius="full" variant="light" onPress={onCartOpen}>
-                                    <ShoppingCartIcon />
-                                </Button>
-                            </Badge>
-
+                            {!isVerificationPage && (
+                                <>
+                                    <Link href={ROUTES.MY_ACCOUNT} onClick={handleMenuClose}>
+                                        <UserIcon />
+                                    </Link>
+                                    <Badge color="default" content={itemCount} shape="circle" variant='faded' className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
+                                        <Button isIconOnly size="sm" aria-label="more than 99 cart items" radius="full" variant="light" onPress={onCartOpen}>
+                                            <ShoppingCartIcon />
+                                        </Button>
+                                    </Badge>
+                                </>
+                            )}
                         </div>
                     </DrawerHeader>
                     <DrawerBody className='py-4 px-4'>
@@ -192,73 +200,75 @@ const MobileMenu = ({ categories }: Props) => {
                 </DrawerContent>
             </Drawer>
 
-            <Drawer isOpen={isCartOpen} onOpenChange={onCartClose} className='filter-drawer rounded-l-32 md:!w-[637px] max-w-[90%] md:!max-w-[637px]'>
-                <DrawerContent>
-                    <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
-                        <h1 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h1>
-                    </DrawerHeader>
-                    <DrawerBody className='max-sm:px-4'>
-                        <div className='space-y-5 my-3'>
-                            {cartItems.length > 0 ? (
-                                cartItems.map((item, idx) => (
-                                    <ShoppingCartCardDrawer key={idx} item={item} />
-                                ))
-                            ) : (
-                                <div className="flex flex-col items-center justify-center gap-4 py-8">
-                                    <p className="text-content-2 text-skin-neutral-500">Your cart is empty</p>
-                                    <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button">
-                                        Continue Shopping
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
-                    </DrawerBody>
-                    {cartItems.length > 0 && (
-                        <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100s'>
-                            <Divider />
-                            <ShippingProgress />
-                            <div className='space-y-3'>
-                                <div className='flex items-center justify-between text-black font-semibold'>
-                                    <p className='text-content-2 md:text-title-1'>Total</p>
-                                    <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
-                                </div>
-                                <Button
-                                    onPress={handleCheckout}
-                                    size="lg"
-                                    radius="md"
-                                    color="primary"
-                                    className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
-                                    isLoading={stockValidationLoading}
-                                >
-                                    Checkout Now
-                                </Button>
-                                <div className='flex items-center gap-3'>
-                                    <Button
-                                        as={Link}
-                                        href={ROUTES.SHOP}
-                                        size="lg"
-                                        radius="md"
-                                        color="primary"
-                                        className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
-                                    >
-                                        Keep Shopping
-                                    </Button>
-                                    <Button
-                                        as={Link}
-                                        href={ROUTES.SHOPPING_CART}
-                                        size="lg"
-                                        radius="md"
-                                        color="primary"
-                                        className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
-                                    >
-                                        View Cart
-                                    </Button>
-                                </div>
+            {!isVerificationPage && (
+                <Drawer isOpen={isCartOpen} onOpenChange={onCartClose} className='filter-drawer rounded-l-32 md:!w-[637px] max-w-[90%] md:!max-w-[637px]'>
+                    <DrawerContent>
+                        <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
+                            <h1 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h1>
+                        </DrawerHeader>
+                        <DrawerBody className='max-sm:px-4'>
+                            <div className='space-y-5 my-3'>
+                                {cartItems.length > 0 ? (
+                                    cartItems.map((item, idx) => (
+                                        <ShoppingCartCardDrawer key={idx} item={item} />
+                                    ))
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center gap-4 py-8">
+                                        <p className="text-content-2 text-skin-neutral-500">Your cart is empty</p>
+                                        <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button">
+                                            Continue Shopping
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
-                        </DrawerFooter>
-                    )}
-                </DrawerContent>
-            </Drawer>
+                        </DrawerBody>
+                        {cartItems.length > 0 && (
+                            <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100s'>
+                                <Divider />
+                                <ShippingProgress />
+                                <div className='space-y-3'>
+                                    <div className='flex items-center justify-between text-black font-semibold'>
+                                        <p className='text-content-2 md:text-title-1'>Total</p>
+                                        <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
+                                    </div>
+                                    <Button
+                                        onPress={handleCheckout}
+                                        size="lg"
+                                        radius="md"
+                                        color="primary"
+                                        className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                        isLoading={stockValidationLoading}
+                                    >
+                                        Checkout Now
+                                    </Button>
+                                    <div className='flex items-center gap-3'>
+                                        <Button
+                                            as={Link}
+                                            href={ROUTES.SHOP}
+                                            size="lg"
+                                            radius="md"
+                                            color="primary"
+                                            className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                        >
+                                            Keep Shopping
+                                        </Button>
+                                        <Button
+                                            as={Link}
+                                            href={ROUTES.SHOPPING_CART}
+                                            size="lg"
+                                            radius="md"
+                                            color="primary"
+                                            className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                        >
+                                            View Cart
+                                        </Button>
+                                    </div>
+                                </div>
+                            </DrawerFooter>
+                        )}
+                    </DrawerContent>
+                </Drawer>
+            )}
         </div>
     );
 };

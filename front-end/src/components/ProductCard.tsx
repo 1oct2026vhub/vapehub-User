@@ -92,7 +92,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 color="primary"
                 className="btn primary-btn shadow-input text-content-2 max-w-36 whitespace-pre-wrap sm:text-content-1 !leading-none max-sm:h-6 sm:max-h-max !px-2 sm:!px-4 !py-2"
               >
-                {buttonText}
+                {buttonText.length > 16 ? `${buttonText.substring(0, 13)}...` : buttonText}
+                {/* {buttonText} */}
               </Button>
             )}
           </div>

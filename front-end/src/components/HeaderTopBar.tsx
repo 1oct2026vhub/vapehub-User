@@ -44,6 +44,9 @@ const HeaderTopBar = ({ categories }: Props) => {
     const [isSuggestionLoading, setIsSuggestionLoading] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
+    // Check if we're on the verification email page
+    const isVerificationPage = pathname.includes('/verify-email');
+
     const searchTerm = useWatch({ control: searchFromConfig.control, name: 'search' });
     const debouncedSearchTerm = useDebounce(searchTerm, 150);
 
@@ -100,49 +103,53 @@ const HeaderTopBar = ({ categories }: Props) => {
         <>
             <div className="hidden lg:flex items-center justify-between gap-10">
                 <Logo className='max-xl:max-w-64' />
-                <div className="relative flex-1 flex-shrink justify-center items-center max-w-[650px] mx-auto">
-                    <Form {...searchFromConfig}>
-                        <form noValidate className="w-full" onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
-                            <InputField
-                                control={searchFromConfig.control}
-                                name="search"
-                                type={Header_FORM_CONFIG.SEARCH.TYPE}
-                                placeholder={Header_FORM_CONFIG.SEARCH.PH}
-                                className="max-w-[650px]"
-                                classNames={{
-                                    input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
-                                }}
-                                startContent={<SearchIcon className='w-4 h-4 md:w-max md:h-max' />}
-                            />
-                        </form>
-                    </Form>
-                   {showSuggestions && searchTerm && (
-                        <ProductSuggestions
-                            suggestions={suggestions}
-                            isLoading={isSuggestionLoading}
-                            onViewAll={handleViewAll}
-                            onClose={() => setShowSuggestions(false)}
-                        />
-                   )}
-                </div>
+                {!isVerificationPage && (
+                    <>
+                        <div className="relative flex-1 flex-shrink justify-center items-center max-w-[650px] mx-auto">
+                            <Form {...searchFromConfig}>
+                                <form noValidate className="w-full" onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
+                                    <InputField
+                                        control={searchFromConfig.control}
+                                        name="search"
+                                        type={Header_FORM_CONFIG.SEARCH.TYPE}
+                                        placeholder={Header_FORM_CONFIG.SEARCH.PH}
+                                        className="max-w-[650px]"
+                                        classNames={{
+                                            input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
+                                        }}
+                                        startContent={<SearchIcon className='w-4 h-4 md:w-max md:h-max' />}
+                                    />
+                                </form>
+                            </Form>
+                           {showSuggestions && searchTerm && (
+                                <ProductSuggestions
+                                    suggestions={suggestions}
+                                    isLoading={isSuggestionLoading}
+                                    onViewAll={handleViewAll}
+                                    onClose={() => setShowSuggestions(false)}
+                                />
+                           )}
+                        </div>
 
-                <div className="flex items-center gap-6">
-                    <NotificationAction  />
-                    <Button onPress={onOpen} variant='light' className="flex items-center gap-0.5 hover:!bg-transparent">
-                        <ShoppingCartIcon />
-                        <div>
-                            <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">{itemCount} item{itemCount !== 1 ? 's' : ''}</h6>
-                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">{DEFAULT_CURRENCY_SYMBOL} {cartTotal.toFixed(2)}</h6>
+                        <div className="flex items-center gap-6">
+                            <NotificationAction  />
+                            <Button onPress={onOpen} variant='light' className="flex items-center gap-0.5 hover:!bg-transparent">
+                                <ShoppingCartIcon />
+                                <div>
+                                    <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">{itemCount} item{itemCount !== 1 ? 's' : ''}</h6>
+                                    <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">{DEFAULT_CURRENCY_SYMBOL} {cartTotal.toFixed(2)}</h6>
+                                </div>
+                            </Button>
+                            <Link href={ROUTES.MY_ACCOUNT} className="flex items-center gap-0.5">
+                                <UserIcon />
+                                <div>
+                                    <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">welcome</h6>
+                                    <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">my account</h6>
+                                </div>
+                            </Link>
                         </div>
-                    </Button>
-                    <Link href={ROUTES.MY_ACCOUNT} className="flex items-center gap-0.5">
-                        <UserIcon />
-                        <div>
-                            <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">welcome</h6>
-                            <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">my account</h6>
-                        </div>
-                    </Link>
-                </div>
+                    </>
+                )}
             </div>
 
             {/* Responsive screens */}
@@ -151,40 +158,44 @@ const HeaderTopBar = ({ categories }: Props) => {
                 <div className="flex items-center justify-between gap-5">
                     <MobileMenu categories={categories} />
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
-                    <div className="flex items-center gap-1">
-                        <NotificationAction  />
-                        <Link href={ROUTES.MY_ACCOUNT}>
-                            <UserIcon />
-                        </Link>
-                        <Badge color="default" content={itemCount} shape="circle" variant='faded' className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
-                            <Button isIconOnly size="sm" aria-label="more than 99 cart items" radius="full" variant="light" className='!min-w-fit !w-fit !h-fit' onPress={onOpen}>
-                                <ShoppingCartIcon />
-                            </Button>
-                        </Badge> 
-                    </div>
-                </div>
-                <div className="relative flex flex-1 flex-shrink justify-center items-center">
-                    <Form {...searchFromConfig}>
-                        <form noValidate className="w-full" onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
-                            <InputField
-                                control={searchFromConfig.control}
-                                name="search"
-                                type={Header_FORM_CONFIG.SEARCH.TYPE}
-                                placeholder={Header_FORM_CONFIG.SEARCH.PH}
-                                className="w-full"
-                                startContent={<SearchIcon />}
-                            />
-                        </form>
-                    </Form>
-                    {showSuggestions && searchTerm && (
-                        <ProductSuggestions
-                            suggestions={suggestions}
-                            isLoading={isSuggestionLoading}
-                            onViewAll={handleViewAll}
-                            onClose={() => setShowSuggestions(false)}
-                        />
+                    {!isVerificationPage && (
+                        <div className="flex items-center gap-1">
+                            <NotificationAction  />
+                            <Link href={ROUTES.MY_ACCOUNT}>
+                                <UserIcon />
+                            </Link>
+                            <Badge color="default" content={itemCount} shape="circle" variant='faded' className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
+                                <Button isIconOnly size="sm" aria-label="more than 99 cart items" radius="full" variant="light" className='!min-w-fit !w-fit !h-fit' onPress={onOpen}>
+                                    <ShoppingCartIcon />
+                                </Button>
+                            </Badge> 
+                        </div>
                     )}
                 </div>
+                {!isVerificationPage && (
+                    <div className="relative flex flex-1 flex-shrink justify-center items-center">
+                        <Form {...searchFromConfig}>
+                            <form noValidate className="w-full" onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
+                                <InputField
+                                    control={searchFromConfig.control}
+                                    name="search"
+                                    type={Header_FORM_CONFIG.SEARCH.TYPE}
+                                    placeholder={Header_FORM_CONFIG.SEARCH.PH}
+                                    className="w-full"
+                                    startContent={<SearchIcon />}
+                                />
+                            </form>
+                        </Form>
+                        {showSuggestions && searchTerm && (
+                            <ProductSuggestions
+                                suggestions={suggestions}
+                                isLoading={isSuggestionLoading}
+                                onViewAll={handleViewAll}
+                                onClose={() => setShowSuggestions(false)}
+                            />
+                        )}
+                    </div>
+                )}
             </div>
             <Drawer isOpen={isOpen} onOpenChange={onOpenChange} className='filter-drawer rounded-l-32 md:!w-[637px] max-w-[90%] md:!max-w-[637px]'>
                 <DrawerContent>

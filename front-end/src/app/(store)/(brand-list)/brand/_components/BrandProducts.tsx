@@ -7,13 +7,15 @@ import { ROUTES } from '@/lib/routes';
 import React, { ReactElement } from 'react';
 import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
+import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 
 type BrandProps = {
     data: BrandByProductResponse;
     reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+    dynamicPageSlug?: DynamicPageSlugResponse;
 }
 
-const BrandProducts: React.FC<BrandProps> = ({ data, reviews }): ReactElement => {
+const BrandProducts: React.FC<BrandProps> = ({ data, reviews, dynamicPageSlug }): ReactElement => {
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Brands", href: ROUTES.BRANDS },
@@ -23,7 +25,7 @@ const BrandProducts: React.FC<BrandProps> = ({ data, reviews }): ReactElement =>
         <div>
             <section className="product-listing-container flex-col">
                 <BreadCrumbs items={breadcrumbs} />
-                <ProductListingContent data={data} />
+                <ProductListingContent data={data} dynamicPageSlug={dynamicPageSlug} />
             </section>
             <ProductList data={data} reviews={reviews} />
             <section className="product-listing-container">

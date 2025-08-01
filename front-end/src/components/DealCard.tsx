@@ -27,7 +27,7 @@ const DealCard: React.FC<DealCardProps> = ({
                     alt={altText} 
                     width={width} 
                     height={height} 
-                    className="w-full h-full object-cover object-center" 
+                    className="w-full h-full object-cover object-center self-stretch md:min-h-[258px]" 
                 />
             </div>
             <div className="p-3.5 md:p-5 flex-1">

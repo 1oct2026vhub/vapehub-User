@@ -18,6 +18,11 @@ interface CouponFormProps {
         code: string | null;
         message: string | null;
         discountValue: string;
+        mailSubscriptionData?: {
+            discount_amount: number;
+            discount_type: string;
+            isDiscountUsed: boolean;
+        };
     }) => void;
     initialCouponCode?: string;
     cartTotal: number;
@@ -66,7 +71,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 isApplied: true,
                 code: data.couponCode || null,
                 message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
-                discountValue: (discountAmount).toString()
+                discountValue: (discountAmount).toString(),
+                mailSubscriptionData: response.data.mail_subscription_data
             });
         } else {
             toast.error(response.message);
@@ -77,7 +83,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 isApplied: false,
                 code: null,
                 message: null,
-                discountValue: ''
+                discountValue: '',
+                mailSubscriptionData: undefined
             });
         }
     };
@@ -90,7 +97,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             isApplied: false,
             code: null,
             message: null,
-            discountValue: ''
+            discountValue: '',
+            mailSubscriptionData: undefined
         });
     };
 

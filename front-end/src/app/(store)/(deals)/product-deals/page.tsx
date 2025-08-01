@@ -10,7 +10,6 @@ import { ServerActionStatus } from '@/lib/config/app.config';
 
 const AllDealsPage: NextPage = () => {
     const [deals, setDeals] = useState<Deal[]>([]);
-
     useEffect(() => {
         const fetchDeals = async () => {
             const response = await getAllDeals({ limit: 50, offset: 0,deal_type:'BUY_N_FOR_FIXED' });
@@ -20,7 +19,6 @@ const AllDealsPage: NextPage = () => {
         };
         fetchDeals();
     }, []);
-
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Deals", href: "/deals", isActive: true },

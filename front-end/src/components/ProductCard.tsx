@@ -1,6 +1,6 @@
 "use client"
 // import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@nextui-org/button';
 // import Link from 'next/link';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
@@ -36,6 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   averageRating = 0,
   totalReviews = 0,
 }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
   return (
     <Link href={link} className="block">
       <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 content-stretch shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
@@ -86,15 +87,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex items-center justify-between gap-2">
             <p className="text-content-1 sm:text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
             {buttonText && (
-              <Button
-                size="md"
-                radius="md"
-                color="primary"
-                className="btn primary-btn shadow-input text-content-2 max-w-36 whitespace-pre-wrap sm:text-content-1 !leading-none max-sm:h-6 sm:max-h-max !px-2 sm:!px-4 !py-2"
-              >
-                {buttonText.length > 16 ? `${buttonText.substring(0, 13)}...` : buttonText}
-                {/* {buttonText} */}
-              </Button>
+              <div className="relative">
+                <Button
+                  size="md"
+                  radius="md"
+                  color="primary"
+                  className="btn primary-btn shadow-input text-content-2 max-w-36 whitespace-pre-wrap sm:text-content-1 !leading-none max-sm:h-6 sm:max-h-max !px-2 sm:!px-4 !py-2"
+                  onMouseEnter={() => buttonText.length > 16 && setShowTooltip(true)}
+                  onMouseLeave={() => setShowTooltip(false)}
+                >
+                  {buttonText.length > 16 ? `${buttonText.substring(0, 13)}...` : buttonText}
+                  {/* {buttonText} */}
+                </Button>
+                {showTooltip && buttonText.length > 16 && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-white text-sm rounded-lg shadow-lg whitespace-nowrap z-50" style={{ backgroundColor: '#02643E' }}>
+                    {buttonText}
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent" style={{ borderTopColor: '#02643E' }}></div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>

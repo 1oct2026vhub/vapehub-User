@@ -18,7 +18,7 @@ const DealsSlider: React.FC = () => {
         };
         fetchDeals();
     }, []);
-
+console.log("deals", deals);
     const settings: Settings = {
         dots: true,
         infinite: deals.length > 4,
@@ -51,13 +51,15 @@ const DealsSlider: React.FC = () => {
     return (
         <Slider {...settings}>
             {deals.map((deal) => (
-                <div key={deal.id} className="px-2 xl:px-5 py-3 first:pl-0" >
-                    <DealCard
-                        title={deal.name}
-                        imageSrc="/images/deal-1.png" // Placeholder image
-                        altText={deal.name}
-                        href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
-                    />
+                <div key={deal.id} className="px-2 xl:px-5 py-3 first:pl-0 h-full">
+                    <div className="w-full h-full">
+                        <DealCard
+                            title={deal.name}
+                            imageSrc={deal?.image_url ?? "/images/deal-1.png"} // Placeholder image
+                            altText={deal.name}
+                            href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
+                        />
+                    </div>
                 </div>
             ))}
         </Slider>

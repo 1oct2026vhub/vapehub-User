@@ -25,7 +25,6 @@ const AllDealsPage: NextPage = () => {
         { label: "Home", href: "/" },
         { label: "Deals", href: "/deals", isActive: true },
     ];
-
     return (
         <main className='flex flex-col'>
             <section className="product-listing-container flex-col py-8">
@@ -41,7 +40,7 @@ const AllDealsPage: NextPage = () => {
                         <DealCard
                             key={deal.id}
                             title={deal.name}
-                            imageSrc="/images/deal-1.png" // Placeholder image
+                            imageSrc={deal.image_url || ""}
                             altText={deal.name}
                             href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
                         />

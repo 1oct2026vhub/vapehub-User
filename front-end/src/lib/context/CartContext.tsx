@@ -16,6 +16,11 @@ interface CouponDiscount {
   code: string | null;
   message: string | null;
   discountValue: string;
+  mailSubscriptionData?: {
+    discount_amount: number;
+    discount_type: string;
+    isDiscountUsed: boolean;
+  };
 }
 
 interface LoyaltyRedemption {
@@ -553,7 +558,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       isApplied: false,
       code: null,
       message: null,
-      discountValue: ''
+      discountValue: '',
+      mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
     });
     setLoyaltyRedemption({
       isRedeemed: false,
@@ -581,6 +587,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         code: null,
         message: null,
         discountValue: '',
+        mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
       });
     }
   }, [itemCount, isLoading]);
@@ -593,15 +600,15 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           couponCode: couponDiscount.code,
           shippingMethodId: 0, // Adjust if you use shipping method
         });
-
+        console.log("Referraresponse",response);
         if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.referral_value != null) {
           setCouponDiscount({
             value: cartTotal - response.data.total,
             isApplied: true,
             code: couponDiscount.code,
-            // 
-             message:response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
+            message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
             discountValue: (cartTotal - response.data.total).toFixed(2),
+            mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
           });
         } else {
           // Only update state if the coupon was previously applied to avoid loops
@@ -612,7 +619,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               isApplied: false,
               code: couponDiscount.code,
               message: null,
-              discountValue: ''
+              discountValue: '',
+              mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
             });
           }
         }

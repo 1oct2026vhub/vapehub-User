@@ -3,6 +3,7 @@
 import { FunctionComponent, ReactElement } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface LogoProps {
     width?: number;
@@ -15,8 +16,11 @@ const Logo: FunctionComponent<LogoProps> = ({
     height = 50,
     className,
 }): ReactElement => {
+    const pathname = usePathname();
+    const isVerificationPage = pathname.includes('/verify-email');
+    
     return (
-        <Link href='/' className='w-fit flex justify-start'>
+        <Link href={!isVerificationPage ? '/' : '/verify-email'} className='w-fit flex justify-start'>
             <Image
                 src='/images/vapehub-logo.svg'
                 alt='VapeHub'

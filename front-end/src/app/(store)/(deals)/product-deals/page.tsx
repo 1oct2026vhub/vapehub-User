@@ -10,7 +10,6 @@ import { ServerActionStatus } from '@/lib/config/app.config';
 
 const AllDealsPage: NextPage = () => {
     const [deals, setDeals] = useState<Deal[]>([]);
-
     useEffect(() => {
         const fetchDeals = async () => {
             const response = await getAllDeals({ limit: 50, offset: 0,deal_type:'BUY_N_FOR_FIXED' });
@@ -20,12 +19,10 @@ const AllDealsPage: NextPage = () => {
         };
         fetchDeals();
     }, []);
-
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Deals", href: "/deals", isActive: true },
     ];
-
     return (
         <main className='flex flex-col'>
             <section className="product-listing-container flex-col py-8">
@@ -41,7 +38,7 @@ const AllDealsPage: NextPage = () => {
                         <DealCard
                             key={deal.id}
                             title={deal.name}
-                            imageSrc="/images/deal-1.png" // Placeholder image
+                            imageSrc={deal.image_url || ""}
                             altText={deal.name}
                             href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
                         />

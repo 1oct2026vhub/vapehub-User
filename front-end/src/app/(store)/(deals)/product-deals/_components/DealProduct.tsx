@@ -3,7 +3,7 @@ import React, { ReactElement } from 'react';
 import ProductListingContent from "@/components/ProductListingContent";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import { ProductResponseData } from '@/lib/config/product.config';
-import FAQSection from '@/components/FAQSection';
+// import FAQSection from '@/components/FAQSection';
 import { Deal } from '@/lib/config/deal.config';
 import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';

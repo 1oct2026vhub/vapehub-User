@@ -84,7 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold h-3 md:h-4 xl:h-5">
             {flavors ? `${flavors} ${flavors > 1 ? 'Flavours' : 'Flavour'}` : ''}
           </p>
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 min-h-8 self-stretch">
             <p className="text-content-1 sm:text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
             {buttonText && (
               <div className="relative">
@@ -92,7 +92,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   size="md"
                   radius="md"
                   color="primary"
-                  className="btn primary-btn shadow-input text-content-2 max-w-36 whitespace-pre-wrap sm:text-content-1 !leading-none max-sm:h-6 sm:max-h-max !px-2 sm:!px-4 !py-2"
+                  className="btn primary-btn shadow-input !text-content-3 line-clamp-1 truncate max-w-26 sm:max-w-30 lg:max-w-36 !min-w-fit sm:!text-content-2 lg:!text-content-1 !leading-none h-8 sm:max-h-max !px-2 md:!px-4 !py-2"
                   onMouseEnter={() => buttonText.length > 16 && setShowTooltip(true)}
                   onMouseLeave={() => setShowTooltip(false)}
                 >

@@ -1,10 +1,11 @@
-import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId } from "@/lib/server.actions";
+import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { notFound } from 'next/navigation';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
 import { Metadata } from "next";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+import { DynamicPageSlugResponse } from "@/lib/config/global.config";
 
 type PageProps = {
   slug: string;
@@ -16,6 +17,19 @@ const Page = async ({ params, searchParams }: {
 }) => {
   const { slug } = await params;
   const searchParamsData = await searchParams;
+
+  // Fetch dynamic page slug data
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
+  console.log('📋 Product Deals Page - Dynamic Page Slug Response:', {
+    slug: slug,
+    dynamicPageSlug: dynamicPageSlug,
+    dealsText: dynamicPageSlug?.deals_text,
+    deals: dynamicPageSlug?.deals,
+    seo: dynamicPageSlug?.seo
+  });
+  if (!dynamicPageSlug) {
+    return notFound();
+  }
 
   const dealResponse = await getAllDeals();
   
@@ -83,10 +97,19 @@ const Page = async ({ params, searchParams }: {
       pagination: productsResponse.data.pagination
     }} 
     reviews={reviews} 
+    dynamicPageSlug={dynamicPageSlug}
   />;
 };
 
 export default Page;
+
+const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
+  const response = await getDynamicPageSlug(slug);
+  if (response.status === ServerActionStatus.ERROR) {
+    return null;
+  }
+  return response.data;
+};
 
 export async function generateMetadata({ params, searchParams }: {
   params: Promise<PageProps>,
@@ -94,6 +117,14 @@ export async function generateMetadata({ params, searchParams }: {
 }): Promise<Metadata> {
   const { slug } = await params;
   const searchParamsData = await searchParams;
+
+  // Fetch dynamic page slug data for metadata
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
+  if (!dynamicPageSlug) {
+    return {
+      title: 'Deal not found',
+    };
+  }
 
   const dealResponse = await getAllDeals();
   
@@ -126,14 +157,19 @@ export async function generateMetadata({ params, searchParams }: {
       const productsResponse = await getProductsByDealSlug(slug, combinedParams);
       
       if (productsResponse.status === ServerActionStatus.SUCCESS) {
+        // Use dynamic page slug SEO data if available, otherwise fall back to deal data
+        const seoTitle = dynamicPageSlug.seo?.title || deal.name;
+        const seoDescription = dynamicPageSlug.seo?.description || deal.name;
+        const seoImage = dynamicPageSlug.seo?.ogImage || productsResponse.data.products[0]?.primary_image?.url;
+        
         return {
-          title: deal.name,
-          description: deal.name,
+          title: seoTitle,
+          description: seoDescription,
           openGraph: {
-            title: deal.name,
-            description: deal.name,
-            images: productsResponse.data.products[0]?.primary_image?.url ? [{
-              url: productsResponse.data.products[0]?.primary_image?.url,
+            title: seoTitle,
+            description: seoDescription,
+            images: seoImage ? [{
+              url: seoImage,
               width: 1200,
               height: 630
             }] : undefined

@@ -1,9 +1,10 @@
 import React from 'react'
-import Image from 'next/image'
+// import Image from 'next/image'
 import { Category } from '@/lib/config/category.config';
 import { BrandConfig } from '@/lib/config/brand.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
+import NoImage from './NoImage';
 
 const banners = [
     { src: '/images/product-banner-1.jpg', alt: 'Elf Bar Disposable Vape' },
@@ -38,18 +39,32 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-            {dynamicBanners.map((banner, index) => (
-                    <Link href="#" key={index} aria-label={`View details of ${banner.alt}`}>
-                        <Image
-                            src={banner.src}
-                            alt={banner.alt}
-                            width={437}
-                            height={162}
-                            className="rounded-xl w-full max-h-[118px] md:max-h-40"
-                            loading="lazy"
-                        />
-                    </Link>
-                ))}
+                {dynamicBanners.length > 0 ? (
+                    dynamicBanners.map((banner, index) => (
+                        <Link href="#" key={index} aria-label={`View details of ${banner.alt}`}>
+                            <NoImage
+                                src={banner.src}
+                                alt={banner.alt}
+                                width={437}
+                                height={162}
+                                className="rounded-xl w-full max-h-[118px] md:max-h-40"
+                            />
+                        </Link>
+                    ))
+                ) : (
+                    // Show NoImage components when no banners are available
+                    Array.from({ length: 3 }, (_, index) => (
+                        <div key={index} className="rounded-xl w-full h-[118px] md:h-40">
+                            <NoImage
+                                src=""
+                                alt="No banner available"
+                                width={437}
+                                height={162}
+                                className="rounded-xl w-full h-full"
+                            />
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     )

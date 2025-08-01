@@ -7,6 +7,7 @@ import FAQSection from '@/components/FAQSection';
 import { Deal } from '@/lib/config/deal.config';
 import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
+import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 
 type DealProps = {
   data: {
@@ -18,10 +19,11 @@ type DealProps = {
     pagination?: ProductResponseData['pagination'];
   };
   deal: Deal;
-  reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]
+  reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+  dynamicPageSlug?: DynamicPageSlugResponse;
 }
 
-const DealProduct: React.FC<DealProps> = ({ data, deal, reviews }): ReactElement => {
+const DealProduct: React.FC<DealProps> = ({ data, deal, reviews, dynamicPageSlug }): ReactElement => {
   const breadcrumbs = [
     { label: "Home", href: "/" },
     { label: "Deals", href: "/vapehub-deals" },
@@ -48,7 +50,7 @@ const DealProduct: React.FC<DealProps> = ({ data, deal, reviews }): ReactElement
     <div>
       <section className="product-listing-container flex-col">
         <BreadCrumbs items={breadcrumbs} />
-        <ProductListingContent data={productListingData} />
+        <ProductListingContent data={productListingData} dynamicPageSlug={dynamicPageSlug} />
       </section>
       <ProductList data={{
         ...data,

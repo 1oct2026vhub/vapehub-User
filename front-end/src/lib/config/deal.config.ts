@@ -15,6 +15,7 @@ export interface Deal {
     createdAt: string;
     bundle_product_ids_json?: number[] | null;
     updated_at?: string;
+    image_url?: string;
 }
 
 export interface CategoryWithDeals {

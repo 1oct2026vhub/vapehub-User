@@ -57,9 +57,9 @@ const DealProduct: React.FC<DealProps> = ({ data, deal, reviews, dynamicPageSlug
         category: data.category || [],
         brand: data.brand || [],
       }} reviews={reviews} />
-      <section className="product-listing-container">
+      {/* <section className="product-listing-container">
         <FAQSection type="common" id={deal.id} />
-      </section>
+      </section> */}
     </div>
   );
 };

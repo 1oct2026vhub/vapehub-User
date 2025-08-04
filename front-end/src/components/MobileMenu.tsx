@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@nextui-org/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Accordion, AccordionItem, Badge, Divider } from '@nextui-org/react';
 import { CloseIcon, DownArrowFilledIcon, MenuIcon, ShoppingCartIcon, UserIcon } from '@/components/Icons';
@@ -12,7 +12,7 @@ import InputField from '@/components/InputField'
 import { Form } from '@/components/ui/Form';
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 import { SUBSCRIBE_FORM_CONFIG, SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
-import { subscribeMail } from '@/lib/server.actions';
+import { subscribeMail, getMailSubscriptionSettings } from '@/lib/server.actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -20,22 +20,47 @@ import MobileSubMenu from './MobileSubMenu';
 import { useCart } from '@/lib/context/CartContext';
 import { ROUTES } from '@/lib/routes';
 import { useRouter, usePathname } from 'next/navigation';
-import { Category, defaultNavLinks } from '@/lib/config/category.config';
+import { defaultNavLinks } from '@/lib/config/category.config';
+import { HeaderMegaMenu } from '@/lib/config/header.config';
 
 type Props = {
-    categories: Category[]
+    megaMenuData?: HeaderMegaMenu[];
 }
-const MobileMenu = ({ categories }: Props) => {
+
+const MobileMenu = ({ megaMenuData = [] }: Props) => {
     const { isOpen: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
     const { isOpen: isCartOpen, onOpen: onCartOpen, onClose: onCartClose } = useDisclosure();
     const [openItems, setOpenItems] = useState<number[]>([]);
     const [isFooterVisible, setFooterVisible] = useState(true);
+    const [discountAmount, setDiscountAmount] = useState('10');
+    const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
     const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading } = useCart();
     const router = useRouter();
     const pathname = usePathname();
     
     // Check if we're on the verification email page
     const isVerificationPage = pathname.includes('/verify-email');
+    
+    // Fetch subscription settings
+    useEffect(() => {
+        const fetchSubscriptionSettings = async () => {
+            const response = await getMailSubscriptionSettings();
+            
+            if (response.status === ServerActionStatus.SUCCESS) {
+                const { discount_amount, discount_type } = response.data;
+                
+                // Validate and set discount type
+                const validDiscountType = discount_type === 'fixed' ? 'fixed' : 'percentage';
+                setDiscountType(validDiscountType);
+
+                // Round the discount amount to the nearest whole number
+                const roundedDiscount = Math.round(parseFloat(discount_amount)).toString();
+                setDiscountAmount(roundedDiscount);
+            }
+        };
+
+        fetchSubscriptionSettings();
+    }, []);
     
     const itemClasses = {
         base: "w-full rounded-lg shadow-input border border-skin-neutral-100",
@@ -45,13 +70,23 @@ const MobileMenu = ({ categories }: Props) => {
         content: "py-4 border-t border-skin-neutral-200",
     };
 
-    const filterOptions = categories.length > 0 ? categories.slice(0, 8).map((category) => ({
-        title: category.name,
-        content: <MobileSubMenu />,
-        link: category.slug,
+    // Use megaMenuData if available, otherwise fall back to categories
+    const menuData = megaMenuData.length > 0 ? megaMenuData : [];
+
+    const filterOptions = menuData.length > 0 ? menuData.slice(0, 8).map((menuItem) => ({
+        title: menuItem.label,
+        content: <MobileSubMenu menuItems={menuItem.children || []} />,
+        link: menuItem.original || '#',
         isLink: false,
     })) : [];
 
+    // Format discount display based on type
+    const formatDiscount = () => {
+        if (discountType === 'percentage') {
+            return `${discountAmount}%`;
+        }
+        return `${DEFAULT_CURRENCY_SYMBOL}${discountAmount}`;
+    };
 
     const subscribeFromConfig = useForm<SubscribeFormSchema>({
         resolver: zodResolver(SUBSCRIBE_IN_SCHEMA),
@@ -181,7 +216,7 @@ const MobileMenu = ({ categories }: Props) => {
                                             isLoading={subscribeFromConfig.formState.isSubmitting}
                                             className="btn !rounded-md bg-skin-neutral-500 !text-skin-white shadow-input text-content-3 !py-1.5 !px-2.5"
                                         >
-                                            Subscribe & Save 10%
+                                            Subscribe & Save {formatDiscount()}
                                         </Button>
                                     </form>
                                 </Form>

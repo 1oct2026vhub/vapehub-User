@@ -8,7 +8,7 @@ import Link from 'next/link';
 import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
 import ShippingProgress from './ShippingProgress';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema } from '@/lib/config/header.config';
+import { Header_FORM_CONFIG, HEADER_IN_SCHEMA, HeaderFormSchema, HeaderMegaMenu } from '@/lib/config/header.config';
 import { useForm, useWatch } from 'react-hook-form';
 import { Form } from '@/components/ui/Form';
 import MobileMenu from './MobileMenu';
@@ -25,9 +25,11 @@ import ProductSuggestions from './ProductSuggestions';
 import { useDebounce } from "@/lib/hooks/useDebounce";
 
 type Props = {
-    categories: Category[]
+    categories: Category[];
+    megaMenuData?: HeaderMegaMenu[];
 }
-const HeaderTopBar = ({ categories }: Props) => {
+
+const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
         mode: 'onBlur',
@@ -113,7 +115,7 @@ const HeaderTopBar = ({ categories }: Props) => {
                                         name="search"
                                         type={Header_FORM_CONFIG.SEARCH.TYPE}
                                         placeholder={Header_FORM_CONFIG.SEARCH.PH}
-                                        className="max-w-[650px]"
+                                        className="w-full"
                                         classNames={{
                                             input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
                                         }}
@@ -121,14 +123,14 @@ const HeaderTopBar = ({ categories }: Props) => {
                                     />
                                 </form>
                             </Form>
-                           {showSuggestions && searchTerm && (
+                            {showSuggestions && searchTerm && (
                                 <ProductSuggestions
                                     suggestions={suggestions}
                                     isLoading={isSuggestionLoading}
                                     onViewAll={handleViewAll}
                                     onClose={() => setShowSuggestions(false)}
                                 />
-                           )}
+                            )}
                         </div>
 
                         <div className="flex items-center gap-6">
@@ -156,7 +158,7 @@ const HeaderTopBar = ({ categories }: Props) => {
 
             <div className="flex flex-col space-y-3.5 lg:hidden">
                 <div className="flex items-center justify-between gap-5">
-                    <MobileMenu categories={categories} />
+                    <MobileMenu megaMenuData={megaMenuData} />
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     {!isVerificationPage && (
                         <div className="flex items-center gap-1">

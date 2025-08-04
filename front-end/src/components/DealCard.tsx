@@ -31,7 +31,12 @@ const DealCard: React.FC<DealCardProps> = ({
                 />
             </div>
             <div className="p-3.5 md:p-5 flex-1">
-                <h3 className="text-lg md:text-title-1 xl:text-h5 text-skin-neutral-500 font-semibold line-clamp-2">{title}</h3>
+                <h3 
+                    className="text-lg md:text-title-1 xl:text-h5 text-skin-neutral-500 font-semibold line-clamp-1"
+                    title={title}
+                >
+                    {title}
+                </h3>
             </div>
         </Link >
     );

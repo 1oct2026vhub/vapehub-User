@@ -4,6 +4,43 @@ import React, { useEffect, useState } from "react";
 import { getTrustpilotReviews } from "@/lib/server.actions";
 import { ServerActionStatus } from "@/lib/config/app.config";
 
+interface TrustpilotData {
+  reviews: Array<{
+    id: string;
+    stars: number;
+    title: string;
+    text: string;
+    createdAt: string;
+    consumer: {
+      displayName: string;
+    };
+    ratingCategory: string;
+  }>;
+  pagination: {
+    page: number;
+    per_page: number;
+  };
+  overallStats: {
+    averageRating: number;
+    trustScore: number;
+    totalReviews: number;
+    ratingDistribution: {
+      oneStar: { count: number; percentage: string };
+      twoStars: { count: number; percentage: string };
+      threeStars: { count: number; percentage: string };
+      fourStars: { count: number; percentage: string };
+      fiveStars: { count: number; percentage: string };
+    };
+    scoreBreakdown: {
+      stars: number;
+      trustScore: number;
+      ratingCategory: string;
+      showRatingBanner: boolean;
+    };
+  };
+  showRatingBanner: boolean;
+}
+
 interface StarRatingProps {
   filledStars: number;
   totalStars?: number;
@@ -55,7 +92,7 @@ const TrustPilotRatingCard: React.FC<TrustPilotRatingCardProps> = ({
   filledStars,
   totalStars = 5,
 }) => {
-  const [trustpilotData, setTrustpilotData] = useState<any>(null);
+  const [trustpilotData, setTrustpilotData] = useState<TrustpilotData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -75,27 +112,10 @@ const TrustPilotRatingCard: React.FC<TrustPilotRatingCardProps> = ({
           setTrustpilotData(response.data);
           
           // Additional console logs for specific data
-          console.log('⭐ Trustpilot Overall Stats:', {
-            averageRating: response.data.overallStats.averageRating,
-            trustScore: response.data.overallStats.trustScore,
-            totalReviews: response.data.overallStats.totalReviews,
-            ratingCategory: response.data.overallStats.scoreBreakdown.ratingCategory
-          });
 
-          console.log('📊 Trustpilot Rating Distribution:', response.data.overallStats.ratingDistribution);
-          
-          console.log('📝 Trustpilot Reviews Sample:', response.data.reviews.slice(0, 3).map(review => ({
-            id: review.id,
-            stars: review.stars,
-            title: review.title,
-            consumer: review.consumer.displayName,
-            ratingCategory: review.ratingCategory
-          })));
-        } else {
-          console.error('❌ Trustpilot API Error:', response.status === ServerActionStatus.ERROR ? response.message : 'Unknown error');
-        }
+        } 
       } catch (error) {
-        console.error('❌ Trustpilot API Exception:', error);
+        console.error('Trustpilot API Exception:', error);
       } finally {
         setLoading(false);
       }

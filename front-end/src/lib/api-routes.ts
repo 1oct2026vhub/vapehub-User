@@ -107,6 +107,7 @@ export const API_ROUTES = {
     GET_DEAL_PRODUCTS: (dealId: number, params?: { limit?: number; offset?: number; product_id?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
     GET_PRODUCTS_BY_DEAL_SLUG: (slug: string, params?: Record<string, unknown>) => buildRequestUrl(`/api/deals/slug/${slug}${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
     GET_MAIL_SUBSCRIPTION_SETTINGS: buildRequestUrl('/api/mailSubscription/settings'),
+    GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
 };
 
 // * Helper functions

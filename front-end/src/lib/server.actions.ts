@@ -865,3 +865,80 @@ export const getProductsByDealSlug = async (
     method: 'GET',
   });
 };
+
+export const getTrustpilotReviews = async (payload?: { page?: number; per_page?: number; stars?: number }): Promise<ServerActionResponse<{
+  reviews: Array<{
+    id: string;
+    stars: number;
+    title: string;
+    text: string;
+    createdAt: string;
+    consumer: {
+      displayName: string;
+    };
+    ratingCategory: string;
+  }>;
+  pagination: {
+    page: number;
+    per_page: number;
+  };
+  overallStats: {
+    averageRating: number;
+    trustScore: number;
+    totalReviews: number;
+    ratingDistribution: {
+      oneStar: { count: number; percentage: string };
+      twoStars: { count: number; percentage: string };
+      threeStars: { count: number; percentage: string };
+      fourStars: { count: number; percentage: string };
+      fiveStars: { count: number; percentage: string };
+    };
+    scoreBreakdown: {
+      stars: number;
+      trustScore: number;
+      ratingCategory: string;
+      showRatingBanner: boolean;
+    };
+  };
+  showRatingBanner: boolean;
+}>> => {
+  return await handleRequest<{
+    reviews: Array<{
+      id: string;
+      stars: number;
+      title: string;
+      text: string;
+      createdAt: string;
+      consumer: {
+        displayName: string;
+      };
+      ratingCategory: string;
+    }>;
+    pagination: {
+      page: number;
+      per_page: number;
+    };
+    overallStats: {
+      averageRating: number;
+      trustScore: number;
+      totalReviews: number;
+      ratingDistribution: {
+        oneStar: { count: number; percentage: string };
+        twoStars: { count: number; percentage: string };
+        threeStars: { count: number; percentage: string };
+        fourStars: { count: number; percentage: string };
+        fiveStars: { count: number; percentage: string };
+      };
+      scoreBreakdown: {
+        stars: number;
+        trustScore: number;
+        ratingCategory: string;
+        showRatingBanner: boolean;
+      };
+    };
+    showRatingBanner: boolean;
+  }, unknown>({
+    endpoint: API_ROUTES.GET_TRUSTPILOT_REVIEWS(payload),
+    method: 'GET',
+  });
+};

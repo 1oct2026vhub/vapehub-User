@@ -12,6 +12,15 @@ import { useMemo, useState, useCallback } from 'react';
 // import { Deal } from '@/lib/config/deal.config';
 import { useRouter } from 'next/navigation';
 
+// Extended type for menu items with additional properties
+interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data'> {
+    is_new?: boolean;
+    is_hot?: boolean;
+    entity_data?: HeaderMegaMenu['entity_data'] & {
+        image_url?: string;
+    };
+}
+
 export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }> = ({ isOpen, menuItems }) => {
     const router = useRouter();
     const searchFromConfig = useForm<HeaderFormSchema>({
@@ -32,18 +41,6 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
         }
         return allItems;
     }, []);
-
-    // Filter product items with images
-    const productItems = useMemo(() => {
-        const allItems = getAllMenuItems(menuItems);
-        return allItems.filter(item =>
-            item.entity_type === 'product' &&
-            item.show_image &&
-            item.entity_data &&
-            item.entity_data.ProductImages &&
-            item.entity_data.ProductImages.length > 0
-        ).slice(0, 3);
-    }, [menuItems, getAllMenuItems]);
 
     // Filter menu items based on search keyword
     const filteredMenuItems = useMemo(() => {
@@ -91,26 +88,60 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
         }
     };
 
+    // Helper: Recursively check if any menu item or its children have is_new or is_hot flags
+    const hasAnyFlag = useCallback((item: HeaderMegaMenu, flag: 'is_new' | 'is_hot'): boolean => {
+        // Check current item
+        const extendedItem = item as ExtendedHeaderMegaMenu;
+        if (extendedItem[flag]) return true;
+        
+        // Check children recursively
+        if (item.children && item.children.length > 0) {
+            for (const child of item.children) {
+                if (hasAnyFlag(child, flag)) return true;
+            }
+        }
+        
+        return false;
+    }, []);
+
     // Render a single menu item with its children
     const renderMenuItem = (menuItem: HeaderMegaMenu, level = 0) => {
         const visibleChildren = menuItem.children && menuItem.children.length > 0 
             ? menuItem.children.filter(child => !child.hide_text) 
             : [];
 
+        // Check if any item in this tree has the flags
+        const hasHotFlag = hasAnyFlag(menuItem, 'is_hot');
+        const extendedMenuItem = menuItem as ExtendedHeaderMegaMenu;
+
         return (
-            <div key={menuItem.id} className="mb-4">
+            <div key={menuItem.id} className={`${shouldShowImageSection ? 'mb-4' : 'mb-2'}`}>
                 {/* If item has visible children, show as header and render children */}
                 {visibleChildren.length > 0 ? (
                     <>
-                        <div className={`${level > 0 ? 'border-b border-skin-neutral-200' : ''} mb-2 pb-2`}>
-                            <h3 
-                                className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
-                                onClick={() => menuItem.original && menuItem.original !== '#' && handleMenuClick(menuItem.original)}
-                            >
-                                {menuItem.label}
-                            </h3>
+                        <div className={`${level > 0 ? 'border-b border-skin-neutral-200' : ''} ${shouldShowImageSection ? 'mb-2 pb-2' : 'mb-1 pb-1'}`}>
+                            <div className="flex items-center gap-2">
+                                <h3 
+                                    className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
+                                    onClick={() => menuItem.original && menuItem.original !== '#' && handleMenuClick(menuItem.original)}
+                                >
+                                    {menuItem.label}
+                                </h3>
+                                {/* New tag */}
+                                {extendedMenuItem.is_new && (                      
+                                <span className="bg-gradient-to-r from-[#001137] to-[#042A82] text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                    New
+                                </span>
+                            )}
+                                {/* Hot tag */}
+                                {hasHotFlag && (
+                                  <span className="bg-gradient-to-r from-[#A90000] to-[#F80101] text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                Hot
+                            </span>
+                                )}
+                            </div>
                         </div>
-                        <div className="pl-4 space-y-2">
+                        <div className={`pl-4 ${shouldShowImageSection ? 'space-y-2' : 'space-y-1'}`}>
                             {visibleChildren.map((child) => (
                                 <div key={child.id} className="pl-3">
                                     {renderMenuItem(child, level + 1)}
@@ -121,10 +152,24 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                 ) : (
                     /* If item has no visible children, show as a link */
                     <div 
-                        className="block py-1 text-skin-neutral-300 font-normal text-content-1 leading-none hover:underline cursor-pointer"
+                        className={`block ${shouldShowImageSection ? 'py-1' : 'py-0.5'} text-skin-neutral-300 font-normal text-content-1 leading-none hover:underline cursor-pointer`}
                         onClick={() => handleMenuClick(menuItem.original)}
                     >
-                        {menuItem.label}
+                        <div className="flex items-center gap-2">
+                            <span>{menuItem.label}</span>
+                            {/* New tag */}
+                            {extendedMenuItem.is_new && (                      
+                                <span className="bg-gradient-to-r from-[#001137] to-[#042A82] text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                    New
+                                </span>
+                            )}
+                            {/* Hot tag */}
+                            {extendedMenuItem.is_hot && (
+                                <span className="bg-gradient-to-r from-[#A90000] to-[#F80101] text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                    Hot
+                                </span>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -133,47 +178,160 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
 
     // Render menu items in columns with overflow handling
     const renderMenuColumns = (items: HeaderMegaMenu[]) => {
-        // Filter items based on hide_text - only show items where hide_text is false
         const visibleItems = items.filter(item => !item.hide_text);
-        
         if (visibleItems.length === 0) return null;
 
-        // Always show first 4 items in columns
-        const firstFourItems = visibleItems.slice(0, 4);
-        const remainingItems = visibleItems.slice(4);
+        // Check if any items have children
+        const hasChildren = visibleItems.some(item => item.children && item.children.length > 0);
 
-        return (
-            <div className="space-y-6">
-                {/* First 4 items in columns */}
-                <div className="grid grid-cols-4 gap-8">
-                    {firstFourItems.map((item, index) => (
-                        <div key={index} className="space-y-4 border-r border-skin-neutral-200 last:border-r-0 pr-6">
-                            {renderMenuItem(item)}
-                        </div>
-                    ))}
-                </div>
+        if (hasChildren) {
+            // When items have children, always use 3 columns to display main menus as titles
+            const firstRowItems = visibleItems.slice(0, 3);
+            const remainingItems = visibleItems.slice(3);
 
-                {/* Remaining items in a separate section */}
-                {remainingItems.length > 0 && (
-                    <div className="border-t border-skin-neutral-200 pt-6">
-                        <div className="grid grid-cols-4 gap-8">
-                            {remainingItems.map((item, index) => (
-                                <div key={index} className="space-y-4 border-r border-skin-neutral-200 last:border-r-0 pr-6">
-                                    {renderMenuItem(item)}
+            return (
+                <div className="space-y-6">
+                    {/* First row with 3 columns */}
+                    <div className="grid grid-cols-3 gap-8">
+                        {Array.from({ length: 3 }, (_, colIdx) => (
+                            <div key={colIdx} className="space-y-4">
+                                {firstRowItems[colIdx] && renderMenuItem(firstRowItems[colIdx])}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {/* Border bottom after first row if there are more items */}
+                    {remainingItems.length > 0 && (
+                        <div className="border-b border-skin-neutral-200 pb-6"></div>
+                    )}
+                    
+                    {/* Remaining items in 3 columns */}
+                    {remainingItems.length > 0 && (
+                        <div className="grid grid-cols-3 gap-8">
+                            {Array.from({ length: 3 }, (_, colIdx) => (
+                                <div key={colIdx} className="space-y-4">
+                                    {remainingItems.filter((_, idx) => idx % 3 === colIdx).map(item => renderMenuItem(item))}
                                 </div>
                             ))}
                         </div>
+                    )}
+                </div>
+            );
+        } else {
+            // When no child items, use dynamic columns based on image section
+            if (!shouldShowImageSection) {
+                // Dynamic column count based on item count for no image section
+                let columnCount = 1;
+                if (visibleItems.length >= 7) {
+                    columnCount = 3;
+                } else if (visibleItems.length >= 4) {
+                    columnCount = 2;
+                } else {
+                    columnCount = 1;
+                }
+
+                return (
+                    <div className={`grid grid-cols-${columnCount} gap-8`}>
+                        {Array.from({ length: columnCount }, (_, colIdx) => (
+                            <div key={colIdx} className="space-y-3">
+                                {visibleItems.filter((_, idx) => idx % columnCount === colIdx).map(item => renderMenuItem(item))}
+                            </div>
+                        ))}
                     </div>
-                )}
-            </div>
-        );
+                );
+            } else {
+                // For image section: use 2 columns to maximize space
+                return (
+                    <div className="grid grid-cols-2 gap-6">
+                        {Array.from({ length: 2 }, (_, colIdx) => (
+                            <div key={colIdx} className="space-y-3">
+                                {visibleItems.filter((_, idx) => idx % 2 === colIdx).map(item => renderMenuItem(item))}
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
+        }
     };
 
+    // Remove old productItems logic and add recursive helpers
+
+    // Helper: Recursively check if any menu item (or its children) has show_image: true
+    const hasAnyShowImage = useCallback((items: HeaderMegaMenu[]): boolean => {
+        for (const item of items) {
+            if (item.show_image) return true;
+            if (item.children && hasAnyShowImage(item.children)) return true;
+        }
+        return false;
+    }, []);
+
+    // Helper: Recursively find the first menu item with show_image: true and a valid image (deal or product)
+    const findFirstImageItem = useCallback((items: HeaderMegaMenu[]): { item: HeaderMegaMenu, imageUrl: string } | null => {
+        for (const item of items) {
+            if (item.show_image && item.entity_data) {
+                const extendedItem = item as ExtendedHeaderMegaMenu;
+                // Deal case
+                if (item.entity_type === 'deal' && extendedItem.entity_data?.image_url) {
+                    return { item, imageUrl: extendedItem.entity_data.image_url };
+                }
+                // Product case
+                if (
+                    item.entity_type === 'product' &&
+                    Array.isArray(item.entity_data.ProductImages) &&
+                    item.entity_data.ProductImages.length > 0 &&
+                    item.entity_data.ProductImages[0]?.image_url
+                ) {
+                    return { item, imageUrl: item.entity_data.ProductImages[0].image_url };
+                }
+            }
+            if (item.children) {
+                const found = findFirstImageItem(item.children);
+                if (found) return found;
+            }
+        }
+        return null;
+    }, []);
+
+    // Helper: Recursively collect all menu items with show_image: true and a valid image
+    const collectAllImageItems = useCallback((items: HeaderMegaMenu[]): { item: HeaderMegaMenu, imageUrl: string }[] => {
+        let result: { item: HeaderMegaMenu, imageUrl: string }[] = [];
+        for (const item of items) {
+            if (item.show_image && item.entity_data) {
+                const extendedItem = item as ExtendedHeaderMegaMenu;
+                // Deal case
+                if (
+                    item.entity_type === 'deal' &&
+                    typeof extendedItem.entity_data?.image_url === 'string' &&
+                    extendedItem.entity_data.image_url
+                ) {
+                    result.push({ item, imageUrl: extendedItem.entity_data.image_url });
+                }
+                // Product case
+                if (
+                    item.entity_type === 'product' &&
+                    Array.isArray(item.entity_data.ProductImages) &&
+                    item.entity_data.ProductImages.length > 0 &&
+                    typeof item.entity_data.ProductImages[0]?.image_url === 'string' &&
+                    item.entity_data.ProductImages[0].image_url
+                ) {
+                    result.push({ item, imageUrl: item.entity_data.ProductImages[0].image_url });
+                }
+            }
+            if (item.children) {
+                result = result.concat(collectAllImageItems(item.children));
+            }
+        }
+        return result;
+    }, []);
+
+    const shouldShowImageSection = hasAnyShowImage(menuItems);
+    const allImageResults = collectAllImageItems(menuItems);
+
     return (
-        <div className={`absolute left-0 -bottom-[420px] w-full border-t border-skin-neutral-200 shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-300 min-h-[428px] max-h-[500px] overflow-y-auto flex items-start opacity-0 invisible transform translate-y-4 ${isOpen ? '!opacity-100 !visible !translate-y-0' : ''}`}>
-            <div className="w-[75%] space-y-6 pr-7 border-r border-skin-neutral-200">
+        <div className={`absolute left-0 top-full w-full border-t border-skin-neutral-200 shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-300 min-h-[250px] max-h-[300px] overflow-y-auto flex items-start justify-between opacity-0 invisible transform translate-y-4 ${isOpen ? '!opacity-100 !visible !translate-y-0' : ''}`}>
+            <div className={`${shouldShowImageSection ? 'w-[68%] pr-7 border-r border-skin-neutral-200' : 'w-full'} space-y-6`}>
                 <Form {...searchFromConfig}>
-                    <form noValidate className="w-full">
+                    <form noValidate className="w-3/4">
                         <InputField
                             control={searchFromConfig.control}
                             name="search"
@@ -192,69 +350,26 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
 
                 {renderMenuColumns(filteredMenuItems)}
             </div>
-            
             {/* Image section - enabled with dynamic handling */}
-            <div className="w-[25%] space-y-6 pl-7">
-                <div className="grid grid-cols-1 gap-3">
-                    {productItems.map(product => (
-                        <Link href={product.original || '#'} key={product.id} className="block">
-                            <div className="relative overflow-hidden rounded-lg">
-                                <Image
-                                    src={product.entity_data?.ProductImages?.[0]?.image_url || '/images/no-image.png'}
-                                    alt={product.entity_data?.name || product.label}
-                                    width={150}
-                                    height={90}
-                                    className="w-full h-20 object-cover transition-transform hover:scale-105"
-                                />
-                                {/* <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                                    <h4 className="text-white text-xs font-semibold truncate">
-                                        {product.entity_data?.name || product.label}
-                                    </h4>
-                                    {product.entity_data?.price && (
-                                        <p className="text-white/90 text-xs">
-                                            £{product.entity_data.price}
-                                        </p>
-                                    )}
-                                </div> */}
-                            </div>
-                        </Link>
-                    ))}
-                    {productItems.length < 3 && Array.from({ length: 3 - productItems.length }).map((_, i) => (
-                        <div key={`placeholder-${i}`} className="relative overflow-hidden rounded-lg bg-gray-100">
-                            <div className="h-20 flex items-center justify-center">
-                                <div className="text-center">
-                                    <div className="w-6 h-6 mx-auto mb-1 bg-gray-300 rounded-full flex items-center justify-center">
-                                        <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                    <p className="text-gray-500 text-xs">No Image Available</p>
+            {shouldShowImageSection && allImageResults.length > 0 && (
+                <div className="w-[32%] space-y-6 pl-7 max-h-[400px] overflow-y-auto">
+                    <div className="grid grid-cols-3 gap-4">
+                        {allImageResults.map(({ item, imageUrl }) => (
+                            <Link href={item.original || '#'} key={item.id} className="block">
+                                <div className="bg-white rounded-2xl shadow-md p-3 flex items-center justify-center">
+                                    <Image
+                                        src={imageUrl}
+                                        alt={item.entity_data?.name || item.label}
+                                        width={183}
+                                        height={130}
+                                        className="rounded-10"
+                                    />
                                 </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                
-                {/* Deals section */}
-                {/* {deals.length > 0 && (
-                    <div className="space-y-3">
-                        <h3 className="text-lg font-bold text-skin-neutral-500 border-b border-skin-neutral-200 pb-2">
-                            Multibuy Deals
-                        </h3>
-                        <div className="space-y-2">
-                            {deals.map((deal) => (
-                                <Link 
-                                    key={deal.id} 
-                                    href={`/product-deals/${deal.slug}`} 
-                                    className="block text-skin-neutral-300 font-medium text-sm hover:text-skin-neutral-500 hover:underline transition-colors"
-                                >
-                                    {deal.name}
-                                </Link>
-                            ))}
-                        </div>
+                            </Link>
+                        ))}
                     </div>
-                )} */}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

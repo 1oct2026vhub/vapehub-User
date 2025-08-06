@@ -1,19 +1,29 @@
 import Image from 'next/image';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { HeaderMegaMenu } from '@/lib/config/header.config';
-import InputField from "./InputField";
+// import InputField from "./InputField";
 import { SearchIcon } from "./Icons";
-import Link from 'next/link';
-import { useMemo, useState, useEffect } from 'react';
+// import Link from 'next/link';
+import { useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Form } from '@/components/ui/Form';
-import { SUBSCRIBE_FORM_CONFIG, SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
-import { subscribeMail, getMailSubscriptionSettings } from '@/lib/server.actions';
-import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { Button } from '@nextui-org/button';
+// import { Form } from '@/components/ui/Form';
+// import { SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
+import { getMailSubscriptionSettings } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
+// import { zodResolver } from '@hookform/resolvers/zod';
+// import { useForm } from 'react-hook-form';
+// import { toast } from 'sonner';
+// import { Button } from '@nextui-org/button';
+
+// Extended type for menu items with additional properties
+interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data'> {
+    is_new?: boolean;
+    is_hot?: boolean;
+    show_all?: boolean;
+    entity_data?: HeaderMegaMenu['entity_data'] & {
+        image_url?: string;
+    };
+}
 
 interface MobileSubMenuProps {
     menuItems: HeaderMegaMenu[];
@@ -22,8 +32,7 @@ interface MobileSubMenuProps {
 const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState<string>('');
-    const [discountAmount, setDiscountAmount] = useState('10');
-    const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     // Debug: Log the received menu items
     console.log('MobileSubMenu received menuItems:', menuItems);
@@ -34,48 +43,16 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             const response = await getMailSubscriptionSettings();
             
             if (response.status === ServerActionStatus.SUCCESS) {
-                const { discount_amount, discount_type } = response.data;
-                
-                // Validate and set discount type
-                const validDiscountType = discount_type === 'fixed' ? 'fixed' : 'percentage';
-                setDiscountType(validDiscountType);
-
-                // Round the discount amount to the nearest whole number
-                const roundedDiscount = Math.round(parseFloat(discount_amount)).toString();
-                setDiscountAmount(roundedDiscount);
+                // Settings fetched successfully, but not used in current implementation
+                console.log('Subscription settings loaded');
             }
         };
 
         fetchSubscriptionSettings();
     }, []);
 
-    // Subscription form configuration
-    const subscribeFromConfig = useForm<SubscribeFormSchema>({
-        resolver: zodResolver(SUBSCRIBE_IN_SCHEMA),
-        mode: 'onSubmit',
-    });
-
-    // Handle subscription form submit
-    const handleFormSubmit = async ({ email }: SubscribeFormSchema) => {
-        const response = await subscribeMail(email);
-        if (response.status === ServerActionStatus.ERROR) {
-            toast.error(response.message);
-            return;
-        }
-        toast.success("You have successfully subscribed");
-        subscribeFromConfig.reset({ email: '' });
-    };
-
-    // Format discount display based on type
-    const formatDiscount = () => {
-        if (discountType === 'percentage') {
-            return `${discountAmount}%`;
-        }
-        return `${DEFAULT_CURRENCY_SYMBOL}${discountAmount}`;
-    };
-
-    // Recursive function to get all menu items
-    const getAllMenuItems = (items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
+    // Recursive function to get all menu items - wrapped in useCallback to fix dependency
+    const getAllMenuItems = useCallback((items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
         let allItems: HeaderMegaMenu[] = [];
         for (const item of items) {
             allItems.push(item);
@@ -84,19 +61,87 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             }
         }
         return allItems;
+    }, []);
+
+    // Helper: Recursively check if any menu item or its children have is_new or is_hot flags
+    const hasAnyFlag = (item: HeaderMegaMenu, flag: 'is_new' | 'is_hot'): boolean => {
+        // Check current item
+        const extendedItem = item as ExtendedHeaderMegaMenu;
+        if (extendedItem[flag]) return true;
+        
+        // Check children recursively
+        if (item.children && item.children.length > 0) {
+            for (const child of item.children) {
+                if (hasAnyFlag(child, flag)) return true;
+            }
+        }
+        
+        return false;
     };
 
-    // Filter product items with images
+    // Helper function to get image URL (matching MegaMenu logic)
+    const getImageUrl = (item: HeaderMegaMenu): string => {
+        const extendedItem = item as ExtendedHeaderMegaMenu;
+        
+        // Deal case
+        if (item.entity_type === 'deal' && extendedItem.entity_data?.image_url) {
+            return extendedItem.entity_data.image_url;
+        }
+        
+        // Product case
+        if (
+            item.entity_type === 'product' &&
+            Array.isArray(item.entity_data?.ProductImages) &&
+            item.entity_data.ProductImages.length > 0 &&
+            item.entity_data.ProductImages[0]?.image_url
+        ) {
+            return item.entity_data.ProductImages[0].image_url;
+        }
+        
+        return '/images/no-image.png';
+    };
+
+    // Filter product items with images - updated to match MegaMenu logic
     const productItems = useMemo(() => {
         const allItems = getAllMenuItems(menuItems);
-        return allItems.filter(item =>
-            item.entity_type === 'product' &&
+        const itemsWithImages = allItems.filter(item =>
             item.show_image &&
-            item.entity_data &&
-            item.entity_data.ProductImages &&
-            item.entity_data.ProductImages.length > 0
-        ).slice(0, 3);
-    }, [menuItems]);
+            item.entity_data
+        );
+
+        // Check if any item has show_all flag
+        const hasShowAll = itemsWithImages.some(item => (item as ExtendedHeaderMegaMenu).show_all);
+        
+        // Collect all valid images (matching MegaMenu logic)
+        const validImageItems = itemsWithImages.filter(item => {
+            const extendedItem = item as ExtendedHeaderMegaMenu;
+            
+            // Deal case
+            if (item.entity_type === 'deal' && extendedItem.entity_data?.image_url) {
+                return true;
+            }
+            
+            // Product case
+            if (
+                item.entity_type === 'product' &&
+                Array.isArray(item.entity_data?.ProductImages) &&
+                item.entity_data.ProductImages.length > 0 &&
+                item.entity_data.ProductImages[0]?.image_url
+            ) {
+                return true;
+            }
+            
+            return false;
+        });
+        
+        if (hasShowAll) {
+            // If show_all is true, return all items with images
+            return validImageItems;
+        } else {
+            // Otherwise, limit to 3 items
+            return validImageItems.slice(0, 3);
+        }
+    }, [menuItems, getAllMenuItems]);
 
     // Filter menu items based on search keyword
     const filteredMenuItems = useMemo(() => {
@@ -138,9 +183,16 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
     };
 
     // Handle menu item click navigation
-    const handleMenuClick = (original: string | null) => {
+    const handleMenuClick = (original: string | null, entityType?: string, slug?: string) => {
         if (original && original !== '#') {
-            router.push(original);
+            // Handle different entity types with custom navigation
+            if (entityType === 'brand' && slug) {
+                router.push(`/brand/${slug}`);
+            } else if (entityType === 'deal' && slug) {
+                router.push(`/product-deals/${slug}`);
+            } else {
+                router.push(original);
+            }
         }
     };
 
@@ -150,18 +202,45 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             ? menuItem.children.filter(child => !child.hide_text) 
             : [];
 
+        // Check if any item in this tree has the flags
+        const hasHotFlag = hasAnyFlag(menuItem, 'is_hot');
+        const extendedMenuItem = menuItem as ExtendedHeaderMegaMenu;
+
         return (
             <div key={menuItem.id} className="mb-3">
                 {/* If item has visible children, show as header and render children */}
                 {visibleChildren.length > 0 ? (
                     <>
                         <div className={`${level > 0 ? 'border-b border-skin-neutral-200' : ''} mb-2 pb-2`}>
-                            <h3 
-                                className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
-                                onClick={() => menuItem.original && menuItem.original !== '#' && handleMenuClick(menuItem.original)}
-                            >
-                                {menuItem.label}
-                            </h3>
+                            <div className="flex items-center gap-2">
+                                <h3 
+                                    className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
+                                    onClick={() => {
+                                        if (menuItem.original && menuItem.original !== '#') {
+                                            // Extract slug from original URL or entity_data
+                                            let slug = '';
+                                            if (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') {
+                                                slug = menuItem.entity_data?.slug || menuItem.original.split('/').pop() || '';
+                                            }
+                                            handleMenuClick(menuItem.original, menuItem.entity_type, slug);
+                                        }
+                                    }}
+                                >
+                                    {menuItem.label}
+                                </h3>
+                                {/* New tag */}
+                                {extendedMenuItem.is_new && (                      
+                                    <span className="bg-gradient-to-r from-[#001137] to-[#042A82] text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                        New
+                                    </span>
+                                )}
+                                {/* Hot tag */}
+                                {hasHotFlag && (
+                                    <span className="bg-gradient-to-r from-[#A90000] to-[#F80101] text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                        Hot
+                                    </span>
+                                )}
+                            </div>
                         </div>
                         <div className="pl-4 space-y-2">
                             {visibleChildren.map((child) => (
@@ -175,9 +254,30 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
                     /* If item has no visible children, show as a link */
                     <div 
                         className="block py-1 text-skin-neutral-300 font-normal text-content-1 leading-none hover:underline cursor-pointer"
-                        onClick={() => handleMenuClick(menuItem.original)}
+                        onClick={() => {
+                            // Extract slug from original URL or entity_data
+                            let slug = '';
+                            if (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') {
+                                slug = menuItem.entity_data?.slug || menuItem.original?.split('/').pop() || '';
+                            }
+                            handleMenuClick(menuItem.original, menuItem.entity_type, slug);
+                        }}
                     >
-                        {menuItem.label}
+                        <div className="flex items-center gap-2">
+                            <span>{menuItem.label}</span>
+                            {/* New tag */}
+                            {extendedMenuItem.is_new && (                      
+                                <span className="bg-gradient-to-r from-[#001137] to-[#042A82] text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                    New
+                                </span>
+                            )}
+                            {/* Hot tag */}
+                            {extendedMenuItem.is_hot && (
+                                <span className="bg-gradient-to-r from-[#A90000] to-[#F80101] text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                    Hot
+                                </span>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -187,46 +287,152 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
     return (
         <div className='flex flex-col gap-4'>
             {/* Dynamic Product Images */}
-            <div className="grid grid-cols-2 gap-3.5">
-                {productItems.map(product => (
-                    <Link href={product.original || '#'} key={product.id} className="block">
-                        <div className="relative overflow-hidden rounded-lg">
-                            <Image
-                                src={product.entity_data?.ProductImages?.[0]?.image_url || '/images/no-image.png'}
-                                alt={product.entity_data?.name || product.label}
-                                width={183}
-                                height={130}
-                                className="w-full h-32 object-cover transition-transform hover:scale-105 rounded-10"
-                            />
-                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                                <h4 className="text-white text-xs font-semibold truncate">
-                                    {product.entity_data?.name || product.label}
-                                </h4>
-                                {product.entity_data?.price && (
-                                    <p className="text-white/90 text-xs">
-                                        £{product.entity_data.price}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </Link>
-                ))}
-                {/* Placeholder images if not enough product images */}
-                {productItems.length < 3 && Array.from({ length: 3 - productItems.length }).map((_, i) => (
-                    <div key={`placeholder-${i}`} className="relative overflow-hidden rounded-lg bg-gray-100">
-                        <div className="h-32 flex items-center justify-center rounded-10">
-                            <div className="text-center">
-                                <div className="w-8 h-8 mx-auto mb-1 bg-gray-300 rounded-full flex items-center justify-center">
-                                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
+            {productItems.length > 0 && (
+                <>
+                    {productItems.length > 3 ? (
+                        // Slider for more than 3 images
+                        <div className="relative">
+                            <div className="overflow-hidden rounded-lg">
+                                <div 
+                                    className="flex transition-transform duration-300 ease-in-out"
+                                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                                >
+                                    {Array.from({ length: Math.ceil(productItems.length / 2) }, (_, slideIndex) => {
+                                        const firstProduct = productItems[slideIndex * 2];
+                                        const secondProduct = productItems[slideIndex * 2 + 1];
+                                        
+                                        return (
+                                            <div key={slideIndex} className="w-full flex-shrink-0">
+                                                <div className="grid grid-cols-2 gap-3.5 px-2">
+                                                    {firstProduct && (
+                                                         <div 
+                                                             className="block cursor-pointer"
+                                                             onClick={() => {
+                                                                 // Extract slug from original URL or entity_data
+                                                                 let slug = '';
+                                                                 if (firstProduct.entity_type === 'brand' || firstProduct.entity_type === 'deal') {
+                                                                     slug = firstProduct.entity_data?.slug || firstProduct.original?.split('/').pop() || '';
+                                                                 }
+                                                                 handleMenuClick(firstProduct.original, firstProduct.entity_type, slug);
+                                                             }}
+                                                         >
+                                                             <div className="relative overflow-hidden rounded-lg">
+                                                                 <Image
+                                                                     src={getImageUrl(firstProduct)}
+                                                                     alt={firstProduct.entity_data?.name || firstProduct.label}
+                                                                     width={183}
+                                                                     height={130}
+                                                                     className="w-full h-32 object-cover transition-transform hover:scale-105 rounded-10"
+                                                                 />
+                                                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                                                                     <h4 className="text-white text-xs font-semibold truncate">
+                                                                         {firstProduct.entity_data?.name || firstProduct.label}
+                                                                     </h4>
+                                                                     {firstProduct.entity_data?.price && (
+                                                                         <p className="text-white/90 text-xs">
+                                                                             £{firstProduct.entity_data.price}
+                                                                         </p>
+                                                                     )}
+                                                                 </div>
+                                                             </div>
+                                                         </div>
+                                                     )}
+                                                     {secondProduct && (
+                                                         <div 
+                                                             className="block cursor-pointer"
+                                                             onClick={() => {
+                                                                 // Extract slug from original URL or entity_data
+                                                                 let slug = '';
+                                                                 if (secondProduct.entity_type === 'brand' || secondProduct.entity_type === 'deal') {
+                                                                     slug = secondProduct.entity_data?.slug || secondProduct.original?.split('/').pop() || '';
+                                                                 }
+                                                                 handleMenuClick(secondProduct.original, secondProduct.entity_type, slug);
+                                                             }}
+                                                         >
+                                                             <div className="relative overflow-hidden rounded-lg">
+                                                                 <Image
+                                                                     src={getImageUrl(secondProduct)}
+                                                                     alt={secondProduct.entity_data?.name || secondProduct.label}
+                                                                     width={183}
+                                                                     height={130}
+                                                                     className="w-full h-32 object-cover transition-transform hover:scale-105 rounded-10"
+                                                                 />
+                                                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                                                                     <h4 className="text-white text-xs font-semibold truncate">
+                                                                         {secondProduct.entity_data?.name || secondProduct.label}
+                                                                     </h4>
+                                                                     {secondProduct.entity_data?.price && (
+                                                                         <p className="text-white/90 text-xs">
+                                                                             £{secondProduct.entity_data.price}
+                                                                         </p>
+                                                                     )}
+                                                                 </div>
+                                                             </div>
+                                                         </div>
+                                                     )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                                <p className="text-gray-500 text-xs">No Image Available</p>
                             </div>
+                            
+                            {/* Slider Navigation */}
+                            {productItems.length > 2 && (
+                                <div className="flex justify-center mt-4 space-x-2">
+                                    {Array.from({ length: Math.ceil(productItems.length / 2) }, (_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setCurrentSlide(i)}
+                                            className={`w-2 h-2 rounded-full transition-colors ${
+                                                currentSlide === i ? 'bg-skin-primary' : 'bg-skin-neutral-300'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ) : (
+                        // Grid layout for 3 or fewer images
+                        <div className="grid grid-cols-2 gap-3.5">
+                            {productItems.map(product => (
+                                <div 
+                                    key={product.id} 
+                                    className="block cursor-pointer"
+                                    onClick={() => {
+                                        // Extract slug from original URL or entity_data
+                                        let slug = '';
+                                        if (product.entity_type === 'brand' || product.entity_type === 'deal') {
+                                            slug = product.entity_data?.slug || product.original?.split('/').pop() || '';
+                                        }
+                                        handleMenuClick(product.original, product.entity_type, slug);
+                                    }}
+                                >
+                                    <div className="relative overflow-hidden rounded-lg">
+                                        <Image
+                                            src={getImageUrl(product)}
+                                            alt={product.entity_data?.name || product.label}
+                                            width={183}
+                                            height={130}
+                                            className="w-full h-32 object-cover transition-transform hover:scale-105 rounded-10"
+                                        />
+                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                                            <h4 className="text-white text-xs font-semibold truncate">
+                                                {product.entity_data?.name || product.label}
+                                            </h4>
+                                            {product.entity_data?.price && (
+                                                <p className="text-white/90 text-xs">
+                                                    £{product.entity_data.price}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </>
+            )}
             
             {/* Search Input */}
             <div className="w-full">
@@ -252,7 +458,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             </div>
             
             {/* Newsletter Subscription */}
-            <div className='p-4.5 bg-subscription-banner-mob bg-no-repeat bg-top rounded-lg bg-cover space-y-4 w-full'>
+            {/* <div className='p-4.5 bg-subscription-banner-mob bg-no-repeat bg-top rounded-lg bg-cover space-y-4 w-full'>
                 <h2 className='text-content-2 font-semibold text-skin-white'>Signup Now to get rewarded</h2>
                 <Form {...subscribeFromConfig}>
                     <form className='space-y-1.5 subscription-form'
@@ -277,7 +483,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
                         </Button>
                     </form>
                 </Form>
-            </div>
+            </div> */}
         </div>
     )
 }

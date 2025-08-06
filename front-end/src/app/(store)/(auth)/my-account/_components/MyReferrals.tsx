@@ -29,6 +29,16 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral }: {
     };
 
     const referralDiscount = (referType: 'referrer' | 'referral') => {
+        // If referrer data exists, use it directly
+        if (referType === 'referrer' && data?.referrer) {
+            if (data.referrer.referral_value_type === 'percentage') {
+                return data.referrer.referral_value + '%';
+            } else if (data.referrer.referral_value_type === 'fixed') {
+                return '£' + data.referrer.referral_value;
+            }
+        }
+        
+        // Fallback to referral methods
         const referralMethod = referralMethods.find(method => method.refer_type === referType);
         if (!referralMethod) return '0%';
         
@@ -40,7 +50,20 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral }: {
         return '0%';
     }
 
+    // Helper function to format referrer's referral value
+    const formatReferrerValue = () => {
+        if (data?.referrer) {
+            if (data.referrer.referral_value_type === 'percentage') {
+                return data.referrer.referral_value + '%';
+            } else if (data.referrer.referral_value_type === 'fixed') {
+                return '£' + data.referrer.referral_value;
+            }
+        }
+        return referralDiscount('referrer');
+    }
+
     console.log("referralMethods", referralMethods);
+    console.log("data", data);
     return (
         <div>
             <h3 className="text-title-3 md:text-title-2 font-semibold text-skin-neutral-400 mb-2">Referral Rewards</h3>
@@ -54,7 +77,10 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral }: {
                     </p> :
                     <div className="flex flex-col gap-2">
                         <p className="text-content-2 text-skin-neutral-300 mb-4 max-w-md">
-                            {`You have been invited to shop at VapeHub and you've got a ${referralDiscount('referral')} discount waiting for you! Use the coupon code below to claim your offer.`}
+                            {data?.referrer ? 
+                                `You have been invited to shop at VapeHub and you've got a ${formatReferrerValue()} discount waiting for you! Use the coupon code below to claim your offer.` :
+                                'You have been invited to shop at VapeHub and you\'ve got a discount waiting for you! Use the coupon code below to claim your offer.'
+                            }
                         </p>
 
                         {data?.referred_user_method !== null &&

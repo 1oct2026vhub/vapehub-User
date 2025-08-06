@@ -50,8 +50,6 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
       {/* Rewards Section */}
       <div className="p-4 mb-6 bg-gradient-to-r from-skin-accent-50 to-skin-white rounded-14 shadow-card flex flex-col md:flex-row md:items-center md:justify-between border border-skin-neutral-50">
         <MyReferrals
-        referredValue={data?.referred_user_method?.referral_value || ''}
-        referrerValue={data?.referrer_user_method?.referral_value || ''}
           referralMethods={data?.referral_methods || []}
           coupons={data?.referred_coupon_code || null}
           isReferral={

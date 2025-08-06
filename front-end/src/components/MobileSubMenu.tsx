@@ -1,19 +1,19 @@
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { HeaderMegaMenu } from '@/lib/config/header.config';
-import InputField from "./InputField";
+// import InputField from "./InputField";
 import { SearchIcon } from "./Icons";
-import Link from 'next/link';
-import { useMemo } from 'react';
+// import Link from 'next/link';
+import { useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Form } from '@/components/ui/Form';
-import { SUBSCRIBE_FORM_CONFIG, SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
-import { subscribeMail, getMailSubscriptionSettings } from '@/lib/server.actions';
-import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { Button } from '@nextui-org/button';
+// import { Form } from '@/components/ui/Form';
+// import { SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
+import { getMailSubscriptionSettings } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
+// import { zodResolver } from '@hookform/resolvers/zod';
+// import { useForm } from 'react-hook-form';
+// import { toast } from 'sonner';
+// import { Button } from '@nextui-org/button';
 
 // Extended type for menu items with additional properties
 interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data'> {
@@ -32,8 +32,6 @@ interface MobileSubMenuProps {
 const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState<string>('');
-    const [discountAmount, setDiscountAmount] = useState('10');
-    const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
     const [currentSlide, setCurrentSlide] = useState(0);
 
     // Debug: Log the received menu items
@@ -45,48 +43,16 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             const response = await getMailSubscriptionSettings();
             
             if (response.status === ServerActionStatus.SUCCESS) {
-                const { discount_amount, discount_type } = response.data;
-                
-                // Validate and set discount type
-                const validDiscountType = discount_type === 'fixed' ? 'fixed' : 'percentage';
-                setDiscountType(validDiscountType);
-
-                // Round the discount amount to the nearest whole number
-                const roundedDiscount = Math.round(parseFloat(discount_amount)).toString();
-                setDiscountAmount(roundedDiscount);
+                // Settings fetched successfully, but not used in current implementation
+                console.log('Subscription settings loaded');
             }
         };
 
         fetchSubscriptionSettings();
     }, []);
 
-    // Subscription form configuration
-    const subscribeFromConfig = useForm<SubscribeFormSchema>({
-        resolver: zodResolver(SUBSCRIBE_IN_SCHEMA),
-        mode: 'onSubmit',
-    });
-
-    // Handle subscription form submit
-    const handleFormSubmit = async ({ email }: SubscribeFormSchema) => {
-        const response = await subscribeMail(email);
-        if (response.status === ServerActionStatus.ERROR) {
-            toast.error(response.message);
-            return;
-        }
-        toast.success("You have successfully subscribed");
-        subscribeFromConfig.reset({ email: '' });
-    };
-
-    // Format discount display based on type
-    const formatDiscount = () => {
-        if (discountType === 'percentage') {
-            return `${discountAmount}%`;
-        }
-        return `${DEFAULT_CURRENCY_SYMBOL}${discountAmount}`;
-    };
-
-    // Recursive function to get all menu items
-    const getAllMenuItems = (items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
+    // Recursive function to get all menu items - wrapped in useCallback to fix dependency
+    const getAllMenuItems = useCallback((items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
         let allItems: HeaderMegaMenu[] = [];
         for (const item of items) {
             allItems.push(item);
@@ -95,7 +61,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             }
         }
         return allItems;
-    };
+    }, []);
 
     // Helper: Recursively check if any menu item or its children have is_new or is_hot flags
     const hasAnyFlag = (item: HeaderMegaMenu, flag: 'is_new' | 'is_hot'): boolean => {
@@ -175,7 +141,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             // Otherwise, limit to 3 items
             return validImageItems.slice(0, 3);
         }
-    }, [menuItems]);
+    }, [menuItems, getAllMenuItems]);
 
     // Filter menu items based on search keyword
     const filteredMenuItems = useMemo(() => {

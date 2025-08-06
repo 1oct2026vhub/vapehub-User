@@ -4,7 +4,17 @@ import { ReferralMethods, ReferralStatsResponse } from "@/lib/config/referral.co
 import { Button } from "@nextui-org/button";
 import { useState } from "react";
 
-const MyReferrals = ({ referralMethods, data, coupons, isReferral, referredValue, referrerValue }: { referralMethods: ReferralMethods[]; data: ReferralStatsResponse | null; coupons: string | null, isReferral: boolean, referredValue: string, referrerValue: string }) => {
+// Extended interface to match the actual API response
+interface ExtendedReferralMethods extends ReferralMethods {
+    refer_type?: 'referrer' | 'referral';
+}
+
+const MyReferrals = ({ referralMethods, data, coupons, isReferral }: { 
+    referralMethods: ExtendedReferralMethods[]; 
+    data: ReferralStatsResponse | null; 
+    coupons: string | null, 
+    isReferral: boolean
+}) => {
 
     const [copied, setCopied] = useState(false);
 
@@ -18,10 +28,19 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral, referredValue
         }
     };
 
-    const referralDiscount = (primary: boolean) => {
-        const referralMethod = referralMethods.find(method => method.primary === primary);
-        return referralMethod?.referral_value_type === 'percentage' ? referralMethod?.referral_value + '%' : '-' + referralMethod?.referral_value  + '%';
+    const referralDiscount = (referType: 'referrer' | 'referral') => {
+        const referralMethod = referralMethods.find(method => method.refer_type === referType);
+        if (!referralMethod) return '0%';
+        
+        if (referralMethod.referral_value_type === 'percentage') {
+            return referralMethod.referral_value + '%';
+        } else if (referralMethod.referral_value_type === 'fixed') {
+            return '£' + referralMethod.referral_value;
+        }
+        return '0%';
     }
+
+    console.log("referralMethods", referralMethods);
     return (
         <div>
             <h3 className="text-title-3 md:text-title-2 font-semibold text-skin-neutral-400 mb-2">Referral Rewards</h3>
@@ -31,12 +50,11 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral, referredValue
                     <p className="text-content-2 text-skin-neutral-300 mb-4 max-w-md">
                         Earn a discount coupon for every friend you refer! Share your referral link,
                         and when your friends sign up and make their first purchase, you both get rewarded coupon.
-                        {/* You get {referralDiscount(true)} and your friend gets {referralDiscount(false)}. */}
-                        You get {referrerValue}% and your friend gets {referredValue}%.
+                        You get {referralDiscount('referrer')} and your friend gets {referralDiscount('referral')}.
                     </p> :
                     <div className="flex flex-col gap-2">
                         <p className="text-content-2 text-skin-neutral-300 mb-4 max-w-md">
-                            {`You have been invited to shop at VapeHub and you've got a ${referralDiscount(true)} discount waiting for you! Use the coupon code below to claim your offer.`}
+                            {`You have been invited to shop at VapeHub and you've got a ${referralDiscount('referral')} discount waiting for you! Use the coupon code below to claim your offer.`}
                         </p>
 
                         {data?.referred_user_method !== null &&

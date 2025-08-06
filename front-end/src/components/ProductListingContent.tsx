@@ -34,7 +34,10 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
             </div>
             {dealsToDisplay && dealsToDisplay.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                    {dealsToDisplay.slice(0, 3).map((banner, index) => (
+                    {dealsToDisplay
+                        .filter(banner => banner.image_url && banner.image_url.trim() !== '')
+                        .slice(0, 3)
+                        .map((banner, index) => (
                         <Link href="#" key={index} aria-label={`View details of ${banner.name}`}>
                             <NoImage
                                 src={banner.image_url || ''}

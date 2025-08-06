@@ -82,9 +82,16 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
     };
 
     // Handle menu item click navigation
-    const handleMenuClick = (original: string | null) => {
+    const handleMenuClick = (original: string | null, entityType?: string, slug?: string) => {
         if (original && original !== '#') {
-            router.push(original);
+            // Handle different entity types with custom navigation
+            if (entityType === 'brand' && slug) {
+                router.push(`/brand/${slug}`);
+            } else if (entityType === 'deal' && slug) {
+                router.push(`/product-deals/${slug}`);
+            } else {
+                router.push(original);
+            }
         }
     };
 
@@ -123,7 +130,16 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                             <div className="flex items-center gap-2">
                                 <h3 
                                     className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
-                                    onClick={() => menuItem.original && menuItem.original !== '#' && handleMenuClick(menuItem.original)}
+                                    onClick={() => {
+                                        if (menuItem.original && menuItem.original !== '#') {
+                                            // Extract slug from original URL or entity_data
+                                            let slug = '';
+                                            if (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') {
+                                                slug = menuItem.entity_data?.slug || menuItem.original.split('/').pop() || '';
+                                            }
+                                            handleMenuClick(menuItem.original, menuItem.entity_type, slug);
+                                        }
+                                    }}
                                 >
                                     {menuItem.label}
                                 </h3>
@@ -153,7 +169,14 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                     /* If item has no visible children, show as a link */
                     <div 
                         className={`block ${shouldShowImageSection ? 'py-1' : 'py-0.5'} text-skin-neutral-300 font-normal text-content-1 leading-none hover:underline cursor-pointer`}
-                        onClick={() => handleMenuClick(menuItem.original)}
+                        onClick={() => {
+                            // Extract slug from original URL or entity_data
+                            let slug = '';
+                            if (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') {
+                                slug = menuItem.entity_data?.slug || menuItem.original?.split('/').pop() || '';
+                            }
+                            handleMenuClick(menuItem.original, menuItem.entity_type, slug);
+                        }}
                     >
                         <div className="flex items-center gap-2">
                             <span>{menuItem.label}</span>

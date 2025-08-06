@@ -33,12 +33,21 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
                 )}
             </div>
             {dealsToDisplay && dealsToDisplay.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                <div className={`grid gap-3.5 ${
+                    dealsToDisplay.filter(banner => banner.image_url && banner.image_url.trim() !== '').length === 1 
+                        ? 'grid-cols-1 justify-items-center' 
+                        : 'grid-cols-1 md:grid-cols-3'
+                }`}>
                     {dealsToDisplay
                         .filter(banner => banner.image_url && banner.image_url.trim() !== '')
                         .slice(0, 3)
                         .map((banner, index) => (
-                        <Link href="#" key={index} aria-label={`View details of ${banner.name}`}>
+                        <Link 
+                            href="#" 
+                            key={index} 
+                            aria-label={`View details of ${banner.name}`}
+                            className={dealsToDisplay.filter(banner => banner.image_url && banner.image_url.trim() !== '').length === 1 ? 'flex justify-center w-[30%]' : ''}
+                        >
                             <NoImage
                                 src={banner.image_url || ''}
                                 alt={banner.name || ''}

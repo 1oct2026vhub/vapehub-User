@@ -73,6 +73,12 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
     // Use megaMenuData if available, otherwise fall back to categories
     const menuData = megaMenuData.length > 0 ? megaMenuData : [];
 
+    // Check if there are any menu items with children or images
+    const hasMenuContent = menuData.some(menuItem => 
+        (menuItem.children && menuItem.children.length > 0) || 
+        (menuItem.show_image && menuItem.entity_data)
+    );
+
     const filterOptions = menuData.length > 0 ? menuData.slice(0, 8).map((menuItem) => ({
         title: menuItem.label,
         content: <MobileSubMenu menuItems={menuItem.children || []} />,
@@ -130,6 +136,20 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
         onMenuClose();
     };
 
+    // Handle menu item click navigation
+    const handleMenuClick = (original: string | null, entityType?: string, slug?: string) => {
+        if (original && original !== '#') {
+            // Handle different entity types with custom navigation
+            if (entityType === 'brand' && slug) {
+                router.push(`/brand/${slug}`);
+            } else if (entityType === 'deal' && slug) {
+                router.push(`/product-deals/${slug}`);
+            } else {
+                router.push(original);
+            }
+        }
+    };
+
 
     return (
         <div>
@@ -168,23 +188,52 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                     </DrawerHeader>
                     <DrawerBody className='py-4 px-4'>
                         {/* Accordion Filters */}
-                        <Accordion variant="splitted" className="!p-0" itemClasses={itemClasses} selectionMode='multiple'>
-                            {filterOptions.map(({ title, content, link }, index) => (
-                                <AccordionItem
-                                    key={title}
-                                    aria-label={title}
-                                    title={
-                                        <Link href={link} key={title} scroll={true} >
-                                            {title}
-                                        </Link>
-                                    }
-                                    indicator={<DownArrowFilledIcon color='black' />}
-                                    onPress={() => handleAccordionItemClick(index)}
-                                >
-                                    {content}
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
+                        {hasMenuContent && (
+                            <Accordion variant="splitted" className="!p-0" itemClasses={itemClasses} selectionMode='multiple'>
+                                {filterOptions.map(({ title, content, link }, index) => {
+                                    // Check if this specific menu item has children or images
+                                    const menuItem = menuData[index];
+                                    const hasSubContent = menuItem && (
+                                        (menuItem.children && menuItem.children.length > 0) || 
+                                        (menuItem.show_image && menuItem.entity_data)
+                                    );
+                                    
+                                    return (
+                                        <AccordionItem
+                                            key={title}
+                                            aria-label={title}
+                                            title={
+                                                menuItem && (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') ? (
+                                                    <button
+                                                        className="w-full text-left"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            // Extract slug from original URL or entity_data
+                                                            let slug = '';
+                                                            if (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') {
+                                                                slug = menuItem.entity_data?.slug || menuItem.original?.split('/').pop() || '';
+                                                            }
+                                                            handleMenuClick(menuItem.original, menuItem.entity_type, slug);
+                                                        }}
+                                                    >
+                                                        {title}
+                                                    </button>
+                                                ) : (
+                                                    <Link href={link} key={title} scroll={true}>
+                                                        {title}
+                                                    </Link>
+                                                )
+                                            }
+                                            indicator={hasSubContent ? <DownArrowFilledIcon color='black' /> : null}
+                                            onPress={hasSubContent ? () => handleAccordionItemClick(index) : undefined}
+                                        >
+                                            {hasSubContent ? content : null}
+                                        </AccordionItem>
+                                    );
+                                })}
+                            </Accordion>
+                        )}
                         {defaultNavLinks.map(({ name, slug }) => (
                             <Button as={Link} href={slug} key={name} variant='light' className='w-full justify-start text-title-2 font-bold p-3'
                                 onPress={handleMenuClose}>

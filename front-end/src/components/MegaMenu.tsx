@@ -13,9 +13,11 @@ import { useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Extended type for menu items with additional properties
-interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data'> {
+interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'hide_mobile_view' | 'hide_desktop_view'> {
     is_new?: boolean;
     is_hot?: boolean;
+    hide_mobile_view?: boolean;
+    hide_desktop_view?: boolean;
     entity_data?: HeaderMegaMenu['entity_data'] & {
         image_url?: string;
     };
@@ -29,6 +31,37 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
     });
 
     const [searchKeyword, setSearchKeyword] = useState<string>('');
+
+    // Platform detection
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+    // Filter menu items based on platform visibility
+    const filterByPlatform = useCallback((items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
+        return items.filter(item => {
+            const extendedItem = item as ExtendedHeaderMegaMenu;
+            
+            // Check platform-specific visibility
+            if (isMobile && extendedItem.hide_mobile_view) {
+                return false;
+            }
+            if (!isMobile && extendedItem.hide_desktop_view) {
+                return false;
+            }
+            
+            // Recursively filter children
+            if (item.children && item.children.length > 0) {
+                const filteredChildren = filterByPlatform(item.children);
+                item.children = filteredChildren;
+            }
+            
+            return true;
+        });
+    }, [isMobile]);
+
+    // Apply platform filtering to menu items
+    const platformFilteredMenuItems = useMemo(() => {
+        return filterByPlatform([...menuItems]);
+    }, [menuItems, filterByPlatform]);
 
     // Recursive function to get all menu items - memoized with useCallback
     const getAllMenuItems = useCallback((items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
@@ -45,7 +78,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
     // Filter menu items based on search keyword
     const filteredMenuItems = useMemo(() => {
         if (!searchKeyword.trim()) {
-            return menuItems;
+            return platformFilteredMenuItems;
         }
 
         const keyword = searchKeyword.toLowerCase().trim();
@@ -73,8 +106,8 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
             });
         };
 
-        return filterItems([...menuItems]); // Create a copy to avoid mutating original
-    }, [menuItems, searchKeyword]);
+        return filterItems([...platformFilteredMenuItems]); // Create a copy to avoid mutating original
+    }, [platformFilteredMenuItems, searchKeyword]);
 
     // Handle search input change
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -282,17 +315,28 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
     // Helper: Recursively check if any menu item (or its children) has show_image: true
     const hasAnyShowImage = useCallback((items: HeaderMegaMenu[]): boolean => {
         for (const item of items) {
+            const extendedItem = item as ExtendedHeaderMegaMenu;
+            
+            // Check platform visibility first
+            if (isMobile && extendedItem.hide_mobile_view) continue;
+            if (!isMobile && extendedItem.hide_desktop_view) continue;
+            
             if (item.show_image) return true;
             if (item.children && hasAnyShowImage(item.children)) return true;
         }
         return false;
-    }, []);
+    }, [isMobile]);
 
     // Helper: Recursively find the first menu item with show_image: true and a valid image (deal or product)
     const findFirstImageItem = useCallback((items: HeaderMegaMenu[]): { item: HeaderMegaMenu, imageUrl: string } | null => {
         for (const item of items) {
+            const extendedItem = item as ExtendedHeaderMegaMenu;
+            
+            // Check platform visibility first
+            if (isMobile && extendedItem.hide_mobile_view) continue;
+            if (!isMobile && extendedItem.hide_desktop_view) continue;
+            
             if (item.show_image && item.entity_data) {
-                const extendedItem = item as ExtendedHeaderMegaMenu;
                 // Deal case
                 if (item.entity_type === 'deal' && extendedItem.entity_data?.image_url) {
                     return { item, imageUrl: extendedItem.entity_data.image_url };
@@ -313,14 +357,19 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
             }
         }
         return null;
-    }, []);
+    }, [isMobile]);
 
     // Helper: Recursively collect all menu items with show_image: true and a valid image
     const collectAllImageItems = useCallback((items: HeaderMegaMenu[]): { item: HeaderMegaMenu, imageUrl: string }[] => {
         let result: { item: HeaderMegaMenu, imageUrl: string }[] = [];
         for (const item of items) {
+            const extendedItem = item as ExtendedHeaderMegaMenu;
+            
+            // Check platform visibility first
+            if (isMobile && extendedItem.hide_mobile_view) continue;
+            if (!isMobile && extendedItem.hide_desktop_view) continue;
+            
             if (item.show_image && item.entity_data) {
-                const extendedItem = item as ExtendedHeaderMegaMenu;
                 // Deal case
                 if (
                     item.entity_type === 'deal' &&
@@ -345,7 +394,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
             }
         }
         return result;
-    }, []);
+    }, [isMobile]);
 
     const shouldShowImageSection = hasAnyShowImage(menuItems);
     const allImageResults = collectAllImageItems(menuItems);

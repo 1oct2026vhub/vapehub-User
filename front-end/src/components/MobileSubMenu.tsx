@@ -16,10 +16,12 @@ import { ServerActionStatus } from '@/lib/config/app.config';
 // import { Button } from '@nextui-org/button';
 
 // Extended type for menu items with additional properties
-interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data'> {
+interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'hide_mobile_view' | 'hide_desktop_view'> {
     is_new?: boolean;
     is_hot?: boolean;
     show_all?: boolean;
+    hide_mobile_view?: boolean;
+    hide_desktop_view?: boolean;
     entity_data?: HeaderMegaMenu['entity_data'] & {
         image_url?: string;
     };
@@ -34,8 +36,39 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [currentSlide, setCurrentSlide] = useState(0);
 
+    // Platform detection
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
     // Debug: Log the received menu items
     console.log('MobileSubMenu received menuItems:', menuItems);
+
+    // Filter menu items based on platform visibility
+    const filterByPlatform = useCallback((items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
+        return items.filter(item => {
+            const extendedItem = item as ExtendedHeaderMegaMenu;
+            
+            // Check platform-specific visibility
+            if (isMobile && extendedItem.hide_mobile_view) {
+                return false;
+            }
+            if (!isMobile && extendedItem.hide_desktop_view) {
+                return false;
+            }
+            
+            // Recursively filter children
+            if (item.children && item.children.length > 0) {
+                const filteredChildren = filterByPlatform(item.children);
+                item.children = filteredChildren;
+            }
+            
+            return true;
+        });
+    }, [isMobile]);
+
+    // Apply platform filtering to menu items
+    const platformFilteredMenuItems = useMemo(() => {
+        return filterByPlatform([...menuItems]);
+    }, [menuItems, filterByPlatform]);
 
     // Fetch subscription settings
     useEffect(() => {
@@ -103,11 +136,16 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
 
     // Filter product items with images - updated to match MegaMenu logic
     const productItems = useMemo(() => {
-        const allItems = getAllMenuItems(menuItems);
-        const itemsWithImages = allItems.filter(item =>
-            item.show_image &&
-            item.entity_data
-        );
+        const allItems = getAllMenuItems(platformFilteredMenuItems);
+        const itemsWithImages = allItems.filter(item => {
+            const extendedItem = item as ExtendedHeaderMegaMenu;
+            
+            // Check platform visibility first
+            if (isMobile && extendedItem.hide_mobile_view) return false;
+            if (!isMobile && extendedItem.hide_desktop_view) return false;
+            
+            return item.show_image && item.entity_data;
+        });
 
         // Check if any item has show_all flag
         const hasShowAll = itemsWithImages.some(item => (item as ExtendedHeaderMegaMenu).show_all);
@@ -141,12 +179,12 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             // Otherwise, limit to 3 items
             return validImageItems.slice(0, 3);
         }
-    }, [menuItems, getAllMenuItems]);
+    }, [platformFilteredMenuItems, getAllMenuItems, isMobile]);
 
     // Filter menu items based on search keyword
     const filteredMenuItems = useMemo(() => {
         if (!searchKeyword.trim()) {
-            return menuItems;
+            return platformFilteredMenuItems;
         }
 
         const keyword = searchKeyword.toLowerCase().trim();
@@ -174,8 +212,8 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             });
         };
 
-        return filterItems([...menuItems]); // Create a copy to avoid mutating original
-    }, [menuItems, searchKeyword]);
+        return filterItems([...platformFilteredMenuItems]); // Create a copy to avoid mutating original
+    }, [platformFilteredMenuItems, searchKeyword]);
 
     // Handle search input change
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -64,12 +64,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }
 
         </div>
-        <div className="flex flex-col space-y-2.5 md:space-y-3.5">
+        <div className="flex flex-col space-y-2.5">
           <div className="flex flex-col justify-between gap-1">
             <div className='min-h-[45px] xl:min-h-[60px]'>
               <p className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</p>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 -mt-2">
               <div className="flex items-center">
                 {Array.from({ length: 5 }, (_, i) => {
                   if (i < Math.round(averageRating)) {

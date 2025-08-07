@@ -254,7 +254,7 @@ input[type='search'] {
 }
 
 .feature-card {
-  @apply flex flex-col gap-2 md:gap-3.5 px-1.5 md:px-2.5 py-3.5 md:py-6 items-center bg-skin-white border border-skin-neutral-100 shadow-card rounded-xl lg:rounded-20;
+  @apply flex flex-col gap-2 md:gap-3.5 px-2.5 py-3.5 md:py-6 items-center bg-skin-white border border-skin-neutral-100 shadow-card rounded-xl lg:rounded-20;
 }
 
 .section-slider .slick-slide {

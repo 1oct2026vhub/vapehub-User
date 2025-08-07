@@ -348,7 +348,7 @@ input[type='search'] {
 
 .section-slider.deals-slider .slick-prev,
 .section-slider.deals-slider .slick-next {
-  @apply top-auto bottom-[-11.5%] sm:bottom-[-15.5%] md:bottom-[-12.5%] lg:bottom-[-14.5%] xl:bottom-[-12.8%] !important;
+  @apply top-auto max-[390px]:bottom-[-15.5%] bottom-[-13.5%] sm:bottom-[-15.5%] md:bottom-[-14%] lg:bottom-[-15.5%] xl:bottom-[-15.8%] 2xl:bottom-[-14.5%] !important;
 }
 
 .section-slider.products-slider .slick-prev,

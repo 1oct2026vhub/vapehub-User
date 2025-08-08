@@ -84,21 +84,21 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 
 			{/* Mobile Card */}
 			<div className="bg-skin-white p-2.5 w-full rounded-xl flex flex-col gap-2.5 md:hidden border border-skin-neutral-100">
-				<div className="space-y-2">
+				<div className="space-y-2 flex flex-col">
 					<Link
 						href={productLink}
-						className="bg-skin-neutral-50 border border-skin-primary-100 rounded-lg p-3 shadow-md"
+						className="bg-white border border-skin-primary-100 rounded-lg p-3 shadow-md"
 					>
 						<NoImage
 							src={imageUrl}
 							alt={name}
 							width={104}
 							height={100}
-							className="w-full"
+							className="w-full aspect-square"
 						/>
 					</Link>
 					<Link href={productLink}>
-						<h4 className="text-content-1 sm:text-content-2 font-semibold text-skin-neutral-400 line-clamp-2">
+						<h4 className="text-content-1 sm:text-content-2 font-semibold text-skin-neutral-400 line-clamp-2 min-h-10">
 							{name}
 						</h4>
 					</Link>

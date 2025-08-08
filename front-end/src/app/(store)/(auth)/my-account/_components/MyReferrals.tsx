@@ -36,8 +36,7 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral }: {
             } else if (data.referrer.referral_value_type === 'fixed') {
                 return '£' + data.referrer.referral_value;
             }
-        }
-        
+        }        
         // Fallback to referral methods - only consider active ones
         const referralMethod = referralMethods.find(method => 
             method.refer_type === referType && 
@@ -122,35 +121,29 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral }: {
         // If neither method is active, show generic message
         if (!isReferrerActive && !isReferralActive) {
             return "Share the experience. Invite your friends to VapeHub and help them discover a better way to vape."
-            // "You can just refer a friend! Share your referral link and help your friends discover VapeHub.";
         }
           
         // If both methods are active and have valid discounts
         if (hasReferrerDiscount && hasReferralDiscount) {
-            return `Earn a discount coupon for every friend you refer! Share your referral link, and when your friends sign up and make their first purchase, you both get rewarded. You get ${referrerDiscountValue} and your friend gets ${referralDiscountValue}.`;
+            return `Earn a discount coupon for every friend you refer! Share your referral link, and when your friends sign up and make their first purchase, you both get rewarded. You get ${referrerDiscountValue} discount and your friend gets ${referralDiscountValue} discount.`;
         }
         
         // If only referrer is active and has valid discount
         if (hasReferrerDiscount && !hasReferralDiscount) {
-            return `Earn a discount coupon for every friend you refer! Share your referral link, and when your friends sign up and make their first purchase, you get ${referrerDiscountValue}.`;
+            return `Earn a discount coupon for every friend you refer! Share your referral link, and when your friends sign up and make their first purchase, you get ${referrerDiscountValue} discount.`;
         }
         
         // If only referral is active and has valid discount
         if (!hasReferrerDiscount && hasReferralDiscount) {
-            return `Help your friends discover VapeHub! Share your referral link, and when your friends sign up and make their first purchase, they get ${referralDiscountValue}.`;
+            return `Help your friends discover VapeHub! Share your referral link, and when your friends sign up and make their first purchase, they get ${referralDiscountValue} discount.`;
         }
         
         // If methods are active but have no valid discounts (0% or £0)
         if (isReferrerActive || isReferralActive) {
             return "Share the experience. Invite your friends to VapeHub and help them discover a better way to vape."
-            // "You can just refer a friend! Share your referral link and help your friends discover VapeHub.";
         }        
         return "Share the experience. Invite your friends to VapeHub and help them discover a better way to vape."
-        // "You can just refer a friend! Share your referral link and help your friends discover VapeHub.";
-    }
-    console.log("referralMethods", referralMethods);
-    console.log("data", data);
-    console.log("formatReferrerValue", formatReferrerValue());    
+    }    
     return (
         <div>
             <h3 className="text-title-3 md:text-title-2 font-semibold text-skin-neutral-400 mb-2">Referral Rewards</h3>

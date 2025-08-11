@@ -875,6 +875,31 @@ export const getWelcomeContent = async (): Promise<ServerActionResponse<WelcomeC
     });
 };
 
+export const getFeatureContent = async (payload?: { page?: number, limit?: number }): Promise<ServerActionResponse<{
+    featureContent: {
+        id: number;
+        title: string;
+        subtitle: string;
+        icon: {
+            icon_url: string;
+        }
+    }[];
+}>> => {
+    return await handleRequest<{
+        featureContent: {
+            id: number;
+            title: string;
+            subtitle: string;
+            icon: {
+                icon_url: string;
+            }
+        }[];
+    }, unknown>({
+        endpoint: API_ROUTES.GET_FEATURE_CONTENT(payload),
+        method: 'GET',
+    });
+};
+
 export const getTrustpilotReviews = async (payload?: { page?: number; per_page?: number; stars?: number }): Promise<ServerActionResponse<{
   reviews: Array<{
     id: string;

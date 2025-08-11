@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
-import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
-import { FREE_DELIVERY_THRESHOLD } from "@/lib/utils";
+import { getFeatureContent } from "@/lib/server.actions";
+import { ServerActionStatus } from "@/lib/config/app.config";
 
 interface FeatureCardProps {
   imageSrc: string;
@@ -10,64 +10,54 @@ interface FeatureCardProps {
   subtitle: string;
 }
 
-const features: FeatureCardProps[] = [
-  {
-    imageSrc: "/images/price.svg",
-    altText: "Unbelievable Prices",
-    title: "Unbelievable Prices",
-    subtitle: "Always",
-  },
-  {
-    imageSrc: "/images/delivery.svg",
-    altText: "Free UK Delivery",
-    title: "Free UK Delivery",
-    subtitle: `Orders-${DEFAULT_CURRENCY_SYMBOL}${FREE_DELIVERY_THRESHOLD}`,
-  },
-  {
-    imageSrc: "/images/dispatch.svg",
-    altText: "Fast Dispatch",
-    title: "Fast Dispatch",
-    subtitle: "Orders-3pm",
-  },
-  {
-    imageSrc: "/images/deals.svg",
-    altText: "Multibuy Deals",
-    title: "Multibuy Deals",
-    subtitle: "Huge Savings",
-  },
-];
-
-
 const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, subtitle }) => (
-  <div className="feature-card">
-    <Image
-      src={imageSrc}
-      alt={altText}
-      width={58}
-      height={58}
-      className="max-w-9 lg:max-w-fit"
-      loading="lazy"
-    />
-    <div className="text-content-2 md:text-title-2 xl:text-title-1 text-center">
-      <h3 className="font-semibold text-skin-neutral-400">{title}</h3>
-      <h4 className="font-bold text-skin-primary-400">{subtitle}</h4>
+    <div className="feature-card">
+        <div className="relative h-14 w-14">
+            <Image
+                src={imageSrc}
+                alt={altText}
+                fill
+                className="object-contain"
+                loading="lazy"
+            />
+        </div>
+        <div className="text-content-2 md:text-title-2 xl:text-title-1 text-center">
+            <h3 className="font-semibold text-skin-neutral-400">{title}</h3>
+            <h4 className="font-bold text-skin-primary-400">{subtitle}</h4>
+        </div>
     </div>
-  </div>
 );
 
 
-const FeatureCards: React.FC = () => (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-6 xl:gap-12">
-    {features.map((feature, index) => (
-      <FeatureCard
-        key={index}
-        imageSrc={feature.imageSrc}
-        altText={feature.altText}
-        title={feature.title}
-        subtitle={feature.subtitle}
-      />
-    ))}
-  </div>
-);
+const FeatureCards: React.FC = async () => {
+
+    const featuresResponse = await getFeatureContent({ page: 1, limit: 4 });
+
+    if (featuresResponse.status !== ServerActionStatus.SUCCESS || !featuresResponse.data) {
+        return null;
+    }
+
+    const features = featuresResponse.data.featureContent.map(feature => ({
+        imageSrc: feature.icon.icon_url,
+        altText: feature.title,
+        title: feature.title,
+        subtitle: feature.subtitle
+    }));
+
+
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-6 xl:gap-12">
+            {features.map((feature, index) => (
+                <FeatureCard
+                    key={index}
+                    imageSrc={feature.imageSrc}
+                    altText={feature.altText}
+                    title={feature.title}
+                    subtitle={feature.subtitle}
+                />
+            ))}
+        </div>
+    )
+};
 
 export default FeatureCards;

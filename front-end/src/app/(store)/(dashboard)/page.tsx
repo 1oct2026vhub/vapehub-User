@@ -7,6 +7,7 @@ import { type ProductResponseData, type CategoryResponseData } from "@/lib/confi
 import { ROUTES } from "@/lib/routes";
 import { getDashboardData } from "./page.data";
 import { ServerActionStatus } from "@/lib/config/app.config";
+import { getFeatureContent } from "@/lib/server.actions";
 
 // Dynamically import all heavy components
 const DynamicHomeCarousel = dynamic(() => import('./_components/HomeCarousel'), {
@@ -76,6 +77,7 @@ const Dashboard: NextPage = async () => {
   // const referralCode = (await searchParams).referral_code;
    
   const data = await getDashboardData();
+  const featuresResponse = await getFeatureContent({ page: 1, limit: 4 });
 
   const emptyProductResponse: ProductResponseData = {
     products: [],
@@ -122,7 +124,7 @@ const Dashboard: NextPage = async () => {
             title="Trustpilot has rated Vapehub as Excellent!"
             filledStars={4}
           />
-          <DynamicFeatureCards />
+          <DynamicFeatureCards features={featuresResponse.status === ServerActionStatus.SUCCESS ? featuresResponse.data?.featureContent : []} />
         </Suspense>
       </section>
 

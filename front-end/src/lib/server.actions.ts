@@ -875,6 +875,37 @@ export const getWelcomeContent = async (): Promise<ServerActionResponse<WelcomeC
     });
 };
 
+export const getReviews = async (payload: { page?: number, limit?: number, product_id?: number, user_id?: number, is_visible?: boolean, testimonial?: boolean }): Promise<ServerActionResponse<{
+    rows: {
+        id: number;
+        user_name: string;
+        rating: number;
+        comment: string;
+        user: {
+            first_name: string;
+            last_name: string;
+            profile_pic_url: string | null;
+        } | null;
+    }[];
+}>> => {
+    return await handleRequest<{
+        rows: {
+            id: number;
+            user_name: string;
+            rating: number;
+            comment: string;
+            user: {
+                first_name: string;
+                last_name: string;
+                profile_pic_url: string | null;
+            } | null;
+        }[];
+    }, unknown>({
+        endpoint: API_ROUTES.REVIEWS(payload),
+        method: 'GET',
+    });
+};
+
 export const getFeatureContent = async (payload?: { page?: number, limit?: number }): Promise<ServerActionResponse<{
     featureContent: {
         id: number;

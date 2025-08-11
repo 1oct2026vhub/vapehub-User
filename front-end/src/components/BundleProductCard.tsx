@@ -62,7 +62,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 							{DEFAULT_CURRENCY_SYMBOL}
 							{price}
 						</p>
-						{regular_price && (
+						{regular_price && regular_price !== price && (
 							<p className="text-skin-neutral-300 text-title-2 xl:text-title-1 line-through font-bold">
 								{DEFAULT_CURRENCY_SYMBOL}
 								{regular_price}

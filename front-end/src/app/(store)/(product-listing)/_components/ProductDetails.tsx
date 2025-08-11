@@ -377,7 +377,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             </>
                         )}
                     </div>
-                    <p className='text-content-2 md:text-title-2 text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
+                    {Number(regularPrice) > 0 && Number(regularPrice) !== price && (
+                        <p className='text-content-2 md:text-title-2 text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
+                    )}
                     <div className='space-y-4 max-md:order-4'>
                         <div className='bg-skin-white border border-skin-neutral-100 rounded-xl shadow-product-offer p-3.5 space-y-2.5'>
                             <div className='flex gap-1 items-center'>

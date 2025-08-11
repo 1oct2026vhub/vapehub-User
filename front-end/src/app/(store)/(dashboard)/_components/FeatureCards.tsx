@@ -2,12 +2,17 @@ import Image from "next/image";
 import React from "react";
 import { getFeatureContent } from "@/lib/server.actions";
 import { ServerActionStatus } from "@/lib/config/app.config";
+import { FeatureContent } from "@/lib/config/content.config";
 
 interface FeatureCardProps {
   imageSrc: string;
   altText: string;
   title: string;
   subtitle: string;
+}
+
+interface FeatureCardsProps {
+    features?: FeatureContent[];
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, subtitle }) => (
@@ -29,15 +34,21 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
 );
 
 
-const FeatureCards: React.FC = async () => {
+const FeatureCards: React.FC<FeatureCardsProps> = async ({ features: initialFeatures }) => {
 
-    const featuresResponse = await getFeatureContent({ page: 1, limit: 4 });
+    let features = initialFeatures;
 
-    if (featuresResponse.status !== ServerActionStatus.SUCCESS || !featuresResponse.data) {
-        return null;
+    if (!features) {
+        const featuresResponse = await getFeatureContent({ page: 1, limit: 4 });
+
+        if (featuresResponse.status !== ServerActionStatus.SUCCESS || !featuresResponse.data) {
+            return null;
+        }
+        features = featuresResponse.data.featureContent;
     }
 
-    const features = featuresResponse.data.featureContent.map(feature => ({
+
+    const mappedFeatures = features.map(feature => ({
         imageSrc: feature.icon.icon_url,
         altText: feature.title,
         title: feature.title,
@@ -47,7 +58,7 @@ const FeatureCards: React.FC = async () => {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-6 xl:gap-12">
-            {features.map((feature, index) => (
+            {mappedFeatures.map((feature, index) => (
                 <FeatureCard
                     key={index}
                     imageSrc={feature.imageSrc}

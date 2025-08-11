@@ -4,7 +4,7 @@ import ShoppingCartCard from '@/components/ShoppingCartCard'
 import { NextPage } from 'next'
 import React, { ReactElement } from 'react'
 import CartDetails from './_components/CartDetails'
-import FeatureCards from '../(dashboard)/_components/FeatureCards'
+// import FeatureCards from '../(dashboard)/_components/FeatureCards'
 import Subscription from '../(dashboard)/_components/Subscription'
 import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
@@ -46,7 +46,7 @@ const ShoppingCartPage: NextPage = (): ReactElement => {
                 {/* Cart Details */}
                 <CartDetails />
             </section>
-            <FeatureCards />
+            {/* <FeatureCards /> */}
             <Subscription />
         </main>
     )

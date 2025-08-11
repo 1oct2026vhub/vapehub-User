@@ -866,6 +866,15 @@ export const getProductsByDealSlug = async (
   });
 };
 
+import { WelcomeContentResponse } from "./config/welcome.config";
+
+export const getWelcomeContent = async (): Promise<ServerActionResponse<WelcomeContentResponse>> => {
+    return await handleRequest<WelcomeContentResponse, unknown>({
+        endpoint: API_ROUTES.GET_WELCOME_CONTENT,
+        method: 'GET',
+    });
+};
+
 export const getTrustpilotReviews = async (payload?: { page?: number; per_page?: number; stars?: number }): Promise<ServerActionResponse<{
   reviews: Array<{
     id: string;

@@ -27,7 +27,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
     return (
         <Link
             href={href}
-            className="block bg-skin-white p-3.5 md:p-6 border space-y-3 border-neutral-50 rounded-3xl shadow-card hover:shadow-brand-card transition-all duration-300"
+            className="flex flex-col h-full bg-skin-white p-3.5 md:p-6 border space-y-3 border-neutral-50 rounded-3xl shadow-card hover:shadow-brand-card transition-all duration-300"
         >
             <div className="flex items-start justify-between">
                 <Image
@@ -54,7 +54,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
             <h5 className="text-content-1 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-semibold">
                 {name}
             </h5>
-            <p className="text-content-3 md:text-content-1 xl:text-title-1 font-bold text-skin-neutral-300 line-clamp-6">
+            <p className="text-content-3 md:text-content-1 xl:text-title-1 font-bold text-skin-neutral-300 line-clamp-6 flex-grow">
                 {review}
             </p>
         </Link>

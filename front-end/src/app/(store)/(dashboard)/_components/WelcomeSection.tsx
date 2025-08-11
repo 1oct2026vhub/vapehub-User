@@ -18,7 +18,7 @@ const WelcomeSection = async () => {
     const mainTitle = titleParts.join(' ');
 
     return (
-        <section className='bg-white p-6 rounded-2xl md:rounded-3xl shadow-card grid grid-cols-1 lg:grid-cols-2 items-stretch gap-6 max-sm:mt-6'>
+        <section className='bg-white p-6 rounded-2xl md:rounded-3xl shadow-card grid grid-cols-1 xl:grid-cols-2 items-stretch gap-6 max-sm:mt-6'>
             <div className='space-y-4 text-neutral-900 text-content-1 md:text-title-2 font-medium'>
                 <h1 className='text-h4 lg:text-h2 font-bold'>
                     {mainTitle}{' '}
@@ -32,7 +32,7 @@ const WelcomeSection = async () => {
                     width={700}
                     height={300}
                     alt={title}
-                    className='aspect-video w-full object-fill max-w-full rounded-lg self-stretch'
+                    className='aspect-video w-full h-full object-fill max-w-full rounded-lg self-stretch'
                 />
             </div>
         </section>

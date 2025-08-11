@@ -2,10 +2,21 @@
 import React, { FunctionComponent } from "react";
 import Slider, { Settings } from "react-slick";
 import TestimonialCard from "./TestimonialCard";
-import { TestimonialResponse } from "@/lib/config/global.config";
 import EmptyPlaceholder from "./ui/EmptyPlaceholder";
+
+interface Testimonial {
+    id: number;
+    user_name: string;
+    rating: number;
+    comment: string;
+    user: {
+        first_name: string;
+        last_name: string;
+        profile_pic_url: string | null;
+    } | null;
+}
 interface TestimonialProps {
-  data: TestimonialResponse[];
+  data: Testimonial[];
 }
  
 
@@ -39,17 +50,18 @@ const settings: Settings = {
 };
 
 const TestimonialSlider: FunctionComponent<TestimonialProps> = ({data}) => {
+  console.log("Testimonial data", data);
      if(!data.length) return  <EmptyPlaceholder title='Uh, oh!' description='No testimonials available' />;
     return (
         <Slider {...settings}>
             {data.map((testimonial, index) => (
                 <div key={index} className="px-1 md:px-2 xl:px-5 py-3 h-auto min-h-0 first:pl-0">
-                    <TestimonialCard 
-                     imageSrc = {"/images/avatar.png"}
-                     altText = {testimonial?.User?.first_name || ""}
+                    <TestimonialCard
+                     imageSrc = {testimonial.user?.profile_pic_url || "/images/avatar.png"}
+                     altText = {testimonial.user_name || ""}
                      href = "#"
-                     name = {testimonial?.User?.first_name || ""}
-                     review = {testimonial.content}
+                     name = {testimonial.user_name || ""}
+                     review = {testimonial.comment}
                      ratingCount = {testimonial.rating}
                      />
                 </div>

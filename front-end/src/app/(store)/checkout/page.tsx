@@ -4,7 +4,7 @@ import { NextPage } from 'next'
 import React, { ReactElement, useEffect } from 'react'
 import ProductList from './_components/ProductList'
 import CartTotal from './_components/CartTotal'
-// import FeatureCards from '../(dashboard)/_components/FeatureCards'
+import FeatureCards from '../(dashboard)/_components/FeatureCards'
 import Subscription from '../(dashboard)/_components/Subscription'
 import CheckoutDetails from './_components/CheckoutDetails'
 import { CheckoutProvider } from '@/lib/context/CheckoutContext'
@@ -58,7 +58,7 @@ const CheckoutPage: NextPage = (): ReactElement => {
                         description="Add items to your cart to proceed with checkout."
                     />
                 </div>
-                {/* <FeatureCards /> */}
+                <FeatureCards />
                 <Subscription />
             </main>
         )
@@ -77,7 +77,7 @@ const CheckoutPage: NextPage = (): ReactElement => {
                             <CartTotal />
                         </div>
                     </section>
-                    {/* <FeatureCards /> */}
+                    <FeatureCards />
                     <Subscription />
                 </main>
             </AddressProvider>

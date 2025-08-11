@@ -55,7 +55,7 @@ const TestimonialSlider: FunctionComponent<TestimonialProps> = ({data}) => {
     return (
         <Slider {...settings}>
             {data.map((testimonial, index) => (
-                <div key={index} className="px-1 md:px-2 xl:px-5 py-3 h-auto min-h-0 first:pl-0">
+                <div key={index} className="px-1 md:px-2 xl:px-5 py-3 h-full first:pl-0">
                     <TestimonialCard
                      imageSrc = {testimonial.user?.profile_pic_url || "/images/avatar.png"}
                      altText = {testimonial.user_name || ""}

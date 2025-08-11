@@ -85,8 +85,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     const allImages: productAllImages[] = cartEntity?.all_images ?? product?.all_images ?? [];
     const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
     const stock = cartEntity?.stock && cartEntity?.stock_status === 'in_stock' ? cartEntity?.stock : 0;
-    const price = cartEntity?.price ?? (product as { price?: number })?.price ?? 0;
-    const regularPrice = cartEntity?.regular_price ?? (product as { regular_price?: number })?.regular_price ?? 0;
+    const rawPrice = cartEntity?.price ?? (product as { price?: number | string })?.price ?? 0;
+    const rawRegularPrice = cartEntity?.regular_price ?? (product as { regular_price?: number | string })?.regular_price ?? 0;
+    const price = Number(rawPrice) || 0;
+    const regularPrice = Number(rawRegularPrice) || 0;
     const productName = productVariant
         ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`
         : product?.name;
@@ -377,7 +379,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             </>
                         )}
                     </div>
-                    {Number(regularPrice) > 0 && Number(regularPrice) !== price && (
+                    {regularPrice > 0 && regularPrice > price && (
                         <p className='text-content-2 md:text-title-2 text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
                     )}
                     <div className='space-y-4 max-md:order-4'>

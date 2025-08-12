@@ -89,6 +89,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     const rawRegularPrice = cartEntity?.regular_price ?? (product as { regular_price?: number | string })?.regular_price ?? 0;
     const price = Number(rawPrice) || 0;
     const regularPrice = Number(rawRegularPrice) || 0;
+    // When sale price is zero, fall back to regular price for display only
+    const effectivePrice = price > 0 ? price : (regularPrice > 0 ? regularPrice : 0);
     const productName = productVariant
         ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`
         : product?.name;
@@ -361,7 +363,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
-                        <p className='text-title-1 md:text-h5 xl:text-h4'>{DEFAULT_CURRENCY_SYMBOL}{price}</p>
+                        <p className='text-title-1 md:text-h5 xl:text-h4'>{DEFAULT_CURRENCY_SYMBOL}{effectivePrice}</p>
                         {mixAndMatchDeal && (
                             <>
                                 <p className='text-content-2 md:text-title-2 cursor-default'>or Mix & Match</p>
@@ -379,7 +381,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             </>
                         )}
                     </div>
-                    {regularPrice > 0 && regularPrice > price && (
+                    {regularPrice > 0 && price > 0 && regularPrice > price && (
                         <p className='text-content-2 md:text-title-2 text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
                     )}
                     <div className='space-y-4 max-md:order-4'>

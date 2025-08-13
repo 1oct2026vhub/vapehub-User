@@ -360,7 +360,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
                                                                      alt={firstProduct.entity_data?.name || firstProduct.label}
                                                                      width={183}
                                                                      height={130}
-                                                                     className="w-full h-32 object-cover transition-transform hover:scale-105 rounded-10"
+                                                                     className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
                                                                  />
                                                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
                                                                      <h4 className="text-white text-xs font-semibold truncate">
@@ -393,7 +393,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
                                                                      alt={secondProduct.entity_data?.name || secondProduct.label}
                                                                      width={183}
                                                                      height={130}
-                                                                     className="w-full h-32 object-cover transition-transform hover:scale-105 rounded-10"
+                                                                     className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
                                                                  />
                                                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
                                                                      <h4 className="text-white text-xs font-semibold truncate">
@@ -432,7 +432,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
                         </div>
                     ) : (
                         // Grid layout for 3 or fewer images
-                        <div className="grid grid-cols-2 gap-3.5">
+                        <div className="grid grid-cols-3 gap-3.5">
                             {productItems.map(product => (
                                 <div 
                                     key={product.id} 
@@ -452,7 +452,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
                                             alt={product.entity_data?.name || product.label}
                                             width={183}
                                             height={130}
-                                            className="w-full h-32 object-cover transition-transform hover:scale-105 rounded-10"
+                                            className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
                                         />
                                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
                                             <h4 className="text-white text-xs font-semibold truncate">

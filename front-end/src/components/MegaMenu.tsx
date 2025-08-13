@@ -115,13 +115,12 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
     };
 
     // Handle menu item click navigation
-    const handleMenuClick = (original: string | null, entityType?: string, slug?: string) => {
+    const handleMenuClick = (original: string | null, entityType?: string) => {
         if (original && original !== '#') {
-            // Handle different entity types with custom navigation
-            if (entityType === 'brand' && slug) {
-                router.push(`/brand/${slug}`);
-            } else if (entityType === 'deal' && slug) {
-                router.push(`/product-deals/${slug}`);
+            if (entityType === 'brand') {
+                router.push(`/brand${original}`);
+            } else if (entityType === 'deal') {
+                router.push(`/product-deals${original}`);
             } else {
                 router.push(original);
             }
@@ -165,12 +164,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                                     className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
                                     onClick={() => {
                                         if (menuItem.original && menuItem.original !== '#') {
-                                            // Extract slug from original URL or entity_data
-                                            let slug = '';
-                                            if (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') {
-                                                slug = menuItem.entity_data?.slug || menuItem.original.split('/').pop() || '';
-                                            }
-                                            handleMenuClick(menuItem.original, menuItem.entity_type, slug);
+                                            handleMenuClick(menuItem.original, menuItem.entity_type);
                                         }
                                     }}
                                 >
@@ -203,12 +197,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                     <div 
                         className={`block ${shouldShowImageSection ? 'py-1' : 'py-0.5'} text-skin-neutral-300 font-normal text-content-1 leading-none hover:underline cursor-pointer`}
                         onClick={() => {
-                            // Extract slug from original URL or entity_data
-                            let slug = '';
-                            if (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') {
-                                slug = menuItem.entity_data?.slug || menuItem.original?.split('/').pop() || '';
-                            }
-                            handleMenuClick(menuItem.original, menuItem.entity_type, slug);
+                            handleMenuClick(menuItem.original, menuItem.entity_type);
                         }}
                     >
                         <div className="flex items-center gap-2">
@@ -426,19 +415,31 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
             {shouldShowImageSection && allImageResults.length > 0 && (
                 <div className="w-[32%] space-y-6 pl-7 max-h-[400px] overflow-y-auto">
                     <div className="grid grid-cols-3 gap-4">
-                        {allImageResults.map(({ item, imageUrl }) => (
-                            <Link href={item.original || '#'} key={item.id} className="block">
-                                <div className="bg-white rounded-2xl shadow-md p-3 flex items-center justify-center">
-                                    <Image
-                                        src={imageUrl}
-                                        alt={item.entity_data?.name || item.label}
-                                        width={183}
-                                        height={130}
-                                        className="rounded-10"
-                                    />
-                                </div>
-                            </Link>
-                        ))}
+                        {allImageResults.map(({ item, imageUrl }) => {
+                            const getHref = () => {
+                                if (item.entity_type === 'brand') {
+                                    return `/brand${item.original}`;
+                                }
+                                if (item.entity_type === 'deal') {
+                                    return `/product-deals${item.original}`;
+                                }
+                                return item.original || '#';
+                            };
+
+                            return (
+                                <Link href={getHref()} key={item.id} className="block">
+                                    <div className="bg-white rounded-2xl shadow-md p-3 flex items-center justify-center">
+                                        <Image
+                                            src={imageUrl}
+                                            alt={item.entity_data?.name || item.label}
+                                            width={183}
+                                            height={130}
+                                            className="rounded-10"
+                                        />
+                                    </div>
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
             )}

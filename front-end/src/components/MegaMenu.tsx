@@ -428,14 +428,16 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
 
                             return (
                                 <Link href={getHref()} key={item.id} className="block">
-                                    <div className="bg-white rounded-2xl shadow-md p-3 flex items-center justify-center">
-                                        <Image
-                                            src={imageUrl}
-                                            alt={item.entity_data?.name || item.label}
-                                            width={183}
-                                            height={130}
-                                            className="rounded-10"
-                                        />
+                                    <div className="bg-white rounded-2xl shadow-md p-3">
+                                        <div className="relative w-full h-[100px]">
+                                            <Image
+                                                src={imageUrl}
+                                                alt={item.entity_data?.name || item.label}
+                                                fill
+                                                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                                                className="object-contain rounded-10"
+                                            />
+                                        </div>
                                     </div>
                                 </Link>
                             );

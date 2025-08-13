@@ -243,7 +243,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                         ))}
                     </DrawerBody>
                     {isFooterVisible && openItems.length === 0 && (
-                        <DrawerFooter className='py-4 px-4 space-y-6 flex-col border-t border-skin-neutral-200 max-md:landscape:hidden'>
+                        <DrawerFooter className='py-4 px-4 space-y-6 flex-col border-t border-skin-neutral-200 max-lg:landscape:hidden'>
                             <div className='p-4.5 bg-subscription-banner-mob bg-no-repeat bg-top rounded-lg bg-cover space-y-4 w-full'>
                                 <h2 className='text-content-2 font-semibold text-skin-white'>Signup Now to get rewarded</h2>
                                 <Form {...subscribeFromConfig}>

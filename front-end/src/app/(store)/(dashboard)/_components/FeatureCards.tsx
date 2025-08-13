@@ -18,7 +18,7 @@ interface FeatureCardsProps {
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, subtitle }) => (
-    <div className="feature-card">
+    <div className="feature-card flex-1">
         <div className="relative h-14 w-14">
             <Image
                 src={imageSrc}
@@ -29,7 +29,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
             />
         </div>
         <div className="text-content-2 md:text-title-2 xl:text-title-1 text-center">
-            <h3 className="font-semibold text-skin-neutral-400">{title}</h3>
+            <h3 className="font-semibold md:text-nowrap text-skin-neutral-400">{title}</h3>
             <h4 className="font-bold text-skin-primary-400">{subtitle}</h4>
         </div>
     </div>
@@ -66,7 +66,7 @@ const FeatureCards: React.FC<FeatureCardsProps> = ({ features: initialFeatures }
 
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-6 xl:gap-12">
+        <div className="grid grid-cols-2 sm:flex flex-wrap items-center justify-center gap-2.5 md:gap-6 xl:gap-12">
             {mappedFeatures.map((feature, index) => (
                 <FeatureCard
                     key={index}

@@ -122,6 +122,7 @@ export type CartItem = {
   deal_required_qty: number | null;
   deal_qty_needed: number | null;
   deals: { id: number, name: string, required_qty: number }[];
+  variantAttributes: { attribute_id: number, term_slug: string }[];
 }
   
 export type StockValidationResponse = {

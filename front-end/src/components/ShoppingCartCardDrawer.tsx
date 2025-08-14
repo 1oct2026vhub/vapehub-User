@@ -25,7 +25,12 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
     }
   };
 
-  const productUrl = `/${item.product_slug}`;
+  const queryParams = new URLSearchParams();
+  item.variantAttributes.slice(1).forEach(attr => {
+    queryParams.set(attr.attribute_id.toString(), attr.term_slug);
+  });
+  const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
+
   console.log("cart item", item);
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">

@@ -16,6 +16,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   const { updateItemQuantity, isLoading } = useCart();
   const [error, setError] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState(item.quantity.toString());
+  console.log("Quantity Selector item", item);
 
   // Update input value when item quantity changes
   useEffect(() => {
@@ -28,7 +29,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
       return;
     }
     if (newQuantity > item.stock) {
-      setError("Out of stock");
+      setError(`Only ${item.stock} items available in stock`);
       return;
     }
     setError(null);
@@ -46,7 +47,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
       if (numValue < 1) {
         setError(`Minimum quantity is 1`);
       } else if (numValue > item.stock) {
-        setError(`Out of stock`);
+        setError(`Only ${item.stock} items available in stock`);
       } else {
         setError(null);
         updateItemQuantity(item.id, numValue, item.name);

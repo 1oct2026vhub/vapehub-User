@@ -37,6 +37,12 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
   const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
   const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
 
+  const queryParams = new URLSearchParams();
+  item.variantAttributes.slice(1).forEach(attr => {
+    queryParams.set(attr.attribute_id.toString(), attr.term_slug);
+  });
+  const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
+
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">

@@ -6,7 +6,7 @@ import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem,
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '../config/app.config';
 import { useSession } from 'next-auth/react';
-import { ProductImage, ProductVariant } from '../config/product.config';
+import { Product, ProductImage, ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
 import { LoyaltyPointsRedemptionResponse } from '../config/loyalty-points.config';
 
@@ -32,7 +32,7 @@ interface LoyaltyRedemption {
 interface CartContextType {
   cartItems: CartItem[];
   isLoading: boolean;
-  addItemToCart: (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => Promise<void>;
+  addItemToCart: (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => Promise<void>;
   updateItemQuantity: (cartId: number, quantity: number,productName: string) => Promise<void>;
   removeItem: (cartId: number) => Promise<void>;
   cartTotal: number;
@@ -165,6 +165,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const bindCartItem = (item: CART_RESPONSE_DATA): CartItem => {
     const attributesName = item.variant.variantAttributes.map(attr => attr.term.name).join(', ');
+    const variantSlug = item.variant.variantAttributes[0]?.term?.slug ?? '';
     return {
       id: item.id,
       product_id: item.product_id,
@@ -174,7 +175,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       discount_price: item.variant.discount_price || '0',
       variant_id: item.variant_id,
       stock: item.variant.stock_status === 'in_stock' ? item.variant.stock : 0,
-      slug: item.product.slug,
+      slug: variantSlug,
       description: item.variant.description,
       ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
       quantity: item.quantity,
@@ -185,25 +186,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       deal_required_qty: item.deal_required_qty,
       deal_qty_needed: item.deal_qty_needed,
       deals: item.product.deals || [],
+      variantAttributes: item.variant.variantAttributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term.slug }))
     };
   };
   const getPrimaryProductImage = (item: ProductImage[]): string => {
-    return item.find(image => image.is_primary)?.image_url || item[0]?.image_url;
+    return item?.find(image => image.is_primary)?.image_url || item?.[0]?.image_url || '';
   }
-  const createGuestCartItem = (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string): CartItem => {
+  const createGuestCartItem = (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]): CartItem => {
     const id = Math.random();
     return {
       id: id,
-      product_id: productId,
-      product_slug: data.slug,
+      product_id: product.id,
+      product_slug: product.slug,
       name: productName,
       price: data.price,
       discount_price: data.discount_price,
       variant_id: variantId,
       stock: data.stock_status === 'in_stock' ? data.stock : 0,
-      slug: data.slug,
+      slug: variantSlug,
       description: "",
-      ProductImages: data.primary_image?.url || "",
+      ProductImages: data.primary_image?.url || data.all_images?.[0]?.url || getPrimaryProductImage(product.ProductImages),
       quantity: quantity,
       subtotal: Number(data.price) * quantity,
       total: Number(data.price) * quantity,
@@ -212,6 +214,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       deal_required_qty: null,
       deal_qty_needed: null,
       deals: [],
+      variantAttributes: variantAttributes,
     };
   };
 
@@ -235,8 +238,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
 
-  const addItemToCart = async (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => {
+  const addItemToCart = async (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => {
     setIsLoading(true);
+    const productId = product.id;
     try {
       // Check if the product with the same product ID and variant ID already exists in the cart
       const existingItem = cartItems.find(item =>
@@ -269,7 +273,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         // Handle as guest cart
-        const newItem = createGuestCartItem(productId, variantId, quantity, data, productName);
+        const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
         const updatedCart = [...cartItems, newItem];
         setCartItems(updatedCart);
         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
@@ -281,7 +285,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error adding item to cart:', error);
       toast.error('Failed to add item to cart. Please try again.');
       // Handle as guest cart as fallback
-      const newItem = createGuestCartItem(productId, variantId, quantity, data, productName);
+      const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
       const updatedCart = [...cartItems, newItem];
       setCartItems(updatedCart);
       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));

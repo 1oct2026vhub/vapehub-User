@@ -359,16 +359,16 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
             if (!isMobile && extendedItem.hide_desktop_view) continue;
             
             if (item.show_image && item.entity_data) {
-                // Deal case
+                // Deal, Brand, or Category case
                 if (
-                    item.entity_type === 'deal' &&
+                    (item.entity_type === 'deal' || item.entity_type === 'brand' || item.entity_type === 'category') &&
                     typeof extendedItem.entity_data?.image_url === 'string' &&
                     extendedItem.entity_data.image_url
                 ) {
                     result.push({ item, imageUrl: extendedItem.entity_data.image_url });
                 }
                 // Product case
-                if (
+                else if (
                     item.entity_type === 'product' &&
                     Array.isArray(item.entity_data.ProductImages) &&
                     item.entity_data.ProductImages.length > 0 &&

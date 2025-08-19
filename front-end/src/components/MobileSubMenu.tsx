@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { HeaderMegaMenu } from '@/lib/config/header.config';
+import Slider from "react-slick";
 // import InputField from "./InputField";
 import { SearchIcon } from "./Icons";
 // import Link from 'next/link';
@@ -34,13 +35,9 @@ interface MobileSubMenuProps {
 const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState<string>('');
-    const [currentSlide, setCurrentSlide] = useState(0);
 
     // Platform detection
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-
-    // Debug: Log the received menu items
-    console.log('MobileSubMenu received menuItems:', menuItems);
 
     // Filter menu items based on platform visibility
     const filterByPlatform = useCallback((items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
@@ -77,7 +74,6 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             
             if (response.status === ServerActionStatus.SUCCESS) {
                 // Settings fetched successfully, but not used in current implementation
-                console.log('Subscription settings loaded');
             }
         };
 
@@ -116,8 +112,8 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
     const getImageUrl = (item: HeaderMegaMenu): string => {
         const extendedItem = item as ExtendedHeaderMegaMenu;
         
-        // Deal case
-        if (item.entity_type === 'deal' && extendedItem.entity_data?.image_url) {
+        // Deal, Brand, or Category case
+        if ((item.entity_type === 'deal' || item.entity_type === 'brand' || item.entity_type === 'category') && extendedItem.entity_data?.image_url) {
             return extendedItem.entity_data.image_url;
         }
         
@@ -147,15 +143,13 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             return item.show_image && item.entity_data;
         });
 
-        // Check if any item has show_all flag
-        const hasShowAll = itemsWithImages.some(item => (item as ExtendedHeaderMegaMenu).show_all);
         
         // Collect all valid images (matching MegaMenu logic)
         const validImageItems = itemsWithImages.filter(item => {
             const extendedItem = item as ExtendedHeaderMegaMenu;
             
-            // Deal case
-            if (item.entity_type === 'deal' && extendedItem.entity_data?.image_url) {
+            // Deal, Brand, or Category case
+            if ((item.entity_type === 'deal' || item.entity_type === 'brand' || item.entity_type === 'category') && extendedItem.entity_data?.image_url) {
                 return true;
             }
             
@@ -171,14 +165,8 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
             
             return false;
         });
-        
-        if (hasShowAll) {
-            // If show_all is true, return all items with images
-            return validImageItems;
-        } else {
-            // Otherwise, limit to 3 items
-            return validImageItems.slice(0, 3);
-        }
+        return validImageItems;
+       
     }, [platformFilteredMenuItems, getAllMenuItems, isMobile]);
 
     // Filter menu items based on search keyword
@@ -214,6 +202,14 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
 
         return filterItems([...platformFilteredMenuItems]); // Create a copy to avoid mutating original
     }, [platformFilteredMenuItems, searchKeyword]);
+
+    const settings = {
+        dots: false,
+        infinite: false,
+        speed: 500,
+        slidesToShow: 2,
+        slidesToScroll: 1,
+    };
 
     // Handle search input change
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -326,150 +322,44 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
         <div className='flex flex-col gap-4'>
             {/* Dynamic Product Images */}
             {productItems.length > 0 && (
-                <>
-                    {productItems.length > 3 ? (
-                        // Slider for more than 3 images
-                        <div className="relative">
-                            <div className="overflow-hidden rounded-lg">
-                                <div 
-                                    className="flex transition-transform duration-300 ease-in-out"
-                                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                                >
-                                    {Array.from({ length: Math.ceil(productItems.length / 2) }, (_, slideIndex) => {
-                                        const firstProduct = productItems[slideIndex * 2];
-                                        const secondProduct = productItems[slideIndex * 2 + 1];
-                                        
-                                        return (
-                                            <div key={slideIndex} className="w-full flex-shrink-0">
-                                                <div className="grid grid-cols-2 gap-3.5 px-2">
-                                                    {firstProduct && (
-                                                         <div 
-                                                             className="block cursor-pointer"
-                                                             onClick={() => {
-                                                                 // Extract slug from original URL or entity_data
-                                                                 let slug = '';
-                                                                 if (firstProduct.entity_type === 'brand' || firstProduct.entity_type === 'deal') {
-                                                                     slug = firstProduct.entity_data?.slug || firstProduct.original?.split('/').pop() || '';
-                                                                 }
-                                                                 handleMenuClick(firstProduct.original, firstProduct.entity_type, slug);
-                                                             }}
-                                                         >
-                                                             <div className="relative overflow-hidden rounded-lg">
-                                                                 <Image
-                                                                     src={getImageUrl(firstProduct)}
-                                                                     alt={firstProduct.entity_data?.name || firstProduct.label}
-                                                                     width={183}
-                                                                     height={130}
-                                                                     className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
-                                                                 />
-                                                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                                                                     <h4 className="text-white text-xs font-semibold truncate">
-                                                                         {firstProduct.entity_data?.name || firstProduct.label}
-                                                                     </h4>
-                                                                     {firstProduct.entity_data?.price && (
-                                                                         <p className="text-white/90 text-xs">
-                                                                             £{firstProduct.entity_data.price}
-                                                                         </p>
-                                                                     )}
-                                                                 </div>
-                                                             </div>
-                                                         </div>
-                                                     )}
-                                                     {secondProduct && (
-                                                         <div 
-                                                             className="block cursor-pointer"
-                                                             onClick={() => {
-                                                                 // Extract slug from original URL or entity_data
-                                                                 let slug = '';
-                                                                 if (secondProduct.entity_type === 'brand' || secondProduct.entity_type === 'deal') {
-                                                                     slug = secondProduct.entity_data?.slug || secondProduct.original?.split('/').pop() || '';
-                                                                 }
-                                                                 handleMenuClick(secondProduct.original, secondProduct.entity_type, slug);
-                                                             }}
-                                                         >
-                                                             <div className="relative overflow-hidden rounded-lg">
-                                                                 <Image
-                                                                     src={getImageUrl(secondProduct)}
-                                                                     alt={secondProduct.entity_data?.name || secondProduct.label}
-                                                                     width={183}
-                                                                     height={130}
-                                                                     className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
-                                                                 />
-                                                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                                                                     <h4 className="text-white text-xs font-semibold truncate">
-                                                                         {secondProduct.entity_data?.name || secondProduct.label}
-                                                                     </h4>
-                                                                     {secondProduct.entity_data?.price && (
-                                                                         <p className="text-white/90 text-xs">
-                                                                             £{secondProduct.entity_data.price}
-                                                                         </p>
-                                                                     )}
-                                                                 </div>
-                                                             </div>
-                                                         </div>
-                                                     )}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                            
-                            {/* Slider Navigation */}
-                            {productItems.length > 2 && (
-                                <div className="flex justify-center mt-4 space-x-2">
-                                    {Array.from({ length: Math.ceil(productItems.length / 2) }, (_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => setCurrentSlide(i)}
-                                            className={`w-2 h-2 rounded-full transition-colors ${
-                                                currentSlide === i ? 'bg-skin-primary' : 'bg-skin-neutral-300'
-                                            }`}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        // Grid layout for 3 or fewer images
-                        <div className="grid grid-cols-3 gap-3.5">
-                            {productItems.map(product => (
-                                <div 
-                                    key={product.id} 
-                                    className="block cursor-pointer"
-                                    onClick={() => {
-                                        // Extract slug from original URL or entity_data
-                                        let slug = '';
-                                        if (product.entity_type === 'brand' || product.entity_type === 'deal') {
-                                            slug = product.entity_data?.slug || product.original?.split('/').pop() || '';
-                                        }
-                                        handleMenuClick(product.original, product.entity_type, slug);
-                                    }}
-                                >
-                                    <div className="relative overflow-hidden rounded-lg">
-                                        <Image
-                                            src={getImageUrl(product)}
-                                            alt={product.entity_data?.name || product.label}
-                                            width={183}
-                                            height={130}
-                                            className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
-                                        />
-                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                                            <h4 className="text-white text-xs font-semibold truncate">
-                                                {product.entity_data?.name || product.label}
-                                            </h4>
-                                            {product.entity_data?.price && (
-                                                <p className="text-white/90 text-xs">
-                                                    £{product.entity_data.price}
-                                                </p>
-                                            )}
-                                        </div>
+                <div className="relative">
+                    <Slider {...settings}>
+                        {productItems.map(product => (
+                            <div
+                                key={product.id}
+                                className="block cursor-pointer px-2"
+                                onClick={() => {
+                                    // Extract slug from original URL or entity_data
+                                    let slug = '';
+                                    if (product.entity_type === 'brand' || product.entity_type === 'deal') {
+                                        slug = product.entity_data?.slug || product.original?.split('/').pop() || '';
+                                    }
+                                    handleMenuClick(product.original, product.entity_type, slug);
+                                }}
+                            >
+                                <div className="relative overflow-hidden rounded-lg">
+                                    <Image
+                                        src={getImageUrl(product)}
+                                        alt={product.entity_data?.name || product.label}
+                                        width={183}
+                                        height={130}
+                                        className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
+                                    />
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                                        <h4 className="text-white text-xs font-semibold truncate">
+                                            {product.entity_data?.name || product.label}
+                                        </h4>
+                                        {product.entity_data?.price && (
+                                            <p className="text-white/90 text-xs">
+                                                £{product.entity_data.price}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </>
+                            </div>
+                        ))}
+                    </Slider>
+                </div>
             )}
             
             {/* Search Input */}

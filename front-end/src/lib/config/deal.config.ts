@@ -106,6 +106,7 @@ export interface ProductInDeal {
     Flavors: Flavor[];
     puff_count: number;
     ProductImages: { image_url: string }[];
+    out_of_stock?: boolean;
 }
 
 export interface CategoriesWithDealsResponse {

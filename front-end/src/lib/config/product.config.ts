@@ -118,6 +118,7 @@ export interface Product {
     Flavors?: Flavor[];
     puff_count?: number | string;
     createdAt?: string;
+    out_of_stock?: boolean;
 }
 
 export interface SimilarProduct extends Product {

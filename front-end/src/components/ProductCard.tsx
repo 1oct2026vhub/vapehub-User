@@ -1,6 +1,6 @@
 "use client"
 // import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@nextui-org/button';
 // import Link from 'next/link';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
@@ -39,6 +39,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
   totalReviews = 0,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showTitleTooltip, setShowTitleTooltip] = useState(false);
+  const [isTitleTruncated, setIsTitleTruncated] = useState(false);
+  const titleRef = useRef<HTMLParagraphElement>(null);
+  
+  // Check if title is actually truncated
+  useEffect(() => {
+    if (titleRef.current) {
+      const element = titleRef.current;
+      const isTruncated = element.scrollHeight > element.clientHeight;
+      setIsTitleTruncated(isTruncated);
+    }
+  }, [title]);
+  
   return (
     <Link href={link} className="block">
       <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 content-stretch shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
@@ -69,7 +82,24 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="flex flex-col space-y-2.5">
           <div className="flex flex-col justify-between gap-1">
             <div className='min-h-[45px] xl:min-h-[60px]'>
-              <p className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8">{title}</p>
+              <div className="relative">
+                <p 
+                  ref={titleRef}
+                  className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8 cursor-pointer"
+                  onMouseEnter={() => isTitleTruncated && setShowTitleTooltip(true)}
+                  onMouseLeave={() => setShowTitleTooltip(false)}
+                >
+                  {title}
+                </p>
+                {showTitleTooltip && isTitleTruncated && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-white text-sm rounded-lg shadow-lg z-50 max-w-xs break-words" style={{ backgroundColor: '#02643E' }}>
+                    <div className="whitespace-normal leading-relaxed">
+                      {title}
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent" style={{ borderTopColor: '#02643E' }}></div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-1 -mt-2">
               <div className="flex items-center">

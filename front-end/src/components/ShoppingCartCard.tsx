@@ -72,11 +72,11 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
                 {/* {DEFAULT_CURRENCY_SYMBOL}{(Number(item.price) * item.quantity).toFixed(2)} */}
                 {DEFAULT_CURRENCY_SYMBOL}{item.total.toFixed(2)}
               </p>
-              {/* {item?.discount_price && (
+              {item.discount_price && parseFloat(item.discount_price) > 0 && item.total !== item.subtotal && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">
                   {DEFAULT_CURRENCY_SYMBOL}{item.subtotal.toFixed(2)}
                 </p>
-              )} */}
+              )}
             </div>
           </div>
 

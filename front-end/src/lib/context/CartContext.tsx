@@ -95,7 +95,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   // Calculate cart totals
   const calculateTotals = (items: CartItem[]) => {
     const total = items.reduce((sum, item) => {
-      const itemTotal = parseFloat(item.price) * item.quantity;
+      // Use discount_price if available, otherwise use regular price
+      const effectivePrice = item.discount_price && parseFloat(item.discount_price) > 0 
+        ? parseFloat(item.discount_price) 
+        : parseFloat(item.price);
+      const itemTotal = effectivePrice * item.quantity;
       return sum + itemTotal;
     }, 0);
     setCartTotal(total);
@@ -194,6 +198,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }
   const createGuestCartItem = (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]): CartItem => {
     const id = Math.random();
+    // Use discount_price if available, otherwise use regular price
+    const effectivePrice = data.discount_price && parseFloat(data.discount_price) > 0 
+      ? parseFloat(data.discount_price) 
+      : parseFloat(data.price);
+    const itemTotal = effectivePrice * quantity;
+    
     return {
       id: id,
       product_id: product.id,
@@ -207,8 +217,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       description: "",
       ProductImages: data.primary_image?.url || data.all_images?.[0]?.url || getPrimaryProductImage(product.ProductImages),
       quantity: quantity,
-      subtotal: Number(data.price) * quantity,
-      total: Number(data.price) * quantity,
+      subtotal: parseFloat(data.price) * quantity, // Original price * quantity
+      total: itemTotal, // Effective price (with discount) * quantity
       applied_deals: [],
       show_deal_toast: false,
       deal_required_qty: null,
@@ -319,9 +329,21 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           }
       } else {
         // Handle as guest cart
-        const updatedCart = cartItems.map(item =>
-          item.id === cartId ? { ...item, quantity } : item
-        );
+        const updatedCart = cartItems.map(item => {
+          if (item.id === cartId) {
+            // Recalculate totals for the updated item
+            const effectivePrice = item.discount_price && parseFloat(item.discount_price) > 0 
+              ? parseFloat(item.discount_price) 
+              : parseFloat(item.price);
+            return {
+              ...item,
+              quantity,
+              subtotal: parseFloat(item.price) * quantity, // Original price * quantity
+              total: effectivePrice * quantity // Effective price (with discount) * quantity
+            };
+          }
+          return item;
+        });
         setCartItems(updatedCart);
         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
         calculateTotals(updatedCart);
@@ -331,9 +353,21 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error updating cart item:', error);
       toast.error('Failed to update cart. Please try again.');
       // Handle as guest cart as fallback
-      const updatedCart = cartItems.map(item =>
-        item.id === cartId ? { ...item, quantity } : item
-      );
+      const updatedCart = cartItems.map(item => {
+        if (item.id === cartId) {
+          // Recalculate totals for the updated item
+          const effectivePrice = item.discount_price && parseFloat(item.discount_price) > 0 
+            ? parseFloat(item.discount_price) 
+            : parseFloat(item.price);
+          return {
+            ...item,
+            quantity,
+            subtotal: parseFloat(item.price) * quantity, // Original price * quantity
+            total: effectivePrice * quantity // Effective price (with discount) * quantity
+          };
+        }
+        return item;
+      });
       setCartItems(updatedCart);
       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
       calculateTotals(updatedCart);

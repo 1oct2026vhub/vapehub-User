@@ -58,11 +58,11 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
               <p className="primary-gradient-100 text-content-2 md:text-title-1 font-bold">
                 {DEFAULT_CURRENCY_SYMBOL}{item.total.toFixed(2)}
               </p>
-              {/* {item.total !== item.subtotal && (
+              {item.discount_price && parseFloat(item.discount_price) > 0 && item.total !== item.subtotal && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 line-through opacity-60 font-bold">
                   {DEFAULT_CURRENCY_SYMBOL}{(item.subtotal).toFixed(2)}
                 </p>
-              )} */}
+              )}
             </div>
           </div>
 

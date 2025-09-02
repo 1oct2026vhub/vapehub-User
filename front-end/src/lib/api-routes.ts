@@ -83,6 +83,7 @@ export const API_ROUTES = {
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
     CHECK_STOCK_VALIDATION: buildRequestUrl('/api/cart/check-stock'),
+    CALCULATE_GUEST_DEALS: buildRequestUrl('/api/cart/calculate-guest-deals'),
     SEND_REFERRAL_CODE: buildRequestUrl('/api/users/refer-a-friend'),
     GET_REFERRAL_STATS: (page: number, limit: number) => buildRequestUrl(`/api/users/referral-stats?page=${page}&limit=${limit}`),
     GET_NOTIFICATION_LIST: buildRequestUrl('/api/notifications'),

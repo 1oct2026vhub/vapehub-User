@@ -114,7 +114,14 @@ export interface Product {
     // Properties required by ProductList.tsx
     Category?: Category | null;
     ProductImages: ProductImage[];
-    deals?: { id: number, name: string, required_qty: number }[];
+    deals?: { 
+        id: number, 
+        name: string, 
+        required_qty: number,
+        deal_type?: string,
+        discount_percent?: number,
+        fixed_price?: string
+    }[];
     Flavors?: Flavor[];
     puff_count?: number | string;
     createdAt?: string;

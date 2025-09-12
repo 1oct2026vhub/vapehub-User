@@ -35,7 +35,7 @@ const ProductSuggestions: React.FC<ProductSuggestionsProps> = ({ suggestions, is
                     {suggestions.map(product => (
                         <li key={product.id} className="p-2 hover:bg-gray-100">
                             <Link href={`/${product.slug}`} className="flex items-center gap-4" onClick={onClose}>
-                                <Image src={getImageUrl(product.ProductImages[0]?.image_url)} alt={product.name} width={40} height={40} className="object-cover rounded" />
+                                <Image src={getImageUrl(product.ProductImages[0]?.image_url)} alt="" width={40} height={40} className="object-cover rounded" />
                                 <div className="flex-1">
                                     <p className="font-semibold text-sm">{product.name}</p>
                                     <p className="text-xs text-gray-500">{DEFAULT_CURRENCY_SYMBOL}{product.price}</p>

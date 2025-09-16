@@ -111,6 +111,7 @@ export const API_ROUTES = {
     GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_WELCOME_CONTENT: buildRequestUrl('/api/home/welcome-content'),
     GET_FEATURE_CONTENT: (payload?: { page?: number, limit?: number }) => buildRequestUrl(`/api/home/feature-content${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_SHIPSTATION_CARRIERS: buildRequestUrl('/api/admin/shipStation/carriers'),
 };
 
 // * Helper functions

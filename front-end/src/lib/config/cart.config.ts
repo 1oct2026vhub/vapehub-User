@@ -121,7 +121,15 @@ export type CartItem = {
   show_deal_toast: boolean;
   deal_required_qty: number | null;
   deal_qty_needed: number | null;
-  deals: { id: number, name: string, required_qty: number }[];
+  deals: { 
+    id: number, 
+    name: string, 
+    required_qty: number,
+    deal_type?: string,
+    discount_percent?: number,
+    fixed_price?: string
+  }[];
+  variantAttributes: { attribute_id: number, term_slug: string }[];
 }
   
 export type StockValidationResponse = {

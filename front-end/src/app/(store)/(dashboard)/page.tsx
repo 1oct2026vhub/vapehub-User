@@ -94,10 +94,10 @@ const Dashboard: NextPage = async () => {
     category: []
   };
 
-  if (data.carousel.status === ServerActionStatus.ERROR || 
-      data.categories.status === ServerActionStatus.ERROR) {
-    return <div>Failed to load dashboard data</div>;
-  }
+  // if (data.carousel.status === ServerActionStatus.ERROR || 
+  //     data.categories.status === ServerActionStatus.ERROR) {
+  //   return <div>Failed to load dashboard data</div>;
+  // }
 
   const transformCategoryToProductResponse = (response: CategoryResponseData): ProductResponseData => ({
     products: response.products,

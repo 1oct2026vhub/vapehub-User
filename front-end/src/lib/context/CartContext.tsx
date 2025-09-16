@@ -2,11 +2,11 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, UnAvailableItem } from '../config/cart.config';
-import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, getLoyaltyPointsRedemption } from '../server.actions';
+import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, getLoyaltyPointsRedemption, calculateGuestDeals } from '../server.actions';
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '../config/app.config';
 import { useSession } from 'next-auth/react';
-import { ProductImage, ProductVariant } from '../config/product.config';
+import { Product, ProductImage, ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
 import { LoyaltyPointsRedemptionResponse } from '../config/loyalty-points.config';
 
@@ -32,7 +32,7 @@ interface LoyaltyRedemption {
 interface CartContextType {
   cartItems: CartItem[];
   isLoading: boolean;
-  addItemToCart: (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => Promise<void>;
+  addItemToCart: (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => Promise<void>;
   updateItemQuantity: (cartId: number, quantity: number,productName: string) => Promise<void>;
   removeItem: (cartId: number) => Promise<void>;
   cartTotal: number;
@@ -95,13 +95,100 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   // Calculate cart totals
   const calculateTotals = (items: CartItem[]) => {
     const total = items.reduce((sum, item) => {
-      const itemTotal = parseFloat(item.price) * item.quantity;
+      // Use discount_price if available, otherwise use regular price
+      const effectivePrice = item.discount_price && parseFloat(item.discount_price) > 0 
+        ? parseFloat(item.discount_price) 
+        : parseFloat(item.price);
+      const itemTotal = effectivePrice * item.quantity;
       return sum + itemTotal;
     }, 0);
     setCartTotal(total);
     setCartSubtotal(total);
     setCartDiscount(0);
     setItemCount(items.length);
+  };
+
+  // Calculate guest deals and update cart totals
+  const calculateGuestDealsAndTotals = async (items: CartItem[]) => {
+    if (isAuthenticated || items.length === 0) {
+      if (isAuthenticated) {
+        console.log('⏭️ Skipping guest deals calculation - user is authenticated');
+      } else {
+        console.log('⏭️ Skipping guest deals calculation - cart is empty');
+      }
+      calculateTotals(items);
+      return;
+    }
+
+    console.log('🔄 Starting guest deals calculation for', items.length, 'items');
+    try {
+      // Prepare cart items for API call
+      const cartItemsForAPI = items.map(item => ({
+        product_id: item.product_id,
+        variant_id: item.variant_id,
+        quantity: item.quantity
+      }));
+
+      console.log('🚀 Calling calculateGuestDeals API with:', cartItemsForAPI);
+      const response = await calculateGuestDeals(cartItemsForAPI);
+      console.log('📡 calculateGuestDeals API Response:', response);
+      
+             if (response.status === ServerActionStatus.SUCCESS && response.data) {
+         console.log('📊 API Response Data:', response.data);
+         
+         // Update cart items with deal information from API
+         const updatedItems = items.map(item => {
+           // Find matching item in API response by product_id and variant_id
+           const apiItem = response.data.items?.find(apiItem => 
+             apiItem.product_id === item.product_id && apiItem.variant_id === item.variant_id
+           );
+           
+           if (apiItem) {
+             console.log('🔄 Updating item:', item.name, 'with API data:', apiItem);
+             return {
+               ...item,
+               // Update with API response data
+               subtotal: apiItem.subtotal || (parseFloat(item.price) * item.quantity),
+               total: apiItem.total || (parseFloat(item.price) * item.quantity),
+               applied_deals: apiItem.applied_deals || [],
+               show_deal_toast: apiItem.show_deal_toast || false,
+               deal_required_qty: apiItem.deal_required_qty || null,
+               deal_qty_needed: apiItem.deal_qty_needed || null,
+               deals: apiItem.deals?.map(deal => ({
+                 ...deal,
+                 fixed_price: deal.fixed_price?.toString() || undefined
+               })) || item.deals || []
+             };
+           }
+           return item;
+         });
+
+         setCartItems(updatedItems);
+         
+         // Update totals from API response summary
+         if (response.data.summary) {
+           console.log('💰 Setting cart totals from API:', {
+             total: response.data.summary.total,
+             subtotal: response.data.summary.subtotal,
+             discount: response.data.summary.total_discount
+           });
+           setCartTotal(response.data.summary.total);
+           setCartSubtotal(response.data.summary.subtotal);
+           setCartDiscount(response.data.summary.total_discount);
+           setItemCount(items.length);
+         } else {
+           console.log('⚠️ No summary in API response, using local calculation');
+           calculateTotals(updatedItems);
+         }
+      } else {
+        // Fallback to local calculation if API fails
+        calculateTotals(items);
+      }
+    } catch (error) {
+      console.error('Error calculating guest deals:', error);
+      // Fallback to local calculation if API fails
+      calculateTotals(items);
+    }
   };
 
   const loadCartItems = useCallback(async () => {
@@ -123,25 +210,36 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             calculateTotals(cartItems);
           }
         }
-      } else {
-        // Load from cookie for guest users
-        const cookieCart = getCookie(CART_COOKIE_NAME);
-        if (cookieCart) {
-          const parsedCart = JSON.parse(cookieCart as string);
-          setCartItems(parsedCart);
-          calculateTotals(parsedCart);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading cart:', error);
-      // Load from cookie as fallback
-      const cookieCart = getCookie(CART_COOKIE_NAME);
-      if (cookieCart) {
-        const parsedCart = JSON.parse(cookieCart as string);
-        setCartItems(parsedCart);
-        calculateTotals(parsedCart);
-      }
-    } finally {
+             } else {
+         // Load from cookie for guest users
+         const cookieCart = getCookie(CART_COOKIE_NAME);
+         if (cookieCart) {
+           const parsedCart = JSON.parse(cookieCart as string);
+           setCartItems(parsedCart);
+           // For guest users, immediately calculate deals using API to prevent flicker
+           await calculateGuestDealsAndTotals(parsedCart);
+         }
+       }
+         } catch (error) {
+       console.error('Error loading cart:', error);
+       // Load from cookie as fallback
+       const cookieCart = getCookie(CART_COOKIE_NAME);
+       if (cookieCart) {
+         const parsedCart = JSON.parse(cookieCart as string);
+         setCartItems(parsedCart);
+         // For guest users, try API first, fallback to local calculation
+         if (!isAuthenticated) {
+           try {
+             await calculateGuestDealsAndTotals(parsedCart);
+           } catch (apiError) {
+             console.error('API failed, using local calculation:', apiError);
+             calculateTotals(parsedCart);
+           }
+         } else {
+           calculateTotals(parsedCart);
+         }
+       }
+     } finally {
       setIsLoading(false);
     }
   }, [isAuthenticated]);
@@ -165,6 +263,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const bindCartItem = (item: CART_RESPONSE_DATA): CartItem => {
     const attributesName = item.variant.variantAttributes.map(attr => attr.term.name).join(', ');
+    const variantSlug = item.variant.variantAttributes[0]?.term?.slug ?? '';
     return {
       id: item.id,
       product_id: item.product_id,
@@ -174,7 +273,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       discount_price: item.variant.discount_price || '0',
       variant_id: item.variant_id,
       stock: item.variant.stock_status === 'in_stock' ? item.variant.stock : 0,
-      slug: item.product.slug,
+      slug: variantSlug,
       description: item.variant.description,
       ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
       quantity: item.quantity,
@@ -185,33 +284,110 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       deal_required_qty: item.deal_required_qty,
       deal_qty_needed: item.deal_qty_needed,
       deals: item.product.deals || [],
+      variantAttributes: item.variant.variantAttributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term.slug }))
     };
   };
   const getPrimaryProductImage = (item: ProductImage[]): string => {
-    return item.find(image => image.is_primary)?.image_url || item[0]?.image_url;
+    return item?.find(image => image.is_primary)?.image_url || item?.[0]?.image_url || '';
   }
-  const createGuestCartItem = (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string): CartItem => {
+
+  // Helper function to calculate deals for guest users
+  // const calculateLocalGuestDeals = (product: Product, quantity: number) => {
+  //   if (!product.deals || product.deals.length === 0) {
+  //     return {
+  //       applied_deals: [],
+  //       show_deal_toast: false,
+  //       deal_required_qty: null,
+  //       deal_qty_needed: null,
+  //       deals: product.deals || [],
+  //       dealDiscountAmount: 0
+  //     };
+  //   }
+
+  //   // Find the best applicable deal
+  //   const applicableDeals = product.deals.filter(deal => deal.required_qty <= quantity);
+  //   const bestDeal = applicableDeals.length > 0 
+  //     ? applicableDeals.reduce((best, current) => 
+  //         current.required_qty > best.required_qty ? current : best
+  //       )
+  //     : null;
+
+  //   if (bestDeal) {
+  //     // Calculate deal discount amount
+  //     let dealDiscountAmount = 0;
+  //     if (bestDeal.deal_type === 'BUY_N_FOR_FIXED' && bestDeal.fixed_price) {
+  //       // Fixed price deal - calculate discount based on difference between regular price and fixed price
+  //       const regularPrice = parseFloat(product.price || '0') * quantity;
+  //       const fixedPrice = parseFloat(bestDeal.fixed_price) * quantity;
+  //       dealDiscountAmount = Math.max(0, regularPrice - fixedPrice);
+  //     } else if (bestDeal.discount_percent) {
+  //       // Percentage discount
+  //       dealDiscountAmount = (parseFloat(product.price || '0') * quantity * bestDeal.discount_percent) / 100;
+  //     }
+
+  //     // Deal is applied - convert to AppliedDeal format
+  //     const appliedDeal = {
+  //       deal_id: bestDeal.id,
+  //       deal_name: bestDeal.name,
+  //       discount_amount: dealDiscountAmount
+  //     };
+      
+  //     return {
+  //       applied_deals: [appliedDeal],
+  //       show_deal_toast: false,
+  //       deal_required_qty: bestDeal.required_qty,
+  //       deal_qty_needed: 0,
+  //       deals: product.deals,
+  //       dealDiscountAmount: dealDiscountAmount
+  //     };
+  //   } else {
+  //     // Find the next deal to show toast
+  //     const nextDeal = product.deals.reduce((next, current) => 
+  //       current.required_qty < next.required_qty ? current : next
+  //     );
+      
+  //     return {
+  //       applied_deals: [],
+  //       show_deal_toast: true,
+  //       deal_required_qty: nextDeal.required_qty,
+  //       deal_qty_needed: nextDeal.required_qty - quantity,
+  //       deals: product.deals,
+  //       dealDiscountAmount: 0
+  //     };
+  //   }
+  // };
+
+  const createGuestCartItem = (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]): CartItem => {
     const id = Math.random();
+    // Use discount_price if available, otherwise use regular price
+    const effectivePrice = data.discount_price && parseFloat(data.discount_price) > 0 
+      ? parseFloat(data.discount_price) 
+      : parseFloat(data.price);
+    
+    // For guest users, don't calculate deals locally - let the API handle it
+    // This prevents the flicker between local calculation and API result
+    
     return {
       id: id,
-      product_id: productId,
-      product_slug: data.slug,
+      product_id: product.id,
+      product_slug: product.slug,
       name: productName,
       price: data.price,
       discount_price: data.discount_price,
       variant_id: variantId,
       stock: data.stock_status === 'in_stock' ? data.stock : 0,
-      slug: data.slug,
+      slug: variantSlug,
       description: "",
-      ProductImages: data.primary_image?.url || "",
+      ProductImages: data.primary_image?.url || data.all_images?.[0]?.url || getPrimaryProductImage(product.ProductImages),
       quantity: quantity,
-      subtotal: Number(data.price) * quantity,
-      total: Number(data.price) * quantity,
-      applied_deals: [],
-      show_deal_toast: false,
-      deal_required_qty: null,
-      deal_qty_needed: null,
-      deals: [],
+      subtotal: parseFloat(data.price) * quantity, // Original price * quantity
+      total: effectivePrice * quantity, // Just the base price * quantity, API will update with deals
+      applied_deals: [], // Empty initially, API will populate
+      show_deal_toast: false, // API will determine this
+      deal_required_qty: null, // API will determine this
+      deal_qty_needed: null, // API will determine this
+      deals: product.deals || [], // Keep product deals for reference
+      variantAttributes: variantAttributes,
     };
   };
 
@@ -235,8 +411,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
 
-  const addItemToCart = async (productId: number, variantId: number, quantity: number, data: ProductVariant, productName: string) => {
+  const addItemToCart = async (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => {
     setIsLoading(true);
+    const productId = product.id;
     try {
       // Check if the product with the same product ID and variant ID already exists in the cart
       const existingItem = cartItems.find(item =>
@@ -269,23 +446,30 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         // Handle as guest cart
-        const newItem = createGuestCartItem(productId, variantId, quantity, data, productName);
+        const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
         const updatedCart = [...cartItems, newItem];
         setCartItems(updatedCart);
         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
-        calculateTotals(updatedCart);
+        // Immediately calculate deals using API to prevent flicker
+        await calculateGuestDealsAndTotals(updatedCart);
         toast.success(`${productName} added to cart successfully`);
       }
 
     } catch (error) {
       console.error('Error adding item to cart:', error);
       toast.error('Failed to add item to cart. Please try again.');
-      // Handle as guest cart as fallback
-      const newItem = createGuestCartItem(productId, variantId, quantity, data, productName);
+      // Handle as guest cart as fallback - still try to use API for deals
+      const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
       const updatedCart = [...cartItems, newItem];
       setCartItems(updatedCart);
       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
-      calculateTotals(updatedCart);
+      // Try API first, fallback to local calculation if API fails
+      try {
+        await calculateGuestDealsAndTotals(updatedCart);
+      } catch (apiError) {
+        console.error('API failed, using local calculation:', apiError);
+        calculateTotals(updatedCart);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -315,21 +499,53 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           }
       } else {
         // Handle as guest cart
-        const updatedCart = cartItems.map(item =>
-          item.id === cartId ? { ...item, quantity } : item
-        );
-        setCartItems(updatedCart);
-        setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
-        calculateTotals(updatedCart);
-        // toast.success('Cart updated successfully');
+        const updatedCart = cartItems.map(item => {
+          if (item.id === cartId) {
+            // For guest users, don't calculate deals locally - let the API handle it
+            // This prevents the flicker between local calculation and API result
+            const effectivePrice = item.discount_price && parseFloat(item.discount_price) > 0 
+              ? parseFloat(item.discount_price) 
+              : parseFloat(item.price);
+            
+            return {
+              ...item,
+              quantity,
+              subtotal: parseFloat(item.price) * quantity, // Original price * quantity
+              total: effectivePrice * quantity, // Just the base price * quantity, API will update with deals
+              // Keep existing deal info until API updates it
+              applied_deals: item.applied_deals,
+              show_deal_toast: item.show_deal_toast,
+              deal_required_qty: item.deal_required_qty,
+              deal_qty_needed: item.deal_qty_needed
+            };
+          }
+          return item;
+        });
+         setCartItems(updatedCart);
+         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+         console.log('🔄 Calling calculateGuestDealsAndTotals for quantity update');
+         await calculateGuestDealsAndTotals(updatedCart);
+         // toast.success('Cart updated successfully');
       }
     } catch (error) {
       console.error('Error updating cart item:', error);
       toast.error('Failed to update cart. Please try again.');
       // Handle as guest cart as fallback
-      const updatedCart = cartItems.map(item =>
-        item.id === cartId ? { ...item, quantity } : item
-      );
+      const updatedCart = cartItems.map(item => {
+        if (item.id === cartId) {
+          // For guest users, don't calculate deals locally - let the API handle it
+          const effectivePrice = item.discount_price && parseFloat(item.discount_price) > 0 
+            ? parseFloat(item.discount_price) 
+            : parseFloat(item.price);
+          return {
+            ...item,
+            quantity,
+            subtotal: parseFloat(item.price) * quantity, // Original price * quantity
+            total: effectivePrice * quantity // Just the base price * quantity, API will update with deals
+          };
+        }
+        return item;
+      });
       setCartItems(updatedCart);
       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
       calculateTotals(updatedCart);
@@ -364,42 +580,57 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             });
           }
         }
-      } else {
-        // Handle as guest cart
-        const updatedCart = cartItems.filter(item => item.id !== cartId);
-        setCartItems(updatedCart);
-        setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
-        calculateTotals(updatedCart);
-        toast.error(`${itemToRemove?.name || 'Item'} removed from cart`);
-        
-        // Reset loyalty points if cart becomes empty
-        if (updatedCart.length === 0) {
-          setLoyaltyRedemption({
-            isRedeemed: false,
-            pointsData: loyaltyRedemption.pointsData,
-            discountValue: 0,
-            message: null,
-          });
-        }
-      }
+             } else {
+         // Handle as guest cart
+         const updatedCart = cartItems.filter(item => item.id !== cartId);
+         setCartItems(updatedCart);
+         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+         // For guest users, recalculate deals using API if cart is not empty
+         if (updatedCart.length > 0) {
+           await calculateGuestDealsAndTotals(updatedCart);
+         } else {
+           calculateTotals(updatedCart);
+         }
+         toast.error(`${itemToRemove?.name || 'Item'} removed from cart`);
+         
+         // Reset loyalty points if cart becomes empty
+         if (updatedCart.length === 0) {
+           setLoyaltyRedemption({
+             isRedeemed: false,
+             pointsData: loyaltyRedemption.pointsData,
+             discountValue: 0,
+             message: null,
+           });
+         }
+       }
     } catch (error) {
       console.error('Error removing item from cart:', error);
       toast.error('Failed to remove item from cart. Please try again.');
-      // Handle as guest cart as fallback
-      const updatedCart = cartItems.filter(item => item.id !== cartId);
-      setCartItems(updatedCart);
-      setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
-      calculateTotals(updatedCart);
-      
-      // Reset loyalty points if cart becomes empty
-      if (updatedCart.length === 0) {
-        setLoyaltyRedemption({
-          isRedeemed: false,
-          pointsData: loyaltyRedemption.pointsData,
-          discountValue: 0,
-          message: null,
-        });
-      }
+             // Handle as guest cart as fallback
+       const updatedCart = cartItems.filter(item => item.id !== cartId);
+       setCartItems(updatedCart);
+       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+       // For guest users, try API first, fallback to local calculation
+       if (!isAuthenticated && updatedCart.length > 0) {
+         try {
+           await calculateGuestDealsAndTotals(updatedCart);
+         } catch (apiError) {
+           console.error('API failed, using local calculation:', apiError);
+           calculateTotals(updatedCart);
+         }
+       } else {
+         calculateTotals(updatedCart);
+       }
+       
+       // Reset loyalty points if cart becomes empty
+       if (updatedCart.length === 0) {
+         setLoyaltyRedemption({
+           isRedeemed: false,
+           pointsData: loyaltyRedemption.pointsData,
+           discountValue: 0,
+           message: null,
+         });
+       }
     } finally {
       setIsLoading(false);
     }

@@ -284,6 +284,7 @@ console.log("filter data", data);
                       isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
                       averageRating={averageRating}
                       totalReviews={totalReviews}
+                      outOfStock={product.out_of_stock}
                     />
                   )
                 })}

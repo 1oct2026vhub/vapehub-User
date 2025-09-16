@@ -228,6 +228,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                                         isNew={isLessThanOneMonth(product.created_at) ? "New" : ""}
                                         averageRating={averageRating}
                                         totalReviews={totalReviews}
+                                        outOfStock={product.out_of_stock}
                                     />
                                 </div>
                             )

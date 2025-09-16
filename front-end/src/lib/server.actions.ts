@@ -1077,3 +1077,29 @@ export const calculateGuestDeals = async (cartItems: { product_id: number; varia
     payload: { cartItems },
   });
 };
+
+// Get ShipStation carriers
+export const getShipStationCarriers = async (): Promise<ServerActionResponse<{
+  name: string;
+  code: string;
+  accountNumber: string | null;
+  requiresFundedAccount: boolean;
+  balance: number;
+  nickname: string | null;
+  shippingProviderId: number;
+  primary: boolean;
+}[]>> => {
+  return await handleRequest<{
+    name: string;
+    code: string;
+    accountNumber: string | null;
+    requiresFundedAccount: boolean;
+    balance: number;
+    nickname: string | null;
+    shippingProviderId: number;
+    primary: boolean;
+  }[], unknown>({
+    endpoint: API_ROUTES.GET_SHIPSTATION_CARRIERS,
+    method: 'GET',
+  });
+};

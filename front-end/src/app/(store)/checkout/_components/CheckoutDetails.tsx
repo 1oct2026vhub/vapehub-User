@@ -10,7 +10,6 @@ import { CustomRadio } from '@/components/CustomRadio';
 import { Button, RadioGroup, useDisclosure } from '@nextui-org/react';
 import { Form } from '@/components/ui/Form';
 import { useCheckout } from '@/lib/context/CheckoutContext';
-import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config';
 import { useCart } from '@/lib/context/CartContext';
 import { useAddress } from '@/lib/context/AddressContext';
 import AddressList from './AddressList';
@@ -18,9 +17,8 @@ import { Address } from '@/lib/config/user.config';
 import { useUserProfile } from '@/lib/hooks/useUserProfile';
 import Flag from '@/components/ui/Flag';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
-import { getShippingMethods, placeOrder } from '@/lib/server.actions';
-import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
-import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
+import { getShipStationCarriers, placeOrder } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
 import { toast } from 'sonner';
@@ -29,8 +27,26 @@ import UnavailableItemsModal from './UnavailableItemsModal';
 const CheckoutDetails: React.FC = () => {
     const { fetchProfile } = useUserProfile();
     const [shippingAsBilling, setShippingAsBilling] = useState(true);
-    const [shippingMethods, setShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
-    const [originalShippingMethods, setOriginalShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
+    const [shippingMethods, setShippingMethods] = useState<{
+        name: string;
+        code: string;
+        accountNumber: string | null;
+        requiresFundedAccount: boolean;
+        balance: number;
+        nickname: string | null;
+        shippingProviderId: number;
+        primary: boolean;
+    }[]>([]);
+    const [originalShippingMethods, setOriginalShippingMethods] = useState<{
+        name: string;
+        code: string;
+        accountNumber: string | null;
+        requiresFundedAccount: boolean;
+        balance: number;
+        nickname: string | null;
+        shippingProviderId: number;
+        primary: boolean;
+    }[]>([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const form = useForm<CHECKOUT_FORM_TYPE>({
         resolver: zodResolver(CHECKOUT_FORM_SCHEMA(shippingAsBilling)),
@@ -65,12 +81,20 @@ const CheckoutDetails: React.FC = () => {
             billingCountry: DEFAULT_COUNTRY
         }
     });
-    const { selectedShippingMethod, setSelectedShippingMethod, handlePlaceOrder, isProcessing } = useCheckout();
+    const { handlePlaceOrder, isProcessing } = useCheckout();
+    const [selectedCarrier, setSelectedCarrier] = useState<{
+        name: string;
+        code: string;
+        accountNumber: string | null;
+        requiresFundedAccount: boolean;
+        balance: number;
+        nickname: string | null;
+        shippingProviderId: number;
+        primary: boolean;
+    } | null>(null);
     const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
-
-
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
         // Validate cart items before proceeding with order
         const isCartValid = await validateCartItems();
@@ -112,11 +136,11 @@ const CheckoutDetails: React.FC = () => {
             useShippingAsBilling: !data.useShippingAsBilling,
             couponCode: couponDiscount.code || undefined,
             loyalty: loyaltyRedemption.isRedeemed,
-            shipping_method_id: Number(selectedShippingMethod?.id) || 0,
+            shipping_method_id: Number(selectedCarrier?.shippingProviderId) || 0,
             payment_method: {
                 method: data.paymentMethod
             },
-            total: (cartTotal + (selectedShippingMethod?.shipping_cost || 0)) - couponDiscount.value - (loyaltyRedemption.discountValue || 0)
+            total: (cartTotal + 0) - couponDiscount.value - (loyaltyRedemption.discountValue || 0)
 
         };;
 
@@ -125,7 +149,9 @@ const CheckoutDetails: React.FC = () => {
         if (response.status == ServerActionStatus.SUCCESS) {
             await handlePlaceOrder(orderPayload, response.data);
             form.reset();
-            setSelectedShippingMethod(shippingMethods[0]);
+            if (shippingMethods.length > 0) {
+                setSelectedCarrier(shippingMethods[0]);
+            }
             setShowNewAddressForm(false);
         } else {
            toast.error(response.message);
@@ -198,13 +224,14 @@ const CheckoutDetails: React.FC = () => {
     useEffect(() => {
         const loadProfile = async () => {
             const profile = await fetchProfile();
-            const response = await getShippingMethods();
+            const response = await getShipStationCarriers();
+            console.log("shipStationCarriersResponse",response);
             if (response.status == ServerActionStatus.SUCCESS) {
-                const shippingMethod = response.data;
-                setOriginalShippingMethods(shippingMethod);
-                setShippingMethods(shippingMethod);
-                setSelectedShippingMethod(shippingMethod[0]);
-                form.setValue('shippingMethodId', shippingMethod[0].id);
+                const carriers = response.data;
+                setOriginalShippingMethods(carriers);
+                setShippingMethods(carriers);
+                setSelectedCarrier(carriers[0]);
+                form.setValue('shippingMethodId', carriers[0].shippingProviderId);
             }
             form.setValue('email', profile?.email || '');
             form.setValue('phone', profile?.phone || '');
@@ -219,14 +246,12 @@ const CheckoutDetails: React.FC = () => {
     }, [form.watch('useShippingAsBilling')]);
 
     useEffect(() => {
-        const filteredMethods = cartTotal > FREE_DELIVERY_THRESHOLD
-            ? originalShippingMethods
-            : originalShippingMethods.filter(method => method.id !== 1);
-
-        setShippingMethods(filteredMethods);
-        if (filteredMethods.length > 0) {
-            setSelectedShippingMethod(filteredMethods[0]);
-            form.setValue('shippingMethodId', filteredMethods[0].id);
+        // For now, show all carriers without filtering based on cart total
+        // You can add filtering logic later if needed
+        setShippingMethods(originalShippingMethods);
+        if (originalShippingMethods.length > 0) {
+            setSelectedCarrier(originalShippingMethods[0]);
+            form.setValue('shippingMethodId', originalShippingMethods[0].shippingProviderId);
         }
     }, [cartTotal, originalShippingMethods]);
 
@@ -517,26 +542,26 @@ const CheckoutDetails: React.FC = () => {
                                 onChange={(e) => {
                                     const method = e.target.value;
                                     form.setValue('shippingMethodId', Number(method));
-                                    setSelectedShippingMethod(shippingMethods.find(m => m.id.toString() === method.toString()) || shippingMethods[0]);
+                                    setSelectedCarrier(shippingMethods.find(m => m.shippingProviderId.toString() === method.toString()) || shippingMethods[0]);
                                 }}
 
                             >
                                 {shippingMethods.map((method) => (
-                                    <CustomRadio key={method.id} value={method.id.toString()}>
+                                    <CustomRadio key={method.shippingProviderId} value={method.shippingProviderId.toString()}>
                                         <div className='space-y-2'>
                                             <div className='flex items-start justify-between gap-4'>
                                                 <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>
-                                                    {method.shipping_method} {method.description && <span className='font-bold'>- {method.description}</span>}
+                                                    {method.name} {method.nickname && <span className='font-bold'>- {method.nickname}</span>}
                                                 </h4>
                                                 <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>
-                                                    {method.shipping_cost ? `${DEFAULT_CURRENCY_SYMBOL}${method.shipping_cost}` : 'Free'}
+                                                    {method.requiresFundedAccount ? 'Account Required' : 'Available'}
                                                 </p>
                                             </div>
-                                            {method.message && (
+                                            {/* {method.accountNumber && (
                                                 <p className='text-skin-neutral-300 text-content-3 md:text-content-1 font-bold'>
-                                                    &bull; {method.message}
+                                                    &bull; Account: {method.accountNumber}
                                                 </p>
-                                            )}
+                                            )} */}
                                         </div>
                                     </CustomRadio>
                                 ))}

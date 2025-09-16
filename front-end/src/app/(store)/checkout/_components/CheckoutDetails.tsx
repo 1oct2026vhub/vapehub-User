@@ -95,8 +95,6 @@ const CheckoutDetails: React.FC = () => {
     const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
-
-
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
         // Validate cart items before proceeding with order
         const isCartValid = await validateCartItems();

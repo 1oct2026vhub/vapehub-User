@@ -112,6 +112,7 @@ export const API_ROUTES = {
     GET_WELCOME_CONTENT: buildRequestUrl('/api/home/welcome-content'),
     GET_FEATURE_CONTENT: (payload?: { page?: number, limit?: number }) => buildRequestUrl(`/api/home/feature-content${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_SHIPSTATION_CARRIERS: buildRequestUrl('/api/admin/shipStation/carriers'),
+    GET_ENTITY_SLUGS: buildRequestUrl('/api/home/entity-slugs'),
 };
 
 // * Helper functions

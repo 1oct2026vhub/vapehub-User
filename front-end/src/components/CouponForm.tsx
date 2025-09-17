@@ -48,7 +48,6 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             shippingMethodId: 0
         };
         const response = await applyCoupon(payload);
-        console.log("apply coupon response from form", response);
         if(response.status === 'SUCCESS') {
           toast.success('Coupon Applied Successfully');
         }

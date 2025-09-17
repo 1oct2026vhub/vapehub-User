@@ -46,13 +46,11 @@ const PaymentSuccessPage = () => {
 
                 // If Worldpay parameters are present, call Worldpay success API
                 if (isWorldpayPayment) {
-                    console.log('=== WORLDPAY PAYMENT SUCCESS API CALL ===');
                     const worldpayPayload = {
                         orderCode,
                         currency,
                         amount: parseFloat(amount)
                     };
-                    console.log('Worldpay API Payload:', worldpayPayload);
                     
                     const worldpayResponse = await worldpayPaymentSuccess(worldpayPayload);
                     if (worldpayResponse.status === ServerActionStatus.SUCCESS) {

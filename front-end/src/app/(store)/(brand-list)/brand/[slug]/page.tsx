@@ -74,7 +74,6 @@ const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugRespon
 
 const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
   const response = await getProductByBrand(slug, params);
-  console.log("Brand response", response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }

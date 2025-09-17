@@ -16,8 +16,6 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   const { updateItemQuantity, isLoading } = useCart();
   const [error, setError] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState(item.quantity.toString());
-  console.log("Quantity Selector item", item);
-
   // Update input value when item quantity changes
   useEffect(() => {
     setInputValue(item.quantity.toString());

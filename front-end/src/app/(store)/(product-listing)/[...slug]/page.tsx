@@ -104,7 +104,6 @@ const Page = async ({
     category: async () => {
       const combinedParams = buildVariantParams(searchParamsData, defaultParams);
       const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
-      console.log("Category response", category);
       if (category) {
         const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = category.products ? await Promise.all(
           category.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
@@ -141,7 +140,6 @@ export default Page;
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
-  console.log("Deals image test",response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }

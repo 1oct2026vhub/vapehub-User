@@ -17,7 +17,6 @@ const Register: FunctionComponent = (): ReactElement => {
     const [pwdVisibility, setPwdVisibility] = useState(false);
     const [cPwdVisibility, setCPwdVisibility] = useState(false);
     const referralCode = getCookie('referral_code') as string;
-    console.log("referralCode",referralCode);
     const signUpFormConfig = useForm<SignUpFormSchema>({
         mode: 'all',
         resolver: zodResolver(SIGN_UP_SCHEMA),

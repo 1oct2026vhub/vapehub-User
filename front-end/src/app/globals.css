@@ -389,7 +389,7 @@ input[type='search'] {
 }
 
 .quantity {
-  @apply w-16 h-4 md:w-24 md:h-6 text-[8px] md:text-content-2 font-medium text-skin-white flex justify-start items-center pl-1 md:pl-2;
+  @apply w-fit h-4 md:h-6 text-[8px] md:text-content-2 font-medium text-skin-white flex justify-start items-center px-1 md:px-2;
   flex-shrink: 0;
   border-radius: 10px 10px 10px 0px;
   background: linear-gradient(269deg, #5F1213 7.86%, #E7818B 99.16%);

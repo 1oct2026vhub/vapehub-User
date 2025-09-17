@@ -19,7 +19,6 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
   currentProductId
 }): AsyncReactElement => {
   const response = await getMoreLikeThis({product_id: currentProductId, limit: 10, offset: 0});
-  console.log("Product response", response);
   if (response.status === ServerActionStatus.ERROR) {
     return <EmptyPlaceholder title='Uh, oh!' description={response.message} />
   }
@@ -41,7 +40,6 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
     category: []
   };
   
-  // console.log("productResponse", productResponse);
   return (
     <section className="space-y-4.5 md:space-y-7.5">
       <div className="flex items-center justify-between">

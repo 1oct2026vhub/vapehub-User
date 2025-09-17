@@ -18,7 +18,6 @@ const DealsSlider: React.FC = () => {
         };
         fetchDeals();
     }, []);
-console.log("deals", deals);
     const settings: Settings = {
         dots: true,
         infinite: deals.length > 4,

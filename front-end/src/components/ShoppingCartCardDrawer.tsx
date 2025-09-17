@@ -30,8 +30,6 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
     queryParams.set(attr.attribute_id.toString(), attr.term_slug);
   });
   const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
-
-  console.log("cart item", item);
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">

@@ -126,7 +126,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     } | null>(null);
     const [isLoadingBundles, setIsLoadingBundles] = useState(false);
     const [currentBundlePage, setCurrentBundlePage] = useState(1);
-    console.log("bundleProducts", bundleProducts);
     const handleReviewsClick = (e: React.MouseEvent) => {
         e.preventDefault();
         const reviewsSection = document.getElementById('reviews');
@@ -221,7 +220,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
         const fetchReviews = async () => {
             if (!product?.id) return;
             const response = await getReviewOrderByProductId(product.id,1,1);
-            console.log("product Details", response);
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setReviewsData({
                     reviews: response.data.reviews || [],
@@ -261,8 +259,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             setCurrentBundlePage(page);
         }
     };
-    console.log("product", product);
-    console.log("data", data);
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>

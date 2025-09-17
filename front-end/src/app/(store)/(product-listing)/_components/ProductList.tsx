@@ -58,12 +58,9 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
   const searchParams = useSearchParams();
   const { getFilterParams, getAppliedFilters, removeFilter, updateFilters, clearAllFilters } = useProductFilters();
 
-console.log("Attribute Terms", data);
-
   const productAttributeTerms: AttributeTerms[] = (data?.attributes || [])
     .filter(attr => attr.attribute?.is_visible === true);
   const appliedFilters = getAppliedFilters(productAttributeTerms);
-console.log("appliedFilters", appliedFilters);
   const handleRemoveFilter = (attributeId: number, type: string) => {
     setIsLoading(true);
     removeFilter(attributeId, productAttributeTerms, type);
@@ -220,7 +217,6 @@ console.log("appliedFilters", appliedFilters);
     }
     router.replace(`${pathname}?${params.toString()}`, { scroll: true });
   };
-console.log("filter data", data);
 
   return (
 

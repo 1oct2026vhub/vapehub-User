@@ -50,7 +50,6 @@ const settings: Settings = {
 };
 
 const TestimonialSlider: FunctionComponent<TestimonialProps> = ({data}) => {
-  console.log("Testimonial data", data);
      if(!data.length) return  <EmptyPlaceholder title='Uh, oh!' description='No testimonials available' />;
     return (
         <Slider {...settings}>

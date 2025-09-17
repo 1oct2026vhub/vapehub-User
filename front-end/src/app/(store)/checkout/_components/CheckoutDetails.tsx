@@ -225,7 +225,6 @@ const CheckoutDetails: React.FC = () => {
         const loadProfile = async () => {
             const profile = await fetchProfile();
             const response = await getShipStationCarriers();
-            console.log("shipStationCarriersResponse",response);
             if (response.status == ServerActionStatus.SUCCESS) {
                 const carriers = response.data;
                 setOriginalShippingMethods(carriers);

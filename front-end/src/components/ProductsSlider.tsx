@@ -15,7 +15,6 @@ interface ProductProps {
 const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, reviews = []}) => {
   
   const products:Product[] = data?.products?.filter((product: Product) => product.Category !== null) ?? [];
-  console.log("landing page products", products);
   
   const settings: Settings = {
     dots: true,

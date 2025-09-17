@@ -29,8 +29,6 @@ const ValidateEmail: FunctionComponent<Props> = async ({ token }): Promise<React
     }
 
     const response = await verifyUserEmailAction(token);
-    console.log("verifyUserEmailAction", response);
-
     if (response.status === ServerActionStatus.ERROR) {
 
         return <UiError

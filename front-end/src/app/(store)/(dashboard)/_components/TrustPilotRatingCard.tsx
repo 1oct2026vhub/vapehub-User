@@ -101,13 +101,6 @@ const TrustPilotRatingCard: React.FC<TrustPilotRatingCardProps> = ({
         setLoading(true);
         const response = await getTrustpilotReviews({ page: 1, per_page: 10 });
         
-        // Console log the response
-        console.log('🔗 Trustpilot Reviews API Response:', {
-          status: response.status,
-          data: response.status === ServerActionStatus.SUCCESS ? response.data : null,
-          timestamp: new Date().toISOString()
-        });
-
         if (response.status === ServerActionStatus.SUCCESS && response.data) {
           setTrustpilotData(response.data);
           

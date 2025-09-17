@@ -868,6 +868,19 @@ export const getProductsByDealSlug = async (
 
 import { WelcomeContentResponse } from "./config/welcome.config";
 
+// Entity slugs types
+interface EntitySlug {
+  entity_id: number;
+  entity_name: string;
+  entity_slug: string;
+  slug_relation: string;
+}
+
+interface EntitySlugsResponse {
+  entities: EntitySlug[];
+  total_found: number;
+}
+
 export const getWelcomeContent = async (): Promise<ServerActionResponse<WelcomeContentResponse>> => {
     return await handleRequest<WelcomeContentResponse, unknown>({
         endpoint: API_ROUTES.GET_WELCOME_CONTENT,
@@ -1100,6 +1113,14 @@ export const getShipStationCarriers = async (): Promise<ServerActionResponse<{
     primary: boolean;
   }[], unknown>({
     endpoint: API_ROUTES.GET_SHIPSTATION_CARRIERS,
+    method: 'GET',
+  });
+};
+
+// Get entity slugs
+export const getEntitySlugs = async (): Promise<ServerActionResponse<EntitySlugsResponse>> => {
+  return await handleRequest<EntitySlugsResponse, unknown>({
+    endpoint: API_ROUTES.GET_ENTITY_SLUGS,
     method: 'GET',
   });
 };

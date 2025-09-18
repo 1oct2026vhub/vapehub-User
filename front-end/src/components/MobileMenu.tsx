@@ -79,7 +79,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
         (menuItem.show_image && menuItem.entity_data)
     );
 
-    const filterOptions = menuData.length > 0 ? menuData.slice(0, 8).map((menuItem) => ({
+    const filterOptions = menuData.length > 0 ? menuData.map((menuItem) => ({
         title: menuItem.label,
         content: <MobileSubMenu menuItems={menuItem.children || []} />,
         link: menuItem.original || '#',

@@ -97,7 +97,6 @@ type DashboardData = {
   // popularSaltsReviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
   // entitySlugs: ServerActionResponse<EntitySlugsResponse>;
 }
-
 export const getDashboardData = async (): Promise<DashboardData> => {
   // First, get entity slugs to determine the correct slugs for disposables and nic-salts
   // const entitySlugsResponse = await getEntitySlugs();

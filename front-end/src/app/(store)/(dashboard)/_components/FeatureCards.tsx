@@ -1,9 +1,7 @@
 'use client'
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { getFeatureContent } from "@/lib/server.actions";
-import { ServerActionStatus } from "@/lib/config/app.config";
+import React from "react";
 import { FeatureContent } from "@/lib/config/content.config";
 
 interface FeatureCardProps {
@@ -38,27 +36,11 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
 );
 
 
-const FeatureCards: React.FC<FeatureCardsProps> = ({ features: initialFeatures }) => {
-
-    const [features, setFeatures] = useState(initialFeatures);
-
-    useEffect(() => {
-        if (!initialFeatures) {
-            const fetchFeatures = async () => {
-                const featuresResponse = await getFeatureContent({ page: 1, limit: 4 });
-
-                if (featuresResponse.status === ServerActionStatus.SUCCESS && featuresResponse.data) {
-                    setFeatures(featuresResponse.data.featureContent);
-                }
-            };
-            fetchFeatures();
-        }
-    }, [initialFeatures]);
-
-    if (!features) {
+const FeatureCards: React.FC<FeatureCardsProps> = ({ features }) => {
+    if (!features || features.length === 0) {
         return null;
     }
-console.log("features", features);
+    console.log("features", features);
 
     const mappedFeatures = features.map(feature => ({
         imageSrc: feature?.icon?.icon_url || null,

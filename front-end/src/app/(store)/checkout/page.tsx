@@ -17,12 +17,14 @@ import { ROUTES } from '@/lib/routes'
 import { getReviewOrderByProductId } from '@/lib/server.actions'
 import { ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config'
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config'
+import { useFeatureData } from '@/lib/hooks/useFeatureData'
 
 const CheckoutPage: NextPage = (): ReactElement => {
 
     const { itemCount, cartItems } = useCart();
     const { status } = useSession();
     const router = useRouter();
+    const { features } = useFeatureData();
     const [reviews, setReviews] = React.useState<ServerActionResponse<REVIEW_ORDER_RESPONSE>[]>([]);
 
     useEffect(() => {
@@ -58,7 +60,7 @@ const CheckoutPage: NextPage = (): ReactElement => {
                         description="Add items to your cart to proceed with checkout."
                     />
                 </div>
-                <FeatureCards />
+                <FeatureCards features={features || undefined} />
                 <Subscription />
             </main>
         )
@@ -77,7 +79,7 @@ const CheckoutPage: NextPage = (): ReactElement => {
                             <CartTotal />
                         </div>
                     </section>
-                    <FeatureCards />
+                    <FeatureCards features={features || undefined} />
                     <Subscription />
                 </main>
             </AddressProvider>

@@ -7,7 +7,7 @@ import { type ProductResponseData, type CategoryResponseData } from "@/lib/confi
 import { ROUTES } from "@/lib/routes";
 import { getDashboardData } from "./page.data";
 import { ServerActionStatus } from "@/lib/config/app.config";
-import { getFeatureContent } from "@/lib/server.actions";
+import { SubscriptionProvider } from "@/lib/context/SubscriptionContext";
 
 // Dynamically import all heavy components
 const DynamicHomeCarousel = dynamic(() => import('./_components/HomeCarousel'), {
@@ -77,7 +77,6 @@ const Dashboard: NextPage = async () => {
   // const referralCode = (await searchParams).referral_code;
    
   const data = await getDashboardData();
-  const featuresResponse = await getFeatureContent({ page: 1, limit: 4 });
 
   const emptyProductResponse: ProductResponseData = {
     products: [],
@@ -123,8 +122,9 @@ const Dashboard: NextPage = async () => {
           <DynamicTrustPilotRatingCard
             title="Trustpilot has rated Vapehub as Excellent!"
             filledStars={4}
+            trustpilotData={data.trustpilot.status === ServerActionStatus.SUCCESS ? data.trustpilot.data : null}
           />
-          <DynamicFeatureCards features={featuresResponse.status === ServerActionStatus.SUCCESS ? featuresResponse.data?.featureContent : []} />
+          <DynamicFeatureCards features={data.features.status === ServerActionStatus.SUCCESS ? data.features.data?.featureContent : []} />
         </Suspense>
       </section>
 
@@ -177,7 +177,11 @@ const Dashboard: NextPage = async () => {
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
-        <DynamicSubscription className="mt-5 md:mt-10" />
+        <SubscriptionProvider 
+          initialSettings={data.subscriptionSettings.status === ServerActionStatus.SUCCESS ? data.subscriptionSettings.data : null}
+        >
+          <DynamicSubscription className="mt-5 md:mt-10" />
+        </SubscriptionProvider>
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>

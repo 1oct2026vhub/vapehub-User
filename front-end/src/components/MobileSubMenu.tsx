@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { HeaderMegaMenu } from '@/lib/config/header.config';
 import Slider from "react-slick";
 // import InputField from "./InputField";
@@ -9,8 +9,7 @@ import { useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 // import { Form } from '@/components/ui/Form';
 // import { SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
-import { getMailSubscriptionSettings } from '@/lib/server.actions';
-import { ServerActionStatus } from '@/lib/config/app.config';
+// import { useSubscription } from '@/lib/context/SubscriptionContext';
 // import { zodResolver } from '@hookform/resolvers/zod';
 // import { useForm } from 'react-hook-form';
 // import { toast } from 'sonner';
@@ -35,6 +34,7 @@ interface MobileSubMenuProps {
 const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState<string>('');
+    // const { subscriptionSettings } = useSubscription();
 
     // Platform detection
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -67,18 +67,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
         return filterByPlatform([...menuItems]);
     }, [menuItems, filterByPlatform]);
 
-    // Fetch subscription settings
-    useEffect(() => {
-        const fetchSubscriptionSettings = async () => {
-            const response = await getMailSubscriptionSettings();
-            
-            if (response.status === ServerActionStatus.SUCCESS) {
-                // Settings fetched successfully, but not used in current implementation
-            }
-        };
-
-        fetchSubscriptionSettings();
-    }, []);
+    // Note: Subscription settings are now available via useSubscription hook
 
     // Recursive function to get all menu items - wrapped in useCallback to fix dependency
     const getAllMenuItems = useCallback((items: HeaderMegaMenu[]): HeaderMegaMenu[] => {

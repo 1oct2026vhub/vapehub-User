@@ -4,48 +4,33 @@ import { Card, CardBody,  Tab, Tabs, Pagination } from '@nextui-org/react'
 import React, { ReactElement, useEffect, useState } from 'react'
 import ReviewCard from './ReviewCard'; 
 import { ProductViewDetails } from '@/lib/config/product.config';
-import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'; 
-import { getReviewOrderByProductId } from '@/lib/server.actions';
-import { REVIEWS } from '@/lib/config/order.config';
+// import { REVIEWS } from '@/lib/config/order.config';
 import EmptyPlaceholder from './ui/EmptyPlaceholder';
+import { useReviews } from '@/lib/context/ReviewContext';
 type ProductContentProps = {
     product: ProductViewDetails;
 }
 
 const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement => {
-    const [reviews, setReviews] = useState<REVIEWS[]>([]);
+    const { reviewData, loading, fetchReviews } = useReviews();
     const [selectedTab, setSelectedTab] = useState('Description');
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
-    const [totalReviews, setTotalReviews] = useState(0);
-    const [isLoadingReviews, setIsLoadingReviews] = useState(false);
     const limit = 10;
 
     useEffect(() => {
-        const getReviewCount = async () => {
-            const response = await getReviewOrderByProductId(product.id, 1, 1);
-            if(response.status === ServerActionStatus.SUCCESS && response.data) {
-                setTotalReviews(response.data.total_reviews);
+        if (selectedTab === 'Reviews' && product.id) {
+            // Only fetch if we don't have paginated reviews data or if page/limit changed
+            const needsFetch = !reviewData?.pagination || 
+                              reviewData.pagination.currentPage !== currentPage || 
+                              reviewData.pagination.limit !== limit;
+            
+            if (needsFetch) {
+                fetchReviews(product.id, currentPage, limit);
             }
         }
-        getReviewCount();
-    }, [product.id]);
-
-    useEffect(() => {
-        const fetchReviews = async () => {
-            if (selectedTab !== 'Reviews') return;
-            setIsLoadingReviews(true);
-            const response = await getReviewOrderByProductId(product.id, currentPage, limit);
-            if(response.status === ServerActionStatus.SUCCESS && response.data) {
-                setReviews(response.data.reviews);
-                setTotalPages(response.data.pagination.totalPages);
-                setTotalReviews(response.data.total_reviews);
-            }
-            setIsLoadingReviews(false);
-        }
-        fetchReviews()
-    }, [product.id, selectedTab, currentPage, limit]);
+    }, [selectedTab, currentPage, limit, product.id, fetchReviews, reviewData]);
         return (
         <section id="reviews" className='bg-skin-white p-4 md:p-6 xl:p-10 rounded-2.5xl shadow-card space-y-7.5'>
             <div className="flex w-full flex-col">
@@ -261,24 +246,24 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             </CardBody>
                         </Card>
                     </Tab>
-                    <Tab key="Reviews" title={`Reviews (${totalReviews})`}>
+                    <Tab key="Reviews" title={`Reviews (${reviewData?.totalReviews || 0})`}>
                         <Card classNames={{
                             base: "!bg-transparent border-none shadow-none p-0"
                         }}>
                             <CardBody className='p-0'>
                                 <div className='flex flex-col gap-7.5 pb-2'>
                                     <h3 className='text-h5 lg:text-h3 primary-gradient-100 font-bold'>Reviews</h3>
-                                    {isLoadingReviews ? (
+                                    {loading ? (
                                         <p>Loading reviews...</p>
-                                    ) : reviews.length > 0 ? (
+                                    ) : reviewData?.reviews && reviewData.reviews.length > 0 ? (
                                         <>
-                                            {reviews.map((review) => (
+                                            {reviewData.reviews.map((review) => (
                                                 <ReviewCard key={review.id} review={review} />
                                             ))}
-                                            {totalPages > 1 && (
+                                            {reviewData.pagination && reviewData.pagination.totalPages > 1 && (
                                                 <div className="flex justify-center mt-4">
                                                     <Pagination
-                                                        total={totalPages}
+                                                        total={reviewData.pagination.totalPages}
                                                         initialPage={1}
                                                         page={currentPage}
                                                         onChange={setCurrentPage}

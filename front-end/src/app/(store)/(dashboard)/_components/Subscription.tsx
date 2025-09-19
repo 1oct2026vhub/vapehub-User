@@ -3,13 +3,14 @@ import InputField from '@/components/InputField'
 import { Form } from '@/components/ui/Form';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { SUBSCRIBE_FORM_CONFIG, SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
-import { subscribeMail, getMailSubscriptionSettings } from '@/lib/server.actions';
+import { subscribeMail } from '@/lib/server.actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@nextui-org/button'
 import { FunctionComponent, ReactElement, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
+import { useSubscription } from '@/lib/context/SubscriptionContext';
 
 interface SubscriptionProps {
     className?: string;
@@ -18,26 +19,21 @@ interface SubscriptionProps {
 const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): ReactElement => {
     const [discountAmount, setDiscountAmount] = useState('10');
     const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
+    const { subscriptionSettings } = useSubscription();
 
     useEffect(() => {
-        const fetchSubscriptionSettings = async () => {
-            const response = await getMailSubscriptionSettings();
+        if (subscriptionSettings) {
+            const { discount_amount, discount_type } = subscriptionSettings;
             
-            if (response.status === ServerActionStatus.SUCCESS) {
-                const { discount_amount, discount_type } = response.data;
-                
-                // Validate and set discount type
-                const validDiscountType = discount_type === 'fixed' ? 'fixed' : 'percentage';
-                setDiscountType(validDiscountType);
+            // Validate and set discount type
+            const validDiscountType = discount_type === 'fixed' ? 'fixed' : 'percentage';
+            setDiscountType(validDiscountType);
 
-                // Round the discount amount to the nearest whole number
-                const roundedDiscount = Math.round(parseFloat(discount_amount)).toString();
-                setDiscountAmount(roundedDiscount);
-            }
-        };
-
-        fetchSubscriptionSettings();
-    }, []);
+            // Round the discount amount to the nearest whole number
+            const roundedDiscount = Math.round(parseFloat(discount_amount)).toString();
+            setDiscountAmount(roundedDiscount);
+        }
+    }, [subscriptionSettings]);
 
     const subscribeFromConfig = useForm<SubscribeFormSchema>({
         resolver: zodResolver(SUBSCRIBE_IN_SCHEMA),

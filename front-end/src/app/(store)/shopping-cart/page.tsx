@@ -4,14 +4,16 @@ import ShoppingCartCard from '@/components/ShoppingCartCard'
 import { NextPage } from 'next'
 import React, { ReactElement } from 'react'
 import CartDetails from './_components/CartDetails'
-// import FeatureCards from '../(dashboard)/_components/FeatureCards'
+import FeatureCards from '../(dashboard)/_components/FeatureCards'
 import Subscription from '../(dashboard)/_components/Subscription'
 import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
 import { ROUTES } from '@/lib/routes'
+import { useFeatureData } from '@/lib/hooks/useFeatureData'
 
 const ShoppingCartPage: NextPage = (): ReactElement => {
     const { cartItems } = useCart();
+    const { features } = useFeatureData();
     if (cartItems.length === 0) {
         return (
             <main className="flex flex-col items-center justify-center gap-6 py-20">
@@ -46,7 +48,7 @@ const ShoppingCartPage: NextPage = (): ReactElement => {
                 {/* Cart Details */}
                 <CartDetails />
             </section>
-            {/* <FeatureCards /> */}
+            <FeatureCards features={features || undefined} />
             <Subscription />
         </main>
     )

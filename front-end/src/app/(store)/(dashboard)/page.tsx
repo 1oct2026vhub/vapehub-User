@@ -98,7 +98,6 @@ const Dashboard: NextPage = async () => {
   //     data.categories.status === ServerActionStatus.ERROR) {
   //   return <div>Failed to load dashboard data</div>;
   // }
-
   const transformCategoryToProductResponse = (response: CategoryResponseData): ProductResponseData => ({
     products: response.products,
     pagination: response.pagination,

@@ -1,6 +1,6 @@
 import { 
   getProductByCategory, 
-  // getProductList, 
+  getHomeProductList, 
   getBrandList, 
   getCategoryList,
   getCarouselList,
@@ -12,8 +12,8 @@ import {
   getTrustpilotReviews,
   getMailSubscriptionSettings
 } from "@/lib/server.actions";
-// import { CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
-import { CategoryResponseData } from "@/lib/config/product.config";
+import { CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
+// import { CategoryResponseData } from "@/lib/config/product.config";
 import { BrandListResponse } from "@/lib/config/brand.config";
 import { Category } from "@/lib/config/category.config";
 import { CarouselConfig } from "@/lib/config/carousel.config";
@@ -39,7 +39,7 @@ interface EntitySlugsResponse {
 type DashboardData = {
   popularVapes: ServerActionResponse<CategoryResponseData>;
   popularSalts: ServerActionResponse<CategoryResponseData>;
-  // newProducts: ServerActionResponse<ProductResponseData>;
+  newProducts: ServerActionResponse<ProductResponseData>;
   brands: ServerActionResponse<BrandListResponse>;
   categories: ServerActionResponse<Category[]>;
   carousel: ServerActionResponse<CarouselConfig[]>;
@@ -93,7 +93,7 @@ type DashboardData = {
     createdAt: string;
     updatedAt: string;
   }>;
-  // newProductsReviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+  newProductsReviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
   popularVapesReviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
   popularSaltsReviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
   entitySlugs: ServerActionResponse<EntitySlugsResponse>;
@@ -129,7 +129,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
   const [
     popularVapesResponse,
     popularSaltsResponse,
-    // newProductsResponse,
+    newProductsResponse,
     brandsResponse,
     categoriesResponse,
     carouselResponse,
@@ -141,7 +141,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
   ] = await Promise.all([
     getProductByCategory(disposableSlug, {sort_by:"id",order:"ASC",limit:8,offset:0}),
     getProductByCategory(nicSaltsSlug, {sort_by:"id",order:"ASC",limit:8,offset:0}),
-    // getProductList({sort_by:"id",order:"DESC",limit:8,offset:0}),
+    getHomeProductList({sort_by:"id",order:"DESC",limit:8,offset:0}),
     getBrandList({page:1,limit:10}),
     getCategoryList(),
     getCarouselList(),
@@ -152,9 +152,9 @@ export const getDashboardData = async (): Promise<DashboardData> => {
     getMailSubscriptionSettings()
   ]);
 
-  // const newProductsReviews = newProductsResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
-  //   newProductsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-  // ) : [];
+  const newProductsReviews = newProductsResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
+    newProductsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+  ) : [];
 
   const popularVapesReviews = popularVapesResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
     popularVapesResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
@@ -167,7 +167,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
   return {
     popularVapes: popularVapesResponse,
     popularSalts: popularSaltsResponse,
-    // newProducts: newProductsResponse,
+    newProducts: newProductsResponse,
     brands: brandsResponse,
     categories: categoriesResponse,
     carousel: carouselResponse,
@@ -176,7 +176,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
     features: featuresResponse,
     trustpilot: trustpilotResponse,
     subscriptionSettings: subscriptionSettingsResponse,
-    // newProductsReviews,
+    newProductsReviews,
     popularVapesReviews,
     popularSaltsReviews,
     entitySlugs: entitySlugsResponse

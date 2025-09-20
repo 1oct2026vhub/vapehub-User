@@ -35,9 +35,9 @@ const DynamicHottestCollections = dynamic(() => import('./_components/HottestCol
   loading: () => <SuspenseLoader />
 });
 
-// const DynamicNewProducts = dynamic(() => import('./_components/NewProducts'), {
-//   loading: () => <SuspenseLoader />
-// });
+const DynamicNewProducts = dynamic(() => import('./_components/NewProducts'), {
+  loading: () => <SuspenseLoader />
+});
 
 const DynamicShopByDeals = dynamic(() => import('./_components/ShopByDeals'), {
   loading: () => <SuspenseLoader />
@@ -137,13 +137,13 @@ const Dashboard: NextPage = async () => {
         <DynamicHottestCollections brands={data.brands.status === ServerActionStatus.SUCCESS ? data.brands.data.brands : []} />
       </Suspense>
 
-      {/* <Suspense fallback={<SuspenseLoader />}>
+      <Suspense fallback={<SuspenseLoader />}>
         <DynamicNewProducts 
           products={data.newProducts.status === ServerActionStatus.SUCCESS ? data.newProducts.data : emptyProductResponse}
           reviews={data.newProductsReviews}
           viewAllHref={ROUTES.SHOP} 
         />
-      </Suspense> */}
+      </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
         <DynamicShopByDeals />

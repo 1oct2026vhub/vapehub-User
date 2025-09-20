@@ -127,6 +127,16 @@ export const getProductList = async (
     method: 'GET',
   });
 };
+// Home page product list api
+
+export const getHomeProductList = async (
+  params: PRODUCT_PAYLOAD
+): Promise<ServerActionResponse<ProductResponseData>> => {
+  return await handleRequest<ProductResponseData, unknown>({
+    endpoint: API_ROUTES.GET_HOME_PRODUCTS(params),
+    method: 'GET',
+  });
+};
 // most popular vapes product list api
 export const getProductByCategory = async (
   slug: string,

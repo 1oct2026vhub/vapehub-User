@@ -111,16 +111,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   // Calculate guest deals and update cart totals
   const calculateGuestDealsAndTotals = async (items: CartItem[]) => {
     if (isAuthenticated || items.length === 0) {
-      if (isAuthenticated) {
-        console.log('⏭️ Skipping guest deals calculation - user is authenticated');
-      } else {
-        console.log('⏭️ Skipping guest deals calculation - cart is empty');
-      }
       calculateTotals(items);
       return;
     }
 
-    console.log('🔄 Starting guest deals calculation for', items.length, 'items');
     try {
       // Prepare cart items for API call
       const cartItemsForAPI = items.map(item => ({
@@ -129,12 +123,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         quantity: item.quantity
       }));
 
-      console.log('🚀 Calling calculateGuestDeals API with:', cartItemsForAPI);
       const response = await calculateGuestDeals(cartItemsForAPI);
-      console.log('📡 calculateGuestDeals API Response:', response);
       
              if (response.status === ServerActionStatus.SUCCESS && response.data) {
-         console.log('📊 API Response Data:', response.data);
          
          // Update cart items with deal information from API
          const updatedItems = items.map(item => {
@@ -144,7 +135,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
            );
            
            if (apiItem) {
-             console.log('🔄 Updating item:', item.name, 'with API data:', apiItem);
              return {
                ...item,
                // Update with API response data
@@ -167,17 +157,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
          
          // Update totals from API response summary
          if (response.data.summary) {
-           console.log('💰 Setting cart totals from API:', {
-             total: response.data.summary.total,
-             subtotal: response.data.summary.subtotal,
-             discount: response.data.summary.total_discount
-           });
+           
            setCartTotal(response.data.summary.total);
            setCartSubtotal(response.data.summary.subtotal);
            setCartDiscount(response.data.summary.total_discount);
            setItemCount(items.length);
          } else {
-           console.log('⚠️ No summary in API response, using local calculation');
            calculateTotals(updatedItems);
          }
       } else {
@@ -196,7 +181,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (isAuthenticated) {
         const response = await getCartItems();
-        console.log("getCartItemsresponse", response);
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartData = response.data;
           const cartItems: CartItem[] = cartData.items.map(bindCartItem);
@@ -523,7 +507,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         });
          setCartItems(updatedCart);
          setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
-         console.log('🔄 Calling calculateGuestDealsAndTotals for quantity update');
          await calculateGuestDealsAndTotals(updatedCart);
          // toast.success('Cart updated successfully');
       }
@@ -831,7 +814,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           couponCode: couponDiscount.code,
           shippingMethodId: 0, // Adjust if you use shipping method
         });
-        console.log("Referraresponse",response);
         if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.referral_value != null) {
           setCouponDiscount({
             value: cartTotal - response.data.total,

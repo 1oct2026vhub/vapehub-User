@@ -32,9 +32,7 @@ const Register: FunctionComponent = (): ReactElement => {
             ...fieldValue, 
             referralCode: referralCode ?? "",
             mail_subscription: fieldValue.mail_subscription || false
-        };
-        console.log("Registration Payload:", payload);
-        
+        };        
         const response = await signUpAction(payload);          
         if (response.status === ServerActionStatus.SUCCESS) {
             signUpFormConfig.reset({ 

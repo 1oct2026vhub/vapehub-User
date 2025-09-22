@@ -40,8 +40,6 @@ const FeatureCards: React.FC<FeatureCardsProps> = ({ features }) => {
     if (!features || features.length === 0) {
         return null;
     }
-    console.log("features", features);
-
     const mappedFeatures = features.map(feature => ({
         imageSrc: feature?.icon?.icon_url || null,
         altText: feature.title,

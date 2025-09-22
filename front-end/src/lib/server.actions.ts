@@ -715,11 +715,6 @@ export const getDealProducts = async (
   };
 }>> => {
   try {
-    console.log("Fetching Deal Products:", {
-      dealId,
-      params: JSON.stringify(params)
-    });
-
     const response = await handleRequest<{
       deal: {
         id: number;
@@ -749,8 +744,6 @@ export const getDealProducts = async (
       endpoint: API_ROUTES.GET_DEAL_PRODUCTS(dealId, params),
       method: 'GET',
     });
-
-    console.log("Deal Products Response:", JSON.stringify(response, null, 2));
     return response;
   } catch (error) {
     console.error("Error fetching deal products:", error);
@@ -848,15 +841,6 @@ export const getProductsByDealSlug = async (
 }>> => {
   // Log the API call with parameters
   const apiUrl = API_ROUTES.GET_PRODUCTS_BY_DEAL_SLUG(slug, params);
-  console.log('🔗 Backend API Call:', {
-    url: apiUrl,
-    slug: slug,
-    params: params,
-    queryString: apiUrl.split('?')[1] || 'No query params',
-    fullUrl: apiUrl,
-    timestamp: new Date().toISOString()
-  });
-
   return await handleRequest<{
     products: Product[];
     category_items: {id: number, name: string, slug: string, product_count: number}[];

@@ -15,7 +15,6 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     isCouponApplied,
     data
 }) => {
-  console.log("OrderDetailCard data", data);
     const attributes = data.variant?.variantAttributes;
     
     const queryParams = new URLSearchParams();

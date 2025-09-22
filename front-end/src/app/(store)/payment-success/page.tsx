@@ -62,7 +62,6 @@ const PaymentSuccessPage = () => {
                             amount: parseFloat(amount)
                         };
               
-                        console.log('Setting transaction details for Worldpay:', newTransactionDetails);
                         setTransactionDetails(prev => ({
                             ...prev,
                             ...newTransactionDetails

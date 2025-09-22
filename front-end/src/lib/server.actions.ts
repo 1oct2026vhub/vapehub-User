@@ -840,7 +840,7 @@ export const getProductsByDealSlug = async (
   };
 }>> => {
   // Log the API call with parameters
-  const apiUrl = API_ROUTES.GET_PRODUCTS_BY_DEAL_SLUG(slug, params);
+  // const apiUrl = API_ROUTES.GET_PRODUCTS_BY_DEAL_SLUG(slug, params);
   return await handleRequest<{
     products: Product[];
     category_items: {id: number, name: string, slug: string, product_count: number}[];

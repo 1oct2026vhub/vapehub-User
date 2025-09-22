@@ -48,7 +48,7 @@ pipeline {
                     sshagent([sshCredentials]) {
                         // SSH into the server and run commands
                         sh "ssh ubuntu@${server} \"cd /var/www/User/ && git pull\""
-                        sh "ssh ubuntu@${server} \"cd /var/www/User/front-end/ && source ~/.nvm/nvm.sh && npm install && npm run build\""
+                        sh "ssh ubuntu@${server} \"cd /var/www/User/front-end/ && source ~/.nvm/nvm.sh && npm install && export NODE_OPTIONS=--max-old-space-size=4096 && npm run build\""
                         sh "ssh ubuntu@${server} \"source ~/.nvm/nvm.sh && pm2 restart 'Frontend' \"" 
                     }
 }

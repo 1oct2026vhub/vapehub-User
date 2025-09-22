@@ -15,13 +15,12 @@ interface MostPopularProps {
 }
 
 export const MostPopularVapes: React.FC<MostPopularProps> = ({
-  title = "Most Popular Disposable Vapes",
+  title = "Most Popular Big-Puff Vapes",
   viewAllHref = "#",
   products,
   reviews
 }) => {
-   
-    
+       
   return (
     <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">
       <div className="flex items-center justify-between gap-4">
@@ -44,7 +43,8 @@ export const MostPopularSalts: React.FC<MostPopularProps> = ({
   reviews
 }) => {
 
-    
+        console.log("Nicsalt products", products);
+
   return (
     <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">
       <div className="flex items-center justify-between gap-4">

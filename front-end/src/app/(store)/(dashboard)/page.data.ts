@@ -103,18 +103,18 @@ export const getDashboardData = async (): Promise<DashboardData> => {
   const entitySlugsResponse = await getEntitySlugs();
   
   // Extract slugs from entity response, with fallbacks to hardcoded values
-  let disposableSlug = "disposable-vapes"; // fallback
+  let bigPuffVapeKitsSlug = "big-puff-vape-kits"; // fallback
   let nicSaltsSlug = "nic-salts"; // fallback
   
   if (entitySlugsResponse.status === ServerActionStatus.SUCCESS && entitySlugsResponse.data) {
     const entities = entitySlugsResponse.data.entities;
     
     // Find disposables slug by entity name
-    const disposableEntity = entities.find(entity => 
-      entity.entity_name === "DISPOSABLES"
+    const bigPuffVapeKitsEntity = entities.find(entity => 
+      entity.entity_name === "big puff vape kits"
     );
-    if (disposableEntity) {
-      disposableSlug = disposableEntity.slug_relation;
+    if (bigPuffVapeKitsEntity) {
+      bigPuffVapeKitsSlug = bigPuffVapeKitsEntity.slug_relation;
     }
     
   //   // Find nic-salts slug by entity name
@@ -139,7 +139,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
     trustpilotResponse,
     subscriptionSettingsResponse
   ] = await Promise.all([
-    getProductByCategory(disposableSlug, {sort_by:"id",order:"ASC",limit:8,offset:0}),
+    getProductByCategory(bigPuffVapeKitsSlug, {sort_by:"id",order:"ASC",limit:8,offset:0}),
     getProductByCategory(nicSaltsSlug, {sort_by:"id",order:"ASC",limit:8,offset:0}),
     getHomeProductList({sort_by:"id",order:"DESC",limit:8,offset:0}),
     getBrandList({page:1,limit:10}),

@@ -47,9 +47,10 @@ const PersonalInfo: NextPage = () => {
             // Set newsletter subscription status from nested subscription object
             if (result?.subscription && 'subscribed' in result.subscription) {
                 setNewsletterSubscribed(Boolean(result.subscription.subscribed))
-            } else {
-                console.log("No subscription.subscribed field found in result");
-            }
+            } 
+            // else {
+            //     console.log("No subscription.subscribed field found in result");
+            // }
             setLoading(false)
         }
     }

@@ -96,7 +96,6 @@ const TrustPilotRatingCard: React.FC<TrustPilotRatingCardProps> = ({
   const displayStars = trustpilotData?.overallStats?.scoreBreakdown?.stars || filledStars;
   const displayTitle = trustpilotData?.overallStats?.scoreBreakdown?.ratingCategory || title;
   const loading = !trustpilotData; 
-  console.log("trustpilotData", trustpilotData);
   return (
     <div className="w-fit sm:max-w-[772px] p-2.5 lg:px-6 lg:py-4.5 mx-auto bg-skin-white rounded-xl shadow-input border border-skin-neutral-100 flex items-center gap-3 md:gap-5">
       <div className="flex items-center gap-1">

@@ -127,6 +127,16 @@ export const getProductList = async (
     method: 'GET',
   });
 };
+// Home page product list api
+
+export const getHomeProductList = async (
+  params: PRODUCT_PAYLOAD
+): Promise<ServerActionResponse<ProductResponseData>> => {
+  return await handleRequest<ProductResponseData, unknown>({
+    endpoint: API_ROUTES.GET_HOME_PRODUCTS(params),
+    method: 'GET',
+  });
+};
 // most popular vapes product list api
 export const getProductByCategory = async (
   slug: string,
@@ -705,11 +715,6 @@ export const getDealProducts = async (
   };
 }>> => {
   try {
-    console.log("Fetching Deal Products:", {
-      dealId,
-      params: JSON.stringify(params)
-    });
-
     const response = await handleRequest<{
       deal: {
         id: number;
@@ -739,8 +744,6 @@ export const getDealProducts = async (
       endpoint: API_ROUTES.GET_DEAL_PRODUCTS(dealId, params),
       method: 'GET',
     });
-
-    console.log("Deal Products Response:", JSON.stringify(response, null, 2));
     return response;
   } catch (error) {
     console.error("Error fetching deal products:", error);
@@ -837,16 +840,7 @@ export const getProductsByDealSlug = async (
   };
 }>> => {
   // Log the API call with parameters
-  const apiUrl = API_ROUTES.GET_PRODUCTS_BY_DEAL_SLUG(slug, params);
-  console.log('🔗 Backend API Call:', {
-    url: apiUrl,
-    slug: slug,
-    params: params,
-    queryString: apiUrl.split('?')[1] || 'No query params',
-    fullUrl: apiUrl,
-    timestamp: new Date().toISOString()
-  });
-
+  // const apiUrl = API_ROUTES.GET_PRODUCTS_BY_DEAL_SLUG(slug, params);
   return await handleRequest<{
     products: Product[];
     category_items: {id: number, name: string, slug: string, product_count: number}[];
@@ -867,6 +861,19 @@ export const getProductsByDealSlug = async (
 };
 
 import { WelcomeContentResponse } from "./config/welcome.config";
+
+// Entity slugs types
+interface EntitySlug {
+  entity_id: number;
+  entity_name: string;
+  entity_slug: string;
+  slug_relation: string;
+}
+
+interface EntitySlugsResponse {
+  entities: EntitySlug[];
+  total_found: number;
+}
 
 export const getWelcomeContent = async (): Promise<ServerActionResponse<WelcomeContentResponse>> => {
     return await handleRequest<WelcomeContentResponse, unknown>({
@@ -1004,6 +1011,110 @@ export const getTrustpilotReviews = async (payload?: { page?: number; per_page?:
     showRatingBanner: boolean;
   }, unknown>({
     endpoint: API_ROUTES.GET_TRUSTPILOT_REVIEWS(payload),
+    method: 'GET',
+  });
+};
+
+export const calculateGuestDeals = async (cartItems: { product_id: number; variant_id?: number; quantity: number }[]): Promise<ServerActionResponse<{
+  items: Array<{
+    product_id: number;
+    variant_id: number;
+    quantity: number;
+    price: string;
+    discount_price: string;
+    subtotal: number;
+    total: number;
+    applied_deals: Array<{
+      deal_id: number;
+      deal_name: string;
+      discount_amount: number;
+    }>;
+    show_deal_toast: boolean;
+    deal_required_qty: number | null;
+    deal_qty_needed: number | null;
+    deals: Array<{
+      id: number;
+      name: string;
+      deal_type: string;
+      required_qty: number;
+      fixed_price: number;
+      discount_percent: number;
+    }>;
+  }>;
+  summary: {
+    subtotal: number;
+    total: number;
+    total_discount: number;
+  };
+}>> => {
+  return await handleRequest<{
+    items: Array<{
+      product_id: number;
+      variant_id: number;
+      quantity: number;
+      price: string;
+      discount_price: string;
+      subtotal: number;
+      total: number;
+      applied_deals: Array<{
+        deal_id: number;
+        deal_name: string;
+        discount_amount: number;
+      }>;
+      show_deal_toast: boolean;
+      deal_required_qty: number | null;
+      deal_qty_needed: number | null;
+      deals: Array<{
+        id: number;
+        name: string;
+        deal_type: string;
+        required_qty: number;
+        fixed_price: number;
+        discount_percent: number;
+      }>;
+    }>;
+    summary: {
+      subtotal: number;
+      total: number;
+      total_discount: number;
+    };
+  }, unknown>({
+    endpoint: API_ROUTES.CALCULATE_GUEST_DEALS,
+    method: 'POST',
+    payload: { cartItems },
+  });
+};
+
+// Get ShipStation carriers
+export const getShipStationCarriers = async (): Promise<ServerActionResponse<{
+  name: string;
+  code: string;
+  accountNumber: string | null;
+  requiresFundedAccount: boolean;
+  balance: number;
+  nickname: string | null;
+  shippingProviderId: number;
+  primary: boolean;
+}[]>> => {
+  return await handleRequest<{
+    name: string;
+    code: string;
+    accountNumber: string | null;
+    requiresFundedAccount: boolean;
+    balance: number;
+    nickname: string | null;
+    shippingProviderId: number;
+    primary: boolean;
+  }[], unknown>({
+    endpoint: API_ROUTES.GET_SHIPSTATION_CARRIERS,
+    method: 'GET',
+  });
+};
+
+// Get entity slugs
+export const getEntitySlugs = async (): Promise<ServerActionResponse<EntitySlugsResponse>> => {
+  return await handleRequest<EntitySlugsResponse, unknown>({
+    endpoint: API_ROUTES.GET_ENTITY_SLUGS,
     method: 'GET',
   });
 };

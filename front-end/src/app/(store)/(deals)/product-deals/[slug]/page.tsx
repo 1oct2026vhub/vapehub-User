@@ -20,13 +20,6 @@ const Page = async ({ params, searchParams }: {
 
   // Fetch dynamic page slug data
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
-  console.log('📋 Product Deals Page - Dynamic Page Slug Response:', {
-    slug: slug,
-    dynamicPageSlug: dynamicPageSlug,
-    dealsText: dynamicPageSlug?.deals_text,
-    deals: dynamicPageSlug?.deals,
-    seo: dynamicPageSlug?.seo
-  });
   if (!dynamicPageSlug) {
     return notFound();
   }
@@ -66,18 +59,7 @@ const Page = async ({ params, searchParams }: {
     
   const combinedParams = { ...defaultParams, ...variantParams };
 
-  // Log the parameters being passed to the API
-  console.log('📋 Product Deals Page - API Parameters:', {
-    slug: slug,
-    searchParamsData: searchParamsData,
-    defaultParams: defaultParams,
-    variantParams: variantParams,
-    combinedParams: combinedParams,
-    fullUrl: `${process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL}/api/deals/slug/${slug}?${new URLSearchParams(Object.fromEntries(Object.entries(combinedParams).map(([key, value]) => [key, String(value)]))).toString()}`
-  });
-
   const productsResponse = await getProductsByDealSlug(slug, combinedParams);
-  console.log("Products response deals", productsResponse);
   if (productsResponse.status === ServerActionStatus.ERROR || !productsResponse.data?.products) {
     return notFound();
   }

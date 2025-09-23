@@ -37,7 +37,6 @@ const PersonalInfo: NextPage = () => {
 
     const loadProfile = async () => {
         const result = await fetchProfile(); 
-        console.log("Profile result:", result);
         if (result) {
             form.reset({
                 first_name: result.first_name || '',
@@ -47,11 +46,11 @@ const PersonalInfo: NextPage = () => {
             })
             // Set newsletter subscription status from nested subscription object
             if (result?.subscription && 'subscribed' in result.subscription) {
-                console.log("Setting newsletter subscribed to:", result.subscription.subscribed);
                 setNewsletterSubscribed(Boolean(result.subscription.subscribed))
-            } else {
-                console.log("No subscription.subscribed field found in result");
-            }
+            } 
+            // else {
+            //     console.log("No subscription.subscribed field found in result");
+            // }
             setLoading(false)
         }
     }
@@ -60,9 +59,6 @@ const PersonalInfo: NextPage = () => {
         loadProfile()
     }, [])
 
-    useEffect(() => {
-        console.log("newsletterSubscribed state changed to:", newsletterSubscribed);
-    }, [newsletterSubscribed])
 
     const onSubmit = async (data: UserProfileFormData) => {
         const result = await updateProfile(data)
@@ -75,10 +71,8 @@ const PersonalInfo: NextPage = () => {
     }
 
     const handleNewsletterToggle = async () => {
-        console.log("Current newsletterSubscribed state:", newsletterSubscribed);
         try {
             const result = await toggleMailSubscription()
-            console.log("Toggle result:", result);
             if (result?.status === ServerActionStatus.SUCCESS) {
                 setNewsletterSubscribed(result.data.subscribed)
                 // setProfileData(prev => prev ? {

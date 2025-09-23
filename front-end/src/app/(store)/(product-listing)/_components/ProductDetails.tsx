@@ -15,11 +15,12 @@ import ProductVariantFilter from './ProductVariantFilter'
 import NoImage from '@/components/NoImage'
 import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 
-import { REVIEWS } from '@/lib/config/order.config'
+// import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
-import { getReviewOrderByProductId } from '@/lib/server.actions'
 import { getDealProducts } from '@/lib/server.actions'
 import { ProductInDeal } from '@/lib/config/deal.config'
+import { Product } from '@/lib/config/product.config'
+import { useReviews } from '@/lib/context/ReviewContext'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -104,15 +105,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [inputValue, setInputValue] = useState(quantity.toString());
     const [error, setError] = useState<string | null>(null);
-    const [reviewsData, setReviewsData] = useState<{
-        reviews: REVIEWS[];
-        averageRating: number;
-        totalReviews: number;
-    }>({
-        reviews: [],
-        averageRating: 0,
-        totalReviews: 0,
-    });
+    const { reviewData } = useReviews();
     const [bundleProducts, setBundleProducts] = useState<ProductInDeal[]>([]);
     const [bundlePagination, setBundlePagination] = useState<{
         total_count: number;
@@ -125,7 +118,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     } | null>(null);
     const [isLoadingBundles, setIsLoadingBundles] = useState(false);
     const [currentBundlePage, setCurrentBundlePage] = useState(1);
-    console.log("bundleProducts", bundleProducts);
     const handleReviewsClick = (e: React.MouseEvent) => {
         e.preventDefault();
         const reviewsSection = document.getElementById('reviews');
@@ -189,7 +181,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
         }
         setIsAddingToCart(true);
         try {
-            await addItemToCart(product.id, cartEntity.id, quantity, cartEntity, productName);
+            const variantTermSlug = cartEntity.attributes[0]?.term_slug ?? '';
+            const variantAttributes = cartEntity.attributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term_slug }));
+            const productForCart: Product = {
+                ...product,
+                price: product.primary_image?.url ?? '0',
+                ProductImages: product.all_images.map(img => ({ id: img.id, image_url: img.url, is_primary: img.is_primary }))
+            };
+            await addItemToCart(productForCart, cartEntity.id, quantity, cartEntity, productName, variantTermSlug, variantAttributes);
         } catch (err) {
             console.error("Failed to add to cart:", err);
         } finally {
@@ -209,21 +208,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     useEffect(() => {
         setMainImage(cartEntity?.primary_image ?? product?.primary_image);
     }, [cartEntity, product]);
-    useEffect(() => {
-        const fetchReviews = async () => {
-            if (!product?.id) return;
-            const response = await getReviewOrderByProductId(product.id,1,1);
-            console.log("product Details", response);
-            if (response.status === ServerActionStatus.SUCCESS && response.data) {
-                setReviewsData({
-                    reviews: response.data.reviews || [],
-                    averageRating: parseFloat(response.data.average_rating) || 0,
-                    totalReviews: response.data.total_reviews || 0,
-                });
-            }
-        }
-        fetchReviews()
-    }, [product]);
+    // Reviews data is now provided by ReviewContext
 
     useEffect(() => {
         const fetchBundleProducts = async (page = 1) => {
@@ -253,8 +238,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             setCurrentBundlePage(page);
         }
     };
-    console.log("product", product);
-    console.log("data", data);
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -275,13 +258,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
                         <div className="flex gap-1">
                             {Array.from({ length: 5 }, (_, i) => {
-                                if (i < Math.round(reviewsData.averageRating)) {
+                                if (i < Math.round(reviewData?.averageRating || 0)) {
                                     return <RatingStarFilled key={i} className='w-4 h-4 md:w-5 md:h-5' />;
                                 }
                                 return <RatingStarEmpty key={i} className='w-4 h-4 md:w-5 md:h-5' />;
                             })}
                         </div>
-                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewsData.totalReviews} {reviewsData.totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
+                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
                     </div>
                 </div>
                 {/* Title section mobile ends */}
@@ -353,13 +336,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                         <div className="flex items-center gap-2" onClick={handleReviewsClick} style={{ cursor: 'pointer' }}>
                             <div className="flex gap-1">
                                 {Array.from({ length: 5 }, (_, i) => {
-                                    if (i < Math.round(reviewsData.averageRating)) {
+                                    if (i < Math.round(reviewData?.averageRating || 0)) {
                                         return <RatingStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
                                     }
                                     return <RatingStarEmpty key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
                                 })}
                             </div>
-                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewsData.totalReviews} {reviewsData.totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
+                            <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>

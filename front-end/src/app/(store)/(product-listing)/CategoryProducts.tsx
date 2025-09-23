@@ -15,9 +15,7 @@ type CategoryProps = {
 }
 
 
-const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageSlug }): ReactElement => {
-  console.log("dynamicPageSlug", dynamicPageSlug);
-  
+const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageSlug }): ReactElement => {  
   const breadcrumbs = [
     { label: "Home", href: "/" },
     { label: data.name, href: `/${data.slug}`, isActive: true },

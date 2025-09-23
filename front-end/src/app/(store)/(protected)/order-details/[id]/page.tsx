@@ -28,7 +28,6 @@ const OrdersListingPage: NextPage<{ params: Promise<{ id: string }> }> = async (
         return <EmptyPlaceholder title="Order not found" description="The order you are looking for does not exist." />;
     }
     const result = response.data;
-console.log("result", result);
 
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 pt-5 pb-10 flex flex-col gap-6 lg:gap-10'>

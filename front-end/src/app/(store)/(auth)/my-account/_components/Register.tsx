@@ -17,7 +17,6 @@ const Register: FunctionComponent = (): ReactElement => {
     const [pwdVisibility, setPwdVisibility] = useState(false);
     const [cPwdVisibility, setCPwdVisibility] = useState(false);
     const referralCode = getCookie('referral_code') as string;
-    console.log("referralCode",referralCode);
     const signUpFormConfig = useForm<SignUpFormSchema>({
         mode: 'all',
         resolver: zodResolver(SIGN_UP_SCHEMA),
@@ -33,9 +32,7 @@ const Register: FunctionComponent = (): ReactElement => {
             ...fieldValue, 
             referralCode: referralCode ?? "",
             mail_subscription: fieldValue.mail_subscription || false
-        };
-        console.log("Registration Payload:", payload);
-        
+        };        
         const response = await signUpAction(payload);          
         if (response.status === ServerActionStatus.SUCCESS) {
             signUpFormConfig.reset({ 

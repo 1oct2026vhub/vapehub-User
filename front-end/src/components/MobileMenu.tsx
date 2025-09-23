@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@nextui-org/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Accordion, AccordionItem, Badge, Divider } from '@nextui-org/react';
 import { CloseIcon, DownArrowFilledIcon, MenuIcon, ShoppingCartIcon, UserIcon } from '@/components/Icons';
@@ -12,10 +12,11 @@ import InputField from '@/components/InputField'
 import { Form } from '@/components/ui/Form';
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config';
 import { SUBSCRIBE_FORM_CONFIG, SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config';
-import { subscribeMail, getMailSubscriptionSettings } from '@/lib/server.actions';
+import { subscribeMail } from '@/lib/server.actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { useSubscription } from '@/lib/context/SubscriptionContext';
 import MobileSubMenu from './MobileSubMenu';
 import { useCart } from '@/lib/context/CartContext';
 import { ROUTES } from '@/lib/routes';
@@ -32,35 +33,17 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
     const { isOpen: isCartOpen, onOpen: onCartOpen, onClose: onCartClose } = useDisclosure();
     const [openItems, setOpenItems] = useState<number[]>([]);
     const [isFooterVisible, setFooterVisible] = useState(true);
-    const [discountAmount, setDiscountAmount] = useState('10');
-    const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
     const { cartItems, cartTotal, itemCount, checkoutStockValidation, stockValidationLoading } = useCart();
     const router = useRouter();
     const pathname = usePathname();
+    const { subscriptionSettings } = useSubscription();
     
     // Check if we're on the verification email page
     const isVerificationPage = pathname.includes('/verify-email');
     
-    // Fetch subscription settings
-    useEffect(() => {
-        const fetchSubscriptionSettings = async () => {
-            const response = await getMailSubscriptionSettings();
-            
-            if (response.status === ServerActionStatus.SUCCESS) {
-                const { discount_amount, discount_type } = response.data;
-                
-                // Validate and set discount type
-                const validDiscountType = discount_type === 'fixed' ? 'fixed' : 'percentage';
-                setDiscountType(validDiscountType);
-
-                // Round the discount amount to the nearest whole number
-                const roundedDiscount = Math.round(parseFloat(discount_amount)).toString();
-                setDiscountAmount(roundedDiscount);
-            }
-        };
-
-        fetchSubscriptionSettings();
-    }, []);
+    // Get discount settings from subscription context
+    const discountAmount = subscriptionSettings ? Math.round(parseFloat(subscriptionSettings.discount_amount)).toString() : '10';
+    const discountType = subscriptionSettings ? (subscriptionSettings.discount_type === 'fixed' ? 'fixed' : 'percentage') : 'percentage';
     
     const itemClasses = {
         base: "w-full rounded-lg shadow-input border border-skin-neutral-100",
@@ -79,7 +62,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
         (menuItem.show_image && menuItem.entity_data)
     );
 
-    const filterOptions = menuData.length > 0 ? menuData.slice(0, 8).map((menuItem) => ({
+    const filterOptions = menuData.length > 0 ? menuData.map((menuItem) => ({
         title: menuItem.label,
         content: <MobileSubMenu menuItems={menuItem.children || []} />,
         link: menuItem.original || '#',

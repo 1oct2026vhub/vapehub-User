@@ -16,11 +16,19 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     data
 }) => {
     const attributes = data.variant?.variantAttributes;
-    const attributeParams = data.variant?.variantAttributes?.[0]?.term.slug ?? '';
+    
+    const queryParams = new URLSearchParams();
+    attributes?.slice(1).forEach(attr => {
+        queryParams.set(attr.attribute_id.toString(), attr.term.slug);
+    });
+    
+    const primaryVariantSlug = attributes?.[0]?.term.slug ?? '';
+    const queryString = queryParams.toString();
+    const productUrl = `/${data.product.slug}/${primaryVariantSlug}${queryString ? `?${queryString}` : ''}`;
     
     return (
         // 10ml?20=up-to-1500-puffs
-        <Link href={`/${data.product.slug}/${attributeParams}`} scroll={true} className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
+        <Link href={productUrl} scroll={true} className="bg-white rounded-14 shadow-card p-2 md:p-4 flex items-stretch gap-3 md:gap-7">
 
             <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
                 <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow h-full flex flex-col justify-center">

@@ -1,13 +1,11 @@
 'use client'
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { getFeatureContent } from "@/lib/server.actions";
-import { ServerActionStatus } from "@/lib/config/app.config";
+import React from "react";
 import { FeatureContent } from "@/lib/config/content.config";
 
 interface FeatureCardProps {
-  imageSrc: string;
+  imageSrc: string | null;
   altText: string;
   title: string;
   subtitle: string;
@@ -20,13 +18,15 @@ interface FeatureCardsProps {
 const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, subtitle }) => (
     <div className="feature-card flex-1">
         <div className="relative h-14 w-14">
-            <Image
-                src={imageSrc}
-                alt={altText}
-                fill
-                className="object-contain"
-                loading="lazy"
-            />
+            {imageSrc && (
+                <Image
+                    src={imageSrc}
+                    alt={altText}
+                    fill
+                    className="object-contain"
+                    loading="lazy"
+                />
+            )}
         </div>
         <div className="text-content-2 md:text-title-2 xl:text-title-1 text-center">
             <h3 className="font-semibold md:text-nowrap text-skin-neutral-400">{title}</h3>
@@ -36,29 +36,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
 );
 
 
-const FeatureCards: React.FC<FeatureCardsProps> = ({ features: initialFeatures }) => {
-
-    const [features, setFeatures] = useState(initialFeatures);
-
-    useEffect(() => {
-        if (!initialFeatures) {
-            const fetchFeatures = async () => {
-                const featuresResponse = await getFeatureContent({ page: 1, limit: 4 });
-
-                if (featuresResponse.status === ServerActionStatus.SUCCESS && featuresResponse.data) {
-                    setFeatures(featuresResponse.data.featureContent);
-                }
-            };
-            fetchFeatures();
-        }
-    }, [initialFeatures]);
-
-    if (!features) {
+const FeatureCards: React.FC<FeatureCardsProps> = ({ features }) => {
+    if (!features || features.length === 0) {
         return null;
     }
-
     const mappedFeatures = features.map(feature => ({
-        imageSrc: feature.icon.icon_url,
+        imageSrc: feature?.icon?.icon_url || null,
         altText: feature.title,
         title: feature.title,
         subtitle: feature.subtitle

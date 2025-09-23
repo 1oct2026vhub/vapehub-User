@@ -43,8 +43,6 @@ const CartTotal: React.FC = () => {
         };
 
         const response = await applyCoupon(payload);
-        console.log("apply coupon response from redeem checkbox", response);
-
         if (response.status === ServerActionStatus.SUCCESS && response.data) {
             const discountAmount = checked ? (cartTotal - response.data.total) : 0;
             setLoyaltyRedemption(prev => ({ 
@@ -66,7 +64,6 @@ const CartTotal: React.FC = () => {
         if (!loyaltyPoints) return "";
     
         const { minimum_points_required, user_points, redemption_amount, redemption_type } = loyaltyPoints;
-        console.log("loyaltyPoints", loyaltyPoints);
         const pointsPrefix = `You're eligible to use ${minimum_points_required} of your ${user_points} loyalty points to get`;
     
         if (redemption_type === 'percentage') {
@@ -86,7 +83,6 @@ const CartTotal: React.FC = () => {
 
     const shippingCost = selectedShippingMethod?.shipping_cost || 0;
     const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
-    console.log("loyaltyRedemption",loyaltyRedemption);
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded-14 w-full'>
             <h3 className='primary-gradient-600 text-title-2 md:text-h5 font-bold w-fit'>Cart Total</h3>

@@ -1,8 +1,6 @@
 "use client"
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { getTrustpilotReviews } from "@/lib/server.actions";
-import { ServerActionStatus } from "@/lib/config/app.config";
+import React from "react";
 
 interface TrustpilotData {
   reviews: Array<{
@@ -85,49 +83,19 @@ interface TrustPilotRatingCardProps {
   title: string;
   filledStars: number;
   totalStars?: number;
+  trustpilotData?: TrustpilotData | null;
 }
 
 const TrustPilotRatingCard: React.FC<TrustPilotRatingCardProps> = ({
   title,
   filledStars,
   totalStars = 5,
+  trustpilotData,
 }) => {
-  const [trustpilotData, setTrustpilotData] = useState<TrustpilotData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchTrustpilotReviews = async () => {
-      try {
-        setLoading(true);
-        const response = await getTrustpilotReviews({ page: 1, per_page: 10 });
-        
-        // Console log the response
-        console.log('🔗 Trustpilot Reviews API Response:', {
-          status: response.status,
-          data: response.status === ServerActionStatus.SUCCESS ? response.data : null,
-          timestamp: new Date().toISOString()
-        });
-
-        if (response.status === ServerActionStatus.SUCCESS && response.data) {
-          setTrustpilotData(response.data);
-          
-          // Additional console logs for specific data
-
-        } 
-      } catch (error) {
-        console.error('Trustpilot API Exception:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTrustpilotReviews();
-  }, []);
-
   // Use API data if available, otherwise fall back to props
   const displayStars = trustpilotData?.overallStats?.scoreBreakdown?.stars || filledStars;
   const displayTitle = trustpilotData?.overallStats?.scoreBreakdown?.ratingCategory || title;
-
+  const loading = !trustpilotData; 
   return (
     <div className="w-fit sm:max-w-[772px] p-2.5 lg:px-6 lg:py-4.5 mx-auto bg-skin-white rounded-xl shadow-input border border-skin-neutral-100 flex items-center gap-3 md:gap-5">
       <div className="flex items-center gap-1">

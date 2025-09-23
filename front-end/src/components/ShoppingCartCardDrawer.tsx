@@ -25,8 +25,11 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
     }
   };
 
-  const productUrl = `/${item.product_slug}`;
-  console.log("cart item", item);
+  const queryParams = new URLSearchParams();
+  item.variantAttributes.slice(1).forEach(attr => {
+    queryParams.set(attr.attribute_id.toString(), attr.term_slug);
+  });
+  const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">
@@ -53,11 +56,11 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
               <p className="primary-gradient-100 text-content-2 md:text-title-1 font-bold">
                 {DEFAULT_CURRENCY_SYMBOL}{item.total.toFixed(2)}
               </p>
-              {/* {item.total !== item.subtotal && (
+              {item.discount_price && parseFloat(item.discount_price) > 0 && item.total !== item.subtotal && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 line-through opacity-60 font-bold">
                   {DEFAULT_CURRENCY_SYMBOL}{(item.subtotal).toFixed(2)}
                 </p>
-              )} */}
+              )}
             </div>
           </div>
 

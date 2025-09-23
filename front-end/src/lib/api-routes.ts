@@ -42,6 +42,7 @@ export const API_ROUTES = {
     GET_CATEGORY_LIST: buildRequestUrl('/api/category'),
     GET_BRAND_LIST: (payload?: BrandListPayload) => buildRequestUrl(`/api/brands/list/paginated${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_HOME_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/new${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_CATEGORY_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/category/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
     GET_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
     GET_PRODUCTS_BY_ID: (id: number, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/fetch/${id}?${new URLSearchParams(payload as never).toString()}`),
@@ -83,6 +84,7 @@ export const API_ROUTES = {
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
     CHECK_STOCK_VALIDATION: buildRequestUrl('/api/cart/check-stock'),
+    CALCULATE_GUEST_DEALS: buildRequestUrl('/api/cart/calculate-guest-deals'),
     SEND_REFERRAL_CODE: buildRequestUrl('/api/users/refer-a-friend'),
     GET_REFERRAL_STATS: (page: number, limit: number) => buildRequestUrl(`/api/users/referral-stats?page=${page}&limit=${limit}`),
     GET_NOTIFICATION_LIST: buildRequestUrl('/api/notifications'),
@@ -110,6 +112,8 @@ export const API_ROUTES = {
     GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_WELCOME_CONTENT: buildRequestUrl('/api/home/welcome-content'),
     GET_FEATURE_CONTENT: (payload?: { page?: number, limit?: number }) => buildRequestUrl(`/api/home/feature-content${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_SHIPSTATION_CARRIERS: buildRequestUrl('/api/admin/shipStation/carriers'),
+    GET_ENTITY_SLUGS: buildRequestUrl('/api/home/entity-slugs'),
 };
 
 // * Helper functions

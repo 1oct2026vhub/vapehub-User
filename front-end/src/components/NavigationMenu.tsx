@@ -39,7 +39,7 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
   };
 
   // Filter menus based on hide_text - only show menus where hide_text is false
-  const visibleMenus = menus.filter(menu => !menu.hide_text).slice(0, 8);
+  const visibleMenus = menus.filter(menu => !menu.hide_text);
 
   const activeMenu = hoveredIndex !== null ? visibleMenus[hoveredIndex] : null;
 

@@ -37,11 +37,18 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
   const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
   const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
 
+  const queryParams = new URLSearchParams();
+  item.variantAttributes.slice(1).forEach(attr => {
+    queryParams.set(attr.attribute_id.toString(), attr.term_slug);
+  });
+  const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
+
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">
         {/* Product Image */}
         <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
+          <Link href={productUrl}>
           <div className="bg-skin-base border border-skin-neutral rounded p-1.5 md:px-2.5 md:py-3.5 shadow">
             <NoImage
               src={item.ProductImages}
@@ -49,13 +56,13 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
               width={104}
               height={100}
             />
-
-          </div>
+            </div>
+          </Link>
         </div>
 
         <div className="flex flex-col gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 w-full justify-between shrink">
-            <Link href={`/${item.product_slug}`} className="cursor-pointer text-wrap text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400">
+            <Link href={productUrl} className="cursor-pointer text-wrap text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400">
               {item.name}
             </Link>
 
@@ -65,11 +72,11 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
                 {/* {DEFAULT_CURRENCY_SYMBOL}{(Number(item.price) * item.quantity).toFixed(2)} */}
                 {DEFAULT_CURRENCY_SYMBOL}{item.total.toFixed(2)}
               </p>
-              {/* {item?.discount_price && (
+              {item.discount_price && parseFloat(item.discount_price) > 0 && item.total !== item.subtotal && (
                 <p className="text-skin-neutral-300 text-content-3 md:text-title-2 xl:text-title-1 line-through opacity-60 font-bold">
                   {DEFAULT_CURRENCY_SYMBOL}{item.subtotal.toFixed(2)}
                 </p>
-              )} */}
+              )}
             </div>
           </div>
 

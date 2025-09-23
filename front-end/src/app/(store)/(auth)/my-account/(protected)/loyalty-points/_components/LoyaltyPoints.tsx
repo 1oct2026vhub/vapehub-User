@@ -7,7 +7,6 @@ interface LoyaltyPointsProps {
 }
 
 const LoyaltyPoints: React.FC<LoyaltyPointsProps> = ({ data }) => {
-  console.log("loyalty points data", data);
   const redemptionAmount = data.redemption_type === 'percentage'
     ? `${data.redemption_amount}%`
     : `${DEFAULT_CURRENCY_SYMBOL}${Number(data.redemption_amount).toFixed(2)}`;

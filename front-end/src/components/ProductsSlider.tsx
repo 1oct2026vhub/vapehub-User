@@ -15,7 +15,6 @@ interface ProductProps {
 const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, reviews = []}) => {
   
   const products:Product[] = data?.products?.filter((product: Product) => product.Category !== null) ?? [];
-  console.log("landing page products", products);
   
   const settings: Settings = {
     dots: true,
@@ -70,6 +69,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, review
               isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
               averageRating={averageRating}
               totalReviews={totalReviews}
+              outOfStock={product.out_of_stock}
             />
           </div>
         )

@@ -64,7 +64,6 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
   };
 
   const addAddress = async (addressData: AddressFormData) => {
-    console.log(addressData);
     try {
       setIsLoading(true);
       setError(null);

@@ -5,7 +5,7 @@ import SuspenseLoader from "@/components/ui/SuspenseLoader";
 import { ROUTES } from "@/lib/routes";
 import HomeCarousel from './_components/HomeCarousel';
 import WelcomeSection from './_components/WelcomeSection';
-import TrustPilotRatingCard from './_components/TrustPilotRatingCard';
+import TrustPilotRating from './_components/TrustPilotRating';
 import FeatureCards from './_components/FeatureCards';
 import ShopByCategory from './_components/ShopByCategory';
 import HottestCollections from './_components/HottestCollections';
@@ -37,10 +37,7 @@ const Dashboard: NextPage = async () => {
 
       <section className="flex flex-col gap-4.5 md:gap-10 max-md:mt-4.5">
         <Suspense fallback={<SuspenseLoader />}>
-          <TrustPilotRatingCard
-            title="Trustpilot has rated Vapehub as Excellent!"
-            filledStars={4}
-          />
+          <TrustPilotRating />
           <FeatureCards />
         </Suspense>
       </section>

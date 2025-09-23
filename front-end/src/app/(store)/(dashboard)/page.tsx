@@ -17,6 +17,8 @@ import ReferFriend from './_components/ReferFriend';
 import Testimonials from './_components/Testimonials';
 import Subscription from './_components/Subscription';
 import BlogsSection from './_components/BlogsSection';
+import { getEntitySlugs } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
 
 export const revalidate = 60;
 
@@ -24,6 +26,12 @@ const Dashboard: NextPage = async () => {
   // const Dashboard: NextPage<{searchParams: Promise<{referral_code: string}>}> = async ({searchParams}) => {
   // const referralCode = (await searchParams).referral_code;
    
+
+  // Resolve entity slugs for Big Puff (id: 8) and Nic Salts (id: 13)
+  const entitySlugsResponse = await getEntitySlugs('order_count');
+  const entities = (entitySlugsResponse.status === ServerActionStatus.SUCCESS ? entitySlugsResponse.data?.entities : undefined) ?? [];
+  const bigPuffResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 8)?.slug_relation || 'big-puff-vape-kits';
+  const nicSaltsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 13)?.slug_relation || 'nic-salts';
 
   return (
     <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
@@ -61,14 +69,14 @@ const Dashboard: NextPage = async () => {
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
-        <MostPopularSalts viewAllHref="nic-salts" slug="nic-salts" />
+        <MostPopularSalts viewAllHref="nic-salts" slug={nicSaltsResolvedSlug} />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
         <MostPopularVapes 
-          title="Most Popular Big Puff"
+          title="Most Popular Big-Puff Vapes"
           viewAllHref="big puff vape kits" 
-          slug="big-puff-vape-kits" 
+          slug={bigPuffResolvedSlug}
         />
       </Suspense>
 

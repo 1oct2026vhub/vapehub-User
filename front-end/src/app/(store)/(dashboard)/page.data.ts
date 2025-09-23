@@ -1,13 +1,3 @@
-import { 
-  getProductByCategory, 
-  getProductList, 
-  getBrandList, 
-  getCategoryList,
-  getCarouselList,
-  getPromotionBanner,
-  getBlogList,
-  getReviewOrderByProductId
-} from "@/lib/server.actions";
 import { CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
 import { BrandListResponse } from "@/lib/config/brand.config";
 import { Category } from "@/lib/config/category.config";
@@ -32,49 +22,19 @@ type DashboardData = {
 }
 
 export const getDashboardData = async (): Promise<DashboardData> => {
-  const [
-    popularVapesResponse,
-    popularSaltsResponse,
-    newProductsResponse,
-    brandsResponse,
-    categoriesResponse,
-    carouselResponse,
-    promotionResponse,
-    blogsResponse
-  ] = await Promise.all([
-    getProductByCategory("disposables", {sort_by:"id",order:"ASC",limit:8,offset:0}),
-    getProductByCategory("nic-salts", {sort_by:"id",order:"ASC",limit:8,offset:0}),
-    getProductList({sort_by:"id",order:"DESC",limit:8,offset:0}),
-    getBrandList({page:1,limit:10}),
-    getCategoryList(),
-    getCarouselList(),
-    getPromotionBanner(),
-    getBlogList("")
-  ]);
-
-  const newProductsReviews = newProductsResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
-    newProductsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-  ) : [];
-
-  const popularVapesReviews = popularVapesResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
-    popularVapesResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-  ) : [];
-
-  const popularSaltsReviews = popularSaltsResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
-    popularSaltsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-  ) : [];
-
-  return {
-    popularVapes: popularVapesResponse,
-    popularSalts: popularSaltsResponse,
-    newProducts: newProductsResponse,
-    brands: brandsResponse,
-    categories: categoriesResponse,
-    carousel: carouselResponse,
-    promotions: promotionResponse,
-    blogs: blogsResponse,
-    newProductsReviews,
-    popularVapesReviews,
-    popularSaltsReviews
-  };
+  // Deprecated: dashboard now fetches per-component with caching. Left for backward compatibility.
+  const empty: DashboardData = {
+    popularVapes: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    popularSalts: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    newProducts: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    brands: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    categories: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    carousel: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    promotions: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    blogs: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    newProductsReviews: [],
+    popularVapesReviews: [],
+    popularSaltsReviews: []
+  } as unknown as DashboardData;
+  return empty;
 } 

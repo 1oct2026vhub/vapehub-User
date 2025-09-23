@@ -6,14 +6,17 @@ import { ROUTES } from '@/lib/routes';
 import { Button } from '@nextui-org/button';
 import Link from 'next/link';
 import React from 'react'
+import { getBrandList } from '@/lib/server.actions'
+import { ServerActionStatus } from '@/lib/config/app.config'
 
-interface HottestCollectionsProps {
-  brands: BrandConfig[];
-}
-
-const HottestCollections: React.FC<HottestCollectionsProps> = ({ brands }) => {
-    if (!brands?.length) {
-        return  <EmptyPlaceholder title='Uh, oh!' description='No brands available' />;
+const HottestCollections: React.FC = async () => {
+    const brandsResponse = await getBrandList({ page: 1, limit: 10 });
+    if (brandsResponse.status !== ServerActionStatus.SUCCESS) {
+        return <EmptyPlaceholder title='Uh, oh!' description='Failed to load brands' />;
+    }
+    const brands: BrandConfig[] = brandsResponse.data?.brands ?? [];
+    if (!brands.length) {
+        return <EmptyPlaceholder title='Uh, oh!' description='No brands available' />;
     }
 
     return (

@@ -1,27 +1,39 @@
 import React from "react";
 import SectionHeading from "@/components/ui/SectionHeading";
-// import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
-import { Product, ProductResponseData } from "@/lib/config/product.config";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
-import { ServerActionResponse } from "@/lib/config/app.config";
-import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+import { getProductList,
+  //  getReviewOrderByProductId 
+  } from "@/lib/server.actions";
+
+  import { 
+    // ServerActionResponse
+     ServerActionStatus } from "@/lib/config/app.config";
+import { Product, ProductResponseData } from "@/lib/config/product.config";
+// import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
 interface NewProductsProps {
   title?: string;
   viewAllHref?: string;
-  products: ProductResponseData;
-  reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
 }
 
-const NewProducts: React.FC<NewProductsProps> = ({
+const NewProducts: React.FC<NewProductsProps> = async ({
   title = "New Products",
   viewAllHref = "/",
-  products,
-  reviews
 }) => {
-  const newProducts:Product[] = products?.products?.filter((product: Product) => product.Category !== null) ?? [];
+  const productsResponse = await getProductList({ sort_by: "id", order: "DESC", limit: 8, offset: 0 });
+  if (productsResponse.status !== ServerActionStatus.SUCCESS) {
+    return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
+  }
+
+  const products: ProductResponseData = productsResponse.data;
+  const newProducts: Product[] = products?.products?.filter((product: Product) => product.Category !== null) ?? [];
+
+  // let reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = [];
+  // if (newProducts.length > 0) {
+  //   reviews = await Promise.all(newProducts.map(p => getReviewOrderByProductId(p.id, 1, 1)));
+  // }
  
   return (
     <section className="space-y-4.5 md:space-y-7.5">
@@ -31,7 +43,7 @@ const NewProducts: React.FC<NewProductsProps> = ({
       </div>
       <div className="slider-container section-slider products-slider">
         {newProducts.length > 0 ? (
-          <ProductsSlider data={products} reviews={reviews} />
+          <ProductsSlider data={products}  />
         ) : (
           <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         )}

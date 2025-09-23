@@ -2,16 +2,20 @@ import React, { FunctionComponent, ReactElement } from "react";
 import CategorySlider from "@/components/CategorySlider";
 import SectionHeading from "@/components/ui/SectionHeading";
 // import ViewAllLink from "@/components/ui/ViewAllLink";
-import { Category, CategoryDetails } from "@/lib/config/category.config";
+import { CategoryDetails } from "@/lib/config/category.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
+import { getCategoryList } from "@/lib/server.actions";
+import { ServerActionStatus } from "@/lib/config/app.config";
 
-interface ShopByCategoryProps {
-  categories: Category[];
-}
-
-const ShopByCategory: FunctionComponent<ShopByCategoryProps> = ({ categories }): ReactElement => {
+const ShopByCategory: FunctionComponent = async (): Promise<ReactElement> => {
+  const categoriesResponse = await getCategoryList();
+  if (categoriesResponse.status !== ServerActionStatus.SUCCESS) {
+    return <EmptyPlaceholder title='Uh, oh!' description='Failed to load categories' />;
+  }
+  const categories = categoriesResponse.data;
+  console.log("categories", categories);
   if (!categories?.length) {
-    return  <EmptyPlaceholder title='Uh, oh!' description='No categories available' />;
+    return <EmptyPlaceholder title='Uh, oh!' description='No categories available' />;
   }
    
   return (

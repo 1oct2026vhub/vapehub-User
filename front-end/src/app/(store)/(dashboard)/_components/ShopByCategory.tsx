@@ -13,7 +13,6 @@ const ShopByCategory: FunctionComponent = async (): Promise<ReactElement> => {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load categories' />;
   }
   const categories = categoriesResponse.data;
-  console.log("categories", categories);
   if (!categories?.length) {
     return <EmptyPlaceholder title='Uh, oh!' description='No categories available' />;
   }

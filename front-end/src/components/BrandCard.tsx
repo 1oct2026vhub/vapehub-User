@@ -19,6 +19,7 @@ const BrandCard: React.FC<BrandCardProps> = ({
 }) => {
   return (
     <Link
+    prefetch={false}
       href={href}
       className="p-1 bg-skin-white border border-[#B9B9B9] shadow-brand-card hover:shadow-slider-card rounded-10 md:rounded-2xl flex items-center justify-center transition-all duration-300 max-w-28 md:max-w-max overflow-hidden"
     >

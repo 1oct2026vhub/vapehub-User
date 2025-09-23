@@ -1112,9 +1112,10 @@ export const getShipStationCarriers = async (): Promise<ServerActionResponse<{
 };
 
 // Get entity slugs
-export const getEntitySlugs = async (): Promise<ServerActionResponse<EntitySlugsResponse>> => {
+export const getEntitySlugs = async (sortBy: string = 'order_count'): Promise<ServerActionResponse<EntitySlugsResponse>> => {
+  const endpoint = `${API_ROUTES.GET_ENTITY_SLUGS}?sort_by=${encodeURIComponent(sortBy)}`;
   return await handleRequest<EntitySlugsResponse, unknown>({
-    endpoint: API_ROUTES.GET_ENTITY_SLUGS,
+    endpoint,
     method: 'GET',
   });
 };

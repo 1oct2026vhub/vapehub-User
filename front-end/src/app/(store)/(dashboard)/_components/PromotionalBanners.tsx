@@ -1,8 +1,10 @@
 import NoImage from '@/components/NoImage';
-// import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
+import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import { BannerResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 import React, { memo } from 'react';
+import { getPromotionBanner } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
 
 interface BannerImageProps {
   banner: BannerResponse;
@@ -30,14 +32,17 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
 
 BannerImage.displayName = 'BannerImage';
 
-interface PromotionalBannersProps {
-  banners: BannerResponse[];
-}
+const PromotionalBanners: React.FC = async () => {
+  const bannersResponse = await getPromotionBanner();
+  
+  if (bannersResponse.status !== ServerActionStatus.SUCCESS) {
+    return <EmptyPlaceholder title='Uh, oh!' description='Failed to load banners' />;
+  }
 
-const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners }) => {
-  // if (!Array.isArray(banners) || banners.length === 0) {
-  //   return  <EmptyPlaceholder title='Uh, oh!' description='No banners available' />;
-  // }
+  const banners: BannerResponse[] = bannersResponse.data ?? [];
+  if (!Array.isArray(banners) || banners.length === 0) {
+    return <EmptyPlaceholder title='Uh, oh!' description='No banners available' />;
+  }
 
   const sortedBanners = [...banners].sort((a, b) => a.display_order - b.display_order);
   
@@ -80,7 +85,7 @@ const PromotionalBanners: React.FC<PromotionalBannersProps> = memo(({ banners })
       </section>
     </>
   );
-});
+};
 
 PromotionalBanners.displayName = 'PromotionalBanners';
 

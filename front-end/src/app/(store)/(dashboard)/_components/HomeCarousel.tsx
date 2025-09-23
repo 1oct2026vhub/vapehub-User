@@ -1,18 +1,22 @@
 import React from 'react';
 import BannerSlider from './BannerSlider';
 import MobileBannerSlider from './MobileBannerSlider';
-import { CarouselConfig } from '@/lib/config/carousel.config';
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
+import { getCarouselList } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
 
-interface HomeCarouselProps {
-  banners: CarouselConfig[];
-}
+const HomeCarousel = async () => {
+  const bannersResponse = await getCarouselList();
 
-const HomeCarousel: React.FC<HomeCarouselProps> = ({ banners }) => {
-  if (!banners?.length) {
-    return  <EmptyPlaceholder title='Uh, oh!' description='No banners available' />;
+  if (bannersResponse.status !== ServerActionStatus.SUCCESS) {
+    return <EmptyPlaceholder title='Uh, oh!' description='Failed to load banners' />;
   }
-        
+
+  const banners = bannersResponse.data
+  if (!banners?.length) {
+    return <EmptyPlaceholder title='Uh, oh!' description='No banners available' />;
+  }
+
   return (
     <>
       <section className="banner-carousel hidden lg:block">

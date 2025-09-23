@@ -1,17 +1,3 @@
-import { 
-  getProductByCategory, 
-  getHomeProductList, 
-  getBrandList, 
-  getCategoryList,
-  getCarouselList,
-  getPromotionBanner,
-  getBlogList,
-  getReviewOrderByProductId,
-  getEntitySlugs,
-  getFeatureContent,
-  getTrustpilotReviews,
-  getMailSubscriptionSettings
-} from "@/lib/server.actions";
 import { CategoryResponseData, ProductResponseData } from "@/lib/config/product.config";
 // import { CategoryResponseData } from "@/lib/config/product.config";
 import { BrandListResponse } from "@/lib/config/brand.config";
@@ -99,86 +85,19 @@ type DashboardData = {
   entitySlugs: ServerActionResponse<EntitySlugsResponse>;
 }
 export const getDashboardData = async (): Promise<DashboardData> => {
-  // First, get entity slugs to determine the correct slugs for disposables and nic-salts
-  const entitySlugsResponse = await getEntitySlugs();
-  
-  // Extract slugs from entity response, with fallbacks to hardcoded values
-  let bigPuffVapeKitsSlug = "big-puff-vape-kits"; // fallback
-  let nicSaltsSlug = "nic-salts"; // fallback
-  
-  if (entitySlugsResponse.status === ServerActionStatus.SUCCESS && entitySlugsResponse.data) {
-    const entities = entitySlugsResponse.data.entities;
-    
-    // Find disposables slug by entity name
-    const bigPuffVapeKitsEntity = entities.find(entity => 
-      entity.entity_name === "big puff vape kits"
-    );
-    if (bigPuffVapeKitsEntity) {
-      bigPuffVapeKitsSlug = bigPuffVapeKitsEntity.slug_relation;
-    }
-    
-  //   // Find nic-salts slug by entity name
-    const nicSaltsEntity = entities.find(entity => 
-      entity.entity_name === "NIC SALTS"
-    );
-    if (nicSaltsEntity) {
-      nicSaltsSlug = nicSaltsEntity.slug_relation;
-    }
-  }
-
-  const [
-    popularVapesResponse,
-    popularSaltsResponse,
-    newProductsResponse,
-    brandsResponse,
-    categoriesResponse,
-    carouselResponse,
-    promotionResponse,
-    blogsResponse,
-    featuresResponse,
-    trustpilotResponse,
-    subscriptionSettingsResponse
-  ] = await Promise.all([
-    getProductByCategory(bigPuffVapeKitsSlug, {sort_by:"id",order:"ASC",limit:8,offset:0}),
-    getProductByCategory(nicSaltsSlug, {sort_by:"id",order:"ASC",limit:8,offset:0}),
-    getHomeProductList({sort_by:"id",order:"DESC",limit:8,offset:0}),
-    getBrandList({page:1,limit:10}),
-    getCategoryList(),
-    getCarouselList(),
-    getPromotionBanner(),
-    getBlogList(""),
-    getFeatureContent({ page: 1, limit: 4 }),
-    getTrustpilotReviews({ page: 1, per_page: 10 }),
-    getMailSubscriptionSettings()
-  ]);
-
-  const newProductsReviews = newProductsResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
-    newProductsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-  ) : [];
-
-  const popularVapesReviews = popularVapesResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
-    popularVapesResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-  ) : [];
-
-  const popularSaltsReviews = popularSaltsResponse.status === ServerActionStatus.SUCCESS ? await Promise.all(
-    popularSaltsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-  ) : [];
-
-  return {
-    popularVapes: popularVapesResponse,
-    popularSalts: popularSaltsResponse,
-    newProducts: newProductsResponse,
-    brands: brandsResponse,
-    categories: categoriesResponse,
-    carousel: carouselResponse,
-    promotions: promotionResponse,
-    blogs: blogsResponse,
-    features: featuresResponse,
-    trustpilot: trustpilotResponse,
-    subscriptionSettings: subscriptionSettingsResponse,
-    newProductsReviews,
-    popularVapesReviews,
-    popularSaltsReviews,
-    entitySlugs: entitySlugsResponse
-  };
+  // Deprecated: dashboard now fetches per-component with caching. Left for backward compatibility.
+  const empty: DashboardData = {
+    popularVapes: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    popularSalts: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    newProducts: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    brands: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    categories: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    carousel: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    promotions: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    blogs: { status: ServerActionStatus.ERROR, message: 'Deprecated' },
+    newProductsReviews: [],
+    popularVapesReviews: [],
+    popularSaltsReviews: []
+  } as unknown as DashboardData;
+  return empty;
 } 

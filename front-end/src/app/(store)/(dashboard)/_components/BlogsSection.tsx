@@ -2,22 +2,26 @@ import React from "react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import BlogsSlider from "@/components/BlogsSlider"; 
-import { BlogResponse } from "@/lib/config/blog.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
+import { getBlogList } from "@/lib/server.actions";
+import { ServerActionStatus } from "@/lib/config/app.config";
 
 interface BlogsSectionProps {
   title?: string;
   viewAllHref?: string;
-  blogs: BlogResponse[];
 }
 
-const BlogsSection: React.FC<BlogsSectionProps> = ({
+const BlogsSection: React.FC<BlogsSectionProps> = async ({
   title = "New to Vaping",
   viewAllHref = "/blogs",
-  blogs
 }) => {
-  if (!blogs?.length) {
-    return  <EmptyPlaceholder title='Uh, oh!' description='No blogs available' />;
+  const blogsResponse = await getBlogList('');
+  if (blogsResponse.status !== ServerActionStatus.SUCCESS) {
+    return <EmptyPlaceholder title='Uh, oh!' description='Failed to load blogs' />;
+  }
+  const blogs = blogsResponse.data ?? [];
+  if (!blogs.length) {
+    return <EmptyPlaceholder title='Uh, oh!' description='No blogs available' />;
   }
   
   return (

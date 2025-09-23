@@ -23,7 +23,7 @@ const DealCard: React.FC<DealCardProps> = ({
     const [showTooltip, setShowTooltip] = useState(false);
     
     return (
-        <Link href={href} className="block bg-skin-white max-w-60 md:max-w-full rounded-xl shadow-deal-card-mob xl:shadow-deal-card hover:shadow-brand-card transition-all duration-300 h-fit">
+        <Link prefetch={false} href={href} className="block bg-skin-white max-w-60 md:max-w-full rounded-xl shadow-deal-card-mob xl:shadow-deal-card hover:shadow-brand-card transition-all duration-300 h-fit">
             <div className="relative w-full aspect-[4/3] overflow-hidden rounded-t-xl">
                 <NoImage 
                     src={imageSrc} 

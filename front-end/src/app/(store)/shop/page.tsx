@@ -1,11 +1,12 @@
 import BreadCrumbs from '@/components/BreadCrumbs';
 import {  AsyncReactElement, ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config';
-import { getProductList, getReviewOrderByProductId } from '@/lib/server.actions';
+import { getProductList } from '@/lib/server.actions';
 import { Metadata, NextPage } from 'next'; 
 import ProductList from '../(product-listing)/_components/ProductList';
 import { ROUTES } from '@/lib/routes';
 import ProductListingContent from '@/components/ProductListingContent';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
+import { Product, ProductReview } from '@/lib/config/product.config';
 
 export const metadata: Metadata = {
   title: "Shop | VapeHub",
@@ -14,7 +15,6 @@ export const metadata: Metadata = {
 type SearchParams = {
   searchParams: Promise<Record<string, string>>
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElement  => {
      
     const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
@@ -48,9 +48,43 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
         return (<p>{response.message}</p>);
       } 
 
-    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = response.status === ServerActionStatus.SUCCESS && response.data.products ? await Promise.all(
-        response.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-    ) : [];
+    // Extract review data from products and format for ProductList
+    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = response.status === ServerActionStatus.SUCCESS && response.data.products ? response.data.products.map((product: Product) => ({
+        status: ServerActionStatus.SUCCESS,
+        data: {
+            reviews: (product.reviews || []).map((review: ProductReview) => ({
+                ...review,
+                product_id: product.id,
+                is_visible: true,
+                updated_at: review.created_at,
+                verified_by: Boolean(review.verified_by),
+                user: review.user ? {
+                    id: review.user.id,
+                    first_name: review.user.first_name,
+                    last_name: review.user.last_name,
+                    profile_pic_url: review.user.profile_pic_url
+                } : null,
+                order: review.order ? {
+                    id: review.order.id,
+                    order_unique_id: review.order.order_unique_id
+                } : null,
+                product: {
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug
+                },
+                media: []
+            })),
+            pagination: {
+                total: product.review_stats?.total_reviews || 0,
+                page: 1,
+                limit: 1,
+                totalPages: 1
+            },
+            average_rating: String(product.review_stats?.average_rating || 0),
+            total_reviews: product.review_stats?.total_reviews || 0
+        }
+    })) : [];
 
     const productListingData = {
         name: searchParamsData.keyword?.toString() || "Shop",

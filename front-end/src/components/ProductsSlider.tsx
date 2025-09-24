@@ -52,8 +52,12 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, review
     <Slider {...settings}>
       {products.map((product, index) => {
         const review = reviews && reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews?.find(review => review.product_id === product.id));
-        const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
-        const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
+        const averageRating = review?.status === ServerActionStatus.SUCCESS 
+          ? parseFloat(review.data.average_rating) 
+          : (product.review_stats ? Number(product.review_stats.average_rating) : 0);
+        const totalReviews = review?.status === ServerActionStatus.SUCCESS 
+          ? review.data.total_reviews 
+          : (product.review_stats ? product.review_stats.total_reviews : 0);
 
         return (
           <div key={index} className="px-2 xl:px-5 py-4 first:pl-0">

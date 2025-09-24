@@ -1,6 +1,6 @@
 import BreadCrumbs from '@/components/BreadCrumbs';
 import {  AsyncReactElement, ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config';
-import { getProductList, getReviewOrderByProductId } from '@/lib/server.actions';
+import { getProductList } from '@/lib/server.actions';
 import { Metadata, NextPage } from 'next'; 
 import ProductList from '../(product-listing)/_components/ProductList';
 import { ROUTES } from '@/lib/routes';
@@ -48,9 +48,33 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
         return (<p>{response.message}</p>);
       } 
 
-    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = response.status === ServerActionStatus.SUCCESS && response.data.products ? await Promise.all(
-        response.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-    ) : [];
+    // Extract review data from products and format for ProductList
+    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = response.status === ServerActionStatus.SUCCESS && response.data.products ? response.data.products.map((product: any) => ({
+        status: ServerActionStatus.SUCCESS,
+        data: {
+            reviews: (product.reviews || []).map((review: any) => ({
+                ...review,
+                product_id: product.id,
+                is_visible: true,
+                updated_at: review.created_at,
+                verified_by: Boolean(review.verified_by),
+                product: {
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug
+                },
+                media: []
+            })),
+            pagination: {
+                total: product.review_stats?.total_reviews || 0,
+                page: 1,
+                limit: 1,
+                totalPages: 1
+            },
+            average_rating: String(product.review_stats?.average_rating || 0),
+            total_reviews: product.review_stats?.total_reviews || 0
+        }
+    })) : [];
 
     const productListingData = {
         name: searchParamsData.keyword?.toString() || "Shop",

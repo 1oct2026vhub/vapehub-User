@@ -126,6 +126,27 @@ export interface Product {
     puff_count?: number | string;
     createdAt?: string;
     out_of_stock?: boolean;
+    reviews?: Array<{
+        id: number;
+        user_id: number | null;
+        order_id: number | null;
+        user_name: string;
+        company_name: string;
+        rating: number;
+        comment: string;
+        verified_by: number;
+        testimonial: number;
+        created_at: string;
+        user: any | null;
+        order: any | null;
+    }>;
+    review_stats?: {
+        average_rating: number | string;
+        total_reviews: number;
+        rating_distribution: Record<string | number, number>;
+        verified_reviews: number;
+        testimonials: number;
+    };
 }
 
 export interface SimilarProduct extends Product {

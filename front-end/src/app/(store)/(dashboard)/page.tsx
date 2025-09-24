@@ -69,13 +69,13 @@ const Dashboard: NextPage = async () => {
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
-        <MostPopularSalts viewAllHref="nic-salts" slug={nicSaltsResolvedSlug} />
+        <MostPopularSalts viewAllHref={nicSaltsResolvedSlug} slug={nicSaltsResolvedSlug} />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
         <MostPopularVapes 
           title="Most Popular Big-Puff Vapes"
-          viewAllHref="big puff vape kits" 
+          viewAllHref={bigPuffResolvedSlug}
           slug={bigPuffResolvedSlug}
         />
       </Suspense>

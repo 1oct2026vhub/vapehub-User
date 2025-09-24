@@ -2,7 +2,7 @@ import { AsyncReactElement, RouteParams, ServerActionResponse, ServerActionStatu
 import { NextPage } from 'next';
 import React from 'react';
 import BrandProducts from '../_components/BrandProducts';
-import { getProductByBrand, getReviewOrderByProductId, getDynamicPageSlug } from '@/lib/server.actions';
+import { getProductByBrand, getDynamicPageSlug } from '@/lib/server.actions';
 import { notFound } from 'next/navigation';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
@@ -49,9 +49,33 @@ const BrandPage: NextPage<Props> = async ({
 
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
-    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = brandProduct.products ? await Promise.all(
-        brandProduct.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-    ) : [];
+    // Extract review data from products and format for BrandProducts
+    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = brandProduct.products ? brandProduct.products.map((product: any) => ({
+      status: ServerActionStatus.SUCCESS,
+      data: {
+        reviews: (product.reviews || []).map((review: any) => ({
+          ...review,
+          product_id: product.id,
+          is_visible: true,
+          updated_at: review.created_at,
+          verified_by: Boolean(review.verified_by),
+          product: {
+            id: product.id,
+            name: product.name,
+            slug: product.slug
+          },
+          media: []
+        })),
+        pagination: {
+          total: product.review_stats?.total_reviews || 0,
+          page: 1,
+          limit: 1,
+          totalPages: 1
+        },
+        average_rating: String(product.review_stats?.average_rating || 0),
+        total_reviews: product.review_stats?.total_reviews || 0
+      }
+    })) : [];
 
     return (
       <BrandProducts data={brandProduct} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />

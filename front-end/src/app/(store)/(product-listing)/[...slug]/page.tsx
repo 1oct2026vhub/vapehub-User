@@ -1,4 +1,4 @@
-import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getReviewOrderByProductId } from "@/lib/server.actions";
+import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { notFound, redirect, RedirectType } from 'next/navigation';
@@ -105,9 +105,33 @@ const Page = async ({
       const combinedParams = buildVariantParams(searchParamsData, defaultParams);
       const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
       if (category) {
-        const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = category.products ? await Promise.all(
-          category.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
-        ) : [];
+        // Extract review data from products and format for CategoryProducts
+        const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = category.products ? category.products.map((product: any) => ({
+          status: ServerActionStatus.SUCCESS,
+          data: {
+            reviews: (product.reviews || []).map((review: any) => ({
+              ...review,
+              product_id: product.id,
+              is_visible: true,
+              updated_at: review.created_at,
+              verified_by: Boolean(review.verified_by),
+              product: {
+                id: product.id,
+                name: product.name,
+                slug: product.slug
+              },
+              media: []
+            })),
+            pagination: {
+              total: product.review_stats?.total_reviews || 0,
+              page: 1,
+              limit: 1,
+              totalPages: 1
+            },
+            average_rating: String(product.review_stats?.average_rating || 0),
+            total_reviews: product.review_stats?.total_reviews || 0
+          }
+        })) : [];
         return <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />;
       }
       return null;

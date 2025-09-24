@@ -103,6 +103,29 @@ export interface AttributeTerms {
     attribute: productAttributes;
     terms: productAttributesTerms[];
 }
+export type ProductReview = {
+    id: number;
+    user_id: number | null;
+    order_id: number | null;
+    user_name: string;
+    company_name: string;
+    rating: number;
+    comment: string;
+    verified_by: number;
+    testimonial: number;
+    created_at: string;
+    user: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        profile_pic_url: string | null;
+    } | null;
+    order: {
+        id: number;
+        order_unique_id: string;
+    } | null;
+};
+
 export interface Product {
     id: number;
     name: string;
@@ -126,6 +149,14 @@ export interface Product {
     puff_count?: number | string;
     createdAt?: string;
     out_of_stock?: boolean;
+    reviews?: ProductReview[];
+    review_stats?: {
+        average_rating: number | string;
+        total_reviews: number;
+        rating_distribution: Record<string | number, number>;
+        verified_reviews: number;
+        testimonials: number;
+    };
 }
 
 export interface SimilarProduct extends Product {

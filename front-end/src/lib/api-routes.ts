@@ -133,6 +133,7 @@ export interface PRODUCT_PAYLOAD {
     limit?: number | string;
     offset?: number | string;
     categoryId?: string;
+    homepage?: number;
 }
 export interface BLOG_PAYLOAD {
     categoryId?: string;

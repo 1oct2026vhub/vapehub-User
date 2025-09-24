@@ -4,8 +4,9 @@ import ProductsSlider from "@/components/ProductsSlider";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import { getHomeProductList } from "@/lib/server.actions";
-import { ServerActionStatus } from "@/lib/config/app.config";
+import { ServerActionStatus, ServerActionResponse } from "@/lib/config/app.config";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
+import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
 interface NewProductsProps {
   title?: string;
@@ -23,7 +24,34 @@ const NewProducts: React.FC<NewProductsProps> = async ({
 
   const products: ProductResponseData = productsResponse.data;
   const newProducts: Product[] = products?.products?.filter((product: Product) => product.Category !== null) ?? [];
- 
+  // Extract review data from products and format for ProductsSlider
+  const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = newProducts.map((product: Product) => ({
+    status: ServerActionStatus.SUCCESS,
+    data: {
+      reviews: (product.reviews || []).map(review => ({
+        ...review,
+        product_id: product.id,
+        is_visible: true,
+        updated_at: review.created_at,
+        verified_by: Boolean(review.verified_by),
+        product: {
+          id: product.id,
+          name: product.name,
+          slug: product.slug
+        },
+        media: []
+      })),
+      pagination: {
+        total: product.review_stats?.total_reviews || 0,
+        page: 1,
+        limit: 1,
+        totalPages: 1
+      },
+      average_rating: String(product.review_stats?.average_rating || 0),
+      total_reviews: product.review_stats?.total_reviews || 0
+    }
+  }));
+
   return (
     <section className="space-y-4.5 md:space-y-7.5">
       <div className="flex items-center justify-between">
@@ -32,7 +60,7 @@ const NewProducts: React.FC<NewProductsProps> = async ({
       </div>
       <div className="slider-container section-slider products-slider">
         {newProducts.length > 0 ? (
-          <ProductsSlider data={products}  />
+          <ProductsSlider data={products} reviews={reviews} />
         ) : (
           <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         )}

@@ -5,7 +5,7 @@ import { notFound, redirect, RedirectType } from 'next/navigation';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
 import { DynamicPageSlugResponse } from "@/lib/config/global.config";
-import { AttributeProductTerms, AttributeTerms, CategoryResponseData, ProductResponse } from "@/lib/config/product.config";
+import { AttributeProductTerms, AttributeTerms, CategoryResponseData, ProductResponse, Product, ProductReview } from "@/lib/config/product.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
 import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
@@ -106,15 +106,25 @@ const Page = async ({
       const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
       if (category) {
         // Extract review data from products and format for CategoryProducts
-        const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = category.products ? category.products.map((product: any) => ({
+        const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = category.products ? category.products.map((product: Product) => ({
           status: ServerActionStatus.SUCCESS,
           data: {
-            reviews: (product.reviews || []).map((review: any) => ({
+            reviews: (product.reviews || []).map((review: ProductReview) => ({
               ...review,
               product_id: product.id,
               is_visible: true,
               updated_at: review.created_at,
               verified_by: Boolean(review.verified_by),
+              user: review.user ? {
+                id: review.user.id,
+                first_name: review.user.first_name,
+                last_name: review.user.last_name,
+                profile_pic_url: review.user.profile_pic_url
+              } : null,
+              order: review.order ? {
+                id: review.order.id,
+                order_unique_id: review.order.order_unique_id
+              } : null,
               product: {
                 id: product.id,
                 name: product.name,

@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
+import { Product, ProductReview } from '@/lib/config/product.config';
 
 
 interface Props {
@@ -50,15 +51,25 @@ const BrandPage: NextPage<Props> = async ({
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
     // Extract review data from products and format for BrandProducts
-    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = brandProduct.products ? brandProduct.products.map((product: any) => ({
+    const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = brandProduct.products ? brandProduct.products.map((product: Product) => ({
       status: ServerActionStatus.SUCCESS,
       data: {
-        reviews: (product.reviews || []).map((review: any) => ({
+        reviews: (product.reviews || []).map((review: ProductReview) => ({
           ...review,
           product_id: product.id,
           is_visible: true,
           updated_at: review.created_at,
           verified_by: Boolean(review.verified_by),
+          user: review.user ? {
+            id: review.user.id,
+            first_name: review.user.first_name,
+            last_name: review.user.last_name,
+            profile_pic_url: review.user.profile_pic_url
+          } : null,
+          order: review.order ? {
+            id: review.order.id,
+            order_unique_id: review.order.order_unique_id
+          } : null,
           product: {
             id: product.id,
             name: product.name,

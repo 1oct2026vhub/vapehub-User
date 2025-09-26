@@ -24,7 +24,7 @@ const Page = async ({
 }) => {
 
   const slug = (await params).slug;
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 } as const;
+  const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
@@ -249,7 +249,7 @@ export async function generateMetadata({ params, searchParams }: {
   const slug = (await params).slug;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 } as const;
+  const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
 
 

@@ -8,8 +8,14 @@ import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 
+// Extended type for category data that might have additional ID fields
+type ExtendedCategoryData = CategoryResponseData & {
+  category_id?: number;
+  categoryId?: number;
+};
+
 type CategoryProps = {
-  data: CategoryResponseData;
+  data: ExtendedCategoryData;
   reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
   dynamicPageSlug?: DynamicPageSlugResponse;
 }
@@ -19,7 +25,14 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
   const breadcrumbs = [
     { label: "Home", href: "/" },
     { label: data.name, href: `/${data.slug}`, isActive: true },
-  ];
+  ];  
+  
+  // Try to get category ID from different possible sources
+  const categoryId = data.id || 
+                    data.category_id || 
+                    data.categoryId || 
+                    (dynamicPageSlug?.entity_id);
+    
   return (
     <div>
       <section className="product-listing-container flex-col">
@@ -28,7 +41,20 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
       </section>
       <ProductList data={data} reviews={reviews} />
       <section className="product-listing-container">
-        <FAQSection type="category" id={data.id} />
+        {categoryId ? (
+          <FAQSection type="category" id={categoryId} />
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-gray-500">FAQ section unavailable - Category ID not found</p>
+            <p className="text-sm text-gray-400">Debug info:</p>
+            <ul className="text-xs text-gray-400 text-left max-w-md mx-auto">
+              <li>data.id = {String(data.id)}</li>
+              <li>data.category_id = {String(data.category_id ?? 'undefined')}</li>
+              <li>data.categoryId = {String(data.categoryId ?? 'undefined')}</li>
+              <li>dynamicPageSlug.entity_id = {String(dynamicPageSlug?.entity_id ?? 'undefined')}</li>
+            </ul>
+          </div>
+        )}
       </section>
     </div>
 

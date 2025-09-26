@@ -33,34 +33,48 @@ const PaymentSuccessPage = () => {
             return;
         }
 
-        // Get parameters from URL
-        const transactionId = searchParams.get('t');
-        const sessionId = searchParams.get('s');
-        const orderCode = searchParams.get('orderCode');
-        const currency = searchParams.get('currency');
-        const amount = searchParams.get('amount');
-
-        // Check if this is a Worldpay payment (has orderCode, currency, amount)
-        const isWorldpayPayment = orderCode && currency && amount;
-        // Check if this is a Viva Wallet payment (has transactionId and sessionId)
-        const isVivaWalletPayment = transactionId && sessionId;
-
-        // Only proceed if we have valid payment parameters
-        if (!isWorldpayPayment && !isVivaWalletPayment) {
-            console.error('Missing required payment parameters for both Worldpay and Viva Wallet');
-            setIsVerifyingPayment(false);
-            return;
-        }
+        // Wait for page to be fully loaded and hydrated
+        const waitForPageLoad = () => {
+            return new Promise<void>((resolve) => {
+                if (document.readyState === 'complete') {
+                    // Page is already loaded
+                    setTimeout(resolve, 500); // Additional delay to ensure hydration
+                } else {
+                    // Wait for page to load
+                    window.addEventListener('load', () => {
+                        setTimeout(resolve, 500); // Additional delay to ensure hydration
+                    });
+                }
+            });
+        };
 
         const verifyPayment = async () => {
-            // Mark as processing and called immediately to prevent race conditions
-            isProcessingRef.current = true;
-            hasApiBeenCalledRef.current = true;
-
             try {
+                // Wait for page to be fully loaded and hydrated
+                await waitForPageLoad();
+                
+                // Get parameters from URL after page is loaded
+                const transactionId = searchParams.get('t');
+                const sessionId = searchParams.get('s');
+                const orderCode = searchParams.get('orderCode');
+                const currency = searchParams.get('currency');
+                const amount = searchParams.get('amount');
 
-                // Add a small delay to ensure the page is fully loaded and hydrated
-                await new Promise(resolve => setTimeout(resolve, 100));
+                // Check if this is a Worldpay payment (has orderCode, currency, amount)
+                const isWorldpayPayment = orderCode && currency && amount;
+                // Check if this is a Viva Wallet payment (has transactionId and sessionId)
+                const isVivaWalletPayment = transactionId && sessionId;
+
+                // Only proceed if we have valid payment parameters
+                if (!isWorldpayPayment && !isVivaWalletPayment) {
+                    console.error('Missing required payment parameters for both Worldpay and Viva Wallet');
+                    setIsVerifyingPayment(false);
+                    return;
+                }
+
+                // Mark as processing and called immediately to prevent race conditions
+                isProcessingRef.current = true;
+                hasApiBeenCalledRef.current = true;
 
                 // If Worldpay parameters are present, call Worldpay success API
                 if (isWorldpayPayment) {
@@ -83,6 +97,7 @@ const PaymentSuccessPage = () => {
                     }));
                     
                     try {
+                        console.log("Calling Worldpay API after page load...");
                         const worldpayResponse = await worldpayPaymentSuccess(worldpayPayload);
                         console.log("worldpayResponse", worldpayResponse);
                         
@@ -128,6 +143,7 @@ const PaymentSuccessPage = () => {
                             // For JSON parsing errors, still clear the cart since payment was successful
                             clearCart();
                             toast.success('Payment completed successfully! (Payment verified)');
+                            console.log('JSON parsing error handled - payment was successful');
                         } else {
                             toast.success('Payment completed! (Details verified from URL)');
                         }
@@ -215,6 +231,7 @@ const PaymentSuccessPage = () => {
             }
         };
 
+        // Call the verification function
         verifyPayment();
 
         // Cleanup function to reset the ref when component unmounts

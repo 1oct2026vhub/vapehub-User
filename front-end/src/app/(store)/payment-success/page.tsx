@@ -10,7 +10,6 @@ import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useCart } from '@/lib/context/CartContext';
-
 const PaymentSuccessPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();

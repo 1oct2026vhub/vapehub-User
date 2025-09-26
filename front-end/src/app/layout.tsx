@@ -4,6 +4,8 @@ import "./globals.css";
 import GlobalProvider from "@/providers/GlobalProvider";
 import { Toaster } from "sonner";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { GoogleMapsProvider } from "@/providers/GoogleMapsProvider";
+import GoogleMapsScript from "@/components/GoogleMapsScript";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -39,11 +41,6 @@ export default function RootLayout({
           content='width=device-width, initial-scale=1.0'
         />
         <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
-        <script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places`}
-          async
-          defer
-        />
         <GoogleAnalytics
         GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_MEASUREMENT_ID ?? ''}
       />
@@ -51,13 +48,18 @@ export default function RootLayout({
       <body
         className={`m-0 min-h-screen bg-white text-skin-black font-poppins antialiased ${poppins.variable}`}
       >
-        <GlobalProvider>
-        <Toaster
-            richColors
-            position='top-right'
-          />
-          {children}
-        </GlobalProvider>
+        {/* Google Maps API Script - Loaded with proper async strategy */}
+        <GoogleMapsScript />
+        
+        <GoogleMapsProvider>
+          <GlobalProvider>
+            <Toaster
+              richColors
+              position='top-right'
+            />
+            {children}
+          </GlobalProvider>
+        </GoogleMapsProvider>
       </body>
     </html>
   );

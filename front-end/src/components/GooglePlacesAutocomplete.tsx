@@ -2,6 +2,7 @@ import { extractAddressComponents, PlaceAutocompleteAddress } from '@/lib/utils/
 import { useEffect, useRef } from 'react';
 import { Input, InputProps } from '@nextui-org/react';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { useGoogleMaps } from '@/providers/GoogleMapsProvider';
 
 interface GooglePlacesAutocompleteProps<T extends FieldValues> extends InputProps {
   onPlaceSelect: (place: PlaceAutocompleteAddress) => void;
@@ -21,9 +22,12 @@ const GooglePlacesAutocomplete = <T extends FieldValues>({
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const listenerRef = useRef<google.maps.MapsEventListener | null>(null);
   const onChangeRef = useRef<(value: string) => void>(() => {});
+  
+  // Use the Google Maps context for better loading management
+  const { isLoaded, isLoading, error } = useGoogleMaps();
 
   useEffect(() => {
-    if (!inputRef.current || !window.google) return;
+    if (!inputRef.current || !isLoaded || !window.google) return;
 
     // Initialize Google Places Autocomplete
     autocompleteRef.current = new window.google.maps.places.Autocomplete(
@@ -55,14 +59,53 @@ const GooglePlacesAutocomplete = <T extends FieldValues>({
         autocompleteRef.current = null;
       }
     };
-  }, [onPlaceSelect]);
+  }, [onPlaceSelect, isLoaded]);
 
   return (
     <Controller
       name={name}
       control={control}
-      render={({ field: { onChange, value, ...field }, fieldState: { error } }) => {
+      render={({ field: { onChange, value, ...field }, fieldState: { error: fieldError } }) => {
         onChangeRef.current = onChange;
+        
+        // Show loading state while Google Maps is loading
+        if (isLoading) {
+          return (
+            <Input
+              {...field}
+              {...props}
+              value={value || ''}
+              placeholder="Loading address autocomplete..."
+              isDisabled
+              classNames={{
+                label: "!text-skin-neutral-400 !font-bold !text-content-2 md:!text-title-2 whitespace-nowrap group-data-[filled-within=true]:mt-1",
+                input: `!bg-skin-neutral-50 !text-skin-neutral-300 font-bold text-content-2 md:!text-title-2 placeholder:!text-skin-neutral-200 placeholder:font-semibold max-md:placeholder:text-content-1 ${inputClassName}`,
+                innerWrapper: "!bg-skin-neutral-50 disabled:!bg-skin-neutral-50 gap-2 hover:!bg-skin-neutral-50 pb-0 group-data-[has-label=true]:pt-9",
+                inputWrapper: "pl-3 md:pl-5 pr-3 h-11 md:h-12 shadow-input rounded-lg lg:rounded-10 !bg-skin-neutral-50 border border-skin-neutral-100 hover:border-skin-neutral-100 group-data-[filled-within=true]:border-skin-neutral-100 data-[hover=true]:!bg-skin-neutral-50 group-data-[focus=true]:border-skin-neutral-100 group-data-[focus=true]:!bg-skin-neutral-50 !cursor-not-allowed disabled:!bg-skin-neutral-50",
+              }}
+            />
+          );
+        }
+        
+        // Show error state if Google Maps failed to load
+        if (error) {
+          return (
+            <Input
+              {...field}
+              {...props}
+              value={value || ''}
+              placeholder="Address autocomplete unavailable"
+              isInvalid
+              errorMessage="Failed to load address autocomplete. Please enter your address manually."
+              classNames={{
+                label: "!text-skin-neutral-400 !font-bold !text-content-2 md:!text-title-2 whitespace-nowrap group-data-[filled-within=true]:mt-1",
+                input: `!bg-skin-white !text-skin-neutral-400 font-bold text-content-2 md:!text-title-2 placeholder:!text-skin-neutral-200 placeholder:font-semibold max-md:placeholder:text-content-1 ${inputClassName}`,
+                innerWrapper: "!bg-skin-white disabled:!bg-skin-neutral-50 gap-2 hover:!bg-skin-white pb-0 group-data-[has-label=true]:pt-9",
+                inputWrapper: "pl-3 md:pl-5 pr-3 h-11 md:h-12 shadow-input rounded-lg lg:rounded-10 !bg-skin-white border border-red-300 hover:border-red-400 group-data-[filled-within=true]:border-red-400 data-[hover=true]:!bg-skin-white group-data-[focus=true]:border-red-500 group-data-[focus=true]:!bg-skin-white !cursor-text disabled:!bg-skin-neutral-50",
+              }}
+            />
+          );
+        }
         
         return (
           <Input
@@ -77,8 +120,8 @@ const GooglePlacesAutocomplete = <T extends FieldValues>({
                 inputRef.current?.blur();
               }
             }}
-            isInvalid={!!error}
-            errorMessage={error?.message}
+            isInvalid={!!fieldError}
+            errorMessage={fieldError?.message}
             classNames={{
               label: "!text-skin-neutral-400 !font-bold !text-content-2 md:!text-title-2 whitespace-nowrap group-data-[filled-within=true]:mt-1",
               input: `!bg-skin-white !text-skin-neutral-400 font-bold text-content-2 md:!text-title-2 placeholder:!text-skin-neutral-200 placeholder:font-semibold max-md:placeholder:text-content-1 ${inputClassName}`,

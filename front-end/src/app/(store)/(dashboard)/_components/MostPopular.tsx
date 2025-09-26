@@ -21,7 +21,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = async ({
   viewAllHref = "#",
   slug,
 }) => {
-  const catResponse = await getProductByCategory(slug, { sort_by: "id", order: "ASC", limit: 8, offset: 0, homepage: 1 });
+  const catResponse = await getProductByCategory(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0, homepage: 1 });
   if (catResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
   }
@@ -84,7 +84,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = async ({
   viewAllHref = "#",
   slug,
 }) => {
-  const catResponse = await getProductByCategory(slug, { sort_by: "id", order: "ASC", limit: 8, offset: 0, homepage: 1 });
+  const catResponse = await getProductByCategory(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0, homepage: 1 });
   if (catResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
   }

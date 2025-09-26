@@ -1,5 +1,4 @@
 'use client'
-
 import ShippingProgress from '@/components/ShippingProgress'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
 import { useCart } from '@/lib/context/CartContext'
@@ -67,7 +66,8 @@ const CartTotal: React.FC = () => {
         const pointsPrefix = `You're eligible to use ${minimum_points_required} of your ${user_points} loyalty points to get`;
     
         if (redemption_type === 'percentage') {
-            return `${pointsPrefix} a ${redemption_amount}% discount`;
+          const discountAmount = (Number(redemption_amount) / 100) * cartTotal;
+            return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${discountAmount.toFixed(2)} discount`;
         }
         
         return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${Number(redemption_amount).toFixed(2)} discount`;

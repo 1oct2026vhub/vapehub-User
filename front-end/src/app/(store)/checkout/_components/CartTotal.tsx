@@ -81,7 +81,7 @@ const CartTotal: React.FC = () => {
         }
     }
 
-    const shippingCost = selectedShippingMethod?.shipping_cost || 0;
+    const shippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
     const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded-14 w-full'>

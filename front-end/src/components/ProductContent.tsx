@@ -9,6 +9,9 @@ import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
 // import { REVIEWS } from '@/lib/config/order.config';
 import EmptyPlaceholder from './ui/EmptyPlaceholder';
 import { useReviews } from '@/lib/context/ReviewContext';
+import { getShippingMethodsDisplay } from '@/lib/server.actions';
+import { SHIPPING_METHOD_DISPLAY } from '@/lib/config/order.config';
+import { ServerActionStatus } from '@/lib/config/app.config';
 type ProductContentProps = {
     product: ProductViewDetails;
 }
@@ -17,6 +20,9 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
     const { reviewData, loading, fetchReviews } = useReviews();
     const [selectedTab, setSelectedTab] = useState('Description');
     const [currentPage, setCurrentPage] = useState(1);
+    const [shippingMethods, setShippingMethods] = useState<SHIPPING_METHOD_DISPLAY[]>([]);
+    const [shippingLoading, setShippingLoading] = useState(true);
+    const [shippingError, setShippingError] = useState<string | null>(null);
     const limit = 10;
 
     useEffect(() => {
@@ -31,6 +37,67 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
             }
         }
     }, [selectedTab, currentPage, limit, product.id, fetchReviews, reviewData]);
+
+    // Fetch shipping methods display
+    useEffect(() => {
+        const fetchShippingMethodsDisplay = async () => {
+            try {
+                setShippingLoading(true);
+                setShippingError(null);
+                const response = await getShippingMethodsDisplay();
+                
+                if (response.status === ServerActionStatus.SUCCESS && response.data) {                    
+                    // Use Map to ensure uniqueness by id
+                    const methodMap = new Map();
+                    response.data.forEach((method, index) => {
+                        if (!methodMap.has(method.id)) {
+                            methodMap.set(method.id, method);
+                        } else {
+                            console.warn(`Duplicate shipping method ID ${method.id} found at index ${index}`);
+                        }
+                    });
+                    
+                    const uniqueMethods = Array.from(methodMap.values());
+                    
+                    // Log if duplicates were found
+                    if (uniqueMethods.length !== response.data.length) {
+                        console.warn('Duplicate shipping method IDs found and removed:', {
+                            original: response.data.length,
+                            unique: uniqueMethods.length,
+                            duplicates: response.data.length - uniqueMethods.length
+                        });
+                    }
+                    // Additional safety check - ensure we're not setting the same data
+                    setShippingMethods(prevMethods => {
+                        // Check if the new data is different from current data
+                        const isDifferent = prevMethods.length !== uniqueMethods.length || 
+                            prevMethods.some((prev, index) => 
+                                !uniqueMethods[index] || 
+                                prev.id !== uniqueMethods[index].id || 
+                                prev.display_text !== uniqueMethods[index].display_text
+                            );
+                        
+                        if (!isDifferent) {
+                            console.log('Shipping methods data unchanged, skipping state update');
+                            return prevMethods;
+                        }
+                        
+                        console.log('Updating shipping methods state with new data');
+                        return uniqueMethods;
+                    });
+                } else {
+                    setShippingError('Failed to fetch shipping methods');
+                }
+            } catch (error) {
+                console.error('Error fetching shipping methods:', error);
+                setShippingError(error instanceof Error ? error.message : 'An error occurred');
+            } finally {
+                setShippingLoading(false);
+            }
+        };
+
+        fetchShippingMethodsDisplay();
+    }, []);
         return (
         <section id="reviews" className='bg-skin-white p-4 md:p-6 xl:p-10 rounded-2.5xl shadow-card space-y-7.5'>
             <div className="flex w-full flex-col">
@@ -233,15 +300,34 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                         }}>
                             <CardBody className='p-0'>
                                 <div className="space-y-7.5">
-                                    <div className='bg-skin-primary-200 px-7.5 py-4.5 rounded-xl text-center text-title-2 text-skin-neutral-500 font-semibold'>
-                                        ***Free Delivery on all orders over {DEFAULT_CURRENCY_SYMBOL}{FREE_DELIVERY_THRESHOLD}***
-                                    </div>
-                                    <ul className='list-disc text-skin-neutral-500 text-title-2 font-bold pl-5 space-y-4 md:space-y-6'>
-                                        <li>Royal Mail Tracked 48 - 2 to 4 working days</li>
-                                        <li>Royal Mail Tracked 24 - 1 to 2 working days</li>
-                                        <li>Royal Mail Next Day Guaranteed</li>
-                                        <li>DPD Next Day Delivery</li>
-                                    </ul>
+                                    {shippingLoading ? (
+                                        <div className='bg-skin-primary-200 px-7.5 py-4.5 rounded-xl text-center text-title-2 text-skin-neutral-500 font-semibold'>
+                                            Loading delivery options...
+                                        </div>
+                                    ) : shippingError ? (
+                                        <div className='bg-red-100 px-7.5 py-4.5 rounded-xl text-center text-title-2 text-red-600 font-semibold'>
+                                            Error loading delivery options. Using default information.
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className='bg-skin-primary-200 px-7.5 py-4.5 rounded-xl text-center text-title-2 text-skin-neutral-500 font-semibold'>
+                                                ***Free Delivery on all orders over {DEFAULT_CURRENCY_SYMBOL}{FREE_DELIVERY_THRESHOLD}***
+                                            </div>
+                                            {shippingMethods.length > 0 && (
+                                                <ul className='list-disc text-skin-neutral-500 text-title-2 font-bold pl-5 space-y-4 md:space-y-6'>
+                                                    {shippingMethods.map((method, index) => {
+                                                        // Create a unique key using multiple fields and index
+                                                        const uniqueKey = `shipping-method-${method.id}-${method.display_text.replace(/\s+/g, '-')}-${index}`;
+                                                        return (
+                                                            <li key={uniqueKey}>
+                                                                {method.display_text}
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            )}
+                                        </>
+                                    )}
                                 </div>
                             </CardBody>
                         </Card>

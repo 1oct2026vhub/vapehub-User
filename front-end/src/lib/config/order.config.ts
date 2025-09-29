@@ -330,7 +330,11 @@ export interface SHIPPING_METHOD_DATA {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+}
 
+export interface SHIPPING_METHOD_DISPLAY {
+    id: number;
+    display_text: string;
 }
 
 export enum ORDER_STATUS {

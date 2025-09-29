@@ -11,7 +11,7 @@ import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionR
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config";
 import { NotificationListResponse } from "./config/notification.config";
-import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS } from "./config/order.config";
+import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, SHIPPING_METHOD_DISPLAY, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { 
   Product, 
@@ -499,6 +499,14 @@ export const updateOrderStatus = async (
 export const getShippingMethods = async (): Promise<ServerActionResponse<SHIPPING_METHOD_DATA[]>> => {
   return await handleRequest<SHIPPING_METHOD_DATA[], unknown>({
     endpoint: API_ROUTES.GET_SHIPPING_METHODS,
+    method: 'GET',
+  });
+};
+
+// get shipping methods display text (public API)
+export const getShippingMethodsDisplay = async (): Promise<ServerActionResponse<SHIPPING_METHOD_DISPLAY[]>> => {
+  return await handleRequest<SHIPPING_METHOD_DISPLAY[], unknown>({
+    endpoint: API_ROUTES.GET_SHIPPING_METHODS_DISPLAY,
     method: 'GET',
   });
 };

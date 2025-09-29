@@ -321,16 +321,25 @@ export interface ORDER {
 export interface SHIPPING_METHOD_DATA {
     id: number;
     shipping_method: string;
+    shipping_cost: string;
+    service_code: string;
+    carrier_code: string;
+    api_key: string | null;
+    api_secret: string | null;
     description: string;
-    message: string;
-    shipping_cost: number;
-    api_key: string;
-    api_secret: string;
-    updated_by: number;
+    method_order: number;
+    is_enabled: boolean;
+    display_text: string;
+    requestedShippingService: string;
+    updated_by: number | null;
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+}
 
+export interface SHIPPING_METHOD_DISPLAY {
+    id: number;
+    display_text: string;
 }
 
 export enum ORDER_STATUS {

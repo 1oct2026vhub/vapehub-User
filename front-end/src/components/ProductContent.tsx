@@ -78,11 +78,8 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             );
                         
                         if (!isDifferent) {
-                            console.log('Shipping methods data unchanged, skipping state update');
                             return prevMethods;
                         }
-                        
-                        console.log('Updating shipping methods state with new data');
                         return uniqueMethods;
                     });
                 } else {

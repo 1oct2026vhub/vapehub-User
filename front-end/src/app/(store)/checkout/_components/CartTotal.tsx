@@ -153,7 +153,7 @@ const CartTotal: React.FC = () => {
                         <p className='text-skin-neutral-300'>{itemCount}</p>
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
-                        <p className='text-skin-neutral-500'>Shipping Cost</p>
+                    <p className='text-skin-neutral-500'>Shipping Cost</p>
                         <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{shippingCost.toFixed(2)}</p>
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>

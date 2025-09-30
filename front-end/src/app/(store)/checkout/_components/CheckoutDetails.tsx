@@ -64,7 +64,7 @@ const CheckoutDetails: React.FC = () => {
             billingCountry: DEFAULT_COUNTRY
         }
     });
-    const { handlePlaceOrder, isProcessing } = useCheckout();
+    const { handlePlaceOrder, isProcessing, setSelectedShippingMethod } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
     const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
@@ -125,6 +125,7 @@ const CheckoutDetails: React.FC = () => {
             form.reset();
             if (shippingMethods.length > 0) {
                 setSelectedCarrier(shippingMethods[0]);
+                setSelectedShippingMethod(shippingMethods[0]);
                 form.setValue('shippingMethodId', shippingMethods[0].id);
             }
             setShowNewAddressForm(false);
@@ -209,7 +210,9 @@ const CheckoutDetails: React.FC = () => {
                 setOriginalShippingMethods(enabledMethods);
                 setShippingMethods(enabledMethods);
                 if (enabledMethods.length > 0) {
+                    console.log('CheckoutDetails - Initial shipping method:', enabledMethods[0]);
                     setSelectedCarrier(enabledMethods[0]);
+                    setSelectedShippingMethod(enabledMethods[0]);
                     form.setValue('shippingMethodId', enabledMethods[0].id);
                 }
             }
@@ -231,6 +234,7 @@ const CheckoutDetails: React.FC = () => {
         setShippingMethods(originalShippingMethods);
         if (originalShippingMethods.length > 0) {
             setSelectedCarrier(originalShippingMethods[0]);
+            setSelectedShippingMethod(originalShippingMethods[0]);
             form.setValue('shippingMethodId', originalShippingMethods[0].id);
         }
     }, [cartTotal, originalShippingMethods]);
@@ -522,7 +526,10 @@ const CheckoutDetails: React.FC = () => {
                                 onChange={(e) => {
                                     const method = e.target.value;
                                     form.setValue('shippingMethodId', Number(method));
-                                    setSelectedCarrier(shippingMethods.find(m => m.id.toString() === method.toString()) || shippingMethods[0]);
+                                    const selectedMethod = shippingMethods.find(m => m.id.toString() === method.toString()) || shippingMethods[0];
+                                    console.log('CheckoutDetails - Setting shipping method:', selectedMethod);
+                                    setSelectedCarrier(selectedMethod);
+                                    setSelectedShippingMethod(selectedMethod);
                                 }}
 
                             >

@@ -259,9 +259,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                         <div className="flex gap-1">
                             {Array.from({ length: 5 }, (_, i) => {
                                 if (i < Math.round(reviewData?.averageRating || 0)) {
-                                    return <RatingStarFilled key={i} className='w-4 h-4 md:w-5 md:h-5' />;
+                                    return <RatingStarFilled key={`rating-filled-${i}-${Date.now()}`} className='w-4 h-4 md:w-5 md:h-5' />;
                                 }
-                                return <RatingStarEmpty key={i} className='w-4 h-4 md:w-5 md:h-5' />;
+                                return <RatingStarEmpty key={`rating-empty-${i}-${Date.now()}`} className='w-4 h-4 md:w-5 md:h-5' />;
                             })}
                         </div>
                         <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
@@ -292,7 +292,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     <Slider {...settings} className='grid items-center gap-4 product-details'>
                         {
                             allImages?.map((image, index) => (
-                                <div key={index}>
+                                <div key={`image-${image.id}-${index}-${Date.now()}`}>
                                     <div className='px-0.5 py-1.5 bg-skin-base flex items-center justify-center'>
 
                                         <Button
@@ -337,9 +337,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             <div className="flex gap-1">
                                 {Array.from({ length: 5 }, (_, i) => {
                                     if (i < Math.round(reviewData?.averageRating || 0)) {
-                                        return <RatingStarFilled key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
+                                        return <RatingStarFilled key={`rating-filled-desktop-${i}-${Date.now()}`} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
                                     }
-                                    return <RatingStarEmpty key={i} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
+                                    return <RatingStarEmpty key={`rating-empty-desktop-${i}-${Date.now()}`} className='w-5 h-5 xl:w-[22px] xl:h-[22px]' />;
                                 })}
                             </div>
                             <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
@@ -472,8 +472,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
                     <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Add more products from this deal and unlock extra savings</h2>
                     <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
-                        {bundleProducts?.map((bundleProduct) => (
-                            <BundleProductCard key={bundleProduct.id} product={bundleProduct} />
+                        {bundleProducts?.map((bundleProduct, index) => (
+                            <BundleProductCard key={`bundle-${bundleProduct.id}-${index}-${Date.now()}`} product={bundleProduct} />
                         ))}
                     </div>
                     {isLoadingBundles && (
@@ -515,10 +515,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
 
                     return pages.map((page, idx) =>
                         page === '...' ? (
-                            <span key={idx} className="text-skin-neutral-400 text-xs px-1">…</span>
+                            <span key={`dots-${idx}-${Date.now()}`} className="text-skin-neutral-400 text-xs px-1">…</span>
                         ) : (
                             <Button
-                                key={page}
+                                key={`page-${page}-${idx}-${Date.now()}`}
                                 size="sm"
                                 radius="full"
                                 variant={page === current ? "solid" : "light"}

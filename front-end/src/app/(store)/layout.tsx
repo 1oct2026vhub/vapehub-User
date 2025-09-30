@@ -1,9 +1,9 @@
 import Footer from "@/components/Footer";
 // import Header from "@/components/Header";
 import { PropsWithChildren, ReactElement } from "react"
-import { getCategoryList, getFlashNews, getHeaderMegaMenu } from '@/lib/server.actions';
-import { ServerActionStatus } from '@/lib/config/app.config';
-import { FlashNewsItem } from '@/lib/config/global.config';
+// import { getCategoryList, getFlashNews, getHeaderMegaMenu } from '@/lib/server.actions';
+//import { ServerActionStatus } from '@/lib/config/app.config';
+//import { FlashNewsItem } from '@/lib/config/global.config';
 
 const StoreRootLayout = async ({
   children,

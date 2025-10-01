@@ -106,3 +106,12 @@ export interface UpdatedBy {
     id: number;
     name: string;
 }
+
+export interface SeoMetaResponse {
+    slug: string;
+    entity_type: string;
+    entity_id: number;
+    name: string;
+    description: string;
+    logo_url: string;
+}

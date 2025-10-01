@@ -7,7 +7,7 @@ import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/ca
 import { Category } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
-import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse } from "./config/global.config";
+import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse, SeoMetaResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config";
 import { NotificationListResponse } from "./config/notification.config";
@@ -1124,6 +1124,14 @@ export const getEntitySlugs = async (sortBy: string = 'order_count'): Promise<Se
   const endpoint = `${API_ROUTES.GET_ENTITY_SLUGS}?sort_by=${encodeURIComponent(sortBy)}`;
   return await handleRequest<EntitySlugsResponse, unknown>({
     endpoint,
+    method: 'GET',
+  });
+};
+
+// Get SEO meta data by slug
+export const getSeoMetaBySlug = async (slug: string): Promise<ServerActionResponse<SeoMetaResponse>> => {
+  return await handleRequest<SeoMetaResponse, unknown>({
+    endpoint: API_ROUTES.GET_SEO_META(slug),
     method: 'GET',
   });
 };

@@ -115,6 +115,7 @@ export const API_ROUTES = {
     GET_FEATURE_CONTENT: (payload?: { page?: number, limit?: number }) => buildRequestUrl(`/api/home/feature-content${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_SHIPSTATION_CARRIERS: buildRequestUrl('/api/admin/shipStation/carriers'),
     GET_ENTITY_SLUGS: buildRequestUrl('/api/home/entity-slugs'),
+    GET_SEO_META: (slug: string) => buildRequestUrl(`/api/home/seo-meta?slug=${encodeURIComponent(slug)}`),
 };
 
 // * Helper functions

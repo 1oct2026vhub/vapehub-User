@@ -1,10 +1,10 @@
-import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID } from "@/lib/server.actions";
+import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { notFound, redirect, RedirectType } from 'next/navigation';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
-import { DynamicPageSlugResponse } from "@/lib/config/global.config";
+import { DynamicPageSlugResponse, SeoMetaResponse } from "@/lib/config/global.config";
 import { AttributeProductTerms, AttributeTerms, CategoryResponseData, ProductResponse, Product, ProductReview } from "@/lib/config/product.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
 import BlogListView from "../../blogs/_components/BlogList";
@@ -220,6 +220,14 @@ const fetchBlogBySlug = async (slug: string): Promise<BlogBySlugResponse | null>
   return response.data;
 };
 
+const fetchSeoMetaBySlug = async (slug: string): Promise<SeoMetaResponse | null> => {
+  const response = await getSeoMetaBySlug(slug);
+  if (response.status === ServerActionStatus.ERROR) {
+    return null;
+  }
+  return response.data;
+};
+
 const buildVariantParams = (searchParamsData: Record<string, string>, defaultParams: PRODUCT_PAYLOAD) => {
   const variantParams = Object.entries(searchParamsData)
     .reduce((acc: Record<string, unknown>, [key, value]) => {
@@ -249,7 +257,7 @@ export async function generateMetadata({ params, searchParams }: {
   const slug = (await params).slug;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
-  const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
+  // const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
 
 
@@ -414,19 +422,19 @@ export async function generateMetadata({ params, searchParams }: {
           }
         };
       }
-      const combinedParams = buildVariantParams(searchParamsData, defaultParams);
-      const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
-
-      if (!category) return null;
+      
+      // Use the new SEO meta API instead of fetchCategory
+      const seoMeta = await fetchSeoMetaBySlug(primarySlug);
+      if (!seoMeta) return null;
 
       return {
-        title: category.name,
-        description: category.description,
+        title:`${seoMeta.name} | VapeHub`,
+        description: seoMeta.description,
         openGraph: {
-          title: category.name,
-          description: category.description,
-          images: category.logo_url ? [{
-            url: category.logo_url,
+          title: `${seoMeta.name} | VapeHub`,
+          description: seoMeta.description,
+          images: seoMeta.logo_url ? [{
+            url: seoMeta.logo_url,
             width: 1200,
             height: 630
           }] : undefined

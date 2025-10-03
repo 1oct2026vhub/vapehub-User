@@ -42,7 +42,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
           href={banner.redirect_url}
         >
           <Image
-            src={banner?.image_url_mid || banner?.image_url}
+            src={banner?.image_url}
             alt={banner?.title}
             width={1340}
             height={671}

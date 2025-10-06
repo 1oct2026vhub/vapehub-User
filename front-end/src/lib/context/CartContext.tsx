@@ -230,12 +230,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   
   useEffect(() => {
     const fetchLoyaltyPoints = async () => {
-        if (isAuthenticated) {
+        // if (isAuthenticated) {
             const response = await getLoyaltyPointsRedemption();
             if (response.status === ServerActionStatus.SUCCESS) {
                 setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));
             }
-        }
+        // }
     };
     fetchLoyaltyPoints();
   }, [isAuthenticated]);

@@ -231,6 +231,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const fetchLoyaltyPoints = async () => {
         // if (isAuthenticated) {
+            // Add 2-second delay to handle database lag for loyalty points data
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
             const response = await getLoyaltyPointsRedemption();
             if (response.status === ServerActionStatus.SUCCESS) {
                 setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));

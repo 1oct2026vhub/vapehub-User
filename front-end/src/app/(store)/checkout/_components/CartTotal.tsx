@@ -83,6 +83,7 @@ const CartTotal: React.FC = () => {
 
     const shippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
     const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
+    console.log("loyaltyPoints", loyaltyPoints);
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded-14 w-full'>
             <h3 className='primary-gradient-600 text-title-2 md:text-h5 font-bold w-fit'>Cart Total</h3>

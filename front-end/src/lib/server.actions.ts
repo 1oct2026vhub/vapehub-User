@@ -669,8 +669,11 @@ export const worldpayPaymentCancel = async (payload: WORLDPAY_PAYMENT_PAYLOAD): 
 };
 
 export const getLoyaltyPointsRedemption = async (): Promise<ServerActionResponse<LoyaltyPointsRedemptionResponse>> => {
+  const timestamp = Date.now();
+  const endpointWithTimestamp = `${API_ROUTES.GET_LOYALTY_POINTS_REDEMPTION}?t=${timestamp}`;
+  
   return await handleRequest<LoyaltyPointsRedemptionResponse, unknown>({
-    endpoint: API_ROUTES.GET_LOYALTY_POINTS_REDEMPTION,
+    endpoint: endpointWithTimestamp,
     method: 'GET',
   });
 };

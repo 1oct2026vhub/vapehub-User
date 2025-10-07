@@ -42,7 +42,8 @@ const CheckoutDetails: React.FC = () => {
             termsAgreement: false,
             shippingMethodId: 0,
             marketingConsent: false,
-            paymentMethod: CHECKOUT_PAYMENT_METHODS.VIVA_WALLET,
+            // paymentMethod: CHECKOUT_PAYMENT_METHODS.VIVA_WALLET,
+            paymentMethod: CHECKOUT_PAYMENT_METHODS.WORLD_PAY,
             selectedAddressId: undefined,
             shippingFirstName: '',
             shippingLastName: '',
@@ -576,18 +577,19 @@ const CheckoutDetails: React.FC = () => {
                                 <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</p>
                             </div>
                             <RadioGroup
-                                defaultValue={CHECKOUT_PAYMENT_METHODS.VIVA_WALLET}
+                                defaultValue={CHECKOUT_PAYMENT_METHODS.WORLD_PAY}
+                                // defaultValue={CHECKOUT_PAYMENT_METHODS.VIVA_WALLET}
                                 value={form.watch('paymentMethod')}
                                 onChange={(e) => form.setValue('paymentMethod', e.target.value as CHECKOUT_PAYMENT_METHODS)}
                             >
-                                <CustomRadio value={CHECKOUT_PAYMENT_METHODS.VIVA_WALLET}>
+                                {/* <CustomRadio value={CHECKOUT_PAYMENT_METHODS.VIVA_WALLET}>
                                     <div className='space-y-4'>
                                         <div className='flex items-center justify-between gap-4'>
                                             <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Pay by Card - Viva Wallet</h4>
                                         </div>
 
                                     </div>
-                                </CustomRadio>
+                                </CustomRadio> */}
                                 <CustomRadio value={CHECKOUT_PAYMENT_METHODS.WORLD_PAY}>
                                     <div className='space-y-2'>
                                         <div className='flex items-center justify-between gap-4'>

@@ -157,11 +157,12 @@ const AddressForm: React.FC<AddressFormProps> = ({
       
       <InputForm
         control={form.control}
-        type="number"
+        type="tel"
         name="phone"
         label="Phone Number (optional)"
         placeholder="Enter your phone number"
         className="w-full"
+        pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
       />
 
       {/* Action Buttons */}

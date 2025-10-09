@@ -1,5 +1,4 @@
 'use client'
-
 import { NextPage } from 'next'
 import React, { ReactElement, useEffect } from 'react'
 import ProductList from './_components/ProductList'
@@ -18,6 +17,7 @@ import { getReviewOrderByProductId } from '@/lib/server.actions'
 import { ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config'
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config'
 import { useFeatureData } from '@/lib/hooks/useFeatureData'
+import GoogleMapsScript from '@/components/GoogleMapsScript'
 
 const CheckoutPage: NextPage = (): ReactElement => {
 
@@ -69,6 +69,8 @@ const CheckoutPage: NextPage = (): ReactElement => {
     return (
         <CheckoutProvider>
             <AddressProvider>
+                {/* Google Maps API Script - Loaded only on this page */}
+                <GoogleMapsScript />
                 <main className='px-4 lg:px-9 xl:px-12.5 pt-5 pb-10 flex flex-col gap-7 lg:gap-10'>
                     <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Checkout</h1>
                     <section className='flex items-start flex-col-reverse lg:flex-row gap-5 xl:gap-7.5'>

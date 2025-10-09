@@ -1,8 +1,7 @@
 import { extractAddressComponents, PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Input, InputProps } from '@nextui-org/react';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-import { useGoogleMaps } from '@/providers/GoogleMapsProvider';
 
 interface GooglePlacesAutocompleteProps<T extends FieldValues> extends InputProps {
   onPlaceSelect: (place: PlaceAutocompleteAddress) => void;
@@ -23,31 +22,100 @@ const GooglePlacesAutocomplete = <T extends FieldValues>({
   const listenerRef = useRef<google.maps.MapsEventListener | null>(null);
   const onChangeRef = useRef<(value: string) => void>(() => {});
   
-  // Use the Google Maps context for better loading management
-  const { isLoaded, isLoading, error } = useGoogleMaps();
+  // Manage Google Maps loading state internally
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
+  // Check for Google Maps loading
+  useEffect(() => {
+    const checkGoogleMaps = () => {
+      if (typeof window !== 'undefined' && 
+          window.google && 
+          window.google.maps && 
+          window.google.maps.places && 
+          window.google.maps.places.Autocomplete) {
+        setIsLoaded(true);
+        setError(null);
+        return true;
+      }
+      return false;
+    };
+
+    // Check immediately
+    if (checkGoogleMaps()) {
+      return;
+    }
+
+    // Listen for custom events from the script loader
+    const handleGoogleMapsLoaded = () => {
+      // Double-check that everything is properly loaded
+      if (checkGoogleMaps()) {
+        return;
+      }
+      // If not fully loaded, wait a bit and try again
+      setTimeout(() => {
+        checkGoogleMaps();
+      }, 100);
+    };
+
+    const handleGoogleMapsError = () => {
+      const error = new Error('Failed to load Google Maps API');
+      setError(error);
+    };
+
+    // Add event listeners
+    window.addEventListener('googleMapsLoaded', handleGoogleMapsLoaded);
+    window.addEventListener('googleMapsError', handleGoogleMapsError as EventListener);
+
+    // Also check periodically in case the event doesn't fire
+    const interval = setInterval(() => {
+      if (checkGoogleMaps()) {
+        clearInterval(interval);
+      }
+    }, 500);
+
+    return () => {
+      window.removeEventListener('googleMapsLoaded', handleGoogleMapsLoaded);
+      window.removeEventListener('googleMapsError', handleGoogleMapsError as EventListener);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Initialize autocomplete when Google Maps is loaded
   useEffect(() => {
     if (!inputRef.current || !isLoaded || !window.google) return;
 
-    // Initialize Google Places Autocomplete
-    autocompleteRef.current = new window.google.maps.places.Autocomplete(
-      inputRef.current,
-      {
-        types: ['address'],
-        componentRestrictions: { country: 'UK' },
-        fields: ['address_components', 'formatted_address', 'geometry', 'name'],
-      }
-    );
+    // Check if Google Maps and Places API are properly loaded
+    if (!window.google.maps || !window.google.maps.places || !window.google.maps.places.Autocomplete) {
+      console.error('Google Maps Places API not properly loaded');
+      setError(new Error('Google Maps Places API not available'));
+      return;
+    }
 
-    // Add place_changed event listener
-    listenerRef.current = autocompleteRef.current.addListener('place_changed', () => {
-      const place = autocompleteRef.current?.getPlace();
-      if (place) {
-        const address = extractAddressComponents(place); 
-        onPlaceSelect(address); 
-        onChangeRef.current(place.name || '');
-      }
-    });
+    try {
+      // Initialize Google Places Autocomplete
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(
+        inputRef.current,
+        {
+          types: ['address'],
+          componentRestrictions: { country: 'UK' },
+          fields: ['address_components', 'formatted_address', 'geometry', 'name'],
+        }
+      );
+
+      // Add place_changed event listener
+      listenerRef.current = autocompleteRef.current.addListener('place_changed', () => {
+        const place = autocompleteRef.current?.getPlace();
+        if (place) {
+          const address = extractAddressComponents(place); 
+          onPlaceSelect(address); 
+          onChangeRef.current(place.name || '');
+        }
+      });
+    } catch (err) {
+      console.error('Error initializing Google Places Autocomplete:', err);
+      setError(new Error('Failed to initialize address autocomplete'));
+    }
 
     // Cleanup
     return () => {
@@ -69,7 +137,7 @@ const GooglePlacesAutocomplete = <T extends FieldValues>({
         onChangeRef.current = onChange;
         
         // Show loading state while Google Maps is loading
-        if (isLoading) {
+        if (!isLoaded && !error) {
           return (
             <Input
               {...field}

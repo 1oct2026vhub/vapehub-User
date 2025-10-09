@@ -4,8 +4,6 @@ import "./globals.css";
 import GlobalProvider from "@/providers/GlobalProvider";
 import { Toaster } from "sonner";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import { GoogleMapsProvider } from "@/providers/GoogleMapsProvider";
-import GoogleMapsScript from "@/components/GoogleMapsScript";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -48,18 +46,13 @@ export default function RootLayout({
       <body
         className={`m-0 min-h-screen bg-white text-skin-black font-poppins antialiased ${poppins.variable}`}
       >
-        {/* Google Maps API Script - Loaded with proper async strategy */}
-        <GoogleMapsScript />
-        
-        <GoogleMapsProvider>
-          <GlobalProvider>
-            <Toaster
-              richColors
-              position='top-right'
-            />
-            {children}
-          </GlobalProvider>
-        </GoogleMapsProvider>
+        <GlobalProvider>
+          <Toaster
+            richColors
+            position='top-right'
+          />
+          {children}
+        </GlobalProvider>
       </body>
     </html>
   );

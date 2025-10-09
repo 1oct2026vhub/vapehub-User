@@ -1,5 +1,4 @@
 'use client'
-
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
 import AddressCard from "../../_components/AddressCard";
@@ -11,6 +10,7 @@ import { AddressProvider, useAddress } from "@/lib/context/AddressContext";
 import AddressForm from "../../_components/AddressForm";
 import { AddressFormData } from "@/lib/config/address.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
+import GoogleMapsScript from "@/components/GoogleMapsScript";
 
 const AddressesContent: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -47,6 +47,8 @@ const AddressesContent: React.FC = () => {
 
   return (
     <main>
+      {/* Google Maps API Script - Loaded only on this page */}
+      <GoogleMapsScript />
       
       <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-4.5 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
         {/* Header */}

@@ -39,10 +39,10 @@ export function AgeVerificationProvider({ children }: { children: React.ReactNod
     setIsDenied(true);
   };
 
-  // Show nothing during initial load
-  if (isVerified === null) {
-    return null;
-  }
+  // // Show nothing during initial load
+  // if (isVerified === null) {
+  //   return null;
+  // }
 
   return (
     <AgeVerificationContext.Provider value={{ isVerified: Boolean(isVerified), setIsVerified }}>

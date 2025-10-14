@@ -35,9 +35,9 @@ const Dashboard: NextPage = async () => {
 
   return (
     <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
-      <Suspense fallback={<SuspenseLoader />}>
+      {/* <Suspense fallback={<SuspenseLoader />}> */}
         <HomeCarousel />
-      </Suspense>
+      {/* </Suspense> */}
 
       <Suspense fallback={<SuspenseLoader />}>
         <WelcomeSection />

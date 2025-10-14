@@ -41,9 +41,10 @@ const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => 
             alt={banner.title}
             width={361}
             height={382}
-            className="w-full h-full rounded-lg object-fill !outline-none focus-visible:!outline-none"
+            className="w-full h-full rounded-lg object-fill aspect-video !outline-none focus-visible:!outline-none"
             priority
             loading="eager"
+            fetchPriority="high"
           />
         </Link>
       ))}

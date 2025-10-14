@@ -29,26 +29,28 @@ const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => 
   const sortedBanners:CarouselConfig[] = [...banners].sort((a, b) => a.display_order - b.display_order);
 
   return (
-    <Slider {...settings}>
-      {sortedBanners.map((banner, index) => (
-        <Link
-          key={index}
-          className="overflow-hidden rounded-lg"
-          href={banner.redirect_url}
-        >
-          <Image
-            src={banner?.image_url_low || banner?.image_url}
-            alt={banner.title}
-            width={361}
-            height={382}
-            className="w-full h-full rounded-lg object-fill aspect-video !outline-none focus-visible:!outline-none"
-            priority
-            loading="eager"
-            fetchPriority="high"
-          />
-        </Link>
-      ))}
-    </Slider>
+    <div className="carousel-wrapper" style={{ minHeight: '200px' }}>
+      <Slider {...settings}>
+        {sortedBanners.map((banner, index) => (
+          <Link
+            key={index}
+            className="overflow-hidden rounded-lg block"
+            href={banner.redirect_url}
+          >
+            <Image
+              src={banner?.image_url_low || banner?.image_url}
+              alt={banner.title}
+              width={361}
+              height={382}
+              className="w-full h-auto rounded-lg object-fill aspect-video !outline-none focus-visible:!outline-none"
+              priority
+              loading="eager"
+              fetchPriority="high"
+            />
+          </Link>
+        ))}
+      </Slider>
+    </div>
   );
 };
 

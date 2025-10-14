@@ -33,26 +33,28 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
   const sortedBanners:CarouselConfig[] = [...banners].sort((a, b) => a.display_order - b.display_order);
   
   return (
-    <Slider {...settings}>
-      {sortedBanners.map((banner, index) => (
-        <Link
-          key={index}
-          className="overflow-hidden rounded-2.5xl bg-gray-100"
-          href={banner.redirect_url}
-        >
-          <Image
-            src={banner?.image_url}
-            alt={banner?.title}
-            width={1340}
-            height={671}
-            className="w-full h-full object-fill rounded-2.5xl outline-none focus-visible:!outline-none"
-            priority
-            fetchPriority="high"
-            loading="eager"
-          />
-        </Link>
-      ))}
-    </Slider>
+    <div className="carousel-wrapper" style={{ minHeight: '100%' }}>
+      <Slider {...settings}>
+        {sortedBanners.map((banner, index) => (
+          <Link
+            key={index}
+            className="overflow-hidden rounded-2.5xl bg-gray-100 block"
+            href={banner.redirect_url}
+          >
+            <Image
+              src={banner?.image_url}
+              alt={banner?.title}
+              width={1340}
+              height={671}
+              className="w-full h-auto object-cover rounded-2.5xl outline-none focus-visible:!outline-none"
+              priority
+              fetchPriority="high"
+              loading="eager"
+            />
+          </Link>
+        ))}
+      </Slider>
+    </div>
   );
 };
 

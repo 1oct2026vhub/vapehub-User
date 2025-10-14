@@ -21,7 +21,6 @@ const settings: Settings = {
   arrows: true,
   pauseOnHover: false,
   cssEase: "linear",
-  lazyLoad: "progressive",
 };
 
 const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
@@ -48,6 +47,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
             height={671}
             className="w-full h-full object-fill rounded-2.5xl outline-none focus-visible:!outline-none"
             priority
+            fetchPriority="high"
             loading="eager"
           />
         </Link>

@@ -19,7 +19,7 @@ type HandleRequest<G> =
       method: 'GET' | 'DELETE';
     };
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 0;
     const RETRY_DELAY = 1000; // in milliseconds
 
     const fetchWithRetry = async (input: RequestInfo, init?: RequestInit, retries = MAX_RETRIES): Promise<Response> => {

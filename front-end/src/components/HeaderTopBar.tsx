@@ -23,6 +23,7 @@ import { getProductList } from "@/lib/server.actions";
 import { Product } from "@/lib/config/product.config";
 import ProductSuggestions from './ProductSuggestions';
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { scrollToTop } from "@/lib/utils/scrollToTop";
 
 type Props = {
     categories: Category[];
@@ -79,17 +80,21 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
 
     const handleSearch = (data: HeaderFormSchema) => {
         if (data.search) {
-            router.push(`${ROUTES.SHOP}?keyword=${data.search}`);
+            router.push(`${ROUTES.SHOP}?keyword=${data.search}`, { scroll: false });
             setShowSuggestions(false);
-            searchFromConfig.reset({ search: '' });
+            searchFromConfig.reset({ search: '' });            
+            // Scroll to top after search
+            scrollToTop();
         }
     };
 
     const handleViewAll = () => {
         if (searchTerm) {
-            router.push(`${ROUTES.SHOP}?keyword=${searchTerm}`);
+            router.push(`${ROUTES.SHOP}?keyword=${searchTerm}`, { scroll: false });
             setShowSuggestions(false);
-            searchFromConfig.reset({ search: '' });
+            searchFromConfig.reset({ search: '' });            
+            // Scroll to top after search
+            scrollToTop();
         }
     }
 

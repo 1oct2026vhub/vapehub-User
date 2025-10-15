@@ -22,6 +22,7 @@ import { FunctionComponent, ReactElement, useState } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+import { scrollToTop } from "@/lib/utils/scrollToTop";
 // import { getAllDeals } from "@/lib/server.actions";
 // import { li } from "framer-motion/client";
 // import { motion } from "framer-motion";
@@ -205,7 +206,9 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
 
     const params = new URLSearchParams(searchParams);    
     params.set("offset", ((page - 1) * 12).toString());
-    router.replace(`${pathname}?${params.toString()}`, { scroll: true });
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });    
+    // Scroll to top after pagination change
+    scrollToTop();
   };
 
   const handleSortChange = (sort: string) => {
@@ -215,7 +218,9 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
     } else {
       params.set("order", sort);
     }
-    router.replace(`${pathname}?${params.toString()}`, { scroll: true });
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    // Scroll to top after sort change
+    scrollToTop();
   };
 
   return (

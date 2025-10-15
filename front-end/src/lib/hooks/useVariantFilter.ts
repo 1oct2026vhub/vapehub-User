@@ -1,6 +1,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { AttributeTerms, AttributeProductTerms } from '@/lib/config/product.config';
+import { scrollToTop } from '@/lib/utils/scrollToTop';
 // import { ProductVariant } from '@/lib/config/product.config';
 
 export const useVariantFilter = (
@@ -46,7 +47,9 @@ export const useVariantFilter = (
 
         // If selecting the same attribute as current variant, replace the variant and clear search params
         if (currentVariant?.attribute.id === attributeTerm.attribute.id) {
-          router.push(`/${baseSlug}/${selectedTerm.slug}`);
+          router.push(`/${baseSlug}/${selectedTerm.slug}`, { scroll: false });    
+          // Scroll to top after variant change
+          scrollToTop();
           return;
         }
 
@@ -55,11 +58,13 @@ export const useVariantFilter = (
           const params = new URLSearchParams(searchParams.toString());
           const attributeKey = attributeTerm.attribute.id.toString();
           params.set(attributeKey, selectedTerm.slug.toString());
-          router.push(`/${baseSlug}/${pathSegments[2]}?${params.toString()}`);
+          router.push(`/${baseSlug}/${pathSegments[2]}?${params.toString()}`, { scroll: false });
         } else {
           // If no secondary slug, set this as the main variant
-          router.push(`/${baseSlug}/${selectedTerm.slug}`);
-        }
+          router.push(`/${baseSlug}/${selectedTerm.slug}`, { scroll: false });
+        }        
+        // Scroll to top after variant change
+        scrollToTop();
       } finally {
         setIsFiltering(false);
       }

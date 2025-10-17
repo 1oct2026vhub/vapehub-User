@@ -45,6 +45,7 @@ const BannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => {
             alt={banner?.title}
             width={1340}
             height={671}
+            sizes="80vw"
             className="w-full h-full object-fill rounded-2.5xl outline-none focus-visible:!outline-none"
             priority
             fetchPriority="high"

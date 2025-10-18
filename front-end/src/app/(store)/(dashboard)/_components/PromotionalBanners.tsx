@@ -24,6 +24,7 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
       width={width}
       height={height}
       priority={priority}
+      sizes="80vw"
       className={`w-full h-full object-fill aspect-video rounded-xl lg:rounded-3xl ${className}`}
     />
     </Link>

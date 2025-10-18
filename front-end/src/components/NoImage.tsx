@@ -9,6 +9,7 @@ interface NoImageProps {
   height?: number;
   className?: string;
   priority?: boolean;
+  sizes?: string;
 }
 
 const NoImage: React.FC<NoImageProps> = ({ 

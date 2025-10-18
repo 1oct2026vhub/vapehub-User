@@ -172,6 +172,26 @@ const Page = async ({
 
 export default Page;
 
+// Enable ISR with revalidation every 60 seconds
+export const revalidate = 60;
+
+// Allow dynamic params for paths not in generateStaticParams
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  // Static product slugs for ISR - no API calls needed
+  const productSlugs = [
+    'ivg-intense-salts-e-liquid',
+    'crystal-prime-nic-salts',
+    'vnsn-quake-10000-pods',
+    'vnsn-quake-10000-prefilled-pod-kit'
+  ];
+
+  return productSlugs.map((slug) => ({
+    slug: [slug]
+  }));
+}
+
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
   if (response.status === ServerActionStatus.ERROR) {
@@ -255,6 +275,7 @@ export async function generateMetadata({ params, searchParams }: {
   searchParams: Promise<Record<string, string>>
 }) {
   const slug = (await params).slug;
+  console.log('GENERATING METADATA FOR PRODUCT LISTING', slug);
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
   // const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;

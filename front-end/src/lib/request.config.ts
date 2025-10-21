@@ -13,12 +13,10 @@ type HandleRequest<G> =
       endpoint: string;
       payload: G;
       method: 'POST' | 'PUT' | 'PATCH';
-      canCache?: boolean;
     }
   | {
       endpoint: string;
       method: 'GET' | 'DELETE';
-      canCache?: boolean;
     };
 
     const MAX_RETRIES = 0;
@@ -44,17 +42,16 @@ type HandleRequest<G> =
 export const handleRequest = async <T, G>(
     requestData: HandleRequest<G>
   ): Promise<ServerActionResponse<T>> => {
-    const { endpoint, method, canCache = false } = requestData;
+    const { endpoint, method } = requestData;
     try {
-      const headers = await buildHeaders(requestData, canCache);
+      const headers = await buildHeaders(requestData);
       
       const response = await fetchWithRetry(endpoint, {
         method,
         headers,
         body: buildRequestBody(requestData),
-        cache: canCache ? 'force-cache' : 'no-store',
-        next: canCache ? { revalidate: 60 } : undefined,
-      }, MAX_RETRIES);   
+        cache: 'no-store',
+      }, 3);   
       const responseJson = await response.json();
 
       if (response.status === 401) {                
@@ -100,18 +97,15 @@ export const handleRequest = async <T, G>(
 
   
 const buildHeaders = async <G>(
-    requestData: HandleRequest<G>,
-    canCache: boolean
+    requestData: HandleRequest<G>
   ): Promise<HeadersInit> => {
     const headers = new Headers();
   
-    // Only fetch session and add Authorization header for non-cached (protected) APIs
-    if (!canCache) {
-      const session = await getServerSessionData();
-       
-      if (session?.user) {
-        headers.append('Authorization', `Bearer ${session.user.accessToken}`);
-      }
+    const session = await getServerSessionData();
+     
+    if (session?.user) {
+        
+      headers.append('Authorization', `Bearer ${session.user.accessToken}`);
     }
   
     if (!(hasPayload(requestData) && isFormData(requestData.payload))) {

@@ -2,8 +2,11 @@ import BreadCrumbs from '@/components/BreadCrumbs'
 import { AsyncReactElement } from '@/lib/config/app.config'
 import { ROUTES } from '@/lib/routes'
 import { Metadata } from 'next'
-import React from 'react'
+// import React, { Suspense } from 'react'
 import BrandList from './BrandList'
+// import SuspenseLoader from '@/components/ui/SuspenseLoader'
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
     title: "BRANDS | VapeHub",
@@ -30,7 +33,9 @@ const BrandsListing = async (): AsyncReactElement => {
                     </div>
                 </div>
             </section>
-            <BrandList />
+            {/* <Suspense fallback={<SuspenseLoader />}> */}
+                <BrandList />
+            {/* </Suspense> */}
         </div>
     )
 }

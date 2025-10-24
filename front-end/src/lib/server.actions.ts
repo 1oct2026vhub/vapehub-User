@@ -104,68 +104,81 @@ export const resetPasswordAction = async (
 };
  
 // category list api 
-export const getCategoryList = async (): Promise<ServerActionResponse<Category[]>> => {
+export const getCategoryList = async (canCache: boolean = true): Promise<ServerActionResponse<Category[]>> => {
   return await handleRequest<Category[], unknown>({
     endpoint: API_ROUTES.GET_CATEGORY_LIST,
     method: 'GET',
+    canCache,
   });
 };
 // brand list api 
-export const getBrandList = async (params?: BrandListPayload): Promise<ServerActionResponse<BrandListResponse>> => {
+export const getBrandList = async (params?: BrandListPayload, canCache: boolean = true): Promise<ServerActionResponse<BrandListResponse>> => {
   return await handleRequest<BrandListResponse, unknown>({
     endpoint: API_ROUTES.GET_BRAND_LIST(params),
     method: 'GET',
+    canCache,
   });
 };
 
 // product list api
 export const getProductList = async (
-  params: PRODUCT_PAYLOAD
+  params: PRODUCT_PAYLOAD,
+  canCache: boolean = true
 ): Promise<ServerActionResponse<ProductResponseData>> => {
   return await handleRequest<ProductResponseData, unknown>({
     endpoint: API_ROUTES.GET_PRODUCTS(params),
     method: 'GET',
+    canCache,
   });
 };
 // Home page product list api
 
 export const getHomeProductList = async (
-  params: PRODUCT_PAYLOAD
+  params: PRODUCT_PAYLOAD,
+  canCache: boolean = true
 ): Promise<ServerActionResponse<ProductResponseData>> => {
   return await handleRequest<ProductResponseData, unknown>({
     endpoint: API_ROUTES.GET_HOME_PRODUCTS(params),
     method: 'GET',
+    canCache,
   });
 };
 // most popular vapes product list api
 export const getProductByCategory = async (
   slug: string,
-  params: PRODUCT_PAYLOAD
+  params: PRODUCT_PAYLOAD,
+  canCache: boolean = true
 ): Promise<ServerActionResponse<CategoryResponseData>> => {
   
   return await handleRequest<CategoryResponseData, unknown>({
     endpoint: API_ROUTES.GET_CATEGORY_PRODUCTS_BY_SLUG(slug, params),
     method: 'GET',
+    canCache,
   });
 };
 
 // get product by slug api
 export const getProductBySlug = async (
   slug: string,
-  params: PRODUCT_PAYLOAD): Promise<ServerActionResponse<Product>> => {
+  params: PRODUCT_PAYLOAD,
+  canCache: boolean = true
+): Promise<ServerActionResponse<Product>> => {
   return await handleRequest<Product, unknown>({
     endpoint: API_ROUTES.GET_PRODUCTS_BY_SLUG(slug, params),
     method: 'GET',
+    canCache,
   });
 };
 
 export const getProductById = async (
   id: number,
-  params: PRODUCT_PAYLOAD
+  params: PRODUCT_PAYLOAD,
+  canCache: boolean = true
 ): Promise<ServerActionResponse<Product>> => {
   return await handleRequest<Product, unknown>({
     endpoint: API_ROUTES.GET_PRODUCTS_BY_ID(id, params),
     method: 'GET',
+    canCache,
   });
 };
  
@@ -178,18 +191,20 @@ export const getProductVariantByID = async (payload: PRODUCT_VARIANT_PAYLOAD): P
 };
 
 // carousel list api
-export const getCarouselList = async (): Promise<ServerActionResponse<CarouselConfig[]>> => {
+export const getCarouselList = async (canCache: boolean = true): Promise<ServerActionResponse<CarouselConfig[]>> => {
   return await handleRequest<CarouselConfig[], unknown>({
     endpoint: API_ROUTES.GET_CAROUSEL,
     method: 'GET',
+    canCache,
   });
 }; 
 
 // get testimonials list api
-export const getTestimonialsList = async (): Promise<ServerActionResponse<TestimonialResponse[]>> => {
+export const getTestimonialsList = async (canCache: boolean = true): Promise<ServerActionResponse<TestimonialResponse[]>> => {
   return await handleRequest<TestimonialResponse[], unknown>({
     endpoint: API_ROUTES.GET_TESTIMONIALS,
     method: 'GET',
+    canCache,
   });
 };
 
@@ -203,50 +218,57 @@ export const subscribeMail = async (email: string): Promise<ServerActionResponse
 };
 
 // blog list api
-export const getBlogList = async (group?: string | number): Promise<ServerActionResponse<BlogResponse[]>> => {
+export const getBlogList = async (group?: string | number, canCache: boolean = true): Promise<ServerActionResponse<BlogResponse[]>> => {
   return await handleRequest<BlogResponse[], unknown>({
     endpoint: API_ROUTES.GET_BLOGS(group),
     method: 'GET',
+    canCache,
   });
 }
 
 // get promotion banner
-export const getPromotionBanner = async (): Promise<ServerActionResponse<BannerResponse[]>> => {
+export const getPromotionBanner = async (canCache: boolean = true): Promise<ServerActionResponse<BannerResponse[]>> => {
   return await handleRequest<BannerResponse[], unknown>({
     endpoint: API_ROUTES.GET_PROMOTION_BANNER,
     method: 'GET',
+    canCache,
   });
 };
 // Get product by brand slug
 export const getProductByBrand = async (
   slug: string,
-  params: PRODUCT_PAYLOAD
+  params: PRODUCT_PAYLOAD,
+  canCache: boolean = true
 ): Promise<ServerActionResponse<BrandByProductResponse>> => {
   return await handleRequest<BrandByProductResponse, unknown>({
     endpoint: API_ROUTES.GET_BRAND_PRODUCTS_BY_SLUG(slug, params),
     method: 'GET',
+    canCache,
   });
 };
 
 // get blog by slug
-export const getBlogBySlug = async (slug: string): Promise<ServerActionResponse<BlogBySlugResponse>> => {
+export const getBlogBySlug = async (slug: string, canCache: boolean = true): Promise<ServerActionResponse<BlogBySlugResponse>> => {
   return await handleRequest<BlogBySlugResponse, unknown>({
     endpoint: API_ROUTES.GET_BLOGS_BY_SLUG(slug),
     method: 'GET',
+    canCache,
   });
 };
 // get blog by category and blog slug
-export const getBlogByCategoryAndSlug = async (categorySlug: string): Promise<ServerActionResponse<BlogByCategoryAndSlugResponse>> => {
+export const getBlogByCategoryAndSlug = async (categorySlug: string, canCache: boolean = true): Promise<ServerActionResponse<BlogByCategoryAndSlugResponse>> => {
   return await handleRequest<BlogByCategoryAndSlugResponse, unknown>({
     endpoint: API_ROUTES.GET_BLOGS_BY_CATEGORY_AND_SLUG(categorySlug),
     method: 'GET',
+    canCache,
   });
 };
 // get blog list
-export const getBlogPostList = async (payload?: BLOG_PAYLOAD): Promise<ServerActionResponse<BlogPostListResponse>> => {
+export const getBlogPostList = async (payload?: BLOG_PAYLOAD, canCache: boolean = true): Promise<ServerActionResponse<BlogPostListResponse>> => {
   return await handleRequest<BlogPostListResponse, unknown>({
     endpoint: API_ROUTES.GET_BLOGS_POST_LIST(payload),
     method: 'GET',
+    canCache,
   });
 };
 
@@ -323,18 +345,20 @@ export const checkStockValidation = async (): Promise<ServerActionResponse<Stock
 };
 
 // get all faqs
-export const getFaqs = async (type: string, id: number): Promise<ServerActionResponse<FaqResponse[]>> => {
+export const getFaqs = async (type: string, id: number, canCache: boolean = true): Promise<ServerActionResponse<FaqResponse[]>> => {
   return await handleRequest<FaqResponse[], unknown>({
     endpoint: API_ROUTES.GET_FAQS(type, id),
     method: 'GET',
+    canCache,
   });
 };
 
 // get dynamic page slug
-export const getDynamicPageSlug = async (slug: string): Promise<ServerActionResponse<DynamicPageSlugResponse>> => {
+export const getDynamicPageSlug = async (slug: string, canCache: boolean = true): Promise<ServerActionResponse<DynamicPageSlugResponse>> => {
   return await handleRequest<DynamicPageSlugResponse, unknown>({
     endpoint: API_ROUTES.GET_DYNAMIC_PAGE_SLUG(slug),
     method: 'GET',
+    canCache,
   });
 };
 
@@ -504,10 +528,11 @@ export const getShippingMethods = async (): Promise<ServerActionResponse<SHIPPIN
 };
 
 // get shipping methods display text (public API)
-export const getShippingMethodsDisplay = async (): Promise<ServerActionResponse<SHIPPING_METHOD_DISPLAY[]>> => {
+export const getShippingMethodsDisplay = async (canCache: boolean = true): Promise<ServerActionResponse<SHIPPING_METHOD_DISPLAY[]>> => {
   return await handleRequest<SHIPPING_METHOD_DISPLAY[], unknown>({
     endpoint: API_ROUTES.GET_SHIPPING_METHODS_DISPLAY,
     method: 'GET',
+    canCache,
   });
 };
 
@@ -591,10 +616,11 @@ export const getFooterMenu = async (): Promise<FooterMenuResponse> => {
 };
 
 // get header mega menu
-export const getHeaderMegaMenu = async (): Promise<ServerActionResponse<HeaderMegaMenuResponse>> => {
+export const getHeaderMegaMenu = async (canCache: boolean = true): Promise<ServerActionResponse<HeaderMegaMenuResponse>> => {
   return await handleRequest<HeaderMegaMenuResponse, unknown>({
     endpoint: API_ROUTES.GET_HEADER_MEGA_MENU,
     method: 'GET',
+    canCache,
   });
 };
 
@@ -643,10 +669,11 @@ export const deleteReviewOrder = async (orderId: number): Promise<ServerActionRe
   });
 };
 //List flash news
-export const getFlashNews = async (status?: boolean): Promise<ServerActionResponse<FlashNewsResponse>> => {
+export const getFlashNews = async (status?: boolean, canCache: boolean = true): Promise<ServerActionResponse<FlashNewsResponse>> => {
   return await handleRequest<FlashNewsResponse, unknown>({
     endpoint: API_ROUTES.GET_FLASH_NEWS(status),
     method: 'GET',
+    canCache,
   });
 };
 
@@ -678,17 +705,19 @@ export const getLoyaltyPointsRedemption = async (): Promise<ServerActionResponse
   });
 };
 
-export const getCategoriesWithDeals = async (payload?: CategoriesWithDealsPayload): Promise<ServerActionResponse<CategoriesWithDealsResponse>> => {
+export const getCategoriesWithDeals = async (payload?: CategoriesWithDealsPayload, canCache: boolean = true): Promise<ServerActionResponse<CategoriesWithDealsResponse>> => {
     return await handleRequest<CategoriesWithDealsResponse, unknown>({
         endpoint: API_ROUTES.GET_CATEGORIES_WITH_DEALS(payload),
         method: 'GET',
+        canCache,
     });
 };
 
-export const getDealsByCategory = async (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }): Promise<ServerActionResponse<DealsByCategoryResponse>> => {
+export const getDealsByCategory = async (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }, canCache: boolean = true): Promise<ServerActionResponse<DealsByCategoryResponse>> => {
     return await handleRequest<DealsByCategoryResponse, unknown>({
         endpoint: API_ROUTES.GET_DEALS_BY_CATEGORY(categoryId, payload),
         method: 'GET',
+        canCache,
     });
 };
 
@@ -698,7 +727,8 @@ export const getDealProducts = async (
     limit?: number; 
     offset?: number; 
     product_id?: number 
-  }
+  },
+  canCache: boolean = true
 ): Promise<ServerActionResponse<{
   deal: {
     id: number;
@@ -754,6 +784,7 @@ export const getDealProducts = async (
     }, unknown>({
       endpoint: API_ROUTES.GET_DEAL_PRODUCTS(dealId, params),
       method: 'GET',
+      canCache,
     });
     return response;
   } catch (error) {
@@ -765,35 +796,39 @@ export const getDealProducts = async (
   }
 };
 
-export const getAllDeals = async (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }): Promise<ServerActionResponse<AllDealsResponse>> => {
+export const getAllDeals = async (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }, canCache: boolean = true): Promise<ServerActionResponse<AllDealsResponse>> => {
     return await handleRequest<AllDealsResponse, unknown>({
         endpoint: API_ROUTES.GET_ALL_DEALS(payload),
         method: 'GET',
+        canCache,
     });
 };
 
-export const getMoreLikeThis = async (payload: { product_id: number; limit?: number; offset?: number }): Promise<ServerActionResponse<MoreLikeThisResponse>> => {
+export const getMoreLikeThis = async (payload: { product_id: number; limit?: number; offset?: number }, canCache: boolean = true): Promise<ServerActionResponse<MoreLikeThisResponse>> => {
     return await handleRequest<MoreLikeThisResponse, unknown>({
         endpoint: API_ROUTES.GET_MORE_LIKE_THIS(payload),
         method: 'GET',
+        canCache,
     });
 };
 
-export const getContactUs = async (): Promise<ServerActionResponse<ContactInfo>> => {
+export const getContactUs = async (canCache: boolean = true): Promise<ServerActionResponse<ContactInfo>> => {
     return await handleRequest<ContactInfo, unknown>({
       endpoint: API_ROUTES.CONTACT.CONTACT_US,
       method: 'GET',
+      canCache,
     });
   };
   
-  export const getSocialMedia = async (): Promise<ServerActionResponse<SocialMedia>> => {
+  export const getSocialMedia = async (canCache: boolean = true): Promise<ServerActionResponse<SocialMedia>> => {
     return await handleRequest<SocialMedia, unknown>({
       endpoint: API_ROUTES.CONTACT.SOCIAL_MEDIA,
       method: 'GET',
+      canCache,
     });
   };
 
-export const getMailSubscriptionSettings = async (): Promise<ServerActionResponse<{
+export const getMailSubscriptionSettings = async (canCache: boolean = true): Promise<ServerActionResponse<{
   id: number;
   email_frequency: string;
   product_updates: boolean;
@@ -817,6 +852,7 @@ export const getMailSubscriptionSettings = async (): Promise<ServerActionRespons
   }, unknown>({
     endpoint: API_ROUTES.GET_MAIL_SUBSCRIPTION_SETTINGS,
     method: 'GET',
+    canCache,
   });
 };
 
@@ -835,7 +871,8 @@ export const getProductsByDealSlug = async (
     limit?: number;
     offset?: number;
     productId?: number;
-  }
+  },
+  canCache: boolean = true
 ): Promise<ServerActionResponse<{
   products: Product[];
   category_items: {id: number, name: string, slug: string, product_count: number}[];
@@ -868,6 +905,7 @@ export const getProductsByDealSlug = async (
   }, unknown>({
     endpoint: API_ROUTES.GET_PRODUCTS_BY_DEAL_SLUG(slug, params),
     method: 'GET',
+    canCache,
   });
 };
 
@@ -886,14 +924,15 @@ interface EntitySlugsResponse {
   total_found: number;
 }
 
-export const getWelcomeContent = async (): Promise<ServerActionResponse<WelcomeContentResponse>> => {
+export const getWelcomeContent = async (canCache: boolean = true): Promise<ServerActionResponse<WelcomeContentResponse>> => {
     return await handleRequest<WelcomeContentResponse, unknown>({
         endpoint: API_ROUTES.GET_WELCOME_CONTENT,
         method: 'GET',
+        canCache,
     });
 };
 
-export const getReviews = async (payload: { page?: number, limit?: number, product_id?: number, user_id?: number, is_visible?: boolean, testimonial?: boolean }): Promise<ServerActionResponse<{
+export const getReviews = async (payload: { page?: number, limit?: number, product_id?: number, user_id?: number, is_visible?: boolean, testimonial?: boolean }, canCache: boolean = true): Promise<ServerActionResponse<{
     rows: {
         id: number;
         user_name: string;
@@ -921,10 +960,11 @@ export const getReviews = async (payload: { page?: number, limit?: number, produ
     }, unknown>({
         endpoint: API_ROUTES.REVIEWS(payload),
         method: 'GET',
+        canCache,
     });
 };
 
-export const getFeatureContent = async (payload?: { page?: number, limit?: number }): Promise<ServerActionResponse<{
+export const getFeatureContent = async (payload?: { page?: number, limit?: number }, canCache: boolean = true): Promise<ServerActionResponse<{
     featureContent: {
         id: number;
         title: string;
@@ -946,10 +986,11 @@ export const getFeatureContent = async (payload?: { page?: number, limit?: numbe
     }, unknown>({
         endpoint: API_ROUTES.GET_FEATURE_CONTENT(payload),
         method: 'GET',
+        canCache,
     });
 };
 
-export const getTrustpilotReviews = async (payload?: { page?: number; per_page?: number; stars?: number }): Promise<ServerActionResponse<{
+export const getTrustpilotReviews = async (payload?: { page?: number; per_page?: number; stars?: number }, canCache: boolean = true): Promise<ServerActionResponse<{
   reviews: Array<{
     id: string;
     stars: number;
@@ -1023,6 +1064,7 @@ export const getTrustpilotReviews = async (payload?: { page?: number; per_page?:
   }, unknown>({
     endpoint: API_ROUTES.GET_TRUSTPILOT_REVIEWS(payload),
     method: 'GET',
+    canCache,
   });
 };
 
@@ -1097,7 +1139,7 @@ export const calculateGuestDeals = async (cartItems: { product_id: number; varia
 };
 
 // Get ShipStation carriers
-export const getShipStationCarriers = async (): Promise<ServerActionResponse<{
+export const getShipStationCarriers = async (canCache: boolean = true): Promise<ServerActionResponse<{
   name: string;
   code: string;
   accountNumber: string | null;
@@ -1119,22 +1161,48 @@ export const getShipStationCarriers = async (): Promise<ServerActionResponse<{
   }[], unknown>({
     endpoint: API_ROUTES.GET_SHIPSTATION_CARRIERS,
     method: 'GET',
+    canCache,
   });
 };
 
 // Get entity slugs
-export const getEntitySlugs = async (sortBy: string = 'order_count'): Promise<ServerActionResponse<EntitySlugsResponse>> => {
+export const getEntitySlugs = async (sortBy: string = 'order_count', canCache: boolean = true): Promise<ServerActionResponse<EntitySlugsResponse>> => {
   const endpoint = `${API_ROUTES.GET_ENTITY_SLUGS}?sort_by=${encodeURIComponent(sortBy)}`;
   return await handleRequest<EntitySlugsResponse, unknown>({
     endpoint,
     method: 'GET',
+    canCache,
   });
 };
 
 // Get SEO meta data by slug
-export const getSeoMetaBySlug = async (slug: string): Promise<ServerActionResponse<SeoMetaResponse>> => {
+export const getSeoMetaBySlug = async (slug: string, canCache: boolean = true): Promise<ServerActionResponse<SeoMetaResponse>> => {
   return await handleRequest<SeoMetaResponse, unknown>({
     endpoint: API_ROUTES.GET_SEO_META(slug),
     method: 'GET',
+    canCache,
+  });
+};
+
+// Legal content types
+export type LegalContentKey = 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions';
+
+export interface LegalContentResponse {
+  content_key: LegalContentKey;
+  content: string;
+  is_active: boolean;
+  last_updated: string;
+  created_at: string;
+}
+
+// Get legal content by content key
+export const getLegalContentByKey = async (
+  contentKey: LegalContentKey,
+  canCache: boolean = true
+): Promise<ServerActionResponse<LegalContentResponse>> => {
+  return await handleRequest<LegalContentResponse, unknown>({
+    endpoint: API_ROUTES.GET_LEGAL_CONTENT(contentKey),
+    method: 'GET',
+    canCache,
   });
 };

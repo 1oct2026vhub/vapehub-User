@@ -1183,3 +1183,26 @@ export const getSeoMetaBySlug = async (slug: string, canCache: boolean = true): 
     canCache,
   });
 };
+
+// Legal content types
+export type LegalContentKey = 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions';
+
+export interface LegalContentResponse {
+  content_key: LegalContentKey;
+  content: string;
+  is_active: boolean;
+  last_updated: string;
+  created_at: string;
+}
+
+// Get legal content by content key
+export const getLegalContentByKey = async (
+  contentKey: LegalContentKey,
+  canCache: boolean = true
+): Promise<ServerActionResponse<LegalContentResponse>> => {
+  return await handleRequest<LegalContentResponse, unknown>({
+    endpoint: API_ROUTES.GET_LEGAL_CONTENT(contentKey),
+    method: 'GET',
+    canCache,
+  });
+};

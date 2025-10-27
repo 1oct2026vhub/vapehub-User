@@ -52,7 +52,7 @@ const NotificationAction: React.FC = () => {
       <PopoverTrigger>
         <Badge color="danger" content={unreadCount > 99 ? "99+" : unreadCount} shape="circle" className='!border-0 max-sm:text-xs w-auto min-w-5 max-h-6 md:max-h-7 aspect-square'>
           <Button isIconOnly aria-label="more than 99 notifications" radius="full" variant="light" className='!min-w-fit !w-fit !h-fit !items-end' onPress={() => setIsPopoverOpen((v) => !v)}>
-            <BellIcon className='mt-1' />
+            <BellIcon className='mt-1 text-white' />
           </Button>
         </Badge>
 

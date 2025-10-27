@@ -389,7 +389,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
     const allImageResults = collectAllImageItems(menuItems);
 
     return (
-        <div className={`absolute left-0 top-full w-full border-t border-skin-neutral-200 shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-300 min-h-[250px] max-h-[300px] overflow-y-auto flex items-start justify-between opacity-0 invisible transform translate-y-4 ${isOpen ? '!opacity-100 !visible !translate-y-0' : ''}`}>
+        <div className={`absolute left-0 top-[140%] w-full border-t border-skin-neutral-200 shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-500 ease-in min-h-[250px] max-h-[300px] overflow-y-auto flex items-start justify-between opacity-0 invisible transform translate-y-2 pointer-events-none ${isOpen ? '!opacity-100 !visible !translate-y-0 pointer-events-auto' : ''}`}>
             <div className={`${shouldShowImageSection ? 'w-[68%] pr-7 border-r border-skin-neutral-200' : 'w-full'} space-y-6`}>
                 <Form {...searchFromConfig}>
                     <form noValidate className="w-3/4">

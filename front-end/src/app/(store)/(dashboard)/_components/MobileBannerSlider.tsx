@@ -33,7 +33,7 @@ const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => 
       {sortedBanners.map((banner, index) => (
         <Link
           key={index}
-          className="overflow-hidden rounded-lg"
+          className="overflow-hidden rounded-md"
           href={banner.redirect_url}
         >
           <Image
@@ -41,7 +41,7 @@ const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => 
             alt={banner.title}
             width={361}
             height={382}
-            className="w-full h-full rounded-lg object-fill aspect-video !outline-none focus-visible:!outline-none"
+            className="w-full h-full rounded-md object-fill aspect-video !outline-none focus-visible:!outline-none"
             priority
             loading="eager"
             fetchPriority="high"

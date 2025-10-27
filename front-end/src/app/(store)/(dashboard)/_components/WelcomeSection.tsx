@@ -18,13 +18,12 @@ const WelcomeSection = async () => {
     const mainTitle = titleParts.join(' ');
 
     return (
-        <section className='bg-white p-6 rounded-2xl md:rounded-3xl shadow-card grid grid-cols-1 xl:grid-cols-2 items-stretch gap-6 max-sm:mt-6'>
+        <section className='grid grid-cols-1 xl:grid-cols-2 items-stretch gap-6 max-sm:mt-6'>
             <div className='space-y-4 text-neutral-900 text-content-1 md:text-title-2 font-medium flex flex-col justify-center'>
-                <h1 className='text-h4 lg:text-h2 font-bold'>
-                    {mainTitle}{' '}
-                    <span className='primary-gradient-600'>{lastWord}</span>
+                <h1 className='text-h4 lg:text-h2 font-bold primary-gradient-600 w-fit'>
+                    {mainTitle}{' '}{lastWord}
                 </h1>
-                <div dangerouslySetInnerHTML={{ __html: content }} />
+                <div className='welcome-text' dangerouslySetInnerHTML={{ __html: content }} />
             </div>
             <div className='flex items-center justify-center'>
                 <Image 
@@ -32,7 +31,7 @@ const WelcomeSection = async () => {
                     width={1920}
                     height={700}
                     alt={title}
-                    className='w-full h-auto object-cover max-w-full rounded-lg'
+                    className='w-full h-full object-fill max-w-full rounded-md self-stretch'
                 />
             </div>
         </section>

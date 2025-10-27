@@ -82,6 +82,10 @@
     @apply !font-oswald;
   }
 
+  p {
+    @apply !font-opensans;
+  }
+
   input[type='password']::-ms-reveal {
     display: none;
   }
@@ -197,6 +201,14 @@
 
 input[type='search'] {
   @apply text-content-2 lg:text-title-2 font-normal lg:font-bold !important;
+}
+
+.welcome-text p {
+  @apply text-title-2 text-skin-neutral-400;
+}
+
+.welcome-text p strong {
+  @apply text-skin-neutral-500 font-bold;
 }
 
 .slick-prev,

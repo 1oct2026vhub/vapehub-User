@@ -63,16 +63,17 @@ export default {
         },
       },
       fontSize: {
-        h1: ["3.75rem", { lineHeight: "140%" },], //60px
-        h2: ["3rem", { lineHeight: "140%" },], //48px
-        h3: ["2.5rem", { lineHeight: "140%" },], //40px
-        h4: ["2rem", { lineHeight: "140%" },], //32px
-        h5: ["1.5rem", { lineHeight: "140%" },], //24px
-        'title-1': ["1.25rem", { lineHeight: "140%" },], //20px
+        h1: ["3rem", { lineHeight: "140%" },], //48px
+        h2: ["2.75rem", { lineHeight: "140%" },], //44px
+        h3: ["2.25rem", { lineHeight: "140%" },], //36px
+        h4: ["1.75rem", { lineHeight: "140%" },], //28px
+        h5: ["1.375rem", { lineHeight: "140%" },], //22px
+        'title-1': ["1.125rem", { lineHeight: "140%" },], //18px
         'title-2': ["1rem", { lineHeight: "140%" },], //16px
         'content-1': ["0.875rem", { lineHeight: "140%", },], //14px
         'content-2': ["0.75rem", { lineHeight: "140%", },], //12px
         'content-3': ["0.625rem", { lineHeight: "140%", },], //10px
+        'content-4': ["0.5rem", { lineHeight: "140%", },], //8px
         '22': ["1.375rem", { lineHeight: "120%", },], //22px
         '28': ["1.75rem", { lineHeight: "120%", },], //28px
         '38': ["2.375rem", { lineHeight: "120%", },], //38px

@@ -18,22 +18,21 @@ const DealCard: React.FC<DealCardProps> = ({
     href,
     title,
     width = 312,
-    height = 258,
+    height = 250,
 }) => {
-    const [showTooltip, setShowTooltip] = useState(false);
     
     return (
-        <Link prefetch={false} href={href} className="block bg-skin-white max-w-60 md:max-w-full rounded-xl shadow-deal-card-mob xl:shadow-deal-card hover:shadow-brand-card transition-all duration-300 h-fit">
-            <div className="relative w-full aspect-[4/3] overflow-hidden rounded-t-xl">
+        <Link prefetch={false} href={href} className="block rounded h-fit">
+            <div className="relative w-full overflow-hidden rounded-md">
                 <NoImage 
                     src={imageSrc} 
                     alt={altText} 
                     width={width} 
                     height={height} 
-                    className="w-full h-full object-cover object-center self-stretch md:min-h-[258px]" 
+                    className="w-full h-full aspect-[16/9] rounded-md object-fill object-center self-stretch min-h-[136px] max-h-[136px] md:min-h-[250px] md:max-h-[250px]" 
                 />
             </div>
-            <div className="p-2 md:p-5 flex-1">
+            {/* <div className="p-2 md:p-5 flex-1">
                 <div className="relative">
                     <h3 
                         className="text-lg md:text-title-1 xl:text-h5 text-skin-neutral-500 font-semibold line-clamp-1"
@@ -49,7 +48,7 @@ const DealCard: React.FC<DealCardProps> = ({
                         </div>
                     )}
                 </div>
-            </div>
+            </div> */}
         </Link >
     );
 };

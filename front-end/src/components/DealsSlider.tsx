@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import Slider, { Settings } from "react-slick";
 import DealCard from "./DealCard";
 import { Deal } from "@/lib/config/deal.config";
 import { getAllDeals } from "@/lib/server.actions";
@@ -18,50 +17,19 @@ const DealsSlider: React.FC = () => {
         };
         fetchDeals();
     }, []);
-    const settings: Settings = {
-        dots: true,
-        infinite: deals.length > 4,
-        speed: 500,
-        slidesToShow: 4,
-        slidesToScroll: 4,
-        lazyLoad:"progressive",
-        responsive: [
-            {
-                breakpoint: 1280,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 2,
-                    infinite: deals.length > 3,
-                    dots: true
-                }
-            },
-            {
-                breakpoint: 640,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                    infinite: deals.length > 2,
-                    dots: true,
-                }
-            },
-        ]
-    };
 
     return (
-        <Slider {...settings}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {deals.map((deal) => (
-                <div key={deal.id} className="px-2 xl:px-5 py-3 first:pl-0 h-full">
-                    <div className="w-full h-full">
-                        <DealCard
-                            title={deal.name}
-                            imageSrc={deal?.image_url ?? "/images/deal-1.png"} // Placeholder image
-                            altText={deal.name}
-                            href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
-                        />
-                    </div>
-                </div>
+                <DealCard
+                    key={deal.id}
+                    title={deal.name}
+                    imageSrc={deal?.image_url ?? "/images/deal-placeholder.jpg"} // Placeholder image
+                    altText={deal.name}
+                    href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
+                />
             ))}
-        </Slider>
+        </div>
     );
 };
 

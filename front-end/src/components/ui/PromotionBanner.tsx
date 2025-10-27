@@ -25,7 +25,7 @@ const PromotionBanner: React.FC<PromotionBannerProps> = ({ messages }) => {
   const currentMessage = messages[currentIndex];
   return (
     <div
-      className="bg-notification-banner-gradient p-3 flex items-center justify-center w-full"
+      className="bg-header-gradient p-3 flex items-center justify-center w-full border-b border-skin-primary-300"
       role="alert"
       aria-live="polite"
     >

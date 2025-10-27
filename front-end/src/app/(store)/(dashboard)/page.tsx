@@ -34,7 +34,7 @@ const Dashboard: NextPage = async () => {
   const nicSaltsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 13)?.slug_relation || 'nic-salts';
 
   return (
-    <div className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10">
+    <main className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10 max-w-[1520px] mx-auto">
       {/* <Suspense fallback={<SuspenseLoader />}> */}
         <HomeCarousel />
       {/* </Suspense> */}
@@ -42,13 +42,6 @@ const Dashboard: NextPage = async () => {
       <Suspense fallback={<SuspenseLoader />}>
         <WelcomeSection />
       </Suspense>
-
-      <section className="flex flex-col gap-4.5 md:gap-10 max-md:mt-4.5">
-        <Suspense fallback={<SuspenseLoader />}>
-          <TrustPilotRating />
-          <FeatureCards />
-        </Suspense>
-      </section>
 
       <Suspense fallback={<SuspenseLoader />}>
         <ShopByCategory />
@@ -101,7 +94,7 @@ const Dashboard: NextPage = async () => {
       </Suspense>
 
       <ScrollToTop />
-    </div>
+    </main>
   );
 };
 

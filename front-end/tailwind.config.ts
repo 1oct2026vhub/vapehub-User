@@ -11,7 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        poppins: "var(--font-poppins)",
+        oswald: "var(--font-oswald)",
+        opensans: "var(--font-opensans)",
       },
       colors: {
         skin: {
@@ -34,6 +35,7 @@ export default {
           'primary-gradient-500': "var(--primary-gradient-500)",
           'primary-gradient-600': "var(--primary-gradient-600)",
 
+          'neutral-25': "var(--neutral-25)",
           'neutral-50': "var(--neutral-50)",
           'neutral-100': "var(--neutral-100)",
           'neutral-200': "var(--neutral-200)",
@@ -85,7 +87,7 @@ export default {
         'red-gradient': "var(--red-gradient)",
         'red-gradient-100': "var(--red-gradient-100)",
         'red-gradient-200': "var(--red-gradient-200)",
-        'notification-banner-gradient': "var(--notification-banner-gradient)",
+        'header-gradient': "var(--header-gradient)",
         'footer-gradient': "var(--footer-gradient)",
         'subscription-banner': "url('/images/subscription-banner.jpg')",
         'subscription-banner-mob': "url('/images/subscription-banner-mob.jpg')"

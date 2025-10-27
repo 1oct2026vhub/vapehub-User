@@ -15,10 +15,10 @@ const itemClasses = {
 
 type Props = {
     footerMenu: FooterMenu[];
-    socialMediaLinks: { icon: React.ReactNode; href: string }[];
+    // socialMediaLinks: { icon: React.ReactNode; href: string }[];
 }
 
-const FooterMobile: React.FC<Props> = ({ footerMenu, socialMediaLinks }) => {
+const FooterMobile: React.FC<Props> = ({ footerMenu }) => {
     const items = footerMenu.map(section => ({
         key: section.id,
         title: section.title,

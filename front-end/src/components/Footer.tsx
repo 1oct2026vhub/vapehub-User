@@ -76,7 +76,7 @@ const Footer = async (): AsyncReactElement => {
 
         {/* Mobile Section */}
         <div className='w-full md:hidden'>
-          <FooterMobile footerMenu={sortedFooterMenu} socialMediaLinks={socialMediaLinks} />
+          <FooterMobile footerMenu={sortedFooterMenu} />
         </div>
 
         {/* Right Section */}

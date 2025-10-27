@@ -15,7 +15,7 @@ import { MostPopularVapes, MostPopularSalts } from './_components/MostPopular';
 import PromotionalBanners from './_components/PromotionalBanners';
 import ReferFriend from './_components/ReferFriend';
 import Testimonials from './_components/Testimonials';
-import Subscription from './_components/Subscription';
+// import Subscription from './_components/Subscription';
 import BlogsSection from './_components/BlogsSection';
 import { getEntitySlugs } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';

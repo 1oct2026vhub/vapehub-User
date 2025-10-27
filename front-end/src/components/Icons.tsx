@@ -1405,6 +1405,7 @@ export const LoyaltyIcon = (
       height="38"
       fill="none"
       viewBox="0 0 38 38"
+      {...props}
     >
       <rect width="38" height="38" fill="#fff" rx="19"></rect>
       <circle

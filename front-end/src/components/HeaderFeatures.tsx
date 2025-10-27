@@ -30,7 +30,11 @@ const features = [
     },
 ];
 
-const ArrowPrev: React.FC<any> = ({ onClick }) => (
+interface ArrowProps {
+    onClick?: () => void;
+}
+
+const ArrowPrev: React.FC<ArrowProps> = ({ onClick }) => (
     <button
         aria-label="Previous"
         className={`absolute left-4 top-[48%] -translate-y-1/2 z-20 w-5 h-5 min-w-5 rounded-full border border-skin-primary-300 flex items-center justify-center`}
@@ -42,7 +46,7 @@ const ArrowPrev: React.FC<any> = ({ onClick }) => (
     </button>
 );
 
-const ArrowNext: React.FC<any> = ({ onClick }) => (
+const ArrowNext: React.FC<ArrowProps> = ({ onClick }) => (
     <button
         aria-label="Next"
         className={`absolute right-4 top-[48%] -translate-y-1/2 z-20 w-5 h-5 min-w-5 rounded-full border border-skin-primary-300 flex items-center justify-center text-skin-primary-300`}

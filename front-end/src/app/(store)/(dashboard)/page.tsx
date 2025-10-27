@@ -34,7 +34,7 @@ const Dashboard: NextPage = async () => {
   const nicSaltsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 13)?.slug_relation || 'nic-salts';
 
   return (
-    <main className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10 max-w-[1520px] mx-auto">
+    <main className="px-4 lg:px-12.5 py-4.5 lg:py-10 flex flex-col gap-4.5 sm:gap-7 md:gap-10 w-full max-w-[1520px] mx-auto">
       {/* <Suspense fallback={<SuspenseLoader />}> */}
         <HomeCarousel />
       {/* </Suspense> */}

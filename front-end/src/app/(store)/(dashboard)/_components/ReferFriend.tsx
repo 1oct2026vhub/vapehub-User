@@ -18,21 +18,21 @@ const ReferFriend: React.FC = async () => {
 					>
 						<div className='bg-skin-white border border-skin-neutral-50 xl:pl-11 pt-7 flex flex-col xl:flex-row h-fit gap-2 shadow-card rounded-[36px] md:rounded-[50px] xl:max-h-[309px]'>
 							<div className='text-center xl:text-left'>
-								<div className='text-h4 md:text-h3 xl:text-55 font-bold'>
-									<h1 className='primary-gradient-100'>Refer a Friend &</h1>
-									<h1 className='primary-gradient-100'>
+								<div className='text-h5 md:text-h3 font-bold'>
+									<h2 className='primary-gradient-100'>Refer a Friend &</h2>
+									<h2 className='primary-gradient-100'>
 										We will reward you both!
-									</h1>
+									</h2>
 								</div>
 								<Button
 									as={"div"}
 									size='lg'
 									radius='sm'
 									color='primary'
-									className='btn primary-btn shadow-input w-fit !min-w-fit text-content-1 !px-4 !py-2 !rounded-10 mt-4 xl:mt-8'
+									className='btn primary-btn shadow-input w-fit !min-w-fit text-h5 !px-3 !py-1.5 !rounded-10 mt-4 xl:mt-8 uppercase'
 									endContent={<RightArrowIcon stroke='#fff' className='ml-1' />}
 								>
-									Register Now
+									Refer Now
 								</Button>
 							</div>
 							<Image

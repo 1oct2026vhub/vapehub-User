@@ -11,7 +11,7 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
 }) => {
 
   return (
-    <h3 className={`primary-gradient-600 text-title-1 md:text-h5 xl:text-h3 font-bold ${className}`}>{title}</h3>
+    <h2 className={`primary-gradient-600 text-h5 md:text-h3 font-semibold ${className}`}>{title}</h2>
   );
 };
 

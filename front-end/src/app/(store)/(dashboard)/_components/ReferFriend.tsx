@@ -16,7 +16,7 @@ const ReferFriend: React.FC = async () => {
 						href={ROUTES.MY_ACCOUNT}
 						className='block'
 					>
-						<div className='bg-skin-white border border-skin-neutral-50 xl:pl-11 flex flex-col md:flex-row items-center justify-between h-fit gap-2 shadow-card rounded-md md:rounded-lg xl:max-h-[309px]'>
+						<div className='bg-skin-white border border-skin-neutral-50 max-lg:pt-6 xl:pl-11 flex flex-col md:flex-row items-center justify-between h-fit gap-2 shadow-card rounded-md md:rounded-lg xl:max-h-[309px]'>
 							<div className='text-center xl:text-left'>
 								<div className='text-h5 md:text-h3 font-bold'>
 									<h2 className='primary-gradient-100'>Refer a Friend &</h2>
@@ -29,7 +29,7 @@ const ReferFriend: React.FC = async () => {
 									size='lg'
 									radius='sm'
 									color='primary'
-									className='btn primary-btn shadow-input w-fit !min-w-fit text-content-2 md:text-h5 px-1.5 py-1 md:!px-3 md:!py-1.5 !rounded font-oswald mt-4 xl:mt-8 uppercase'
+									className='btn primary-btn shadow-input w-fit !min-w-fit text-content-2 md:text-h5 !px-1.5 !py-1 md:!px-3 md:!py-1.5 !rounded font-oswald mt-4 xl:mt-8 uppercase !h-fit'
 									endContent={<RightArrowIcon stroke='#fff' className='w-5.5 h-5.5' />}
 								>
 									Refer Now

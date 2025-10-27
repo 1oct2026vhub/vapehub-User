@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import { DownArrowFilledIcon } from './Icons';
+import { DownArrowIcon } from './Icons';
 import { Accordion, AccordionItem } from '@nextui-org/react';
 import Link from 'next/link';
 import { FooterMenu } from '@/lib/config/header.config';
@@ -50,19 +50,19 @@ const FooterMobile: React.FC<Props> = ({ footerMenu, socialMediaLinks }) => {
                     <AccordionItem
                         key={item.key}
                         title={item.title}
-                        indicator={<DownArrowFilledIcon />}
+                        indicator={<DownArrowIcon />}
                     >
                         {item.content}
                     </AccordionItem>
                 ))}
             </Accordion>
-            <div className="flex items-center gap-4.5 justify-center md:justify-end mt-4 xl:mt-5.5">
+            {/* <div className="flex items-center gap-4.5 justify-center md:justify-end mt-4 xl:mt-5.5">
                 {socialMediaLinks.map((link, idx) => (
                     <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer">
                         {link.icon}
                     </a>
                 ))}
-            </div>
+            </div> */}
         </>
     );
 };

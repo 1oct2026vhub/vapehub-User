@@ -53,7 +53,7 @@ const NewProducts: React.FC<NewProductsProps> = async ({
   }));
 
   return (
-    <section className="space-y-4.5 md:space-y-7.5">
+    <section className="md:space-y-5">
       <div className="flex items-center justify-between">
         <SectionHeading title={title} />
         <ViewAllLink href={viewAllHref} />

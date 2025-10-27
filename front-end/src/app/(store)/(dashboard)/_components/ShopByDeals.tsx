@@ -13,7 +13,7 @@ const ShopByDeals: React.FC<ShopByDealsProps> = ({
     viewAllHref = "/product-deals",
 }) => {
     return (
-        <section className="space-y-4.5 md:space-y-7.5 mt-5 lg:mt-10">
+        <section className="space-y-4.5 md:space-y-7.5">
             <div className="flex items-center justify-between">
                 <div className="space-y-2.5">
                     <SectionHeading title={title} />

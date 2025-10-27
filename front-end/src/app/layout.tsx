@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Oswald, Open_Sans } from "next/font/google";
 import "./globals.css";
 import GlobalProvider from "@/providers/GlobalProvider";
 import { Toaster } from "sonner";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const oswald = Oswald({
+  variable: "--font-oswald",
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["200", "300", "400", "500", "600", "700"],
+});
+
+const openSans = Open_Sans({
+  variable: "--font-opensans",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -44,7 +50,7 @@ export default function RootLayout({
       />
       </head>
       <body
-        className={`m-0 min-h-screen bg-white text-skin-black font-poppins antialiased ${poppins.variable}`}
+        className={`m-0 min-h-screen bg-white text-skin-black font-opensans antialiased ${oswald.variable} ${openSans.variable}`}
       >
         <GlobalProvider>
           <Toaster

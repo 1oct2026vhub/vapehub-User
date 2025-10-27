@@ -44,20 +44,20 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
   const activeMenu = hoveredIndex !== null ? visibleMenus[hoveredIndex] : null;
 
   return (
-    <div className="hidden lg:block">
+    <div className="hidden lg:block max-w-[1520px] mx-auto">
       <ul className="inline-flex flex-wrap items-center justify-center w-full">
         {/* Static NEW IN menu item */}
         <li>
           <Link 
             href="/shop?is_new=true" 
-            className="px-3 rounded-md text-shadow text-lg text-skin-neutral-400 uppercase font-extrabold hover:opacity-70 transition-all duration-300 ease-in flex items-center gap-2"
+            className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold font-oswald hover:text-skin-primary-300 transition-all duration-300 ease-in flex items-center gap-2"
           >
             NEW IN
           </Link>
         </li>
         
         {visibleMenus.map((item, index) => {
-          // Extract slug for brand and deal items
+          // ct slug for brand and deal items
           let slug = '';
           if (item.entity_type === 'brand' || item.entity_type === 'deal') {
             slug = item.entity_data?.slug || item.original?.split('/').pop() || '';
@@ -72,19 +72,19 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
               {item.entity_type === 'brand' || item.entity_type === 'deal' ? (
                 <button
                   onClick={() => handleMenuClick(item.original, item.entity_type, slug)}
-                  className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-400 uppercase font-extrabold hover:opacity-70 transition-all duration-300 ease-in flex items-center gap-2 bg-transparent border-none cursor-pointer`}
+                  className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold hover:text-skin-primary-300 font-oswald transition-all duration-300 ease-in flex items-center gap-2 bg-transparent border-none cursor-pointer`}
                 >
                   {item.label}
-                  {item.children && item.children.length > 0 && <DownArrowIcon className="w-3 h-3" />}
+                  {item.children && item.children.length > 0 && <DownArrowIcon className="w-3 h-3 text-white" />}
                 </button>
               ) : (
                 <Link 
                   href={item.original || '#'} 
                   passHref 
-                  className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-400 uppercase font-extrabold hover:opacity-70 transition-all duration-300 ease-in flex items-center gap-2`}
+                  className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold hover:text-skin-primary-300 font-oswald transition-all duration-300 ease-in flex items-center gap-2`}
                 >
                   {item.label}
-                  {item.children && item.children.length > 0 && <DownArrowIcon className="w-3 h-3" />}
+                  {item.children && item.children.length > 0 && <DownArrowIcon className="w-3 h-3 text-white" />}
                 </Link>
               )}
               {activeMenu && activeMenu.children && activeMenu.children.length > 0 && (
@@ -99,7 +99,7 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
           <li key={index}>
             <Link 
               href={item?.slug} 
-              className="px-3 rounded-md text-shadow text-lg text-skin-neutral-400 uppercase font-extrabold hover:opacity-70 transition-all duration-200 ease-in"
+              className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-oswald font-bold hover:text-skin-primary-300 transition-all duration-300 ease-in"
             >
               {item.name}
             </Link>

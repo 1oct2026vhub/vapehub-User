@@ -108,11 +108,11 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
     }
     return (
         <>
-            <div className="hidden lg:flex items-center justify-between gap-10">
+            <div className="hidden lg:flex items-center justify-between gap-10 max-w-[1520px] mx-auto w-full">
                 <Logo className='max-xl:max-w-64' />
                 {!isVerificationPage && (
                     <>
-                        <div className="relative flex-1 flex-shrink justify-center items-center max-w-[650px] mx-auto">
+                        <div className="relative flex-1 flex-shrink justify-center items-center max-w-[650px] mx-auto search-wrapper">
                             <Form {...searchFromConfig}>
                                 <form noValidate className="w-full" onSubmit={searchFromConfig.handleSubmit(handleSearch)}>
                                     <InputField
@@ -138,20 +138,20 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-6 self-stretch">
                             <NotificationAction  />
-                            <Button onPress={onOpen} variant='light' className="flex items-center gap-0.5 hover:!bg-transparent">
+                            <Button onPress={onOpen} variant='light' className="flex items-center gap-2 hover:!bg-transparent h-fit">
                                 <ShoppingCartIcon />
-                                <div>
-                                    <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">{itemCount} item{itemCount !== 1 ? 's' : ''}</h6>
-                                    <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">{DEFAULT_CURRENCY_SYMBOL} {cartTotal.toFixed(2)}</h6>
+                                <div className="flex flex-col gap-1 text-start">
+                                    <span className="capitalize text-title-1 font-bold font-oswald text-white">{itemCount} item{itemCount !== 1 ? 's' : ''}</span>
+                                    <span className="capitalize text-content-1 font-bold text-skin-primary-50">{DEFAULT_CURRENCY_SYMBOL} {cartTotal.toFixed(2)}</span>
                                 </div>
                             </Button>
-                            <Link href={ROUTES.MY_ACCOUNT} className="flex items-center gap-0.5">
+                            <Link href={ROUTES.MY_ACCOUNT} className="flex items-center gap-2">
                                 <UserIcon />
-                                <div>
-                                    <h6 className="uppercase text-content-1 font-extrabold text-skin-neutral-400 leading-tight">welcome</h6>
-                                    <h6 className="uppercase text-content-1 font-extrabold primary-gradient-100 leading-none">my account</h6>
+                                <div className="flex flex-col gap-1 text-start">
+                                    <span className="capitalize text-title-1 font-bold font-oswald text-white">Welcome</span>
+                                    <span className="capitalize text-content-1 font-bold text-skin-primary-50 tracking-normal">My ACCOUNT</span>
                                 </div>
                             </Link>
                         </div>

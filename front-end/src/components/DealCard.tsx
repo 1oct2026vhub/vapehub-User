@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link";
-import React, { useState } from "react";
+import React from "react";
 import NoImage from "./NoImage";
 
 interface DealCardProps {
@@ -16,7 +16,6 @@ const DealCard: React.FC<DealCardProps> = ({
     imageSrc,
     altText,
     href,
-    title,
     width = 312,
     height = 250,
 }) => {

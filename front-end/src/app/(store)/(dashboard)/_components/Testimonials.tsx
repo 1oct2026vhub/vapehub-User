@@ -19,7 +19,7 @@ const Testimonials: FunctionComponent<TestimonialsProps> = async ({
     }
 
     return (
-        <section className="space-y-4.5 md:space-y-7.5">
+        <section className="space-y-3 md:space-y-5">
             <SectionHeading title={title} />
             <div className="slider-container section-slider testimonial-slider">
                 <TestimonialSlider data={response.data?.rows || []} />

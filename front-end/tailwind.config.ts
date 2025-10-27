@@ -137,7 +137,8 @@ export default {
         'base': '0px 2px 4px 0px rgba(0, 0, 0, 0.25)',
         'delivery-card': '0px 4px 41px 0px rgba(0, 0, 0, 0.16);',
         'button': '0px 0px 8px 0px rgba(0, 0, 0, 0.11);',
-        'checkout': '0px -1px 17px 0px rgba(0, 0, 0, 0.07);'
+        'checkout': '0px -1px 17px 0px rgba(0, 0, 0, 0.07);',
+        'product-card': '-1px 4px 24px 0 rgba(0, 0, 0, 0.24);',
       }
     },
   },

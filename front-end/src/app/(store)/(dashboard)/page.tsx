@@ -15,7 +15,7 @@ import { MostPopularVapes, MostPopularSalts } from './_components/MostPopular';
 import PromotionalBanners from './_components/PromotionalBanners';
 import ReferFriend from './_components/ReferFriend';
 import Testimonials from './_components/Testimonials';
-import Subscription from './_components/Subscription';
+// import Subscription from './_components/Subscription';
 import BlogsSection from './_components/BlogsSection';
 import { getEntitySlugs } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
@@ -34,7 +34,7 @@ const Dashboard: NextPage = async () => {
   const nicSaltsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 13)?.slug_relation || 'nic-salts';
 
   return (
-    <main className="px-4 lg:px-12.5 py-4 md:py-[60px] flex flex-col gap-4.5 sm:gap-7 md:gap-[60px] w-full max-w-[1520px] mx-auto">
+    <main className="px-4 lg:px-12.5 py-4 md:py-[60px] flex flex-col gap-7 md:gap-[60px] w-full max-w-[1520px] mx-auto">
       {/* <Suspense fallback={<SuspenseLoader />}> */}
         <HomeCarousel />
       {/* </Suspense> */}
@@ -83,10 +83,6 @@ const Dashboard: NextPage = async () => {
 
       <Suspense fallback={<SuspenseLoader />}>
         <Testimonials />
-      </Suspense>
-
-      <Suspense fallback={<SuspenseLoader />}>
-        <Subscription className="mt-5 md:mt-10" />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>

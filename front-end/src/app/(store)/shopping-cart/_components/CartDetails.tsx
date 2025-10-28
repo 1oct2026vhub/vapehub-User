@@ -60,11 +60,11 @@ const CartDetails: React.FC = () => {
             )}
             <div className='space-y-1.5'>
                 <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
-                    <p className='text-skin-neutral-500'>Number of Items</p>
+                    <p className='text-skin-neutral-500 !font-oswald'>Number of Items</p>
                     <p className='text-skin-neutral-300'>{itemCount}</p>
                 </div>
                 <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
-                    <p className='text-skin-neutral-500'>Subtotal</p>
+                    <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
                     <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL} {cartTotal.toFixed(2)}</p>
                 </div>
             </div>
@@ -72,14 +72,14 @@ const CartDetails: React.FC = () => {
             <ShippingProgress />
             <Divider />
             <div className='flex items-center justify-between text-black font-semibold'>
-                <p className='text-content-2 md:text-title-1'>Total</p>
-                <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.isApplied ?  (cartTotal - couponDiscount.value).toFixed(2): (cartTotal).toFixed(2)}</p>
+                <p className='text-content-2 md:text-2xl !font-oswald'>Total</p>
+                <p className='text-title-2 md:text-2xl !font-oswald'>{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.isApplied ?  (cartTotal - couponDiscount.value).toFixed(2): (cartTotal).toFixed(2)}</p>
             </div>
             <Button
                 size="lg"
                 radius="md"
                 color="primary"
-                className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                className="w-full btn primary-btn shadow-button !text-skin-white !rounded-md uppercase text-content-1 md:text-2xl !py-1.5 !px-3"
                 onPress={handleCheckout}
                 isLoading={stockValidationLoading}
             >

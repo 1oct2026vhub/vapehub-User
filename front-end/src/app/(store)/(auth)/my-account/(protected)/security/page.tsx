@@ -77,9 +77,9 @@ const AccountSecurity: NextPage = () => {
 
     return (
         <main>
-            <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-6 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
+            <div className="p-4 bg-skin-white rounded-md md:rounded-lg shadow-card space-y-6 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
                 <div className="flex items-start flex-col gap-4.5">
-                    <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
+                    <h2 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold">
                         User ID
                     </h2>
                     <Input
@@ -92,7 +92,7 @@ const AccountSecurity: NextPage = () => {
                 </div>
                 <div className="flex items-start flex-col gap-4.5">
                     <div className='flex items-center gap-4'>
-                        <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold leading-none">Password</h3>
+                        <h3 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold leading-none">Password</h3>
                         {!showButtons && (
                             <button
                                 onClick={() => setShowButtons(true)}

@@ -30,11 +30,11 @@ const OrdersListingPage: NextPage<{ params: Promise<{ id: string }> }> = async (
     const result = response.data;
 
     return (
-        <main className='px-4 lg:px-9 xl:px-12.5 pt-5 pb-10 flex flex-col gap-6 lg:gap-10'>
+        <main className='px-4 lg:px-9 xl:px-12.5 pt-7.5 pb-10 flex flex-col gap-6 lg:gap-10'>
 
 
             <div className='flex justify-between items-center'>
-                <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>My Order</h1>
+                <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>My Order</h1>
                 {
                     result.order.status === ORDER_STATUS.PENDING && (
                        <OrderPaymentAction orderId={Number(id)} />
@@ -42,13 +42,13 @@ const OrdersListingPage: NextPage<{ params: Promise<{ id: string }> }> = async (
                 }
             </div>
             <section className='flex flex-col gap-4'>
-                <div className='bg-skin-white p-4 shadow-card rounded-14 flex flex-col md:flex-row  items-start'>
+                <div className='bg-skin-white p-4 shadow-card rounded-md md:rounded-lg flex flex-col md:flex-row  items-start'>
                     <OrderDetails data={result.order} referral={result.referral} />              
                     <OrderActions orderId={Number(id)} orderItems={result.order.orderItems} status={result.order.status} />
                 <div className='mt-6 md:mt-0 md:ml-8 flex-shrink-0'>
                 <Link
                     href={ROUTES.REFERRAL}
-                    className="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-skin-accent-500 transition-colors duration-200"
+                    className="inline-block bg-primary px-3 py-1.5 text-h5 text-white font-semibold rounded-md uppercase font-oswald shadow hover:bg-skin-accent-500 transition-colors duration-200"
                 >
                     Refer a Friend
                 </Link>

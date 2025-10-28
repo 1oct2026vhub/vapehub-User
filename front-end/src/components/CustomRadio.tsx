@@ -15,7 +15,7 @@ export const CustomRadio: React.FC<CustomRadioProps> = ({ children, className, .
       classNames={{
         base: cn(
           "flex m-0 mb-2 bg-skin-white items-start",
-          "flex-row cursor-pointer !w-full !max-w-full rounded-lg gap-1 p-2 md:p-3.5 border border-skin-neutral-200",
+          "flex-row cursor-pointer !w-full !max-w-full rounded gap-1 p-2 md:p-3.5 border border-skin-neutral-200",
           "data-[selected=true]:border-skin-primary-500",
           className
         ),

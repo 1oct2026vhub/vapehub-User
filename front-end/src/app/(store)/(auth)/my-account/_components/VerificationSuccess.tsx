@@ -46,7 +46,7 @@ const VerificationSuccess: FunctionComponent<Props> = ({ data }): ReactElement =
                     size="lg"
                     radius="md"
                     color="primary"
-                    className="btn primary-btn shadow-input text-content-1 !font-medium md:!min-w-28 h-11 mx-auto"
+                    className="btn primary-btn shadow-input text-title-1 md:text-2xl w-full h-12 !rounded-md uppercase mx-auto"
                 >
                     Go to Home
                 </Button>

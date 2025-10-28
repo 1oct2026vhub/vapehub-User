@@ -44,7 +44,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
   const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
 
   return (
-    <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
+    <div className="bg-skin-white p-4 rounded-lg shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">
         {/* Product Image */}
         <div className="bg-skin-white p-2 rounded-10 shadow-brand-card min-w-16 md:min-w-36">
@@ -62,13 +62,13 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
 
         <div className="flex flex-col gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 w-full justify-between shrink">
-            <Link href={productUrl} className="cursor-pointer text-wrap text-content-2 md:text-title-2 xl:text-title-1 font-semibold text-skin-neutral-400">
+            <Link href={productUrl} className="cursor-pointer text-wrap text-content-2 md:text-xl font-semibold !font-oswald text-skin-neutral-400">
               {item.name}
             </Link>
 
             {/* Price Section */}
             <div className="text-right">
-              <p className="primary-gradient-100 text-content-2 md:text-title-1 xl:text-h5 font-bold min-w-fit">
+              <p className="primary-gradient-100 text-content-2 md:text-2xl font-semibold !font-oswald min-w-fit">
                 {/* {DEFAULT_CURRENCY_SYMBOL}{(Number(item.price) * item.quantity).toFixed(2)} */}
                 {DEFAULT_CURRENCY_SYMBOL}{item.total.toFixed(2)}
               </p>
@@ -143,7 +143,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
               radius="md"
               color="default"
               variant="bordered"
-              className="!py-2 !px-4 bg-skin-neutral-500 border-skin-white shadow-button text-skin-white !rounded-10 !text-content-2 md:!text-content-1 font-semibold !max-h-9 min-w-fit"
+              className="!py-1 !px-3 bg-skin-neutral-500 border-skin-white shadow-button text-skin-white uppercase !rounded-md !text-content-2 md:!text-content-1 font-semibold min-w-fit"
               onPress={handleAddNow}
               disabled={isLoading}
             >

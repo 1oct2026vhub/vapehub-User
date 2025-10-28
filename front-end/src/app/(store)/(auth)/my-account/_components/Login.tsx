@@ -92,7 +92,7 @@ const Login: FunctionComponent = (): ReactElement => {
                                     variant="light"
                                     isIconOnly
                                     type="button"
-                                    onPress={() => setPwdVisibility(prev => !prev)} startContent={pwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
+                                    onPress={() => setPwdVisibility(prev => !prev)} startContent={pwdVisibility ? <EyeOpenIcon className="z-10 mb-1" /> : <EyeClosedIcon className="z-10 mb-1" />}
                                     className="!p-0 h-fit hover:!bg-transparent"
                                 />
                             }
@@ -108,14 +108,14 @@ const Login: FunctionComponent = (): ReactElement => {
                              isSelected={rememberMeValue}
                             onValueChange={setRememberMe} 
                         >Remember me</Checkbox>
-                        <Link href={ROUTES.FORGOT} className="primary-gradient-100 text-content-1 font-semibold tracking-tight">Forgot Password?</Link>
+                        <Link href={ROUTES.FORGOT} className="primary-gradient-100 text-content-1 font-bold tracking-tight font-oswald">Forgot Password?</Link>
                     </div>
                 </div>
                 <Button
                     size="lg"
                     radius="sm"
                     color="primary"
-                    className="btn primary-btn shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
+                    className="btn primary-btn shadow-input text-title-1 md:text-2xl w-full h-12 !rounded-md uppercase"
                     disabled={signInFromConfig.formState.isSubmitting}
                     isLoading={signInFromConfig.formState.isSubmitting}
                     type="submit"

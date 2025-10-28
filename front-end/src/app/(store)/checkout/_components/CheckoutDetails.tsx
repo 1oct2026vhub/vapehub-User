@@ -249,7 +249,7 @@ const CheckoutDetails: React.FC = () => {
     }, [addresses]);
 
     return (
-        <div className='bg-skin-white p-3.5 sm:p-5 border border-skin-neutral-50 shadow-checkout rounded-14 flex flex-col gap-5 w-full'>
+        <div className='bg-skin-white p-3.5 sm:p-5 border border-skin-neutral-50 shadow-checkout rounded-md flex flex-col gap-5 w-full'>
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
@@ -257,7 +257,7 @@ const CheckoutDetails: React.FC = () => {
                     <div className='space-y-6'>
                         {/* contact info */}
                         <div className='space-y-4 lg:space-y-6'>
-                            <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Enter Contact Info</h2>
+                            <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Enter Contact Info</h2>
                             <div className='space-y-4 w-full'>
                                 <InputForm
                                     control={form.control}
@@ -297,7 +297,7 @@ const CheckoutDetails: React.FC = () => {
                         {/* shipping details */}
                         <div className='space-y-4 lg:space-y-6'>
                             <div className='flex items-center justify-between'>
-                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Shipping Details</h3>
+                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Shipping Details</h3>
                                 {addresses.length > 0 &&
                                     <Button
                                         type="button"
@@ -414,7 +414,7 @@ const CheckoutDetails: React.FC = () => {
 
                         {/* billing details */}
                         <div className='space-y-4 lg:space-y-6'>
-                            <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Billing Details</h3>
+                            <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Billing Details</h3>
                             <div className='flex flex-col space-y-5 w-full'>
                                 <CustomCheckbox
                                     control={form.control}
@@ -516,8 +516,8 @@ const CheckoutDetails: React.FC = () => {
                         {/* shipping methods */}
                         <div className='space-y-4'>
                             <div className='space-y-2'>
-                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Shipping Methods</h3>
-                                <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>Important: Order by 3pm for same day dispatch</p>
+                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Shipping Methods</h3>
+                                <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-semibold'>Important: Order by 3pm for same day dispatch</p>
                             </div>
                             {/* value={form.watch('paymentMethod')}
                             onChange={(e) => form.setValue('paymentMethod', e.target.value as CHECKOUT_PAYMENT_METHODS) */}
@@ -545,7 +545,7 @@ const CheckoutDetails: React.FC = () => {
                                                     £{method.shipping_cost}
                                                 </p>
                                             </div>
-                                            <p className='text-skin-neutral-300 text-content-3 md:text-content-1 font-bold'>
+                                            <p className='text-skin-neutral-300 text-content-3 md:text-content-1 font-semibold'>
                                                 {method.description}
                                             </p>
                                         </div>
@@ -560,7 +560,7 @@ const CheckoutDetails: React.FC = () => {
 
                         {/* never miss out */}
                         <div className='space-y-4'>
-                            <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Never Miss Out</h3>
+                            <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Never Miss Out</h3>
                             <div className='flex flex-col w-full'>
                                 <CustomCheckbox
                                     control={form.control}
@@ -573,8 +573,8 @@ const CheckoutDetails: React.FC = () => {
                         {/* payment information */}
                         <div className='space-y-4 pt-2'>
                             <div className='space-y-2'>
-                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-bold'>Payment Information</h3>
-                                <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-bold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</p>
+                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Payment Information</h3>
+                                <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-semibold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</p>
                             </div>
                             <RadioGroup
                                 defaultValue={CHECKOUT_PAYMENT_METHODS.WORLD_PAY}
@@ -605,7 +605,7 @@ const CheckoutDetails: React.FC = () => {
                         </div>
 
                         <div className='space-y-5'>
-                            <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-bold'>
+                            <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-semibold'>
                                 Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our <a href="#">privacy policy.</a>
                             </p>
                             <div className='space-y-5'>
@@ -613,7 +613,7 @@ const CheckoutDetails: React.FC = () => {
                                     control={form.control}
                                     name="termsAgreement"
                                     label={
-                                        <a href="#" className='inline-block !text-content-2 md:!text-title-2 text-skin-neutral-300 font-bold'>
+                                        <a href="#" className='inline-block !text-content-2 md:!text-title-2 text-skin-neutral-300 font-semibold'>
                                             <span>I have read and agree to the website </span>terms and conditions *
                                         </a>
                                     }
@@ -625,13 +625,13 @@ const CheckoutDetails: React.FC = () => {
                                 size="lg"
                                 radius="md"
                                 color="primary"
-                                className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                className="w-full btn primary-btn shadow-button !text-skin-white !rounded-md text-content-1 md:text-2xl uppercase !py-1.5 !px-3"
                                 isLoading={isProcessing}
 
                             >
                                 Place Order Now
                             </Button>
-                            <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-bold'>We Respect Your Privacy & Information</p>
+                            <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-semibold'>We Respect Your Privacy & Information</p>
                             <div className='flex items-center gap-5 flex-wrap justify-center'>
                                 <a href="" className='primary-gradient-100 text-content-3 md:text-content-1 font-semibold'>Delivery Policy</a>
                                 <a href="" className='primary-gradient-100 text-content-3 md:text-content-1 font-semibold'>Returns Policy</a>

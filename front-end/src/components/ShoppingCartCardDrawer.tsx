@@ -47,13 +47,13 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
 
         <div className="flex flex-col items-start gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 justify-between w-full">
-            <Link href={productUrl} className="text-content-2 md:text-title-2 font-semibold text-skin-neutral-400 md:mr-5">
+            <Link href={productUrl} className="text-content-2 md:text-title-2 font-semibold font-oswald line-clamp-2 text-skin-neutral-400 md:mr-5">
               {item.name}
             </Link>
 
             {/* Price Section */}
             <div className="text-right">
-              <p className="primary-gradient-100 text-content-2 md:text-title-1 font-bold">
+              <p className="primary-gradient-100 text-content-2 md:text-title-1 font-semibold !font-oswald">
                 {DEFAULT_CURRENCY_SYMBOL}{item.total.toFixed(2)}
               </p>
               {item.discount_price && parseFloat(item.discount_price) > 0 && item.total !== item.subtotal && (
@@ -114,8 +114,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
               size="md"
               radius="md"
               color="default"
-              variant="bordered"
-              className="!py-2 !px-4 bg-skin-neutral-500 border-skin-white shadow-button text-skin-white !rounded-10 !text-content-2 md:!text-content-1 font-semibold !max-h-9 min-w-fit"
+              className="!py-1.5 !px-3 bg-skin-neutral-500 shadow-button text-skin-white !rounded !text-content-2 md:!text-content-1 font-semibold !max-h-9 min-w-fit"
               onPress={handleAddNow}
               disabled={isLoading}
             >

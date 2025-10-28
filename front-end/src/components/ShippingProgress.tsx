@@ -23,9 +23,9 @@ const ShippingProgress: React.FC = () => {
         <Progress
             classNames={{
                 base: "w-full relative -mt-2",
-                track: "bg-skin-primary-50 rounded-lg md:rounded-xl !h-7 md:!h-[46px]",
+                track: "bg-skin-primary-50 rounded md:rounded-md !h-7 md:!h-[46px]",
                 indicator: "bg-skin-primary-200",
-                label: "!text-content-3 md:!text-title-2 font-semibold text-skin-neutral-500 absolute z-10 left-[50%] top-4 md:top-5 translate-x-[-50%] w-fit whitespace-nowrap",
+                label: "!text-content-3 md:!text-title-2 font-semibold !font-oswald text-skin-neutral-500 absolute z-10 left-[50%] top-4 md:top-5 translate-x-[-50%] w-fit whitespace-nowrap",
             }}
             label={getProgressLabel()}
             radius="sm"

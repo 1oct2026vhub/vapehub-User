@@ -54,7 +54,7 @@ const Footer = async (): AsyncReactElement => {
       </Suspense>
       <div className="px-4 lg:px-10 py-7 md:py-10 flex flex-col md:flex-row items-start justify-between gap-x-7 gap-y-6 md:gap-y-0 max-w-[1520px] mx-auto">
         {/* Left Sections */}
-        <div className="hidden md:grid grid-cols-5 gap-5 lg:gap-8">
+        <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-5 lg:gap-8">
           {sortedFooterMenu.map((section) => (
             <div key={section.id} className="space-y-4 text-skin-white flex flex-col">
               <h6 className="text-title-2 lg:text-h5 font-semibold !capitalize">{section.title}</h6>

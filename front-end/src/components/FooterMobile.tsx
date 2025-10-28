@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { FooterMenu } from '@/lib/config/header.config';
 
 const itemClasses = {
-    base: "w-full rounded-lg",
+    base: "w-[45%] rounded-lg !bg-transparent inline-block !shadow-none !px-0",
     title: "text-title-2 lg:text-title-1 font-semibold uppercase text-skin-white",
     trigger: '',
     indicator: "text-medium text-skin-neutral-50 data-[open=true]:rotate-180",
@@ -41,10 +41,10 @@ const FooterMobile: React.FC<Props> = ({ footerMenu }) => {
     return (
         <>
             <Accordion 
-                variant='light' 
-                className="!px-0" 
+                variant='splitted' 
+                className="!px-0 flex flex-wrap items-start !flex-row !gap-3" 
                 itemClasses={itemClasses} 
-                selectionMode='multiple'
+                selectionMode='single'
             >
                 {items.map((item) => (
                     <AccordionItem

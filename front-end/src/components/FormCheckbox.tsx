@@ -21,7 +21,7 @@ const CustomCheckbox = <T extends FieldValues>({ label, control, name }: CustomC
           classNames={{
             base: "!py-0",
             wrapper: "after:bg-primary-gradient-100",
-            label: "!text-content-2 md:!text-title-2 text-skin-neutral-300 font-bold pointer-events-none",
+            label: "!text-content-2 md:!text-title-2 text-skin-neutral-300 font-semibold pointer-events-none",
             icon: "pointer-events-none",
           }}
         >

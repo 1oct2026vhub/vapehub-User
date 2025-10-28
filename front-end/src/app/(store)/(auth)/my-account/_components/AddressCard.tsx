@@ -46,7 +46,7 @@ const AddressCard: React.FC<AddressCardProps> = ({ address }) => {
 
   return (
     <>
-      <div className='bg-skin-white p-3.5 flex items-start justify-between gap-2 border border-skin-neutral-200 rounded-10 shadow-base'>
+      <div className='bg-skin-white p-3.5 flex items-start justify-between gap-2 border border-skin-neutral-200 rounded shadow-base'>
         <div className='space-y-1.5'>
           <h3 className='text-content-1 md:text-title-2 font-bold text-skin-neutral-500 capitalize'>
             {address.name} {address.last_name}

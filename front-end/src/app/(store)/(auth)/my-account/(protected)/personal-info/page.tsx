@@ -113,9 +113,9 @@ const PersonalInfo: NextPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Column - Personal Information */}
                 <div className="lg:col-span-2">
-                    <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-4.5 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
+                    <div className="p-4 bg-skin-white rounded-md md:rounded-lg shadow-card space-y-4.5 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
                         <div className='flex items-center gap-4'>
-                            <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold leading-none">Personal Information</h2>
+                            <h2 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold leading-none">Personal Information</h2>
                             {!showButtons && (
                                 <button
                                     onClick={() => setShowButtons(true)}
@@ -129,7 +129,7 @@ const PersonalInfo: NextPage = () => {
                             <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='space-y-4 md:space-y-6'>
                                 {/* First Name */}
                                 <div className='space-y-3 md:space-y-4.5'>
-                                    <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">First Name<span className="text-red-500"> *</span></h3>
+                                    <h3 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold">First Name<span className="text-red-500"> *</span></h3>
                                     <InputField
                                         control={form.control}
                                         name='first_name'
@@ -141,7 +141,7 @@ const PersonalInfo: NextPage = () => {
 
                                 {/* Last Name */}
                                 <div className='space-y-3 md:space-y-4.5'>
-                                    <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Last Name<span className="text-red-500"> *</span></h3>
+                                    <h3 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold">Last Name<span className="text-red-500"> *</span></h3>
                                     <InputField
                                         control={form.control}
                                         name='last_name'
@@ -153,7 +153,7 @@ const PersonalInfo: NextPage = () => {
 
                                 {/* Email */}
                                 <div className='space-y-3 md:space-y-4.5'>
-                                    <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Email</h3>
+                                    <h3 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold">Email</h3>
                                     <InputField
                                         control={form.control}
                                         name='email'
@@ -165,7 +165,7 @@ const PersonalInfo: NextPage = () => {
 
                                 {/* Mobile Number */}
                                 <div className='space-y-3 md:space-y-4.5'>
-                                    <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
+                                    <h3 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold">
                                         Mobile Number<span className="text-red-500"> *</span>
                                     </h3>
                                     <InputField

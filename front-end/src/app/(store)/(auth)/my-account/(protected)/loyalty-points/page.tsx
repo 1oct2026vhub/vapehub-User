@@ -26,9 +26,9 @@ const LoyaltyPointsPage = async () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">Loyalty Points</h2>
+      <h2 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold">Loyalty Points</h2>
       <LoyaltyPoints data={loyaltyPointsData} />
-        <div className="flex md:hidden bg-skin-white p-4 rounded-14 shadow-card w-full mt-4 items-center justify-center">
+        <div className="flex md:hidden bg-skin-white p-4 rounded-md md:rounded-lg shadow-card w-full mt-4 items-center justify-center">
                 <LogoutButton className="mt-auto red-gradient-100 px-4 py-3 text-content-1 bg-skin-white font-semibold" />
         </div>
     </div>

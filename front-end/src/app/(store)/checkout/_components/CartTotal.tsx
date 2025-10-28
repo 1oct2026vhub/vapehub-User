@@ -25,8 +25,8 @@ const CartTotal: React.FC = () => {
     useEffect(() => {
         if (itemCount === 0) {
             // Reset loyalty points when cart becomes empty
-            setLoyaltyRedemption(prev => ({ 
-                ...prev, 
+            setLoyaltyRedemption(prev => ({
+                ...prev,
                 isRedeemed: false,
                 discountValue: 0,
                 message: null
@@ -44,8 +44,8 @@ const CartTotal: React.FC = () => {
         const response = await applyCoupon(payload);
         if (response.status === ServerActionStatus.SUCCESS && response.data) {
             const discountAmount = checked ? (cartTotal - response.data.total) : 0;
-            setLoyaltyRedemption(prev => ({ 
-                ...prev, 
+            setLoyaltyRedemption(prev => ({
+                ...prev,
                 isRedeemed: checked,
                 discountValue: discountAmount,
                 message: checked ? 'Loyalty points applied' : null
@@ -61,15 +61,15 @@ const CartTotal: React.FC = () => {
 
     const getRedemptionLabel = () => {
         if (!loyaltyPoints) return "";
-    
+
         const { minimum_points_required, user_points, redemption_amount, redemption_type } = loyaltyPoints;
         const pointsPrefix = `You're eligible to use ${minimum_points_required} of your ${user_points} loyalty points to get`;
-    
+
         if (redemption_type === 'percentage') {
-          const discountAmount = (Number(redemption_amount) / 100) * cartTotal;
+            const discountAmount = (Number(redemption_amount) / 100) * cartTotal;
             return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${discountAmount.toFixed(2)} discount`;
         }
-        
+
         return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${Number(redemption_amount).toFixed(2)} discount`;
     }
 
@@ -85,8 +85,8 @@ const CartTotal: React.FC = () => {
     const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
     console.log("loyaltyPoints", loyaltyPoints);
     return (
-        <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded-14 w-full'>
-            <h3 className='primary-gradient-600 text-title-2 md:text-h5 font-bold w-fit'>Cart Total</h3>
+        <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded w-full shadow-checkout'>
+            <h3 className='primary-gradient-600 text-title-2 md:text-2xl font-semibold w-fit'>Cart Total</h3>
             <div className='flex flex-col gap-3'>
                 {!isRedeemed && (
                     <CouponForm
@@ -101,22 +101,22 @@ const CartTotal: React.FC = () => {
                     />
                 )}
                 {couponDiscount.isApplied && couponDiscount.code && (
-                  <div>
-                    <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
-                        <div className='flex flex-col'>
-                        <p>{couponDiscount.message}</p>
-                        <p>Coupon: {couponDiscount.code}</p>
+                    <div>
+                        <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
+                            <div className='flex flex-col'>
+                                <p>{couponDiscount.message}</p>
+                                <p>Coupon: {couponDiscount.code}</p>
+                            </div>
+                            <div className='flex items-center'>
+                                <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
+                                <button
+                                    className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
+                                    onClick={handleRemoveDiscount}
+                                >
+                                    [Remove]
+                                </button>
+                            </div>
                         </div>
-                        <div className='flex items-center'>
-                        <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
-                        <button
-                            className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
-                            onClick={handleRemoveDiscount}
-                        >
-                            [Remove]
-                        </button>
-                        </div>
-                    </div>
                     </div>
                 )}
                 {couponDiscount.mailSubscriptionData && couponDiscount.mailSubscriptionData.isDiscountUsed === false && (
@@ -124,17 +124,17 @@ const CartTotal: React.FC = () => {
                         Subscription discount applied with coupon.
                     </p>
                 )}
-                 {isRedeemed && (
+                {isRedeemed && (
                     <div className='flex items-center justify-between text-green-600 text-content-3 md:text-content-1 font-bold'>
                         <p>{loyaltyMessage}</p>
                         <div className='flex items-center'>
-                        <p>-{DEFAULT_CURRENCY_SYMBOL} {loyaltyDiscountValue.toFixed(2)}</p>
-                        <button
-                            className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
-                            onClick={handleRemoveDiscount}
-                        >
-                            [Remove]
-                        </button>
+                            <p>-{DEFAULT_CURRENCY_SYMBOL} {loyaltyDiscountValue.toFixed(2)}</p>
+                            <button
+                                className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
+                                onClick={handleRemoveDiscount}
+                            >
+                                [Remove]
+                            </button>
                         </div>
                     </div>
                 )}
@@ -149,25 +149,25 @@ const CartTotal: React.FC = () => {
                 )}
                 <Divider className='border-2' />
                 <div className='space-y-1.5'>
-                    <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
-                        <p className='text-skin-neutral-500'>Number of Items</p>
+                    <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
+                        <p className='text-skin-neutral-500 !font-oswald'>Number of Items</p>
                         <p className='text-skin-neutral-300'>{itemCount}</p>
                     </div>
-                    <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
-                    <p className='text-skin-neutral-500'>Shipping Cost</p>
+                    <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
+                        <p className='text-skin-neutral-500 !font-oswald'>Shipping Cost</p>
                         <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{shippingCost.toFixed(2)}</p>
                     </div>
-                    <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
-                        <p className='text-skin-neutral-500'>Subtotal</p>
+                    <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
+                        <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
                         <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
                     </div>
                 </div>
-                <Divider className='border-2'/>
+                <Divider className='border-2' />
                 <ShippingProgress />
-                <Divider className='border-2'/>
-                <div className='flex items-center justify-between text-black font-semibold'>
-                    <p className='text-content-2 md:text-title-1'>Total</p>
-                    <p className='text-title-2 md:text-h5'>{DEFAULT_CURRENCY_SYMBOL}{total.toFixed(2)}</p>
+                <Divider className='border-2' />
+                <div className='flex items-center justify-between text-black font-bold'>
+                    <p className='text-title-2 md:text-2xl !font-oswald'>Total</p>
+                    <p className='text-title-2 md:text-2xl !font-oswald'>{DEFAULT_CURRENCY_SYMBOL}{total.toFixed(2)}</p>
                 </div>
             </div>
         </div>

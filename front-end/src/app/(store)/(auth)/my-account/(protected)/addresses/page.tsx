@@ -50,10 +50,10 @@ const AddressesContent: React.FC = () => {
       {/* Google Maps API Script - Loaded only on this page */}
       <GoogleMapsScript />
       
-      <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-4.5 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
+      <div className="p-4 bg-skin-white rounded-md md:rounded-lg shadow-card space-y-4.5 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold leading-none">
+          <h2 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold leading-none">
             Manage Addresses
           </h2>
 

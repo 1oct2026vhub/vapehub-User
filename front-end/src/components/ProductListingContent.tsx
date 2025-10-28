@@ -23,7 +23,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
-                <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>{data.name}</h1>
+                <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name}</h1>
                 {(dynamicPageSlug?.deals_text || dealsToDisplay?.length) && (
                     <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">
                         <p>

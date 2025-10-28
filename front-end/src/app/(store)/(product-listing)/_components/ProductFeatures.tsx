@@ -58,9 +58,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
     <div className="feature-card w-full flex basis-[1/6] min-h-24 md:max-w-xs">
         
         <NoImage src={imageSrc} alt={altText} width={58} height={58} />
-        <div className="text-content-2 md:text-title-2 xl:text-title-1 text-center">
-            <h4 className="font-semibold text-skin-neutral-400 capitalize">{title}</h4>
-            <h5 className="font-bold text-skin-primary-400">{subtitle}</h5>
+        <div className="text-center">
+            <h4 className="font-semibold text-content-2 md:text-h5 text-skin-neutral-500 capitalize">{title}</h4>
+            <p className="font-seminbold text-skin-primary-400 text-content-4 md:text-title-2 ">{subtitle}</p>
         </div>
     </div>
 );

@@ -48,7 +48,7 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
   return (
     <main>
       {/* Rewards Section */}
-      <div className="p-4 mb-6 bg-gradient-to-r from-skin-accent-50 to-skin-white rounded-14 shadow-card flex flex-col md:flex-row md:items-center md:justify-between border border-skin-neutral-50">
+      <div className="p-4 mb-6 bg-gradient-to-r from-skin-accent-50 to-skin-white rounded-md md:rounded-lg shadow-card flex flex-col md:flex-row md:items-center md:justify-between border border-skin-neutral-50">
         <MyReferrals
           referralMethods={data?.referral_methods || []}
           coupons={data?.referred_coupon_code || null}
@@ -61,15 +61,15 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
         <div className="mt-6 md:mt-0 md:ml-8 flex-shrink-0">
           <Link
             href={ROUTES.REFERRAL}
-            className="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-skin-accent-500 transition-colors duration-200"
+            className="inline-block px-3 py-1.5 text-h5 bg-primary text-white font-semibold rounded uppercase font-oswald shadow hover:opacity-90 transition-colors duration-200"
           >
             Refer a Friend
           </Link>
         </div>
       </div>
       {/* Referrals List */}
-      <div className="p-4 bg-skin-white rounded-14 shadow-card space-y-6 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
-        <h2 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
+      <div className="p-4 bg-skin-white rounded-md md:rounded-lg shadow-card space-y-6 w-full h-full md:min-h-[670px] border border-skin-neutral-50">
+        <h2 className="text-title-2 md:text-xl text-skin-neutral-400 font-semibold">
           My Referrals
         </h2>
         {loading ? (

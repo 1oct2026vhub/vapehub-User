@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
-import { Chip, Divider } from '@nextui-org/react'
+import { Divider } from '@nextui-org/react'
 // import Image from 'next/image'
 import BundleProductCard from '@/components/BundleProductCard'
 import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant } from '@/lib/config/product.config'
@@ -150,24 +150,24 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     };
 
 
-  const handleBlur = () => {
-    // Reset to current quantity if input is invalid
-    const numValue = parseInt(inputValue);
-    if (isNaN(numValue) || numValue < minQuantity || numValue > stock) {
-      setInputValue(quantity.toString());
-      setError(null);
-    }
-  };
+    const handleBlur = () => {
+        // Reset to current quantity if input is invalid
+        const numValue = parseInt(inputValue);
+        if (isNaN(numValue) || numValue < minQuantity || numValue > stock) {
+            setInputValue(quantity.toString());
+            setError(null);
+        }
+    };
 
     const handleQuantityChange = (newQuantity: number) => {
         if (!cartEntity) return;
         if (newQuantity < minQuantity) {
             setError(`Minimum quantity is ${minQuantity}`);
             return;
-          }
-          setError(null);
-          setQuantity(newQuantity);
-          setInputValue(newQuantity.toString());
+        }
+        setError(null);
+        setQuantity(newQuantity);
+        setInputValue(newQuantity.toString());
 
     };
 
@@ -239,16 +239,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
         }
     };
     return (
-        <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-2xl border border-skin-neutral-50 shadow-card flex flex-col gap-4'>
+        <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 {/* Title section mobile */}
                 <div className='space-y-2 lg:hidden'>
-                    <h1 className='text-title-1 md:text-h5 text-skin-neutral-500 font-bold'>{product?.name}</h1>
-                    <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
+                    <h1 className='text-h4 text-skin-neutral-500 font-semibold'>{product?.name}</h1>
+                    <div className='block text-content-1 text-skin-neutral-500 w-fit'>
                         Brand:
                         {product?.product_brands?.map((brand, index) => (
                             <React.Fragment key={brand.id}>
-                                <Link href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>
+                                <Link href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 hover:underline ml-1'>
                                     {brand.name}
                                 </Link>
                                 {index < product.product_brands.length - 1 && <span className="ml-1">, </span>}
@@ -264,19 +264,19 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                                 return <RatingStarEmpty key={`rating-empty-${i}-${Date.now()}`} className='w-4 h-4 md:w-5 md:h-5' />;
                             })}
                         </div>
-                        <p className="text-title-2 xl:text-lg text-black font-bold mt-1">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
+                        <p className="text-content-2 sm:text-lg text-black font-bold mt-1">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
                     </div>
                 </div>
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit'>
-                    <div className='bg-skin-white border border-[#A6AAA9] rounded-10 relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
+                    <div className='bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
                         <CustomImageMagnifier
                             src={mainImage?.url || ''}
                             alt={product?.name || ''}
                             width={320}
                             height={396}
-                            className='aspect-square'
+                            className='aspect-square  mix-blend-multiply'
                             zoomLevel={2}
                         />
 
@@ -298,15 +298,15 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                                         <Button
                                             onPress={() => setMainImage(image)}
                                             isIconOnly
-                                            className={`p-0 w-[118px] h-[111px] flex items-center justify-center bg-transparent ${mainImage?.id === image.id ? 'ring-2 ring-skin-primary2-500' : ''
+                                            className={`p-0 w-[118px] h-[111px] flex items-center !rounded justify-center bg-transparent ${mainImage?.id === image.id ? 'ring-2 ring-skin-primary2-500' : ''
                                                 }`}
                                         >
                                             <NoImage
                                                 src={image?.url}
                                                 alt={`product ${index}`}
-                                                width={118}
-                                                height={111}
-                                                className={`lg:max-w-max cursor-pointer rounded-lg shadow-brand-card shrink border `}
+                                                width={110}
+                                                height={100}
+                                                className={`lg:max-w-max cursor-pointer object-contain rounded shadow-brand-card shrink border border-skin-neutral-100 mix-blend-multiply`}
                                             />
                                         </Button>
 
@@ -321,12 +321,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                 <div className='flex flex-col gap-4.5 lg:gap-5 w-full'>
                     <div className='space-y-3.5 hidden lg:block'>
 
-                        <h1 className='text-h5 xl:text-h4 text-skin-neutral-500 font-bold mr-8'>{productName}</h1>
-                        <div className='block text-content-2 text-skin-neutral-500 font-semibold w-fit'>
+                        <h1 className='text-h2 text-skin-neutral-500 font-semibold mr-8'>{productName}</h1>
+                        <div className='block text-content-1 text-skin-neutral-500 w-fit'>
                             Brand:
                             {product?.product_brands?.map((brand, index) => (
                                 <React.Fragment key={brand.id}>
-                                    <Link href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block font-bold text-skin-primary2-500 underline'>
+                                    <Link href={ROUTES.BRAND.replace(':slug', brand.slug ?? "")} className='inline-block text-skin-primary2-500 hover:underline ml-1'>
                                         {brand.name}
                                     </Link>
                                     {index < product.product_brands.length - 1 && <span className="ml-1">, </span>}
@@ -345,22 +345,19 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
                         </div>
                     </div>
-                    <div className='flex items-center gap-2 font-bold text-skin-neutral-500'>
-                        <p className='text-title-1 md:text-h5 xl:text-h4'>{DEFAULT_CURRENCY_SYMBOL}{effectivePrice}</p>
+                    <div className='flex items-center justify-between gap-2 text-skin-neutral-500'>
+                        <p className='text-xl md:text-h5 !font-oswald font-bold'>{DEFAULT_CURRENCY_SYMBOL}{effectivePrice}</p>
                         {mixAndMatchDeal && (
                             <>
-                                <p className='text-content-2 md:text-title-2 cursor-default'>or Mix & Match</p>
-                                <Chip
+                                <Button
                                     size="sm"
                                     radius="md"
-                                    classNames={{
-                                        base: "btn primary-btn w-fit cursor-default !min-w-fit text-content-2 md:text-content-1 !leading-none !tap-highlight-transparent !h-5 md:!h-8 xl:!h-9 !px-1.5 !py-1 md:!px-4 md:!py-2",
-                                        content: "text-white"
-                                    }}
+                                    className="btn primary-btn w-fit gap-1 cursor-pointer !min-w-fit text-content-1 md:text-title-1 !leading-none !font-bold !font-oswald uppercase !tap-highlight-transparent !px-1.5 !py-1 md:!px-4 md:!py-2 text-white"
                                 >
-                                  {mixAndMatchDeal?.name}
+                                     <span className='mr-0.5'>MIX & MATCH</span>
+                                    {mixAndMatchDeal?.name}
                                     {/* {`${mixAndMatchDeal.required_qty} for ${DEFAULT_CURRENCY_SYMBOL}${Number(mixAndMatchDeal.fixed_price).toFixed(0)}`} */}
-                                </Chip>
+                                </Button>
                             </>
                         )}
                     </div>
@@ -370,21 +367,21 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     <div className='space-y-4 max-md:order-4'>
                         <div className='bg-skin-white border border-skin-neutral-100 rounded-xl shadow-product-offer p-3.5 space-y-2.5'>
                             <div className='flex gap-1 items-center'>
-                                <DispatchIcon />
-                                <p className='text-content-2 md:text-content-1 font-bold red-gradient-100'>Same day dispatch for orders before 3pm!</p>
+                                <DispatchIcon className='min-w-6'/>
+                                <p className='text-content-2 md:text-content-1 font-semibold red-gradient-100'>Same day dispatch for orders before 3pm!</p>
                             </div>
                             {product?.loyaltySettings && product.loyaltySettings.status && product.loyaltySettings.points_value > 0 && (
                                 <div className='flex gap-1 items-center'>
-                                    <BenefitIcon />
-                                    <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-500'>
+                                    <BenefitIcon className='min-w-6' />
+                                    <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-500'>
                                         Earn at least {product.loyaltySettings.points_value} loyalty points with this purchase!
                                     </p>
                                 </div>
                             )}
                             {mixAndMatchDeal && (
                                 <div className='flex gap-1 items-center'>
-                                    <DealsIcon />
-                                    <p className='text-content-2 md:text-content-1 font-bold text-skin-neutral-500'>{`Choose ${mixAndMatchDeal.required_qty} for ${DEFAULT_CURRENCY_SYMBOL}${Number(mixAndMatchDeal.fixed_price).toFixed(0)} - Multibuy Deal!`}</p>
+                                    <DealsIcon className='min-w-6' />
+                                    <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-500'>{`Choose ${mixAndMatchDeal.required_qty} for ${DEFAULT_CURRENCY_SYMBOL}${Number(mixAndMatchDeal.fixed_price).toFixed(0)} - Multibuy Deal!`}</p>
                                 </div>
                             )}
                         </div>
@@ -399,21 +396,21 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
-                           cartEntity && ( stock > 0 ?
+                            cartEntity && (stock > 0 ?
                                 <p className='text-content-2 md:text-title-2 font-bold primary-gradient-100'>In stock</p> :
                                 <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>)
                         }
                     </div>
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
                         <div
-                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-10 !font-bold h-12 md:h-[60px]"
+                            className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-md !font-bold h-12"
                         >
                             <Button
                                 isIconOnly
                                 size='lg'
                                 variant='light'
                                 color='primary'
-                                className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
+                                className='text-title-1 leading-none font-medium !rounded-l-10 !rounded-r-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-11'
                                 onPress={() => handleQuantityChange(quantity - 1)}
                                 isDisabled={isAddingToCart || quantity <= 1 || !cartEntity}
                             >
@@ -443,7 +440,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                                 size='lg'
                                 variant='light'
                                 color='primary'
-                                className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-[56px]'
+                                className='text-title-1 leading-none font-medium !rounded-r-10 !rounded-l-none hover:!bg-transparent !px-0 !min-w-fit !w-8 !h-11'
                                 onPress={() => handleQuantityChange(quantity + 1)}
                                 isDisabled={isAddingToCart || quantity >= stock || !cartEntity}
                             >
@@ -457,7 +454,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                             radius="md"
                             color="primary"
                             isLoading={isAddingToCart}
-                            className={`btn primary-btn w-full shadow-input !rounded-10 text-title-1 !leading-none !font-bold h-12 md:h-[60px] ${(isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
                             disabled={isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock}
                         >
@@ -470,7 +467,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             <Divider />
             {bundleProducts.length > 0 && (
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
-                    <h2 className='text-content-1 md:text-title-1 lg:text-h5 font-bold primary-gradient-600 w-fit'>Add more products from this deal and unlock extra savings</h2>
+                    <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>Add more products from this deal and unlock extra savings</h2>
                     <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
                         {bundleProducts?.map((bundleProduct, index) => (
                             <BundleProductCard key={`bundle-${bundleProduct.id}-${index}-${Date.now()}`} product={bundleProduct} />
@@ -479,75 +476,75 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     {isLoadingBundles && (
                         <div className='flex justify-center'><span>Loading...</span></div>
                     )}
-                            {bundlePagination && bundlePagination.total_pages > 1 && bundleProducts.length > 0 && (
-            <div className="flex justify-center items-center gap-1 mt-4">
-                {/* Previous button */}
-                {bundlePagination.has_prev && (
-                    <Button
-                        size="sm"
-                        radius="full"
-                        variant="light"
-                        className="w-7 h-7 min-w-0 px-0 text-xs"
-                        onPress={() => handleBundlePageChange(currentBundlePage - 1)}
-                        disabled={isLoadingBundles}
-                    >
-                        ‹
-                    </Button>
-                )}
+                    {bundlePagination && bundlePagination.total_pages > 1 && bundleProducts.length > 0 && (
+                        <div className="flex justify-center items-center gap-1 mt-4">
+                            {/* Previous button */}
+                            {bundlePagination.has_prev && (
+                                <Button
+                                    size="sm"
+                                    radius="full"
+                                    variant="light"
+                                    className="w-7 h-7 min-w-0 px-0 text-xs"
+                                    onPress={() => handleBundlePageChange(currentBundlePage - 1)}
+                                    disabled={isLoadingBundles}
+                                >
+                                    ‹
+                                </Button>
+                            )}
 
-                {/* Page numbers with dots */}
-                {(() => {
-                    const totalPages = bundlePagination.total_pages;
-                    const current = currentBundlePage;
-                    const pages = [];
+                            {/* Page numbers with dots */}
+                            {(() => {
+                                const totalPages = bundlePagination.total_pages;
+                                const current = currentBundlePage;
+                                const pages = [];
 
-                    if (totalPages <= 5) {
-                        for (let i = 1; i <= totalPages; i++) pages.push(i);
-                    } else {
-                        pages.push(1);
-                        if (current > 3) pages.push('...');
-                        for (let i = Math.max(2, current - 1); i <= Math.min(totalPages - 1, current + 1); i++) {
-                            if (i > 1 && i < totalPages) pages.push(i);
-                        }
-                        if (current < totalPages - 2) pages.push('...');
-                        pages.push(totalPages);
-                    }
+                                if (totalPages <= 5) {
+                                    for (let i = 1; i <= totalPages; i++) pages.push(i);
+                                } else {
+                                    pages.push(1);
+                                    if (current > 3) pages.push('...');
+                                    for (let i = Math.max(2, current - 1); i <= Math.min(totalPages - 1, current + 1); i++) {
+                                        if (i > 1 && i < totalPages) pages.push(i);
+                                    }
+                                    if (current < totalPages - 2) pages.push('...');
+                                    pages.push(totalPages);
+                                }
 
-                    return pages.map((page, idx) =>
-                        page === '...' ? (
-                            <span key={`dots-${idx}-${Date.now()}`} className="text-skin-neutral-400 text-xs px-1">…</span>
-                        ) : (
-                            <Button
-                                key={`page-${page}-${idx}-${Date.now()}`}
-                                size="sm"
-                                radius="full"
-                                variant={page === current ? "solid" : "light"}
-                                color={page === current ? "primary" : "default"}
-                                className={`w-7 h-7 min-w-0 px-0 text-xs font-semibold ${page === current ? '!bg-skin-primary2-500 text-white' : ''}`}
-                                onPress={() => handleBundlePageChange(page as number)}
-                                disabled={isLoadingBundles}
-                            >
-                                {page}
-                            </Button>
-                        )
-                    );
-                })()}
+                                return pages.map((page, idx) =>
+                                    page === '...' ? (
+                                        <span key={`dots-${idx}-${Date.now()}`} className="text-skin-neutral-400 text-xs px-1">…</span>
+                                    ) : (
+                                        <Button
+                                            key={`page-${page}-${idx}-${Date.now()}`}
+                                            size="sm"
+                                            radius="full"
+                                            variant={page === current ? "solid" : "light"}
+                                            color={page === current ? "primary" : "default"}
+                                            className={`w-7 h-7 min-w-0 px-0 text-xs font-semibold ${page === current ? '!bg-skin-primary2-500 text-white' : ''}`}
+                                            onPress={() => handleBundlePageChange(page as number)}
+                                            disabled={isLoadingBundles}
+                                        >
+                                            {page}
+                                        </Button>
+                                    )
+                                );
+                            })()}
 
-                {/* Next button */}
-                {bundlePagination.has_next && (
-                    <Button
-                        size="sm"
-                        radius="full"
-                        variant="light"
-                        className="w-7 h-7 min-w-0 px-0 text-xs"
-                        onPress={() => handleBundlePageChange(currentBundlePage + 1)}
-                        disabled={isLoadingBundles}
-                    >
-                        ›
-                    </Button>
-                )}
-            </div>
-        )}
+                            {/* Next button */}
+                            {bundlePagination.has_next && (
+                                <Button
+                                    size="sm"
+                                    radius="full"
+                                    variant="light"
+                                    className="w-7 h-7 min-w-0 px-0 text-xs"
+                                    onPress={() => handleBundlePageChange(currentBundlePage + 1)}
+                                    disabled={isLoadingBundles}
+                                >
+                                    ›
+                                </Button>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
         </section>

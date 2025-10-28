@@ -61,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             alt={title}
             width={275}
             height={275}
-            className="w-full aspect-square rounded"
+            className="w-full aspect-square rounded mix-blend-multiply"
           />
 
           {totalPuffs && (
@@ -79,9 +79,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }
 
         </div>
-        <div className="flex flex-col space-y-2.5 px-2.5 py-5">
+        <div className="flex flex-col space-y-2.5 px-2.5 py-3 md:py-5">
           <div className="flex flex-col justify-between gap-2.5">
-            <div className='min-h-[45px] xl:min-h-[60px]'>
+            <div className='min-h-[45px] md:min-h-[60px]'>
               <div className="relative">
                 <h4 
                   ref={titleRef}
@@ -133,7 +133,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   size="md"
                   radius="md"
                   color="primary"
-                  className="btn primary-btn shadow-input text-content-2 md:!text-title-2 uppercase line-clamp-1 truncate max-w-26 sm:max-w-30 lg:max-w-36 !min-w-fit h-fit !px-2 !py-1"
+                  className="btn primary-btn shadow-input !text-content-3 md:!text-title-2 uppercase line-clamp-1 truncate max-w-26 sm:max-w-30 lg:max-w-36 !min-w-fit h-fit !px-2 !py-1"
                   onMouseEnter={() => buttonText.length > 16 && setShowTooltip(true)}
                   onMouseLeave={() => setShowTooltip(false)}
                 >

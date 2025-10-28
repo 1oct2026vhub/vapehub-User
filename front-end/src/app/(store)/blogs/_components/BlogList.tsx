@@ -89,16 +89,16 @@ const BlogListView: React.FC<{ selectedId: string }> = ({ selectedId }): ReactEl
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
             <section className="w-full">
-                <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Blogs</h1>
-                <div className='w-full mt-2.5 lg:-mt-16 '>
+                <h1 className='primary-gradient-600 text-h4 md:text-h2 font-semibold w-fit'>Blogs</h1>
+                <div className='w-full mt-2.5 lg:-mt-16'>
                     <Tabs aria-label="Options" selectedKey={selectedTab} onSelectionChange={(e) => handleTabChange(e)}
                         variant='bordered'
                         color='primary'
                         classNames={{
                             base: "w-full",
-                            tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 lg:ml-auto lg:max-w-3xl xl:max-w-5xl ml-auto border border-skin-neutral-100 rounded-xl !bg-skin-base flex whitespace-nowrap",
-                            cursor: "bg-primary-gradient-100 border-none text-skin-white rounded-lg shadow-md",
-                            tab: "rounded-lg max-sm:px-5 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] h-10 border border-skin-primary2-500 text-skin-primary2-500 group-data-[selected=true]:!border-none",
+                            tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 lg:ml-auto lg:max-w-3xl xl:max-w-5xl ml-auto border border-skin-neutral-100 rounded-md !bg-skin-base flex whitespace-nowrap",
+                            cursor: "bg-primary-gradient-100 border-none text-skin-white rounded shadow-md",
+                            tab: "rounded max-sm:px-5 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] h-10 border border-[#035335] text-skin-[#035335] group-data-[selected=true]:!border-none",
                             tabContent: "group-data-[selected=true]:!text-skin-white text-content-2 md:text-title-2 font-semibold leading-none",
                             panel: "!px-0"
                         }}

@@ -80,7 +80,7 @@ const Register: FunctionComponent = (): ReactElement => {
                                     isIconOnly
                                     type="button"
                                     onPress={() => setPwdVisibility(prev => !prev)}
-                                    startContent={pwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
+                                    startContent={pwdVisibility ? <EyeOpenIcon className="z-10 mb-1" /> : <EyeClosedIcon className="z-10 mb-1" />}
                                     className="!p-0 h-fit hover:!bg-transparent"
                                 />
                             }
@@ -102,7 +102,7 @@ const Register: FunctionComponent = (): ReactElement => {
                                     isIconOnly
                                     type="button"
                                     onPress={() => setCPwdVisibility(prev => !prev)}
-                                    startContent={cPwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
+                                    startContent={cPwdVisibility ? <EyeOpenIcon className="z-10 mb-1" /> : <EyeClosedIcon className="z-10 mb-1" />}
                                     className="!p-0 h-fit hover:!bg-transparent"
                                 />
                             }
@@ -138,7 +138,7 @@ const Register: FunctionComponent = (): ReactElement => {
                     radius="sm"
                     color="primary"
                     type="submit"
-                    className="btn primary-btn shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
+                    className="btn primary-btn shadow-input text-title-1 md:text-2xl w-full h-12 !rounded-md uppercase"
                     disabled={signUpFormConfig.formState.isSubmitting}
                     isLoading={signUpFormConfig.formState.isSubmitting}
                 >

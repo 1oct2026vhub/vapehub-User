@@ -46,7 +46,7 @@ const AddressList: FunctionComponent<AddressListProps> = ({ selectedAddressId, o
         >
           {displayedAddresses.map((address) => (
             <CustomRadio key={address.id} value={address.id.toString()}>
-              <div className='bg-skin-white p-3.5 flex items-start justify-between gap-2 border border-skin-neutral-200 rounded-10 shadow-base w-full'>
+              <div className='bg-skin-white p-3.5 flex items-start justify-between gap-2 border border-skin-neutral-200 rounded-md shadow-base w-full'>
                 <div className='space-y-1.5'>
                   <h3 className='text-content-1 md:text-title-2 font-bold text-skin-neutral-500 capitalize'>
                     {address.name} {address.last_name}

@@ -28,9 +28,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
                 />
             )}
         </div>
-        <div className="text-content-2 md:text-title-2 xl:text-title-1 text-center">
-            <h3 className="font-semibold md:text-nowrap text-skin-neutral-400">{title}</h3>
-            <h4 className="font-bold text-skin-primary-400">{subtitle}</h4>
+        <div className="text-center">
+            <h3 className="font-semibold md:text-nowrap text-title-2 md:text-xl text-skin-neutral-500">{title}</h3>
+            <p className="font-semibold text-content-2 md:text-title-2 text-skin-primary-400">{subtitle}</p>
         </div>
     </div>
 );

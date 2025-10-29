@@ -30,7 +30,7 @@ type Props = {
     megaMenuData?: HeaderMegaMenu[];
 }
 
-const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
+const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
         mode: 'onBlur',
@@ -38,7 +38,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
             search: ''
         }
     });
-    
+
     const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
     const router = useRouter();
     const pathname = usePathname();
@@ -82,7 +82,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
         if (data.search) {
             router.push(`${ROUTES.SHOP}?keyword=${data.search}`, { scroll: false });
             setShowSuggestions(false);
-            searchFromConfig.reset({ search: '' });            
+            searchFromConfig.reset({ search: '' });
             // Scroll to top after search
             scrollToTop();
         }
@@ -92,7 +92,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
         if (searchTerm) {
             router.push(`${ROUTES.SHOP}?keyword=${searchTerm}`, { scroll: false });
             setShowSuggestions(false);
-            searchFromConfig.reset({ search: '' });            
+            searchFromConfig.reset({ search: '' });
             // Scroll to top after search
             scrollToTop();
         }
@@ -139,7 +139,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                         </div>
 
                         <div className="flex items-center gap-6 self-stretch">
-                            <NotificationAction  />
+                            <NotificationAction />
                             <Button onPress={onOpen} variant='light' className="flex items-center gap-2 hover:!bg-transparent h-fit">
                                 <ShoppingCartIcon />
                                 <div className="flex flex-col gap-1 text-start">
@@ -167,7 +167,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                     <Logo className="max-w-[174px] max-h-[28px] ml-6" />
                     {!isVerificationPage && (
                         <div className="flex items-center gap-1">
-                            <NotificationAction  />
+                            <NotificationAction />
                             <Link href={ROUTES.MY_ACCOUNT}>
                                 <UserIcon />
                             </Link>
@@ -175,7 +175,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                                 <Button isIconOnly size="sm" aria-label="more than 99 cart items" radius="full" variant="light" className='!min-w-fit !w-fit !h-fit' onPress={onOpen}>
                                     <ShoppingCartIcon />
                                 </Button>
-                            </Badge> 
+                            </Badge>
                         </div>
                     )}
                 </div>
@@ -209,7 +209,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                     {(onClose) => (
                         <>
                             <DrawerHeader className="flex items-center justify-between gap-1 border-b border-skin-neutral-100">
-                                <h1 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h1>
+                                <h1 className='primary-gradient-600 text-xl font-semibold w-fit'>Shopping Cart</h1>
                                 <Button isIconOnly variant='light' onPress={onClose}>
                                     <CloseIcon />
                                 </Button>
@@ -222,9 +222,12 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                                         ))
                                     ) : (
                                         <div className="flex flex-col items-center justify-center gap-4 py-8 my-auto h-full">
-                                            <ShoppingCartIcon className='w-20 h-20' />
+                                            <div className="bg-primary-gradient-100 rounded-lg p-3 relative">
+                                                <ShoppingCartIcon className='w-20 h-20 text-black' />
+                                                <span className="absolute -top-4 -right-3 w-auto min-w-10 h-auto aspect-square bg-skin-primary-300 rounded-full text-title-2 font-semibold text-white flex items-center justify-center">{itemCount}</span>
+                                            </div>
                                             <p className="text-title-2 font-semibold text-skin-neutral-500 italic">Looks like you haven&apos;t added anything yet!</p>
-                                            <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button" onPress={onClose}>
+                                            <Button as={Link} href={ROUTES.SHOP} color="primary" className="shadow-button btn primary-btn uppercase !font-oswald text-title-2 md:text-title-1" onPress={onClose}>
                                                 Continue Shopping
                                             </Button>
                                         </div>
@@ -251,7 +254,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                                             size="lg"
                                             radius="md"
                                             color="primary"
-                                            className="w-full btn primary-btn shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                            className="w-full btn primary-btn shadow-button !text-skin-white !rounded text-title-1 md:text-h5 !font-semibold !py-4 !px-6"
                                             onPress={handleCheckout}
                                             isLoading={stockValidationLoading}
 
@@ -265,7 +268,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                                                 size="lg"
                                                 radius="md"
                                                 color="primary"
-                                                className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                                className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-xl !py-4 !px-6 max-md:!h-9.5"
                                                 onPress={onClose}
                                             >
                                                 Keep Shopping
@@ -276,7 +279,7 @@ const HeaderTopBar = ({  megaMenuData = [] }: Props) => {
                                                 size="lg"
                                                 radius="md"
                                                 color="primary"
-                                                className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-title-1 !py-4 !px-6 max-md:!h-9.5"
+                                                className="w-full bg-skin-neutral-500 shadow-button !text-skin-white !rounded-10 text-content-1 md:text-xl !py-4 !px-6 max-md:!h-9.5"
                                                 onPress={onClose}
                                             >
                                                 View Cart

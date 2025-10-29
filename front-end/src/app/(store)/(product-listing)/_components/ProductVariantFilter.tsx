@@ -26,10 +26,10 @@ const SelectAttributeTerms = ({
     return (
         <>
             <div>
-                <p className='text-content-1 sm:text-title-2 lg:text-title-1 font-semibold text-black capitalize'>
+                <p className='text-content-1 md:text-h5 font-semibold !font-oswald text-black capitalize'>
                     {attributeTerm?.attribute.name}
                 </p>
-                <p className='primary-gradient-100 font-bold text-content-3 md:text-content-1'>
+                <p className='primary-gradient-100 text-content-2 md:text-content-1'>
                     {`${attributeTerm?.terms.length} available`}
                 </p>
             </div>
@@ -37,12 +37,12 @@ const SelectAttributeTerms = ({
                 size='sm'
                 className="w-full"
                 variant='bordered'
-                label="Choose your option"
+                label="Choose your flavour"
                 selectedKeys={selectedTerm ? new Set([selectedTerm]) : undefined}
                 isDisabled={isFiltering}
                 classNames={{
-                    label: "!text-content-1 !text-skin-neutral-500 font-bold",
-                    trigger: "shadow-base border-skin-neutral-100",
+                    label: "!text-content-1 !text-skin-neutral-500 !font-opensans",
+                    trigger: "shadow-base border-skin-neutral-100 !rounded",
                     listboxWrapper: "max-h-[400px]",
                 }}
                 onChange={(e) => {
@@ -101,7 +101,7 @@ const ButtonAttributeTerms = ({
                         }
 
                         }
-                        className={`btn ${finalCurrentTerm === term.slug ? "primary-btn" : "bg-skin-white border-skin-neutral-200"} w-full shadow-base !text-content-1 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold`}
+                        className={`btn ${finalCurrentTerm === term.slug ? "primary-btn" : "bg-skin-white border-skin-neutral-200"} rounded w-full shadow-base !text-content-1 md:!text-title-1 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold`}
                     >
                         {term.name}
                     </Button>

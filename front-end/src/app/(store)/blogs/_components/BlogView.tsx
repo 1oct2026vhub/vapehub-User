@@ -2,7 +2,6 @@
 import BreadCrumbs from "@/components/BreadCrumbs";
 import { BlogBySlugResponse } from "@/lib/config/blog.config";
 import { ROUTES } from "@/lib/routes";
-import Subscription from "../../(dashboard)/_components/Subscription";
 import BlogCard from "@/components/BlogCard";
 import { Card, CardBody } from "@nextui-org/react";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
@@ -22,7 +21,7 @@ const BlogView = ({ data }: BlogViewProps) => {
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10 w-full '>
             <BreadCrumbs items={breadcrumbs} />
-            <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Blogs</h1>
+            <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Blogs</h1>
             <Card classNames={{
                             base: "!bg-transparent border-none shadow-none p-0"
                         }}>
@@ -38,7 +37,6 @@ const BlogView = ({ data }: BlogViewProps) => {
                     )}
                 </CardBody>
             </Card>
-            <Subscription />
         </main>
     );
 };

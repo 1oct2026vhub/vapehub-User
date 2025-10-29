@@ -26,7 +26,7 @@ const ReferFriend: NextPage = async (): Promise<ReactElement> => {
             <BreadCrumbs items={breadcrumbs} />
             <div className="space-y-6">
                 <div className='space-y-4'>
-                    <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Refer a Friend</h1>
+                    <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Refer a Friend</h1>
                     <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">
                         <p>
                             At Vapehub we believe that friends and family should be treated every so often! We have made it super easy for you to treat multiple people with a discount code. What’s great is that in return for you sharing a treat with your friend, we will treat you. So, how does it all work? It’s very straightforward. Firstly, refer multiple people by using the form below. Secondly, your friend(s) shall receive a unique discount code from us. Finally, you will also receive a discount code once your friend shops with us and uses their discount code. By referring multiple friends, you will receive a discount code each time a friend completes a purchase and uses their discount code!

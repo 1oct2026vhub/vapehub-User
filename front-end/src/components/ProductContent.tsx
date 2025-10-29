@@ -105,9 +105,9 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                     onSelectionChange={(key) => setSelectedTab(key as string)}
                     classNames={{
                         base: "mb-5",
-                        tabList: "gap-3 px-5 py-4 mx-auto border border-skin-neutral-100 rounded-xl !bg-skin-base",
-                        cursor: "bg-primary-gradient-100 border-none text-skin-white rounded-lg shadow-md",
-                        tab: "rounded-lg min-w-[124px] h-10 border border-skin-primary2-500 text-skin-primary2-500 group-data-[selected=true]:!border-none",
+                        tabList: "gap-3 px-5 py-4 mx-auto border border-skin-neutral-100 rounded-md !bg-skin-base",
+                        cursor: "bg-primary-gradient-100 border-none text-skin-white rounded shadow-md",
+                        tab: "rounded min-w-[124px] h-10 border border-[#035335] text-[#035335] group-data-[selected=true]:!border-none",
                         tabContent: "group-data-[selected=true]:!text-skin-white text-title-2 leading-none font-semibold",
                     }}
                 >
@@ -118,7 +118,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             <CardBody className='p-0'>
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
-                                        <h3 className='text-title-1 md:text-h5 xl:text-38 font-semibold text-black'>Description</h3>
+                                        <h3 className='text-title-2 md:text-h4 font-semibold text-black'>Description</h3>
                                         <div dangerouslySetInnerHTML={{ __html: product.description }}></div>
                                     </div>
                                     {/* <Divider />

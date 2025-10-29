@@ -39,7 +39,7 @@ const LostPasswordForm: FunctionComponent = (): ReactElement => {
         <div className="auth-form-container">
             <div className="auth-form-wrapper !max-w-[674px]">
                 <div className="space-y-2">
-                    <h1 className="text-22 md:text-h4 font-bold primary-gradient-600">Forgot Password</h1>
+                    <h1 className="text-h5 md:text-h2 font-semibold primary-gradient-600">Forgot Password</h1>
                     <p className="text-content-2 md:text-content-1 text-skin-neutral-300 font-bold">Enter your email and we will send a link to reset your password</p>
                 </div>
                 <Form {...resetPasswordFromConfig}>
@@ -62,7 +62,7 @@ const LostPasswordForm: FunctionComponent = (): ReactElement => {
                                 radius="sm"
                                 color="primary"
                                 type="submit"
-                                className="btn primary-btn shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
+                                className="btn primary-btn shadow-input text-title-1 md:text-2xl w-full h-12 !rounded-md uppercase"
                                 isLoading={resetPasswordFromConfig.formState.isSubmitting}
                                 disabled={resetPasswordFromConfig.formState.isSubmitting}
                             >
@@ -77,7 +77,7 @@ const LostPasswordForm: FunctionComponent = (): ReactElement => {
                                     color="primary"
                                     variant="light"
                                     type="button" 
-                                    className="btn primary-gradient-100 hover:shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
+                                    className="btn primary-gradient-100 hover:shadow-input text-title-1 md:text-2xl w-full h-12 font-oswald !rounded-md uppercase"
                                 >
                                     Back
                                 </Button> 

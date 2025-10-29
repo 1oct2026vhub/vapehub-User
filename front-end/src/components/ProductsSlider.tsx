@@ -60,7 +60,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, review
           : (product.review_stats ? product.review_stats.total_reviews : 0);
 
         return (
-          <div key={index} className="px-2 xl:px-5 py-4 first:pl-0">
+          <div key={index} className="px-2 md:px-3 xl:px-5 py-5 first:xl:pl-5">
             <ProductCard
               title={product?.name} 
               imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ""}

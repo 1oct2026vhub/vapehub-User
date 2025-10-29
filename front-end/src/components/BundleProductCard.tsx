@@ -12,18 +12,18 @@ type BundleProductCardProps = {
 const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 	const { name, primary_image, image, price, discount_price, regular_price, slug } = product;
 	const productLink = `/${slug}`;
-	
+
 	// Handle both old and new image structure
 	const imageUrl = image?.image_url || primary_image?.url;
 
 	return (
 		<>
-			<div className="bg-skin-white p-4 rounded-14 shadow-card hidden md:flex items-center justify-between gap-8">
+			<div className="bg-skin-white p-4 rounded-md shadow-card hidden md:flex items-center justify-between gap-8">
 				<div className="flex items-center gap-5 xl:gap-7">
-					<div className="bg-skin-white p-2 rounded-10 shadow-deal-card">
+					<div className="bg-skin-white p-2 rounded-10 shadow-product-card">
 						<Link
 							href={productLink}
-							// className="bg-skin-base border border-skin-neutral-100 rounded p-3 shadow"
+						// className="bg-skin-base border border-skin-neutral-100 rounded p-3 shadow"
 						>
 							<NoImage
 								src={imageUrl}
@@ -35,7 +35,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 					</div>
 					<div className="space-y-8 max-w-lg">
 						<Link href={productLink}>
-							<h3 className="text-lg xl:text-title-1 font-semibold text-skin-neutral-400 mr-10">{name}</h3>
+							<h3 className="text-content-2 xl:text-xl font-semibold text-skin-black mr-10">{name}</h3>
 						</Link>
 						{product.Flavors && product.Flavors.length > 0 && (
 							<Select
@@ -58,7 +58,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 				</div>
 				<div className="space-y-7 text-right">
 					<div>
-						<p className="primary-gradient-100 text-title-1 xl:text-h5 font-bold">
+						<p className="primary-gradient-100 text-title-1 md:text-h5 font-semibold !font-oswald">
 							{DEFAULT_CURRENCY_SYMBOL}
 							{price}
 						</p>
@@ -75,7 +75,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 						size="sm"
 						radius="sm"
 						color="primary"
-						className="btn primary-btn w-full shadow-input !rounded-10 text-content-1 !leading-none"
+						className="btn primary-btn w-full !min-w-fit !px-3 !py-1.5 shadow-input !rounded uppercase font-oswald text-content-1 md:text-title-1 !leading-none"
 					>
 						View Product
 					</Button>
@@ -83,27 +83,27 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 			</div>
 
 			{/* Mobile Card */}
-			<div className="bg-skin-white p-2.5 w-full rounded-xl flex flex-col gap-2.5 md:hidden border border-skin-neutral-100">
-				<div className="space-y-2 flex flex-col">
-					<Link
-						href={productLink}
-						className="bg-white border border-skin-primary-100 rounded-lg p-3 shadow-md"
-					>
-						<NoImage
-							src={imageUrl}
-							alt={name}
-							width={104}
-							height={100}
-							className="w-full aspect-square"
-						/>
-					</Link>
+			<div className="bg-skin-white w-full rounded-md flex flex-col gap-2.5 md:hidden shadow-product-card">
+				<Link
+					href={productLink}
+					className="bg-skin-neutral-50 rounded-t-md p-1.5"
+				>
+					<NoImage
+						src={imageUrl}
+						alt={name}
+						width={104}
+						height={100}
+						className="w-full aspect-square mix-blend-multiply"
+					/>
+				</Link>
+				<div className="space-y-2 flex flex-col px-2.5 pb-2.5">
 					<Link href={productLink}>
 						<h4 className="text-content-1 sm:text-content-2 font-semibold text-skin-neutral-400 line-clamp-2 min-h-10">
 							{name}
 						</h4>
 					</Link>
 					<div className="flex items-end gap-2.5">
-						<p className="text-black text-content-1 sm:text-title-2 font-semibold">
+						<p className="text-skin-neutral-500 text-content-1 font-semibold">
 							{DEFAULT_CURRENCY_SYMBOL}
 							{price}
 						</p>
@@ -131,18 +131,19 @@ const BundleProductCard: React.FC<BundleProductCardProps> = ({ product }) => {
 							))}
 						</Select>
 					)}
+					<Divider />
+					<Button
+						as={Link}
+						href={productLink}
+						size="sm"
+						radius="sm"
+						color="primary"
+						className="btn primary-btn w-full shadow-input !rounded uppercase font-oswald text-content-1 !leading-none !h-9"
+					>
+						View Product
+					</Button>
 				</div>
-				<Divider />
-				<Button
-					as={Link}
-					href={productLink}
-					size="sm"
-					radius="sm"
-					color="primary"
-					className="btn primary-btn w-full shadow-input !rounded-10 text-content-1 !leading-none !h-9"
-				>
-					View Product
-				</Button>
+
 			</div>
 		</>
 	);

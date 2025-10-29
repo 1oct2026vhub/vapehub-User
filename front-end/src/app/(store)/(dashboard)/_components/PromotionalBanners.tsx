@@ -25,7 +25,7 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
       height={height}
       priority={priority}
       sizes="80vw"
-      className={`w-full h-full object-fill aspect-video rounded-xl lg:rounded-3xl ${className}`}
+      className={`w-full h-full object-fill aspect-video rounded-md md:rounded-lg ${className}`}
     />
     </Link>
   </>
@@ -56,7 +56,7 @@ const PromotionalBanners: React.FC = async () => {
             width={662}
             height={573}
             priority
-            className='max-h-[573px] rounded-3xl'
+            className='max-h-[573px] rounded-md md:rounded-lg'
           />
         )}
 
@@ -67,7 +67,7 @@ const PromotionalBanners: React.FC = async () => {
               banner={banner}
               width={662}
               height={274}
-              className='max-h-[274px] rounded-3xl'
+              className='max-h-[274px] rounded-md md:rounded-lg'
             />
           ))}
         </div>
@@ -80,7 +80,7 @@ const PromotionalBanners: React.FC = async () => {
             banner={banner}
             width={361}
             height={274}
-            className='max-h-[274px] rounded-3xl'
+            className='max-h-[274px] rounded-md md:rounded-lg'
           />
         ))}
       </section>

@@ -57,7 +57,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
         <div className="auth-form-container">
             <div className="auth-form-wrapper !max-w-[674px]">
                 <div className="space-y-2">
-                    <h1 className="text-22 md:text-h4 font-bold primary-gradient-600">Choose a New Password</h1>
+                    <h1 className="text-h5 md:text-h2 font-semibold primary-gradient-600">Choose a New Password</h1>
                     <p className="text-content-2 md:text-content-1 text-skin-neutral-300 font-bold">Your new password must be different from your previous one.</p>
                 </div>
                 <Form {...changePasswordFormConfig}>
@@ -80,7 +80,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                                         isIconOnly
                                         type="button"
                                         onPress={() => setPwdVisibility(prev => !prev)}
-                                        startContent={pwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
+                                        startContent={pwdVisibility ? <EyeOpenIcon className="z-10 mb-10" /> : <EyeClosedIcon className="z-10 mb-10" />}
                                         className="!p-0 h-fit hover:!bg-transparent"
                                     />
                                 }
@@ -102,7 +102,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                                         isIconOnly
                                         type="button"
                                         onPress={() => setCPwdVisibility(prev => !prev)}
-                                        startContent={cPwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
+                                        startContent={cPwdVisibility ? <EyeOpenIcon className="z-10 mb-10" /> : <EyeClosedIcon className="z-10 mb-10" />}
                                         className="!p-0 h-fit hover:!bg-transparent"
                                     />
                                 }
@@ -114,7 +114,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                                 radius="sm"
                                 color="primary"
                                 type="submit"
-                                className="btn primary-btn shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
+                                className="btn primary-btn shadow-input text-title-1 md:text-2xl w-full h-12 !rounded-md uppercase"
                                 disabled={changePasswordFormConfig.formState.isSubmitting}
                                 isLoading={changePasswordFormConfig.formState.isSubmitting}
                             >
@@ -129,7 +129,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                                 color="primary"
                                 variant="light"
                                 type="button"
-                                className="btn primary-gradient-100 hover:shadow-input text-title-2 md:text-title-1 w-full h-11 md:h-[60px]"
+                                className="btn primary-gradient-100 hover:shadow-input text-title-1 md:text-2xl w-full h-12 !rounded-md uppercase font-oswald"
                             >
                                 Back
                             </Button>

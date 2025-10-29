@@ -54,14 +54,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
   
   return (
     <Link prefetch={false} href={link} className="block">
-      <div className="bg-skin-white border border-skin-neutral-50 rounded-xl flex flex-col gap-4 content-stretch shadow-deal-card-mob xl:shadow-deal-card hover:shadow-xl transition-all duration-300 p-3 md:p-4.5">
-        <div className="relative p-1.5 md:py-6 md:px-3 border-2 border-skin-neutral-100 shadow-input bg-skin-white rounded-10">
+      <div className="bg-skin-white rounded-md flex flex-col content-stretch shadow-product-card hover:shadow-card transition-all duration-300">
+        <div className="relative p-1.5 md:py-6 md:px-3 bg-skin-neutral-50 rounded-t-md">
           <NoImage
             src={imageSrc}
             alt={title}
             width={275}
             height={275}
-            className="w-full aspect-square"
+            className="w-full aspect-square rounded mix-blend-multiply"
           />
 
           {totalPuffs && (
@@ -79,18 +79,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }
 
         </div>
-        <div className="flex flex-col space-y-2.5">
-          <div className="flex flex-col justify-between gap-1">
-            <div className='min-h-[45px] xl:min-h-[60px]'>
+        <div className="flex flex-col space-y-2.5 px-2.5 py-3 md:py-5">
+          <div className="flex flex-col justify-between gap-2.5">
+            <div className='min-h-[45px] md:min-h-[60px]'>
               <div className="relative">
-                <p 
+                <h4 
                   ref={titleRef}
-                  className="text-content-1 md:text-title-2 xl:text-title-1 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8 cursor-pointer"
+                  className="text-title-2 md:text-h5 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8 cursor-pointer"
                   onMouseEnter={() => isTitleTruncated && setShowTitleTooltip(true)}
                   onMouseLeave={() => setShowTitleTooltip(false)}
                 >
                   {title}
-                </p>
+                </h4>
                 {showTitleTooltip && isTitleTruncated && (
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-white text-sm rounded-lg shadow-lg z-50 max-w-xs break-words" style={{ backgroundColor: '#02643E' }}>
                     <div className="whitespace-normal leading-relaxed">
@@ -110,11 +110,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   return <RatingStarEmpty key={i} className='w-3 md:w-4' />;
                 })}
               </div>
-              <p className="text-[8px] md:text-content-3 xl:text-content-2 text-black font-bold mt-0.5">({totalReviews} {totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
+              <p className="text-content-3 md:text-title-2 text-skin-neutral-400 font-semibold mt-0.5">({totalReviews} {totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
             </div>
           </div>
           <div className='flex items-center justify-between'>
-          <p className="text-content-3 md:text-content-2 xl:text-content-1 text-skin-neutral-500 font-bold h-3 md:h-4 xl:h-5">
+          <p className="text-content-3 md:text-content-1 text-skin-neutral-400 font-semibold md:font-bold h-3 md:h-4 xl:h-5">
             {flavors ? `${flavors} ${flavors > 1 ? 'Flavours' : 'Flavour'}` : ''}
           </p>
           <div>
@@ -126,14 +126,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
           <div className="flex items-center justify-between gap-2 min-h-8 self-stretch">
-            <p className="text-content-1 sm:text-title-2 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
+            <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
             {buttonText && (
               <div className="relative">
                 <Button
                   size="md"
                   radius="md"
                   color="primary"
-                  className="btn primary-btn shadow-input !text-content-3 line-clamp-1 truncate max-w-26 sm:max-w-30 lg:max-w-36 !min-w-fit sm:!text-content-2 lg:!text-content-1 !leading-none h-8 sm:max-h-max !px-2 md:!px-4 !py-2"
+                  className="btn primary-btn shadow-input !text-content-3 md:!text-title-2 uppercase line-clamp-1 truncate max-w-26 sm:max-w-30 lg:max-w-36 !min-w-fit h-fit !px-2 !py-1"
                   onMouseEnter={() => buttonText.length > 16 && setShowTooltip(true)}
                   onMouseLeave={() => setShowTooltip(false)}
                 >

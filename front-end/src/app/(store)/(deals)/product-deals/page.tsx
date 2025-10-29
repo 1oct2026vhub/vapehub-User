@@ -28,7 +28,7 @@ const AllDealsPage: NextPage = () => {
             <section className="product-listing-container flex-col py-8">
                 <BreadCrumbs items={breadcrumbs} />
                 <div className='space-y-4 mt-4'>
-                    <h1 className='primary-gradient-600 text-h5 md:text-h3 font-bold w-fit'>Shop a Deal</h1>
+                    <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Shop a Deal</h1>
                     <h2 className="text-content-2 md:text-title-1 text-skin-neutral-300 font-semibold">Fantastic deals, all year round!</h2>
                 </div>
             </section>

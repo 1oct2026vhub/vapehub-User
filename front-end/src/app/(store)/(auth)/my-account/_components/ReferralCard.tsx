@@ -22,7 +22,7 @@ const ReferralCard: React.FC<ReferralCardProps> = ({ referral }) => {
     }; 
 
     return (
-        <div className="bg-skin-white p-4 flex items-start justify-between gap-5 shadow-card rounded-14">
+        <div className="bg-skin-white p-4 flex items-start justify-between gap-5 shadow-card rounded-md md:rounded-lg">
             <div className="space-y-1">
                 <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold capitalize">
                     {referred_user?.name === "null null" ? "Anonymous" : referred_user?.name}

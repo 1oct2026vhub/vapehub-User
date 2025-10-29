@@ -266,7 +266,7 @@ const PaymentSuccessContent = () => {
                         height={200}
                         className="mx-auto aspect-square max-sm:max-w-32"
                     />
-                    <h1 className="mx-auto text-title-2 md:text-title-1 text-skin-neutral-300 font-bold">Puff, Paid, Perfect!</h1>
+                    <h1 className="mx-auto text-title-2 md:text-xl text-skin-neutral-300 font-bold">Puff, Paid, Perfect!</h1>
                     <p className="text-content-2 md:text-content-1 text-center font-bold text-skin-neutral-300 mx-auto max-w-[406px]">
                         Payment completed. Your next puff is on its way.
                     </p>

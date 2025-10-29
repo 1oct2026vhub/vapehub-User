@@ -86,7 +86,7 @@ const HeaderFeatures: React.FC = () => {
                                     <Image src="/images/trustpilot-rating.png" alt="Trustpilot rating" width={140} height={20} className="object-contain" />
                                 </div>
                             ) : (
-                                <span className="font-bold font-oswald text-sm md:text-title-1 text-skin-white">{f.title}</span>
+                                <span className="font-bold font-oswald text-sm md:text-xl text-skin-white">{f.title}</span>
                             )}
                             <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">{f.desc}</span>
                         </div>

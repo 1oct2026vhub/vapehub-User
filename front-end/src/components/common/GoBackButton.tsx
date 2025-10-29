@@ -8,7 +8,7 @@ const GoBackButton = () => {
         router.back();
     }
     return (
-        <Button onPress={handleGoBack} className="btn primary-btn w-full text-center text-title-2 font-semibold">
+        <Button onPress={handleGoBack} className="btn primary-btn w-full text-center text-xl md:text-2xl font-semibold uppercase !h-12">
             Go Back
         </Button>
     );

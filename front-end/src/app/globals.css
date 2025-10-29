@@ -64,13 +64,6 @@
     --border: rgba(242, 242, 242, 1);
   }
 
-  /* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-
 
   body {
     font-synthesis: none;
@@ -297,31 +290,6 @@ input[type='search'] {
   height: auto !important;
 }
 
-/* .section-slider .slick-prev,
-.section-slider .slick-next {
-  @apply top-auto max-[390px]:-bottom-[6.5%] -bottom-[7%] sm:-bottom-[17%] lg:-bottom-[19%] xl:-bottom-[15.5%] !important;
-}
-
-.section-slider .slick-prev {
-  @apply left-[30%] md:left-[35%] lg:left-[36%] xl:left-[42%];
-}
-
-.section-slider .slick-next {
-  @apply right-[30%] md:right-[35%] lg:right-[36%] xl:right-[42%];
-}
-
-.section-slider.products-slider .slick-prev {
-  @apply max-[430px]:left-[19%] left-[22%] sm:left-[28%] md:left-[32%] lg:left-[34%] xl:left-[39%];
-}
-
-.section-slider.products-slider .slick-next {
-  @apply max-[430px]:right-[19%] right-[22%] sm:right-[28%] md:right-[32%] lg:right-[34%] xl:right-[39%];
-} */
-
-/* .section-slider .slick-list {
-  @apply pb-6 md:pb-8 xl:pb-12.5;
-} */
-
 .section-slider .slick-dots li {
   margin: 0px;
 }
@@ -350,48 +318,9 @@ input[type='search'] {
   border-radius: 50%;
 }
 
-/* .section-slider .slick-prev::before,
-.section-slider .slick-next::before {
-  @apply max-sm:w-3 max-sm:h-3
-} */
-
 .slick-slider .slick-list .slick-track {
   transition: transform 1000ms !important;
 }
-
-/* .section-slider.deals-slider .slick-prev,
-.section-slider.deals-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-15.5%] bottom-[-13.5%] sm:bottom-[-15.5%] md:bottom-[-14%] lg:bottom-[-15.5%] xl:bottom-[-15.8%] 2xl:bottom-[-14.5%] !important;
-} */
-
-/* .section-slider.products-slider .slick-prev,
-.section-slider.products-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-8.5%] bottom-[-8%] sm:bottom-[-10.5%] md:bottom-[-9%] lg:bottom-[-10%] xl:bottom-[-10.2%] 2xl:bottom-[-9.6%] !important;
-} */
-
-/* @media screen and (min-width:1890px) {  
-  .section-slider.products-slider .slick-prev,
-  .section-slider.products-slider .slick-next{
-    @apply bottom-[-8%] !important;
-  }
-}
-
-
-.section-slider.products-slider .slick-prev {
-  @apply max-[390px]:left-[16%]
-}
-
-.section-slider.products-slider .slick-next {
-  @apply max-[390px]:right-[16%]
-} */
-
-/* .section-slider.deals-slider .slick-prev {
-  @apply max-[390px]:left-[26%]
-}
-
-.section-slider.deals-slider .slick-next {
-  @apply max-[390px]:right-[26%]
-} */
 
 .quantity {
   @apply w-fit h-4 md:h-6 text-content-3 font-oswald font-semibold uppercase text-skin-white flex justify-start items-center p-1 pr-2 md:px-2;
@@ -431,49 +360,9 @@ input[type='search'] {
   @apply -bottom-2.5 md:-bottom-[14.5px];
 }
 
-/* .section-slider.deals-slider .slick-list {
-  @apply pb-3 md:pb-8 xl:pb-12.5;
-}
-
-.section-slider.products-slider .slick-list {
-  @apply pb-3 md:pb-8 xl:pb-12.5;
-} */
-
-/* .section-slider.testimonial-slider .slick-prev,
-.section-slider.testimonial-slider .slick-next {
-  @apply top-auto bottom-[-16.5%] sm:bottom-[-19%] md:bottom-[-14.5%] lg:bottom-[-19.5%] xl:bottom-[-15.9%] !important;
-}
-
-.section-slider.testimonial-slider .slick-list {
-  @apply pb-3 md:pb-8 xl:pb-12.5;
-}
-
-.section-slider.testimonial-slider .slick-prev {
-  @apply max-[390px]:left-[23%]
-}
-
-.section-slider.testimonial-slider .slick-next {
-  @apply max-[390px]:right-[23%]
-} */
-
 .product-listing-container {
   @apply px-4 lg:px-12.5 py-4.5 lg:py-10 flex gap-4.5 lg:gap-10
 }
-
-/* .section-slider.blogs-slider .slick-prev,
-.section-slider.blogs-slider .slick-next {
-  @apply top-auto max-[390px]:bottom-[-8.5%] bottom-[-9%]  sm:bottom-[-11.7%] md:bottom-[-10%] lg:bottom-[-10.6%] xl:bottom-[-9.6%] !important;
-}
-
-
-.section-slider.blogs-slider .slick-prev {
-  @apply max-[390px]:left-[28%] left-[32%] sm:left-[39%] xl:left-[43%]
-}
-
-.section-slider.blogs-slider .slick-next {
-  @apply max-[390px]:right-[28%] right-[32%] sm:right-[39%] xl:right-[43%]
-} */
-
 
 .filter-drawer button[aria-label="Close"] {
   display: none;
@@ -490,8 +379,6 @@ input[type='search'] {
 }
 
 /* blog details */
-
-
 .blog-details ol {
   @apply list-decimal pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
 }

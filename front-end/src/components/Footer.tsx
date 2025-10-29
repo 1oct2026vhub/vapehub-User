@@ -56,14 +56,14 @@ const Footer = async (): AsyncReactElement => {
         {/* Left Sections */}
         <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-5 lg:gap-8">
           {sortedFooterMenu.map((section) => (
-            <div key={section.id} className="space-y-4 text-skin-white flex flex-col">
+            <div key={section.id} className={`space-y-4 text-skin-white flex flex-col`}>
               <h6 className="text-title-2 lg:text-h5 font-semibold !capitalize">{section.title}</h6>
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.id}>
                     <Link
                       href={link.url}
-                      className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 hover:font-semibold transition-all duration-100 !capitalize"
+                      className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 hover:underline transition-all duration-100 !capitalize"
                     >
                       {link.label}
                     </Link>

@@ -24,7 +24,7 @@ const ReferFriend: React.FC = async () => {
                     size="lg"
                     radius="sm"
                     color="primary"
-                    className="btn primary-btn shadow-input w-fit !min-w-fit text-content-2 md:text-h5 !px-1.5 !py-1 md:!px-3 md:!py-1.5 !rounded font-oswald mt-4 xl:mt-8 uppercase !h-fit"
+                    className="btn primary-btn shadow-input w-fit !min-w-fit text-content-2 md:text-h5 !px-1.5 !py-1 md:!px-3 md:!py-1.5 !rounded font-oswald mt-4 xl:mt-8 uppercase !h-fit md:!h-11"
                     endContent={<RightArrowIcon stroke='#fff' className='w-5.5 h-5.5' />}
                 >
                     Refer Now

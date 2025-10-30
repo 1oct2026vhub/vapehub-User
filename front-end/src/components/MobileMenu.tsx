@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@nextui-org/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Accordion, AccordionItem, Badge, Divider } from '@nextui-org/react';
-import { CloseIcon, DownArrowFilledIcon, MenuIcon, ShoppingCartIcon, UserIcon } from '@/components/Icons';
+import { CloseIcon, DownArrowFilledIcon, MenuCartIcon, MenuIcon, MenuUserIcon } from '@/components/Icons';
 import Logo from './ui/Logo';
 import Link from 'next/link';
 import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
@@ -158,11 +158,11 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             {!isVerificationPage && (
                                 <>
                                     <Link href={ROUTES.MY_ACCOUNT} onClick={handleMenuClose}>
-                                        <UserIcon />
+                                        <MenuUserIcon />
                                     </Link>
                                     <Badge color="default" content={itemCount} shape="circle" variant='faded' className="bg-skin-white border-[#DCDCDC] text-skin-black text-content-2 font-bold">
                                         <Button isIconOnly size="sm" aria-label="more than 99 cart items" radius="full" variant="light" onPress={onCartOpen}>
-                                            <ShoppingCartIcon />
+                                            <MenuCartIcon />
                                         </Button>
                                     </Badge>
                                 </>

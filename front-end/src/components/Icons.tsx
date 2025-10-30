@@ -1446,3 +1446,76 @@ export const LoyaltyIcon = (
     </svg>
   );
 }
+
+export const MenuUserIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="28"
+      height="28"
+      fill="none"
+      viewBox="0 0 28 28"
+      {...props}
+    >
+      <g filter="url(#filter0_d_1191_47366)">
+        <path
+          fill="#000"
+          d="M14 14c3.025 0 5.5-2.475 5.5-5.5S17.025 3 14 3 8.5 5.475 8.5 8.5 10.975 14 14 14m0 2.75c-3.644 0-11 1.856-11 5.5V25h22v-2.75c0-3.644-7.356-5.5-11-5.5"
+        ></path>
+      </g>
+      <defs>
+        <filter
+          id="filter0_d_1191_47366"
+          width="24"
+          height="24"
+          x="2"
+          y="3"
+          colorInterpolationFilters="sRGB"
+          filterUnits="userSpaceOnUse"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood>
+          <feColorMatrix
+            in="SourceAlpha"
+            result="hardAlpha"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+          ></feColorMatrix>
+          <feOffset dy="1"></feOffset>
+          <feGaussianBlur stdDeviation="0.5"></feGaussianBlur>
+          <feComposite in2="hardAlpha" operator="out"></feComposite>
+          <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
+          <feBlend
+            in2="BackgroundImageFix"
+            result="effect1_dropShadow_1191_47366"
+          ></feBlend>
+          <feBlend
+            in="SourceGraphic"
+            in2="effect1_dropShadow_1191_47366"
+            result="shape"
+          ></feBlend>
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
+export const MenuCartIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="22"
+      height="22"
+      fill="none"
+      viewBox="0 0 22 22"
+      {...props}
+    >
+      <path
+        fill="#000"
+        d="M7.582 18.375c1.047 0 1.896.811 1.896 1.811 0 1.001-.849 1.812-1.896 1.812s-1.895-.811-1.895-1.812.848-1.81 1.895-1.811m8.668 0c1.047 0 1.895.811 1.895 1.811 0 1.001-.848 1.812-1.895 1.812s-1.896-.811-1.896-1.812.85-1.81 1.896-1.811m4.614-10.61c.51 0 .9.404.857.88l-.358 4.835c-.119 1.552-1.55 2.826-3.174 2.826H6.143c-1.853 0-3.304-1.522-3.153-3.282l.39-4.503a.86.86 0 0 1 .867-.755zM2.73 0c.78 0 1.539.32 2.07.87.336.361.553.797.661 1.252h13.292c1.917 0 3.38 1.491 3.238 3.323-.032.435-.411.766-.866.766H4.539c-.51 0-.91-.404-.867-.89l.217-2.537a1.14 1.14 0 0 0-.314-.869 1.24 1.24 0 0 0-.878-.362H.813C.368 1.553 0 1.2 0 .776 0 .352.368 0 .813 0z"
+      ></path>
+    </svg>
+  );
+}

@@ -27,11 +27,14 @@ const Dashboard: NextPage = async () => {
   // const referralCode = (await searchParams).referral_code;
    
 
-  // Resolve entity slugs for Big Puff (id: 8) and Nic Salts (id: 13)
+  // Resolve entity slugs for Big Puff (id: 8), Nic Salts (id: 13), and Pod Kits
   const entitySlugsResponse = await getEntitySlugs('order_count');
+    console.log("entities", entitySlugsResponse);
+
   const entities = (entitySlugsResponse.status === ServerActionStatus.SUCCESS ? entitySlugsResponse.data?.entities : undefined) ?? [];
   const bigPuffResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 8)?.slug_relation || 'big-puff-vape-kits';
   const nicSaltsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 13)?.slug_relation || 'nic-salts';
+  const podKitsResolvedSlug = 'pod-kits';
 
   return (
     <main className="px-4 lg:px-12.5 py-4 md:py-[60px] flex flex-col gap-7 md:gap-[60px] w-full max-w-[1520px] mx-auto">
@@ -66,6 +69,14 @@ const Dashboard: NextPage = async () => {
           title="Most Popular Big-Puff Vapes"
           viewAllHref={bigPuffResolvedSlug}
           slug={bigPuffResolvedSlug}
+        />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <MostPopularVapes 
+          title="Most Popular Pod Kits"
+          viewAllHref={podKitsResolvedSlug}
+          slug={podKitsResolvedSlug}
         />
       </Suspense>
 

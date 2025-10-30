@@ -504,9 +504,9 @@ export async function generateMetadata({ params, searchParams }: {
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;
-  if (!metadata) {
-    notFound();
-  }
+  // if (!metadata) {
+  //   notFound();
+  // }
 
   return metadata;
 }

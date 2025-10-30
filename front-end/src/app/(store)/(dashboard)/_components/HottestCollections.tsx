@@ -41,7 +41,7 @@ const HottestCollections: React.FC = async () => {
                 size="lg"
                 radius="sm"
                 color="primary"
-                className="btn primary-btn shadow-input w-fit !min-w-fit !rounded !text-content-2 md:!text-h5 max-md:h-fit !leading-none uppercase font-semibold font-oswald !px-1.5 md:!px-3 !py-1 md:!py-1.5"
+                className="btn primary-btn shadow-input w-fit !min-w-fit !rounded !text-content-2 md:!text-h5 !h-fit md:!h-11 !leading-none uppercase font-semibold font-oswald !px-1.5 md:!px-3 !py-1 md:!py-1.5"
             >
               View All
             </Button>

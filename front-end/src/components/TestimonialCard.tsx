@@ -51,10 +51,10 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
                      
                 </div>
             </div>
-            <h5 className="text-content-1 md:text-title-1 xl:text-h5 text-skin-neutral-500 font-semibold">
+            <h5 className="text-title-2 md:text-2xl text-skin-neutral-500 font-semibold">
                 {name}
             </h5>
-            <p className="text-content-3 md:text-content-1 xl:text-title-1 font-bold text-skin-neutral-300 line-clamp-6 flex-grow">
+            <p className="text-content-3 md:text-title-2 font-bold text-skin-neutral-300 line-clamp-6 flex-grow">
                 {review}
             </p>
         </Link>

@@ -17,7 +17,6 @@ const DealsSlider: React.FC = () => {
         };
         fetchDeals();
     }, []);
-
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {deals.map((deal) => (

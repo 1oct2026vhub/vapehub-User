@@ -118,8 +118,8 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                             <CardBody className='p-0'>
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
-                                        <h3 className='text-title-2 md:text-h4 font-semibold text-black'>Description</h3>
-                                        <div dangerouslySetInnerHTML={{ __html: product.description }}></div>
+                                        <h3 className='text-title-1 md:text-h4 font-semibold text-black ml-0.5'>Description</h3>
+                                        <div className='product-content' dangerouslySetInnerHTML={{ __html: product.description }}></div>
                                     </div>
                                     {/* <Divider />
                                     <div className='space-y-3.5'>

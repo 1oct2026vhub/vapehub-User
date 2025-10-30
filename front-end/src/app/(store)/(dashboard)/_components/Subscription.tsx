@@ -62,7 +62,7 @@ const Subscription: FunctionComponent<SubscriptionProps> = ({ className }): Reac
         <section className={`bg-footer-gradient border-b border-skin-primary-300 px-4 py-7.5 md:px-10 ${className}`}>
             <div className='space-y-5 lg:space-y-7.5 flex flex-col items-center'>
                 <div className='space-y-2 text-center'>
-                    <h3 className='!text-skin-white text-h5 md:text-h1 xl:text-[60px] font-semibold'>
+                    <h3 className='!text-skin-white text-h4 md:text-h3 font-semibold'>
                         <span>{formatDiscount()}</span>
                         <span> off, especially for you</span>
                     </h3>

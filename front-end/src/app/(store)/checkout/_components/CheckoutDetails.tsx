@@ -633,10 +633,10 @@ const CheckoutDetails: React.FC = () => {
                             </Button>
                             <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-semibold'>We Respect Your Privacy & Information</p>
                             <div className='flex items-center gap-5 flex-wrap justify-center'>
-                                <a href="" className='primary-gradient-100 text-content-3 md:text-content-1 font-semibold'>Delivery Policy</a>
-                                <a href="" className='primary-gradient-100 text-content-3 md:text-content-1 font-semibold'>Returns Policy</a>
-                                <a href="" className='primary-gradient-100 text-content-3 md:text-content-1 font-semibold'>Privacy Policy</a>
-                                <a href="" className='primary-gradient-100 text-content-3 md:text-content-1 font-semibold'>Terms of Service</a>
+                                <a href="" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Delivery Policy</a>
+                                <a href="" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Returns Policy</a>
+                                <a href="" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Privacy Policy</a>
+                                <a href="" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Terms of Service</a>
                             </div>
                         </div>
                     </div>

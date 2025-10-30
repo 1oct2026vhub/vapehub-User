@@ -39,7 +39,7 @@ const MyAccountTab: FunctionComponent = (): ReactElement => {
                     size="lg"
                     radius="sm"
                     color="primary"
-                    className={`btn text-title-2 md:text-22 max-md:h-10 ${isLogin ? "primary-btn shadow-input" : "primary-outline-btn"}`}
+                    className={`btn text-title-1 md:text-2xl max-md:h-10 ${isLogin ? "primary-btn shadow-input" : "primary-outline-btn"}`}
                     onPress={() => setLogin(true)}
 
                 >
@@ -49,7 +49,7 @@ const MyAccountTab: FunctionComponent = (): ReactElement => {
                     size="lg"
                     radius="sm"
                     color="primary"
-                    className={`btn text-title-2 md:text-22 max-md:h-10 ${!isLogin ? "primary-btn shadow-input" : "primary-outline-btn"}`}
+                    className={`btn text-title-1 md:text-2xl max-md:h-10 ${!isLogin ? "primary-btn shadow-input" : "primary-outline-btn"}`}
                     onPress={() => setLogin(false)}
                 >
                     Register

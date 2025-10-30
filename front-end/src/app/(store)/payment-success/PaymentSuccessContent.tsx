@@ -301,7 +301,7 @@ const PaymentSuccessContent = () => {
                     size="lg"
                     radius="md"
                     color="primary"
-                    className="btn primary-btn shadow-input text-content-1 !font-medium h-11 mx-auto"
+                    className="btn primary-btn shadow-input text-content-1 !font-semibold !font-oswald h-11 mx-auto"
                 >
                     View Orders
                 </Button>

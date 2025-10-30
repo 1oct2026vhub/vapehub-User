@@ -109,7 +109,7 @@ const Register: FunctionComponent = (): ReactElement => {
                         />
                     </div>
 
-                    <div className="text-content-1 text-skin-neutral-300 font-bold">
+                    <div className="text-content-1 md:text-title-2 text-skin-neutral-300 font-semibold md:font-bold">
                         <p>A link to set a new password will be sent to your email address.</p>
                         <p>Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our <a href="#" className="hover:underline">privacy policy.</a></p>
                     </div>

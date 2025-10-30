@@ -6,16 +6,15 @@ import Link from 'next/link';
 import { FooterMenu } from '@/lib/config/header.config';
 
 const itemClasses = {
-    base: "w-[45%] rounded-lg !bg-transparent inline-block !shadow-none !px-0",
+    base: "w-full rounded-lg !bg-transparent !shadow-none !px-0",
     title: "text-title-2 lg:text-title-1 font-semibold uppercase text-skin-white",
-    trigger: '',
+    trigger: '!py-2',
     indicator: "text-medium text-skin-neutral-50 data-[open=true]:rotate-180",
     content: "",
 };
 
 type Props = {
     footerMenu: FooterMenu[];
-    // socialMediaLinks: { icon: React.ReactNode; href: string }[];
 }
 
 const FooterMobile: React.FC<Props> = ({ footerMenu }) => {
@@ -41,8 +40,8 @@ const FooterMobile: React.FC<Props> = ({ footerMenu }) => {
     return (
         <>
             <Accordion 
-                variant='splitted' 
-                className="!px-0 flex flex-wrap items-start !flex-row !gap-3" 
+                variant='light' 
+                className="!px-0" 
                 itemClasses={itemClasses} 
                 selectionMode='single'
             >
@@ -56,13 +55,6 @@ const FooterMobile: React.FC<Props> = ({ footerMenu }) => {
                     </AccordionItem>
                 ))}
             </Accordion>
-            {/* <div className="flex items-center gap-4.5 justify-center md:justify-end mt-4 xl:mt-5.5">
-                {socialMediaLinks.map((link, idx) => (
-                    <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer">
-                        {link.icon}
-                    </a>
-                ))}
-            </div> */}
         </>
     );
 };

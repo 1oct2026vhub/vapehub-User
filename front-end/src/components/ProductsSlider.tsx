@@ -17,7 +17,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, review
   const products:Product[] = data?.products?.filter((product: Product) => product.Category !== null) ?? [];
   
   const settings: Settings = {
-    dots: false,
+    dots: true,
     infinite: products.length > 5,
     speed: -100,
     slidesToShow: 5,
@@ -31,7 +31,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, review
           slidesToShow: 3,
           slidesToScroll: 1,
           infinite: products.length > (isListing ? 4: 3),
-          dots: false,
+          dots: true,
         },
       },
       {

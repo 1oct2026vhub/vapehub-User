@@ -21,7 +21,7 @@ export default function MyAccountLayout({
 
   return (
    
-    <div className="container mx-auto px-4 py-8 lg:px-12.5">
+    <div className="container mx-auto px-4 py-8 lg:px-12.5 w-full max-w-[1520px]">
      {status === 'authenticated' && 
      <MyAccountHeading className="mb-6" />}   
       <div className="flex flex-col md:flex-row gap-8">

@@ -34,7 +34,7 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
                     (dynamicPageSlug?.entity_id);
     
   return (
-    <div>
+    <div className='w-full max-w-[1520px] mx-auto'>
       <section className="product-listing-container flex-col">
         <BreadCrumbs items={breadcrumbs} />
         <ProductListingContent data={data} dynamicPageSlug={dynamicPageSlug} />

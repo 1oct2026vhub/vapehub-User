@@ -37,17 +37,17 @@ const Dashboard: NextPage = async () => {
   const podKitsResolvedSlug = 'pod-kits';
 
   return (
-    <main className="px-4 lg:px-12.5 py-4 md:py-[60px] flex flex-col gap-7 md:gap-[60px] w-full max-w-[1520px] mx-auto">
+    <main className="px-4 lg:px-12.5 py-4 md:py-[60px] flex flex-col gap-7 md:gap-[60px]">
       {/* <Suspense fallback={<SuspenseLoader />}> */}
         <HomeCarousel />
       {/* </Suspense> */}
 
       <Suspense fallback={<SuspenseLoader />}>
-        <WelcomeSection />
+        <ShopByCategory />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>
-        <ShopByCategory />
+        <WelcomeSection />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>

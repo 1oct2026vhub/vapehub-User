@@ -75,6 +75,10 @@
     @apply !font-oswald;
   }
 
+  main {
+    @apply w-full max-w-[1520px] mx-auto;
+  }
+
   p {
     @apply !font-opensans;
   }
@@ -342,7 +346,7 @@ input[type='search'] {
 }
 
 .new-product {
-  @apply w-9 h-4 md:w-14 md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold capitalize text-skin-white flex justify-center items-center pl-2;
+  @apply w-9 h-4 md:w-14 md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-center items-center pl-2;
   flex-shrink: 0;
   border-radius: 10px 10px 0px 10px;
   background: #083122;

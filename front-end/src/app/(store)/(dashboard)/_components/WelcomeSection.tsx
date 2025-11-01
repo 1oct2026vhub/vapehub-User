@@ -20,9 +20,9 @@ const WelcomeSection = async () => {
     return (
         <section className='grid grid-cols-1 xl:grid-cols-2 items-stretch gap-6 max-sm:mt-6'>
             <div className='space-y-4 text-neutral-900 text-content-1 md:text-title-2 font-medium flex flex-col justify-center'>
-                <h1 className='text-h4 lg:text-h2 font-bold primary-gradient-600 w-fit'>
+                <h2 className='text-h4 lg:text-h2 font-bold primary-gradient-600 w-fit'>
                     {mainTitle}{' '}{lastWord}
-                </h1>
+                </h2>
                 <div className='welcome-text' dangerouslySetInnerHTML={{ __html: content }} />
             </div>
             <div className='flex items-center justify-center'>

@@ -1,7 +1,5 @@
 import React, { FunctionComponent, ReactElement } from "react";
 import CategorySlider from "@/components/CategorySlider";
-import SectionHeading from "@/components/ui/SectionHeading";
-// import ViewAllLink from "@/components/ui/ViewAllLink";
 import { CategoryDetails } from "@/lib/config/category.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import { getCategoryList } from "@/lib/server.actions";
@@ -20,7 +18,7 @@ const ShopByCategory: FunctionComponent = async (): Promise<ReactElement> => {
   return (
     <section className="space-y-4.5 md:space-y-7.5">
       <div className="flex items-center justify-between">
-        <SectionHeading title={CategoryDetails.title} />
+        <h1 className="text-h5 md:text-h3 w-fit font-semibold primary-gradient-100">{CategoryDetails.title}</h1>
         {/* <ViewAllLink href={CategoryDetails.viewAllHref} /> */}
       </div>
       <div className="slider-container section-slider">

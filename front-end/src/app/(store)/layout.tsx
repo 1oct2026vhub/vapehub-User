@@ -8,28 +8,30 @@ import { FlashNewsItem } from '@/lib/config/global.config';
 const StoreRootLayout = async ({
   children,
 }: Readonly<PropsWithChildren>): Promise<ReactElement> => {
-    const megaMenuResponse = await getHeaderMegaMenu();
-    if(megaMenuResponse.status !== ServerActionStatus.SUCCESS) {
-        return <div>{megaMenuResponse.message}</div>;
-    }
-    const megaMenu = megaMenuResponse.data;
-    
-    const response = await getCategoryList();
-    if (response.status !== ServerActionStatus.SUCCESS) {
-        return <div>{response.message}</div>;
-    }
-    
-    const flashNewsResponse = await getFlashNews(true);
-    let flashNews: FlashNewsItem[] = [];
-    if (flashNewsResponse.status === ServerActionStatus.SUCCESS) {
-        flashNews = flashNewsResponse.data;
-    }
-     
+  const megaMenuResponse = await getHeaderMegaMenu();
+  if (megaMenuResponse.status !== ServerActionStatus.SUCCESS) {
+    return <div>{megaMenuResponse.message}</div>;
+  }
+  const megaMenu = megaMenuResponse.data;
+
+  const response = await getCategoryList();
+  if (response.status !== ServerActionStatus.SUCCESS) {
+    return <div>{response.message}</div>;
+  }
+
+  const flashNewsResponse = await getFlashNews(true);
+  let flashNews: FlashNewsItem[] = [];
+  if (flashNewsResponse.status === ServerActionStatus.SUCCESS) {
+    flashNews = flashNewsResponse.data;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header megaMenu={megaMenu} flashNews={flashNews} />
+      <div className="w-full max-w-[1520px] mx-auto">
         {children}
-      <Footer/>
+      </div>
+      <Footer />
     </div>
   )
 }

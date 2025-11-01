@@ -64,7 +64,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = async ({
   }));
 
   return (
-    <section className="md:space-y-5">
+    <section className="md:space-y-5 max-sm:mb-5">
       <div className="flex items-center justify-between gap-4">
         <SectionHeading title={title} />
         <ViewAllLink href={viewAllHref} />
@@ -127,7 +127,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = async ({
   }));
 
   return (
-    <section className="md:space-y-5">
+    <section className="md:space-y-5 max-sm:mb-5">
       <div className="flex items-center justify-between gap-4">
         <SectionHeading title={title} />
         <ViewAllLink href={viewAllHref} />

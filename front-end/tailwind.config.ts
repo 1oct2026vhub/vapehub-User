@@ -125,8 +125,8 @@ export default {
         '32': '2rem' //32px
       },
       boxShadow: {
-        'card': '4px 4px 28px 0px rgba(0, 0, 0, 0.09);',
-        'slider-card': '4px 17px 14px 0px rgba(0, 0, 0, 0.07);',
+        'card': '4px 4px 10px 0px rgba(0, 0, 0, 0.09);',
+        'slider-card': '4px 17px 10px 0px rgba(0, 0, 0, 0.07);',
         'brand-card': '2px 2px 16px 0px rgba(0, 0, 0, 0.16);',
         'deal-card': '4px 4px 10px 0px rgba(0, 0, 0, 0.24);',
         'deal-card-mob': '4px 4px 6px 0px rgba(0, 0, 0, 0.24);',
@@ -138,7 +138,8 @@ export default {
         'delivery-card': '0px 4px 41px 0px rgba(0, 0, 0, 0.16);',
         'button': '0px 0px 8px 0px rgba(0, 0, 0, 0.11);',
         'checkout': '0px -1px 17px 0px rgba(0, 0, 0, 0.07);',
-        'product-card': '-1px 4px 24px 0 rgba(0, 0, 0, 0.24);',
+        'product-card': '-1px 4px 10px 0 rgba(0, 0, 0, 0.24);',
+        'mob-product-card': '-1px 4px 6px 0 rgba(0, 0, 0, 0.24);',
       }
     },
   },

@@ -23,7 +23,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 }) => {
     const itemClasses = {
         base: "w-full shadow-none !p-0",
-        title: "!text-content-2 xl:!text-content-1 capitalize text-nowrap font-bold",
+        title: "!text-content-2 xl:!text-content-1 capitalize text-nowrap text-skin-neutral-500 !font-opensans",
         trigger: "rounded-lg h-11 !p-3 flex items-center border border-skin-primary-400",
         indicator: "text-medium text-skin-neutral-500 -rotate-90 data-[open=true]:rotate-90",
         content: "text-content-1 !px-3 !pt-4 !pb-0 !space-y-6 rounded-lg border border-skin-neutral-200 shadow-md my-2",
@@ -32,7 +32,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     return (
         <div className="hidden md:flex flex-col gap-6 xl:min-w-[310px] max-w-[310px] bg-skin-white p-4 xl:p-9 border border-skin-neutral-50 rounded-14">
             <div className="flex items-center justify-between">
-                <h2 className="primary-gradient-600 rounded-14 text-h5 font-bold w-fit">Filter by</h2>
+                <h2 className="primary-gradient-600 text-h5 font-bold w-fit">Filter by</h2>
                 {appliedFilters.length > 0 && (
                     <Button onPress={onClearAllFilters} color="default" variant="bordered" className="text-skin-neutral-500 text-content-2 font-bold">Clear All</Button>
                 )}

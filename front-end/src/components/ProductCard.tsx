@@ -54,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   
   return (
     <Link prefetch={false} href={link} className="block">
-      <div className="bg-skin-white rounded-md flex flex-col content-stretch shadow-product-card hover:shadow-card transition-all duration-300">
+      <div className="bg-skin-white rounded-md flex flex-col content-stretch shadow-mob-product-card md:shadow-product-card hover:shadow-card transition-all duration-300">
         <div className="relative p-1.5 md:py-6 md:px-3 bg-skin-neutral-50 rounded-t-md">
           <NoImage
             src={imageSrc}

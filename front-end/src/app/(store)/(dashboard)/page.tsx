@@ -11,7 +11,7 @@ import ShopByCategory from './_components/ShopByCategory';
 import HottestCollections from './_components/HottestCollections';
 import NewProducts from './_components/NewProducts';
 import ShopByDeals from './_components/ShopByDeals';
-import { MostPopularVapes, MostPopularSalts } from './_components/MostPopular';
+import { MostPopularVapes, MostPopularSalts, MostPopularPods } from './_components/MostPopular';
 import PromotionalBanners from './_components/PromotionalBanners';
 import ReferFriend from './_components/ReferFriend';
 import Testimonials from './_components/Testimonials';
@@ -29,12 +29,13 @@ const Dashboard: NextPage = async () => {
 
   // Resolve entity slugs for Big Puff (id: 8), Nic Salts (id: 13), and Pod Kits
   const entitySlugsResponse = await getEntitySlugs('order_count');
-    console.log("entities", entitySlugsResponse);
 
   const entities = (entitySlugsResponse.status === ServerActionStatus.SUCCESS ? entitySlugsResponse.data?.entities : undefined) ?? [];
   const bigPuffResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 8)?.slug_relation || 'big-puff-vape-kits';
   const nicSaltsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 13)?.slug_relation || 'nic-salts';
-  const podKitsResolvedSlug = 'pod-kits';
+  const podKitsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 16)?.slug_relation || 'pod-kits';
+  const prefilledPodKitsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 23)?.slug_relation || 'prefilled-pod-kits';
+  const refillablePodKitsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 24)?.slug_relation || 'refillable-pod-kits';
 
   return (
     <main className="px-4 lg:px-12.5 py-4 md:py-[60px] flex flex-col gap-7 md:gap-[60px]">
@@ -77,6 +78,15 @@ const Dashboard: NextPage = async () => {
           title="Most Popular Pod Kits"
           viewAllHref={podKitsResolvedSlug}
           slug={podKitsResolvedSlug}
+        />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <MostPopularPods 
+          title="Most Popular Pods"
+          viewAllHref={podKitsResolvedSlug}
+          prefilledSlug={prefilledPodKitsResolvedSlug}
+          refillableSlug={refillablePodKitsResolvedSlug}
         />
       </Suspense>
 

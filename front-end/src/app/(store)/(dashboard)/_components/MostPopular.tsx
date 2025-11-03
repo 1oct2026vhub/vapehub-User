@@ -141,4 +141,98 @@ export const MostPopularVapes: React.FC<MostPopularProps> = async ({
   );
 };
 
+interface MostPopularPodsProps {
+  title?: string;
+  viewAllHref?: string;
+  prefilledSlug: string;
+  refillableSlug: string;
+}
+
+export const MostPopularPods: React.FC<MostPopularPodsProps> = async ({
+  title = "Most Popular Pods",
+  viewAllHref = "#",
+  prefilledSlug,
+  refillableSlug,
+}) => {
+  // Fetch products from both categories
+  const [prefilledResponse, refillableResponse] = await Promise.all([
+    getProductByCategory(prefilledSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0, homepage: 1 }),
+    getProductByCategory(refillableSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0, homepage: 1 })
+  ]);
+
+  if (prefilledResponse.status !== ServerActionStatus.SUCCESS && refillableResponse.status !== ServerActionStatus.SUCCESS) {
+    return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
+  }
+
+  // Combine products from both categories
+  const prefilledProducts = prefilledResponse.status === ServerActionStatus.SUCCESS ? prefilledResponse.data.products : [];
+  const refillableProducts = refillableResponse.status === ServerActionStatus.SUCCESS ? refillableResponse.data.products : [];
+  const combinedProducts = [...prefilledProducts, ...refillableProducts];
+
+  const products: ProductResponseData = {
+    products: combinedProducts,
+    pagination: {
+      current_page: 1,
+      limit: 8,
+      offset: 0,
+      total_count: combinedProducts.length,
+      total_pages: 1
+    },
+    attributes: (prefilledResponse.status === ServerActionStatus.SUCCESS ? prefilledResponse.data?.attributes : undefined) || 
+                (refillableResponse.status === ServerActionStatus.SUCCESS ? refillableResponse.data?.attributes : undefined) || [],
+    price_ranges: (prefilledResponse.status === ServerActionStatus.SUCCESS ? prefilledResponse.data?.price_ranges : undefined) || 
+                  (refillableResponse.status === ServerActionStatus.SUCCESS ? refillableResponse.data?.price_ranges : undefined) || [],
+    brand: (prefilledResponse.status === ServerActionStatus.SUCCESS ? prefilledResponse.data?.brand : undefined) || 
+           (refillableResponse.status === ServerActionStatus.SUCCESS ? refillableResponse.data?.brand : undefined) || [],
+    category: [
+      ...((prefilledResponse.status === ServerActionStatus.SUCCESS ? prefilledResponse.data?.category : undefined) || []),
+      ...((refillableResponse.status === ServerActionStatus.SUCCESS ? refillableResponse.data?.category : undefined) || [])
+    ]
+  };
+
+  const filtered: Product[] = products.products?.filter((p: Product) => p.Category !== null) ?? [];
+
+  // Extract review data from products and format for ProductsSlider
+  const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = filtered.map((product: Product) => ({
+    status: ServerActionStatus.SUCCESS,
+    data: {
+      reviews: (product.reviews || []).map(review => ({
+        ...review,
+        product_id: product.id,
+        is_visible: true,
+        updated_at: review.created_at,
+        verified_by: Boolean(review.verified_by),
+        product: {
+          id: product.id,
+          name: product.name,
+          slug: product.slug
+        },
+        media: []
+      })),
+      pagination: {
+        total: product.review_stats?.total_reviews || 0,
+        page: 1,
+        limit: 1,
+        totalPages: 1
+      },
+      average_rating: String(product.review_stats?.average_rating || 0),
+      total_reviews: product.review_stats?.total_reviews || 0
+    }
+  }));
+
+  return (
+    <section className="md:space-y-5">
+      <div className="flex items-center justify-between gap-4">
+        <SectionHeading title={title} />
+        <ViewAllLink href={viewAllHref} />
+      </div>
+      <div className="slider-container section-slider products-slider">
+        {
+          filtered.length > 0 ? <ProductsSlider data={products} reviews={reviews} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
+        }
+      </div>
+    </section>
+  );
+};
+
 

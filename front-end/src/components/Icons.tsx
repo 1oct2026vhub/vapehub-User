@@ -1519,3 +1519,47 @@ export const MenuCartIcon = (
     </svg>
   );
 }
+
+
+export const CategoryIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+
+    xmlns="http://www.w3.org/2000/svg"
+
+    width="43"
+
+    height="43"
+
+    fill="none"
+
+    viewBox="0 0 43 43"
+    {...props}
+>
+<circle
+
+      cx="21.097"
+
+      cy="21.097"
+
+      r="20.357"
+
+      stroke="#fff"
+
+      strokeWidth="1.481"
+></circle>
+<g fill="#fff" clipPath="url(#clip0_5388_30372)">
+<path d="m7.738 16.027 13 5a1.01 1.01 0 0 0 .72 0l13-5a1 1 0 0 0 0-1.867l-13-5a1 1 0 0 0-.72 0l-13 5a1 1 0 0 0 0 1.867m13.36-4.862 10.214 3.928-10.214 3.929-10.214-3.929zM34.457 26.165l-2.866-1.102-2.786 1.072 2.506.964-10.213 3.928L10.884 27.1l2.507-.964-2.786-1.072-2.867 1.102a1 1 0 0 0 0 1.867l13 5a1 1 0 0 0 .72 0l13-5a1 1 0 0 0 0-1.867"></path>
+<path d="m34.457 20.157-2.866-1.102-2.786 1.072 2.506.964-10.213 3.928-10.214-3.928 2.507-.964-2.786-1.072-2.867 1.102a1 1 0 0 0 0 1.867l13 5a1 1 0 0 0 .72 0l13-5a1 1 0 0 0 0-1.867"></path>
+</g>
+<defs>
+<clipPath id="clip0_5388_30372">
+<path fill="#fff" d="M7.098 7.094h28v28h-28z"></path>
+</clipPath>
+</defs>
+</svg>
+ 
+  );
+}

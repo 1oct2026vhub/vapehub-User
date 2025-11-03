@@ -455,6 +455,13 @@ input[type="checkbox"] + span {
   @apply lg:h-14.5 rounded-md md:!rounded-lg
 }
 
+.product-content p,
+.product-content .wp-block-heading,
+.product-content .wp-block-list,
+.product-content figure {
+  margin-bottom: 1rem;
+}
+
 /* Styles for webkit-based browsers */
 ::-webkit-scrollbar {
   width: 5px;

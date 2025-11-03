@@ -28,7 +28,7 @@ const BrandCard: React.FC<BrandCardProps> = ({
         alt={altText}
         width={width}
         height={height}
-        className="rounded-lg max-w-[110px] md:max-w-[154px] max-h-[79px] md:max-h-[112px] min-h-[79px] md:min-h-[112px]"
+        className="rounded-lg object-contain max-w-[110px] md:max-w-[154px] max-h-[79px] md:max-h-[112px] min-h-[79px] md:min-h-[112px]"
       />
        
     </Link>

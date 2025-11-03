@@ -1,9 +1,20 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Slider from 'react-slick';
+import { getFeatureContent, getTrustpilotReviews } from '@/lib/server.actions';
+import { ServerActionStatus } from '@/lib/config/app.config';
 
-const features = [
+interface Feature {
+    id: string | number;
+    title: string;
+    desc: string;
+    image: string | null;
+    isTrustpilot?: boolean;
+}
+
+// Static fallback features
+const fallbackFeatures: Feature[] = [
     {
         id: 'delivery',
         title: 'Free Delivery',
@@ -15,6 +26,7 @@ const features = [
         title: 'Trustpilot',
         desc: 'Trustpilot has rated Vapehub as Excellent!',
         image: '/images/trustpilot.svg',
+        isTrustpilot: true,
     },
     {
         id: 'offers',
@@ -59,6 +71,65 @@ const ArrowNext: React.FC<ArrowProps> = ({ onClick }) => (
 );
 
 const HeaderFeatures: React.FC = () => {
+    const [features, setFeatures] = useState<Feature[]>(fallbackFeatures);
+    const [trustpilotData, setTrustpilotData] = useState<{
+        stars: number;
+        ratingCategory: string;
+    }>({
+        stars: 5,
+        ratingCategory: 'Excellent',
+    });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch both feature content and trustpilot data in parallel
+                const [featuresResponse, trustpilotResponse] = await Promise.all([
+                    getFeatureContent(),
+                    getTrustpilotReviews()
+                ]);
+
+                // Process feature content
+                if (featuresResponse.status === ServerActionStatus.SUCCESS && featuresResponse.data?.featureContent) {
+                    const apiFeatures: Feature[] = featuresResponse.data.featureContent.map((feature) => ({
+                        id: feature.id,
+                        title: feature.title,
+                        desc: feature.subtitle,
+                        image: feature.icon?.icon_url || null,
+                        isTrustpilot: feature.title.toLowerCase().includes('trustpilot'),
+                    }));
+                    
+                    // Ensure Trustpilot feature is always present at second position
+                    const hasTrustpilot = apiFeatures.some(f => f.isTrustpilot);
+                    if (!hasTrustpilot) {
+                        // Find and add the trustpilot fallback feature at index 1 (second position)
+                        const trustpilotFallback = fallbackFeatures.find(f => f.isTrustpilot);
+                        if (trustpilotFallback) {
+                            apiFeatures.splice(1, 0, trustpilotFallback);
+                        }
+                    }
+                    
+                    setFeatures(apiFeatures.length > 0 ? apiFeatures : fallbackFeatures);
+                }
+
+                // Process trustpilot data - if no data, static fallback is already set
+                if (trustpilotResponse.status === ServerActionStatus.SUCCESS && 
+                    trustpilotResponse.data?.overallStats?.scoreBreakdown) {
+                    setTrustpilotData({
+                        stars: trustpilotResponse.data.overallStats.scoreBreakdown.stars || 5,
+                        ratingCategory: trustpilotResponse.data.overallStats.scoreBreakdown.ratingCategory || 'Excellent',
+                    });
+                }
+                // If no valid data from API, static fallback remains (already set in initial state)
+            } catch (error) {
+                console.error('Error fetching header features data:', error);
+                // Keep static fallback data on error
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const settings = {
         dots: false,
         infinite: true,
@@ -78,17 +149,22 @@ const HeaderFeatures: React.FC = () => {
                 {features.map((f) => (
                     <div key={f.id} className="flex items-center gap-4 max-w-[28%]">
                         {f.image ? (
-                            <Image src={f.image} alt={`${f.title} icon`} width={38} height={38} className="object-contain" />
+                            <Image src={f.image} alt={`${f.title} icon`} width={38} height={38} className="object-contain" loading="lazy" />
                         ) : null}
                         <div className="flex flex-col">
-                            {f.id === 'trustpilot' ? (
+                            {f.isTrustpilot && trustpilotData ? (
                                 <div className="flex items-center">
-                                    <Image src="/images/trustpilot-rating.png" alt="Trustpilot rating" width={140} height={20} className="object-contain" />
+                                    <Image src="/images/trustpilot-rating.png" alt="Trustpilot rating" width={140} height={20} className="object-contain" loading="lazy" />
                                 </div>
                             ) : (
                                 <span className="font-bold font-oswald text-sm md:text-xl text-skin-white">{f.title}</span>
                             )}
-                            <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">{f.desc}</span>
+                            <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">
+                                {f.isTrustpilot && trustpilotData 
+                                    ? `Trustpilot has rated Vapehub as ${trustpilotData.ratingCategory}!`
+                                    : f.desc
+                                }
+                            </span>
                         </div>
                     </div>
                 ))}
@@ -101,9 +177,14 @@ const HeaderFeatures: React.FC = () => {
                         <div key={f.id} className="px-4">
                             <div className="flex items-center justify-center gap-1">
                                 {f.image ? (
-                                    <Image src={f.image} alt={`${f.title} icon`} width={20} height={20} className="object-contain" />
+                                    <Image src={f.image} alt={`${f.title} icon`} width={20} height={20} className="object-contain" loading="lazy" />
                                 ) : null}
-                                <div className="text-content-1 font-oswald font-semibold text-skin-neutral-50">{f.desc}</div>
+                                <div className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
+                                    {f.isTrustpilot && trustpilotData 
+                                        ? `Trustpilot has rated Vapehub as ${trustpilotData.ratingCategory}!`
+                                        : f.desc
+                                    }
+                                </div>
                             </div>
                         </div>
                     ))}

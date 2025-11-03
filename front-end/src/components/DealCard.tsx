@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
 import React from "react";
-import NoImage from "./NoImage";
+import DealNoImage from "./DealNoImage";
 
 interface DealCardProps {
     imageSrc: string;
@@ -23,7 +23,7 @@ const DealCard: React.FC<DealCardProps> = ({
     return (
         <Link prefetch={false} href={href} className="block rounded h-fit">
             <div className="relative w-full overflow-hidden rounded-md">
-                <NoImage 
+                <DealNoImage 
                     src={imageSrc} 
                     alt={altText} 
                     width={width} 

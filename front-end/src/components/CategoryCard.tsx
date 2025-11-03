@@ -1,6 +1,5 @@
 import Link from "next/link";
 import React from "react";
-import NoImage from "./NoImage";
 import { CategoryIcon } from "./Icons";
 
 interface CategoryCardProps {
@@ -11,7 +10,6 @@ interface CategoryCardProps {
 
 const CategoryCard: React.FC<CategoryCardProps> = ({
   title,
-  imageSrc,
   link
 }) => {
   return (

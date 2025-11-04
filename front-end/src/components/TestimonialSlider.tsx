@@ -9,6 +9,7 @@ interface Testimonial {
     user_name: string;
     rating: number;
     comment: string;
+    verified_by?: boolean;
     user: {
         first_name: string;
         last_name: string;
@@ -56,12 +57,13 @@ const TestimonialSlider: FunctionComponent<TestimonialProps> = ({data}) => {
             {data.map((testimonial, index) => (
                 <div key={index} className="px-2 md:px-3 xl:px-5 py-3 h-full">
                     <TestimonialCard
-                     imageSrc = {testimonial.user?.profile_pic_url || "/images/avatar.png"}
+                     imageSrc = {testimonial.user?.profile_pic_url || null}
                      altText = {testimonial.user_name || ""}
                      href = "#"
                      name = {testimonial.user_name || ""}
                      review = {testimonial.comment}
                      ratingCount = {testimonial.rating}
+                     verified = {testimonial.verified_by || false}
                      />
                 </div>
             ))}

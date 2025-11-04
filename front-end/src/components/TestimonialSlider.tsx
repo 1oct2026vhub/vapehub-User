@@ -22,7 +22,7 @@ interface TestimonialProps {
  
 
 const settings: Settings = {
-    dots: true,
+    dots: false,
     infinite: false,
     speed: 500,
     slidesToShow: 3,
@@ -35,7 +35,7 @@ const settings: Settings = {
                 slidesToShow: 2,
                 slidesToScroll: 2,
                 infinite: false,
-                dots: true
+                dots: false
             }
         },
         {
@@ -44,7 +44,7 @@ const settings: Settings = {
                 slidesToShow: 2,
                 slidesToScroll: 2,
                 infinite: false,
-                dots: true,
+                dots: false,
             }
         },
     ]

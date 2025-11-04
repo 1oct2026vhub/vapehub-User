@@ -357,7 +357,7 @@ input[type='search'] {
 }
 
 .new-product::after {
-  @apply content-new-badge relative block -right-[6px] -bottom-3.5 md:-right-[10.5px] md:-bottom-[14px];
+  @apply content-new-badge relative block -right-[6.5px] -bottom-[12px] md:-right-[10.5px] md:-bottom-[14px];
 }
 
 .section-slider .new-product::after {
@@ -453,6 +453,13 @@ input[type="checkbox"] + span {
 
 .search-wrapper form div[data-slot="input-wrapper"]{
   @apply lg:h-14.5 rounded-md md:!rounded-lg
+}
+
+.product-content p,
+.product-content .wp-block-heading,
+.product-content .wp-block-list,
+.product-content figure {
+  margin-bottom: 1rem;
 }
 
 /* Styles for webkit-based browsers */

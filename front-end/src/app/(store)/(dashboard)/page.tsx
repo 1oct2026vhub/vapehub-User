@@ -31,7 +31,7 @@ const Dashboard: NextPage = async () => {
   const entitySlugsResponse = await getEntitySlugs('order_count');
 
   const entities = (entitySlugsResponse.status === ServerActionStatus.SUCCESS ? entitySlugsResponse.data?.entities : undefined) ?? [];
-  const bigPuffResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 8)?.slug_relation || 'big-puff-vape-kits';
+  // const bigPuffResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 8)?.slug_relation || 'big-puff-vape-kits';
   const nicSaltsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 13)?.slug_relation || 'nic-salts';
   const podKitsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 16)?.slug_relation || 'pod-kits';
   const prefilledPodKitsResolvedSlug = entities.find((e: { entity_id: number; slug_relation?: string }) => e.entity_id === 23)?.slug_relation || 'prefilled-pod-kits';
@@ -61,17 +61,13 @@ const Dashboard: NextPage = async () => {
         <ShopByDeals />
       </Suspense>
 
-      <Suspense fallback={<SuspenseLoader />}>
-        <MostPopularSalts viewAllHref={nicSaltsResolvedSlug} slug={nicSaltsResolvedSlug} />
-      </Suspense>
-
-      <Suspense fallback={<SuspenseLoader />}>
+      {/* <Suspense fallback={<SuspenseLoader />}>
         <MostPopularVapes 
           title="Most Popular Big-Puff Vapes"
           viewAllHref={bigPuffResolvedSlug}
           slug={bigPuffResolvedSlug}
         />
-      </Suspense>
+      </Suspense> */}
 
       <Suspense fallback={<SuspenseLoader />}>
         <MostPopularVapes 
@@ -88,6 +84,10 @@ const Dashboard: NextPage = async () => {
           prefilledSlug={prefilledPodKitsResolvedSlug}
           refillableSlug={refillablePodKitsResolvedSlug}
         />
+      </Suspense>
+
+        <Suspense fallback={<SuspenseLoader />}>
+        <MostPopularSalts viewAllHref={nicSaltsResolvedSlug} slug={nicSaltsResolvedSlug} />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>

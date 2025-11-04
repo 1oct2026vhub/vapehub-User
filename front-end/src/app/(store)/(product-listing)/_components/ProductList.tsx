@@ -291,7 +291,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
                 })}
               </div>
 
-              <div className="flex items-center gap-3 justify-between pl-5">
+              <div className="flex items-center gap-3 justify-between pl-5 flex-wrap">
                 <p className="text-content-1 text-skin-neutral-300 font-bold">Showing {activePage}-{products.length} of {totalCount} results</p>
                 {totalPage > 1 && (
                   <Pagination total={totalPage} onPageChange={handlePagination} currentPage={activePage} />

@@ -14,7 +14,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
 }) => {
   return (
     <Link prefetch={false} href={link} className="w-full h-full">
-      <div className="bg-primary-gradient-100 p-5 lg:px-8 flex flex-col lg:flex-row items-center rounded-md gap-3.5 lg:gap-5 lg:min-h-[150px]">
+      <div className="bg-primary-gradient-100 p-5 lg:px-8 flex flex-col lg:flex-row items-center rounded-md gap-3.5 lg:gap-5 lg:min-h-[150px] h-full">
         {/* <div className="w-[58px] h-[58px] aspect-square bg-white rounded-full flex items-center justify-center">
           <NoImage
             src={imageSrc}

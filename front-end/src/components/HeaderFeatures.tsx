@@ -149,7 +149,7 @@ const HeaderFeatures: React.FC = () => {
                 {features.map((f) => (
                     <div key={f.id} className="flex items-center gap-4 max-w-[28%]">
                         {f.image ? (
-                            <Image src={f.image} alt={`${f.title} icon`} width={38} height={38} className="object-contain" loading="lazy" />
+                            <Image src={f.image} alt={`${f.title} icon`} width={38} height={38} className="object-contain rounded-full" loading="lazy" />
                         ) : null}
                         <div className="flex flex-col">
                             {f.isTrustpilot && trustpilotData ? (
@@ -177,7 +177,7 @@ const HeaderFeatures: React.FC = () => {
                         <div key={f.id} className="px-4">
                             <div className="flex items-center justify-center gap-1">
                                 {f.image ? (
-                                    <Image src={f.image} alt={`${f.title} icon`} width={20} height={20} className="object-contain" loading="lazy" />
+                                    <Image src={f.image} alt={`${f.title} icon`} width={20} height={20} className="object-contain rounded-full" loading="lazy" />
                                 ) : null}
                                 <div className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
                                     {f.isTrustpilot && trustpilotData 

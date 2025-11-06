@@ -158,7 +158,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                 {/* If item has visible children, show as header and render children */}
                 {visibleChildren.length > 0 ? (
                     <>
-                        <div className={`${level > 0 ? 'border-b border-skin-neutral-200' : ''} ${shouldShowImageSection ? 'mb-2 pb-2' : 'mb-1 pb-1'}`}>
+                        <div className={`border-b border-skin-neutral-200 ${shouldShowImageSection ? 'mb-2 pb-2' : 'mb-1 pb-1'}`}>
                             <div className="flex items-center gap-2">
                                 <h3 
                                     className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
@@ -184,9 +184,9 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                                 )}
                             </div>
                         </div>
-                        <div className={`pl-4 ${shouldShowImageSection ? 'space-y-2' : 'space-y-1'}`}>
+                        <div className={`${shouldShowImageSection ? 'space-y-2' : 'space-y-1'}`}>
                             {visibleChildren.map((child) => (
-                                <div key={child.id} className="pl-3">
+                                <div key={child.id}>
                                     {renderMenuItem(child, level + 1)}
                                 </div>
                             ))}

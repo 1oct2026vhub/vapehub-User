@@ -264,7 +264,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
             <EmptyPlaceholder title='Uh, oh!' description='No products found.' />
           ) :
             <>
-              <div className={`grid grid-cols-2  ${isFilterVisible ? 'md:grid-cols-3 xl:grid-cols-4' : 'md:grid-cols-4 xl:grid-cols-5'} transition-all duration-600 ease-in-out gap-3 md:gap-5 xl:gap-10 products-slider`}>
+              <div className={`grid grid-cols-2  ${isFilterVisible ? 'md:grid-cols-3 xl:grid-cols-4' : 'md:grid-cols-4 xl:grid-cols-5'} transition-all duration-600 ease-in-out gap-4.5 md:gap-5 xl:gap-10 products-slider`}>
                 {products.map((product, index) => {
                   const review = reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews.find(review => review.product_id === product.id));
                   const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;

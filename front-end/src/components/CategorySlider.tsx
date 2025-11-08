@@ -19,9 +19,9 @@ const CategorySlider: React.FC<props> = ({ categories }): ReactElement => {
             {
                 categories.map((category, index) => (
                     <CategoryCard
-                        key={index}
+                        key={category.id || index}
                         title={category.name}
-                        imageSrc={category.logo_url}
+                        imageSrc={category.logo_url || undefined}
                         link={category.slug}
                     />
                 ))

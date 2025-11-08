@@ -4,8 +4,8 @@ import Slider, { Settings } from "react-slick";
 import TestimonialCard from "./TestimonialCard";
 import EmptyPlaceholder from "./ui/EmptyPlaceholder";
 
-interface Testimonial {
-    id: number;
+export interface Testimonial {
+    id: number | string; // Support both number (legacy) and string (Trustpilot) IDs
     user_name: string;
     rating: number;
     comment: string;
@@ -54,8 +54,8 @@ const TestimonialSlider: FunctionComponent<TestimonialProps> = ({data}) => {
      if(!data.length) return  <EmptyPlaceholder title='Uh, oh!' description='No testimonials available' />;
     return (
         <Slider {...settings}>
-            {data.map((testimonial, index) => (
-                <div key={index} className="px-2 md:px-3 xl:px-5 py-3 h-full">
+            {data.map((testimonial) => (
+                <div key={testimonial.id} className="px-2 md:px-3 xl:px-5 py-3 h-full">
                     <TestimonialCard
                      imageSrc = {testimonial.user?.profile_pic_url || null}
                      altText = {testimonial.user_name || ""}

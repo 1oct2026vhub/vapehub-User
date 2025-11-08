@@ -70,15 +70,74 @@ const ArrowNext: React.FC<ArrowProps> = ({ onClick }) => (
     </button>
 );
 
+// Star Rating Component for dynamic star display
+interface StarRatingProps {
+    rating: number;
+    totalStars?: number;
+    starSize?: number;
+}
+
+const StarRating: React.FC<StarRatingProps> = ({ rating, totalStars = 5, starSize = 20 }) => {
+    const decimalPart = rating % 1;
+    let fullStars = Math.floor(rating);
+    let hasHalfStar = false;
+    
+    // Determine star display based on decimal part
+    if (decimalPart >= 0.75) {
+        // Round up: show as full star
+        fullStars = Math.ceil(rating);
+    } else if (decimalPart >= 0.25 && decimalPart < 0.75) {
+        // Show half star for decimals between 0.25 and 0.75
+        hasHalfStar = true;
+    }
+    // For decimals < 0.25, show as empty (round down)
+    
+    return (
+        <div className="flex gap-1 items-center">
+            {Array.from({ length: totalStars }).map((_, index) => {
+                const starValue = index + 1;
+                const isFullyFilled = starValue <= fullStars;
+                const isHalfFilled = starValue === fullStars + 1 && hasHalfStar;
+                
+                return (
+                    <div key={index} className="relative" style={{ width: starSize, height: starSize }}>
+                        {isFullyFilled ? (
+                            // Fully filled star: white star on green square background
+                            <div className="w-full h-full bg-[#00B67A]  flex items-center justify-center">
+                                <svg width={starSize * 0.7} height={starSize * 0.7} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 0L12.2451 6.90983H19.5106L13.6327 11.1803L15.8779 18.0902L10 13.8197L4.12215 18.0902L6.36729 11.1803L0.489435 6.90983H7.75486L10 0Z" fill="white"/>
+                                </svg>
+                            </div>
+                        ) : isHalfFilled ? (
+                            // Half filled star: left half green, right half gray
+                            <div className="w-full h-full  flex items-center justify-center relative overflow-hidden">
+                                <div className="absolute left-0 top-0 w-1/2 h-full bg-[#00B67A]"></div>
+                                <div className="absolute right-0 top-0 w-1/2 h-full bg-gray-300"></div>
+                                <svg width={starSize * 0.7} height={starSize * 0.7} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10">
+                                    <path d="M10 0L12.2451 6.90983H19.5106L13.6327 11.1803L15.8779 18.0902L10 13.8197L4.12215 18.0902L6.36729 11.1803L0.489435 6.90983H7.75486L10 0Z" fill="white"/>
+                                </svg>
+                            </div>
+                        ) : (
+                            // Empty star: white star on light gray square background
+                            <div className="w-full h-full bg-gray-300  flex items-center justify-center">
+                                <svg width={starSize * 0.7} height={starSize * 0.7} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 0L12.2451 6.90983H19.5106L13.6327 11.1803L15.8779 18.0902L10 13.8197L4.12215 18.0902L6.36729 11.1803L0.489435 6.90983H7.75486L10 0Z" fill="white"/>
+                                </svg>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
 const HeaderFeatures: React.FC = () => {
     const [features, setFeatures] = useState<Feature[]>(fallbackFeatures);
     const [trustpilotData, setTrustpilotData] = useState<{
         stars: number;
         ratingCategory: string;
-    }>({
-        stars: 5,
-        ratingCategory: 'Excellent',
-    });
+    } | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -88,6 +147,7 @@ const HeaderFeatures: React.FC = () => {
                     getFeatureContent(),
                     getTrustpilotReviews()
                 ]);
+                console.log("trustpilot response", trustpilotResponse);
 
                 // Process feature content
                 if (featuresResponse.status === ServerActionStatus.SUCCESS && featuresResponse.data?.featureContent) {
@@ -112,15 +172,17 @@ const HeaderFeatures: React.FC = () => {
                     setFeatures(apiFeatures.length > 0 ? apiFeatures : fallbackFeatures);
                 }
 
-                // Process trustpilot data - if no data, static fallback is already set
+                // Process trustpilot data from API
                 if (trustpilotResponse.status === ServerActionStatus.SUCCESS && 
                     trustpilotResponse.data?.overallStats?.scoreBreakdown) {
-                    setTrustpilotData({
-                        stars: trustpilotResponse.data.overallStats.scoreBreakdown.stars || 5,
-                        ratingCategory: trustpilotResponse.data.overallStats.scoreBreakdown.ratingCategory || 'Excellent',
-                    });
+                    const scoreBreakdown = trustpilotResponse.data.overallStats.scoreBreakdown;
+                    if (scoreBreakdown.stars && scoreBreakdown.ratingCategory) {
+                        setTrustpilotData({
+                            stars: scoreBreakdown.stars,
+                            ratingCategory: scoreBreakdown.ratingCategory,
+                        });
+                    }
                 }
-                // If no valid data from API, static fallback remains (already set in initial state)
             } catch (error) {
                 console.error('Error fetching header features data:', error);
                 // Keep static fallback data on error
@@ -153,8 +215,8 @@ const HeaderFeatures: React.FC = () => {
                         ) : null}
                         <div className="flex flex-col">
                             {f.isTrustpilot && trustpilotData ? (
-                                <div className="flex items-center">
-                                    <Image src="/images/trustpilot-rating.png" alt="Trustpilot rating" width={140} height={20} className="object-contain" loading="lazy" />
+                                <div className="flex items-center gap-2">
+                                    <StarRating rating={trustpilotData.stars} starSize={26} />
                                 </div>
                             ) : (
                                 <span className="font-bold font-oswald text-sm md:text-xl text-skin-white">{f.title}</span>
@@ -179,11 +241,19 @@ const HeaderFeatures: React.FC = () => {
                                 {f.image ? (
                                     <Image src={f.image} alt={`${f.title} icon`} width={20} height={20} className="object-contain rounded-full" loading="lazy" />
                                 ) : null}
-                                <div className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
-                                    {f.isTrustpilot && trustpilotData 
-                                        ? `Trustpilot has rated Vapehub as ${trustpilotData.ratingCategory}!`
-                                        : f.desc
-                                    }
+                                <div className="flex items-center gap-2">
+                                    {f.isTrustpilot && trustpilotData ? (
+                                        <>
+                                            <StarRating rating={trustpilotData.stars} starSize={20} />
+                                            <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
+                                                Trustpilot has rated Vapehub as {trustpilotData.ratingCategory}!
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
+                                            {f.desc}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>

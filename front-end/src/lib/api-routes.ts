@@ -118,6 +118,7 @@ export const API_ROUTES = {
     GET_SEO_META: (slug: string) => buildRequestUrl(`/api/home/seo-meta?slug=${encodeURIComponent(slug)}`),
     GET_LEGAL_CONTENT: (contentKey: 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions') => buildRequestUrl(`/api/settings/legal-content/${contentKey}`),
     GET_HOME_BLOCKS: buildRequestUrl('/api/home/blocks'),
+    GET_DISPATCH_NOTICE: buildRequestUrl('/api/settings/dispatch-notice'),
 };
 
 // * Helper functions

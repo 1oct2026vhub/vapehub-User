@@ -990,6 +990,30 @@ export const getFeatureContent = async (payload?: { page?: number, limit?: numbe
     });
 };
 
+export const getDispatchNotice = async (canCache: boolean = true): Promise<ServerActionResponse<{
+  dispatch_notice: {
+    id: number;
+    content: string;
+    is_active: boolean;
+    last_updated: string;
+    created_at: string;
+  };
+}>> => {
+  return await handleRequest<{
+    dispatch_notice: {
+      id: number;
+      content: string;
+      is_active: boolean;
+      last_updated: string;
+      created_at: string;
+    };
+  }, unknown>({
+    endpoint: API_ROUTES.GET_DISPATCH_NOTICE,
+    method: 'GET',
+    canCache,
+  });
+};
+
 export const getHomeBlocks = async (canCache: boolean = true): Promise<ServerActionResponse<{
   shopByCategories: Array<{
     id: number;

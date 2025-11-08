@@ -467,10 +467,18 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             <Divider />
             {bundleProducts.length > 0 && (
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
+                    {/* Green Banner with Bundle Discount */}
+                    {/* {mixAndMatchDeal && (
+                        <div className='bg-green-500 text-white text-center py-3 px-4 rounded-md'>
+                            <p className='text-content-1 md:text-title-1 font-bold !font-oswald'>
+                                Bundle together and save {(mixAndMatchDeal as any).discount_percent ? `${(mixAndMatchDeal as any).discount_percent}%` : '5%'}
+                            </p>
+                        </div>
+                    )} */}
                     <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>Add more products from this deal and unlock extra savings</h2>
                     <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
                         {bundleProducts?.map((bundleProduct, index) => (
-                            <BundleProductCard key={`bundle-${bundleProduct.id}-${index}-${Date.now()}`} product={bundleProduct} />
+                            <BundleProductCard key={`bundle-${bundleProduct.id}-${currentBundlePage}-${index}`} product={bundleProduct} />
                         ))}
                     </div>
                     {isLoadingBundles && (

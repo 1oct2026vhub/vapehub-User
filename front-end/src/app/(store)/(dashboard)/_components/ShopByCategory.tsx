@@ -1,19 +1,32 @@
 import React, { FunctionComponent, ReactElement } from "react";
 import CategorySlider from "@/components/CategorySlider";
-import { CategoryDetails } from "@/lib/config/category.config";
+import { CategoryDetails, Category } from "@/lib/config/category.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
-import { getCategoryList } from "@/lib/server.actions";
+import { getHomeBlocks } from "@/lib/server.actions";
 import { ServerActionStatus } from "@/lib/config/app.config";
 
 const ShopByCategory: FunctionComponent = async (): Promise<ReactElement> => {
-  const categoriesResponse = await getCategoryList();
-  if (categoriesResponse.status !== ServerActionStatus.SUCCESS) {
+  const homeBlocksResponse = await getHomeBlocks();
+  console.log("homeBlocksResponse", homeBlocksResponse);
+  if (homeBlocksResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load categories' />;
   }
-  const categories = categoriesResponse.data;
-  if (!categories?.length) {
+  
+  // Get shopByCategories from the API response
+  const shopByCategories = homeBlocksResponse.data?.shopByCategories || [];
+  if (!shopByCategories?.length) {
     return <EmptyPlaceholder title='Uh, oh!' description='No categories available' />;
   }
+  
+  // Map the data to match CategorySlider's expected format
+  // Use image_url from shopByCategories item, and category data from nested category object
+  const categories: Category[] = shopByCategories
+    .filter(item => item.status && item.category) // Only include active items with category data
+    .sort((a, b) => a.order - b.order) // Sort by order
+    .map(item => ({
+      ...item.category,
+      logo_url: item.image_url || item.category.logo_url, // Use image_url from shopByCategories, fallback to category logo_url
+    }));
    
   return (
     <section className="space-y-4.5 md:space-y-7.5">

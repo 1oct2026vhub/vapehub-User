@@ -990,6 +990,62 @@ export const getFeatureContent = async (payload?: { page?: number, limit?: numbe
     });
 };
 
+export const getHomeBlocks = async (canCache: boolean = true): Promise<ServerActionResponse<{
+  shopByCategories: Array<{
+    id: number;
+    category_id: number;
+    image_url: string;
+    status: boolean;
+    order: number;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+    category: Category;
+  }>;
+  popularCategories: Array<{
+    id: number;
+    category_id: number;
+    title: string;
+    description: string;
+    status: boolean;
+    order: number;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+    category: Category;
+  }>;
+}>> => {
+  return await handleRequest<{
+    shopByCategories: Array<{
+      id: number;
+      category_id: number;
+      image_url: string;
+      status: boolean;
+      order: number;
+      createdAt: string;
+      updatedAt: string;
+      deletedAt: string | null;
+      category: Category;
+    }>;
+    popularCategories: Array<{
+      id: number;
+      category_id: number;
+      title: string;
+      description: string;
+      status: boolean;
+      order: number;
+      createdAt: string;
+      updatedAt: string;
+      deletedAt: string | null;
+      category: Category;
+    }>;
+  }, unknown>({
+    endpoint: API_ROUTES.GET_HOME_BLOCKS,
+    method: 'GET',
+    canCache,
+  });
+};
+
 export const getTrustpilotReviews = async (payload?: { page?: number; per_page?: number; stars?: number }, canCache: boolean = true): Promise<ServerActionResponse<{
   reviews: Array<{
     id: string;

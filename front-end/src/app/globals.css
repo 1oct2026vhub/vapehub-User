@@ -479,6 +479,57 @@ input[type="checkbox"] + span {
   background: #555;
 }
 
+/* NextUI Select dropdown scrollbar */
+[data-slot="listboxWrapper"]::-webkit-scrollbar,
+[data-slot="listbox"]::-webkit-scrollbar,
+.nextui-listbox-wrapper::-webkit-scrollbar,
+.nextui-listbox::-webkit-scrollbar {
+  width: 5px;
+}
+
+[data-slot="listboxWrapper"]::-webkit-scrollbar-track,
+[data-slot="listbox"]::-webkit-scrollbar-track,
+.nextui-listbox-wrapper::-webkit-scrollbar-track,
+.nextui-listbox::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+[data-slot="listboxWrapper"]::-webkit-scrollbar-thumb,
+[data-slot="listbox"]::-webkit-scrollbar-thumb,
+.nextui-listbox-wrapper::-webkit-scrollbar-thumb,
+.nextui-listbox::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+[data-slot="listboxWrapper"]::-webkit-scrollbar-thumb:hover,
+[data-slot="listbox"]::-webkit-scrollbar-thumb:hover,
+.nextui-listbox-wrapper::-webkit-scrollbar-thumb:hover,
+.nextui-listbox::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Ensure scrollbar is visible for variant select dropdowns */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 5px;
+  display: block;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 
 /* //Loader */
 .loader {

@@ -213,21 +213,35 @@ const HeaderFeatures: React.FC = () => {
                         {f.image ? (
                             <Image src={f.image} alt={`${f.title} icon`} width={38} height={38} className="object-contain rounded-full" loading="lazy" />
                         ) : null}
-                        <div className="flex flex-col">
-                            {f.isTrustpilot && trustpilotData ? (
-                                <div className="flex items-center gap-2">
-                                    <StarRating rating={trustpilotData.stars} starSize={26} />
-                                </div>
-                            ) : (
+                        {f.isTrustpilot ? (
+                            <a 
+                                href="https://uk.trustpilot.com/review/vapehub.co.uk" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity"
+                            >
+                                {trustpilotData ? (
+                                    <div className="flex items-center gap-2">
+                                        <StarRating rating={trustpilotData.stars} starSize={26} />
+                                    </div>
+                                ) : (
+                                    <span className="font-bold font-oswald text-sm md:text-xl text-skin-white">{f.title}</span>
+                                )}
+                                <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">
+                                    {trustpilotData 
+                                        ? `Trustpilot has rated Vapehub as ${trustpilotData.ratingCategory}!`
+                                        : f.desc
+                                    }
+                                </span>
+                            </a>
+                        ) : (
+                            <div className="flex flex-col">
                                 <span className="font-bold font-oswald text-sm md:text-xl text-skin-white">{f.title}</span>
-                            )}
-                            <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">
-                                {f.isTrustpilot && trustpilotData 
-                                    ? `Trustpilot has rated Vapehub as ${trustpilotData.ratingCategory}!`
-                                    : f.desc
-                                }
-                            </span>
-                        </div>
+                                <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">
+                                    {f.desc}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
@@ -241,20 +255,33 @@ const HeaderFeatures: React.FC = () => {
                                 {f.image ? (
                                     <Image src={f.image} alt={`${f.title} icon`} width={20} height={20} className="object-contain rounded-full" loading="lazy" />
                                 ) : null}
-                                <div className="flex items-center gap-2">
-                                    {f.isTrustpilot && trustpilotData ? (
-                                        <>
-                                            <StarRating rating={trustpilotData.stars} starSize={20} />
+                                {f.isTrustpilot ? (
+                                    <a 
+                                        href="https://uk.trustpilot.com/review/vapehub.co.uk" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                                    >
+                                        {trustpilotData ? (
+                                            <>
+                                                <StarRating rating={trustpilotData.stars} starSize={20} />
+                                                <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
+                                                    Trustpilot has rated Vapehub as {trustpilotData.ratingCategory}!
+                                                </span>
+                                            </>
+                                        ) : (
                                             <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
-                                                Trustpilot has rated Vapehub as {trustpilotData.ratingCategory}!
+                                                {f.desc}
                                             </span>
-                                        </>
-                                    ) : (
+                                        )}
+                                    </a>
+                                ) : (
+                                    <div className="flex items-center gap-2">
                                         <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
                                             {f.desc}
                                         </span>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

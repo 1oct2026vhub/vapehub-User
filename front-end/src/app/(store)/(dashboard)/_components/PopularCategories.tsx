@@ -108,10 +108,10 @@ const PopularCategories: FunctionComponent = async (): Promise<ReactElement> => 
       {validSections.map((section) => (
         <section key={section.id} className="md:space-y-5 max-sm:mb-5">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <SectionHeading title={section.title} />
               {section.description && (
-                <p className="text-content-1 text-skin-neutral-400 mt-2 max-w-2xl">
+                <p className="text-content-1 text-skin-neutral-400 mt-2 truncate">
                   {section.description}
                 </p>
               )}

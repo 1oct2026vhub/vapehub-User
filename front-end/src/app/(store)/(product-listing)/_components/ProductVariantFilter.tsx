@@ -43,7 +43,13 @@ const SelectAttributeTerms = ({
                 classNames={{
                     label: "!text-content-1 !text-skin-neutral-500 !font-opensans",
                     trigger: "shadow-base border-skin-neutral-100 !rounded",
-                    listboxWrapper: "max-h-[400px]",
+                    listboxWrapper: "max-h-[400px] overflow-y-auto",
+                    listbox: "max-h-[400px] overflow-y-auto",
+                }}
+                popoverProps={{
+                    classNames: {
+                        content: "max-h-[400px] overflow-hidden",
+                    }
                 }}
                 onChange={(e) => {
                     const term = attributeTerm.terms.find(t => t.slug === e.target.value);

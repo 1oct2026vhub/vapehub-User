@@ -15,6 +15,17 @@ interface Feature {
     link?: string | null;
 }
 
+// Type for API response feature
+interface ApiFeature {
+    id: number;
+    title: string;
+    subtitle: string;
+    link?: string | null;
+    icon?: {
+        icon_url: string;
+    } | null;
+}
+
 // Static fallback features
 const fallbackFeatures: Feature[] = [
     {
@@ -153,7 +164,7 @@ const HeaderFeatures: React.FC = () => {
 
                 // Process feature content
                 if (featuresResponse.status === ServerActionStatus.SUCCESS && featuresResponse.data?.featureContent) {
-                    const apiFeatures: Feature[] = featuresResponse.data.featureContent.map((feature: any) => ({
+                    const apiFeatures: Feature[] = featuresResponse.data.featureContent.map((feature: ApiFeature) => ({
                         id: feature.id,
                         title: feature.title,
                         desc: feature.subtitle,

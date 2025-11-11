@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import Slider from 'react-slick';
 import { getFeatureContent, getTrustpilotReviews } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
@@ -11,6 +12,7 @@ interface Feature {
     desc: string;
     image: string | null;
     isTrustpilot?: boolean;
+    link?: string | null;
 }
 
 // Static fallback features
@@ -151,12 +153,13 @@ const HeaderFeatures: React.FC = () => {
 
                 // Process feature content
                 if (featuresResponse.status === ServerActionStatus.SUCCESS && featuresResponse.data?.featureContent) {
-                    const apiFeatures: Feature[] = featuresResponse.data.featureContent.map((feature) => ({
+                    const apiFeatures: Feature[] = featuresResponse.data.featureContent.map((feature: any) => ({
                         id: feature.id,
                         title: feature.title,
                         desc: feature.subtitle,
                         image: feature.icon?.icon_url || null,
                         isTrustpilot: feature.title.toLowerCase().includes('trustpilot'),
+                        link: feature.link || null,
                     }));
                     
                     // Ensure Trustpilot feature is always present at second position
@@ -208,60 +211,93 @@ const HeaderFeatures: React.FC = () => {
         <div className="w-full bg-footer-gradient">
             {/* Desktop / tablet view */}
             <div className="hidden lg:flex items-center justify-between gap-6 px-4 lg:px-12 py-3 lg:py-5 text-white max-w-[1520px] mx-auto">
-                {features.map((f) => (
-                    <div key={f.id} className="flex items-center gap-4 max-w-[28%]">
-                        {f.image ? (
-                            <Image src={f.image} alt={`${f.title} icon`} width={38} height={38} className="object-contain rounded-full" loading="lazy" />
-                        ) : null}
-                        {f.isTrustpilot ? (
-                            <a 
-                                href="https://uk.trustpilot.com/review/vapehub.co.uk" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity"
-                            >
-                                {trustpilotData ? (
-                                    <div className="flex items-center gap-2">
-                                        <StarRating rating={trustpilotData.stars} starSize={26} />
-                                    </div>
-                                ) : (
+                {features.map((f) => {
+                    // Determine the link to use: for Trustpilot, use API link if available, otherwise use hardcoded link
+                    const link = f.isTrustpilot 
+                        ? (f.link || "https://uk.trustpilot.com/review/vapehub.co.uk")
+                        : f.link;
+                    
+                    const isExternalLink = link && (link.startsWith('http://') || link.startsWith('https://'));
+                    const isRelativeLink = link && link.startsWith('/');
+                    const linkClassName = "flex flex-col cursor-pointer hover:opacity-80 transition-opacity";
+
+                    const renderContent = () => {
+                        if (f.isTrustpilot) {
+                            return (
+                                <>
+                                    {trustpilotData ? (
+                                        <div className="flex items-center gap-2">
+                                            <StarRating rating={trustpilotData.stars} starSize={26} />
+                                        </div>
+                                    ) : (
+                                        <span className="font-bold font-oswald text-sm md:text-xl text-skin-white">{f.title}</span>
+                                    )}
+                                    <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">
+                                        {trustpilotData 
+                                            ? `Trustpilot has rated Vapehub as ${trustpilotData.ratingCategory}!`
+                                            : f.desc
+                                        }
+                                    </span>
+                                </>
+                            );
+                        } else {
+                            return (
+                                <>
                                     <span className="font-bold font-oswald text-sm md:text-xl text-skin-white">{f.title}</span>
-                                )}
-                                <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">
-                                    {trustpilotData 
-                                        ? `Trustpilot has rated Vapehub as ${trustpilotData.ratingCategory}!`
-                                        : f.desc
-                                    }
-                                </span>
-                            </a>
-                        ) : (
-                            <div className="flex flex-col">
-                                <span className="font-bold font-oswald text-sm md:text-xl text-skin-white">{f.title}</span>
-                                <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">
-                                    {f.desc}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                ))}
+                                    <span className="text-title-2 font-oswald font-semibold text-skin-neutral-50">
+                                        {f.desc}
+                                    </span>
+                                </>
+                            );
+                        }
+                    };
+                    
+                    return (
+                        <div key={f.id} className="flex items-center gap-4 max-w-[28%]">
+                            {f.image ? (
+                                <Image src={f.image} alt={`${f.title} icon`} width={38} height={38} className="object-contain rounded-full" loading="lazy" />
+                            ) : null}
+                            {link ? (
+                                isRelativeLink ? (
+                                    <Link href={link} className={linkClassName}>
+                                        {renderContent()}
+                                    </Link>
+                                ) : (
+                                    <a 
+                                        href={link} 
+                                        {...(isExternalLink && { target: "_blank", rel: "noopener noreferrer" })}
+                                        className={linkClassName}
+                                    >
+                                        {renderContent()}
+                                    </a>
+                                )
+                            ) : (
+                                <div className="flex flex-col">
+                                    {renderContent()}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Mobile carousel */}
             <div className="lg:hidden text-white">
                 <Slider {...settings} className="py-2.5">
-                    {features.map((f) => (
-                        <div key={f.id} className="px-4">
-                            <div className="flex items-center justify-center gap-1">
-                                {f.image ? (
-                                    <Image src={f.image} alt={`${f.title} icon`} width={20} height={20} className="object-contain rounded-full" loading="lazy" />
-                                ) : null}
-                                {f.isTrustpilot ? (
-                                    <a 
-                                        href="https://uk.trustpilot.com/review/vapehub.co.uk" 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                                    >
+                    {features.map((f) => {
+                        // Determine the link to use: for Trustpilot, use API link if available, otherwise use hardcoded link
+                        const link = f.isTrustpilot 
+                            ? (f.link || "https://uk.trustpilot.com/review/vapehub.co.uk")
+                            : f.link;
+                        
+                        const isExternalLink = link && (link.startsWith('http://') || link.startsWith('https://'));
+                        const isRelativeLink = link && link.startsWith('/');
+                        const linkClassName = "flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity";
+
+                        const renderContent = () => {
+                            if (f.isTrustpilot) {
+                                return (
+                                    <>
                                         {trustpilotData ? (
                                             <>
                                                 <StarRating rating={trustpilotData.stars} starSize={20} />
@@ -274,17 +310,46 @@ const HeaderFeatures: React.FC = () => {
                                                 {f.desc}
                                             </span>
                                         )}
-                                    </a>
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
-                                            {f.desc}
-                                        </span>
-                                    </div>
-                                )}
+                                    </>
+                                );
+                            } else {
+                                return (
+                                    <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
+                                        {f.desc}
+                                    </span>
+                                );
+                            }
+                        };
+
+                        return (
+                            <div key={f.id} className="px-4">
+                                <div className="flex items-center justify-center gap-1">
+                                    {f.image ? (
+                                        <Image src={f.image} alt={`${f.title} icon`} width={20} height={20} className="object-contain rounded-full" loading="lazy" />
+                                    ) : null}
+                                    {link ? (
+                                        isRelativeLink ? (
+                                            <Link href={link} className={linkClassName}>
+                                                {renderContent()}
+                                            </Link>
+                                        ) : (
+                                            <a 
+                                                href={link} 
+                                                {...(isExternalLink && { target: "_blank", rel: "noopener noreferrer" })}
+                                                className={linkClassName}
+                                            >
+                                                {renderContent()}
+                                            </a>
+                                        )
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            {renderContent()}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </Slider>
             </div>
         </div>

@@ -18,6 +18,7 @@ interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'h
     is_hot?: boolean;
     hide_mobile_view?: boolean;
     hide_desktop_view?: boolean;
+    image_url?: string | null; // image_url is now provided at top level by API
     entity_data?: HeaderMegaMenu['entity_data'] & {
         image_url?: string;
     };
@@ -245,11 +246,6 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
                         ))}
                     </div>
                     
-                    {/* Border bottom after first row if there are more items */}
-                    {remainingItems.length > 0 && (
-                        <div className="border-b border-skin-neutral-200 pb-6"></div>
-                    )}
-                    
                     {/* Remaining items in 3 columns */}
                     {remainingItems.length > 0 && (
                         <div className="grid grid-cols-3 gap-8">
@@ -325,19 +321,10 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
             if (isMobile && extendedItem.hide_mobile_view) continue;
             if (!isMobile && extendedItem.hide_desktop_view) continue;
             
-            if (item.show_image && item.entity_data) {
-                // Deal case
-                if (item.entity_type === 'deal' && extendedItem.entity_data?.image_url) {
-                    return { item, imageUrl: extendedItem.entity_data.image_url };
-                }
-                // Product case
-                if (
-                    item.entity_type === 'product' &&
-                    Array.isArray(item.entity_data.ProductImages) &&
-                    item.entity_data.ProductImages.length > 0 &&
-                    item.entity_data.ProductImages[0]?.image_url
-                ) {
-                    return { item, imageUrl: item.entity_data.ProductImages[0].image_url };
+            if (item.show_image) {
+                // Check for image_url at top level (now provided directly by API)
+                if (extendedItem.image_url && typeof extendedItem.image_url === 'string' && extendedItem.image_url.trim() !== '') {
+                    return { item, imageUrl: extendedItem.image_url };
                 }
             }
             if (item.children) {
@@ -358,24 +345,10 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
             if (isMobile && extendedItem.hide_mobile_view) continue;
             if (!isMobile && extendedItem.hide_desktop_view) continue;
             
-            if (item.show_image && item.entity_data) {
-                // Deal, Brand, or Category case
-                if (
-                    (item.entity_type === 'deal' || item.entity_type === 'brand' || item.entity_type === 'category') &&
-                    typeof extendedItem.entity_data?.image_url === 'string' &&
-                    extendedItem.entity_data.image_url
-                ) {
-                    result.push({ item, imageUrl: extendedItem.entity_data.image_url });
-                }
-                // Product case
-                else if (
-                    item.entity_type === 'product' &&
-                    Array.isArray(item.entity_data.ProductImages) &&
-                    item.entity_data.ProductImages.length > 0 &&
-                    typeof item.entity_data.ProductImages[0]?.image_url === 'string' &&
-                    item.entity_data.ProductImages[0].image_url
-                ) {
-                    result.push({ item, imageUrl: item.entity_data.ProductImages[0].image_url });
+            if (item.show_image) {
+                // Check for image_url at top level (now provided directly by API)
+                if (extendedItem.image_url && typeof extendedItem.image_url === 'string' && extendedItem.image_url.trim() !== '') {
+                    result.push({ item, imageUrl: extendedItem.image_url });
                 }
             }
             if (item.children) {
@@ -390,7 +363,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
 
     return (
         <div className={`absolute left-0 right-0 top-[100%] w-full shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-500 ease-in min-h-[250px] max-h-[300px] overflow-y-auto flex items-start justify-between opacity-0 invisible transform translate-y-2 pointer-events-none max-w-[1520px] mx-auto ${isOpen ? '!opacity-100 !visible !translate-y-0 pointer-events-auto' : ''}`}>
-            <div className={`${shouldShowImageSection ? 'w-[68%] pr-7 border-r border-skin-neutral-200' : 'w-full'} space-y-6`}>
+            <div className={`${allImageResults.length > 0 ? 'w-[68%] pr-7 border-r border-skin-neutral-200' : 'w-full'} space-y-6`}>
                 <Form {...searchFromConfig}>
                     <form noValidate className="w-3/4">
                         <InputField

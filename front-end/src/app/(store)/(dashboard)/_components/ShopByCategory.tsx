@@ -7,7 +7,6 @@ import { ServerActionStatus } from "@/lib/config/app.config";
 
 const ShopByCategory: FunctionComponent = async (): Promise<ReactElement> => {
   const homeBlocksResponse = await getHomeBlocks();
-  console.log("homeBlocksResponse", homeBlocksResponse);
   if (homeBlocksResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load categories' />;
   }
@@ -25,7 +24,7 @@ const ShopByCategory: FunctionComponent = async (): Promise<ReactElement> => {
     .sort((a, b) => a.order - b.order) // Sort by order
     .map(item => ({
       ...item.category,
-      logo_url: item.image_url || item.category.logo_url, // Use image_url from shopByCategories, fallback to category logo_url
+      logo_url: item.image_url , // Use image_url from shopByCategories, fallback to category logo_url
     }));
    
   return (

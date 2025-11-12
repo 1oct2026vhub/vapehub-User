@@ -24,7 +24,7 @@ interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'h
     };
 }
 
-export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }> = ({ isOpen, menuItems }) => {
+export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; parentMenu?: HeaderMegaMenu | null }> = ({ isOpen, menuItems, parentMenu }) => {
     const router = useRouter();
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
@@ -361,9 +361,27 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
     const shouldShowImageSection = hasAnyShowImage(menuItems);
     const allImageResults = collectAllImageItems(menuItems);
 
+    // Get parent menu image if available
+    const parentMenuExtended = parentMenu as ExtendedHeaderMegaMenu | undefined;
+    const parentMenuImageUrl = parentMenuExtended?.image_url;
+
+    // Helper function to get navigation href for parent menu
+    const getParentMenuHref = () => {
+        if (!parentMenu) return '#';
+        if (parentMenu.entity_type === 'brand') {
+            const slug = parentMenu.entity_data?.slug || parentMenu.original?.split('/').pop() || '';
+            return `/brand/${slug}`;
+        }
+        if (parentMenu.entity_type === 'deal') {
+            const slug = parentMenu.entity_data?.slug || parentMenu.original?.split('/').pop() || '';
+            return `/product-deals/${slug}`;
+        }
+        return parentMenu.original || '#';
+    };
+
     return (
         <div className={`absolute left-0 right-0 top-[100%] w-full shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-500 ease-in min-h-[250px] max-h-[300px] overflow-y-auto flex items-start justify-between opacity-0 invisible transform translate-y-2 pointer-events-none max-w-[1520px] mx-auto ${isOpen ? '!opacity-100 !visible !translate-y-0 pointer-events-auto' : ''}`}>
-            <div className={`${allImageResults.length > 0 ? 'w-[68%] pr-7 border-r border-skin-neutral-200' : 'w-full'} space-y-6`}>
+            <div className={`${(parentMenuImageUrl || allImageResults.length > 0) ? 'w-[68%] pr-7 border-r border-skin-neutral-200' : 'w-full'} space-y-6`}>
                 <Form {...searchFromConfig}>
                     <form noValidate className="w-3/4">
                         <InputField
@@ -384,11 +402,34 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[] }
 
                 {renderMenuColumns(filteredMenuItems)}
             </div>
-            {/* Image section - enabled with dynamic handling */}
-            {shouldShowImageSection && allImageResults.length > 0 && (
+            {/* Image section - show parent menu image in same row as child images */}
+            {(parentMenuImageUrl || (shouldShowImageSection && allImageResults.length > 0)) && (
                 <div className="w-[32%] space-y-6 pl-7 max-h-[400px] overflow-y-auto">
                     <div className="grid grid-cols-3 gap-4">
-                        {allImageResults.map(({ item, imageUrl }) => {
+                        {/* Parent menu main image - same size as child images */}
+                        {parentMenuImageUrl && (
+                            <Link href={getParentMenuHref()} className="block">
+                                <div className="bg-white rounded-2xl shadow-md p-3">
+                                    <div className="relative w-full h-[100px]">
+                                        <Image
+                                            src={parentMenuImageUrl}
+                                            alt={parentMenu?.label || 'Menu Image'}
+                                            fill
+                                            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                                            className="object-contain rounded-10"
+                                        />
+                                    </div>
+                                    {/* {parentMenu && (
+                                        <h3 className="text-content-2 font-semibold text-skin-neutral-500 text-center line-clamp-2">
+                                            {parentMenu.label}
+                                        </h3>
+                                    )} */}
+                                </div>
+                            </Link>
+                        )}
+                        
+                        {/* Child menu images */}
+                        {shouldShowImageSection && allImageResults.length > 0 && allImageResults.map(({ item, imageUrl }) => {
                             const getHref = () => {
                                 if (item.entity_type === 'brand') {
                                     return `/brand${item.original}`;

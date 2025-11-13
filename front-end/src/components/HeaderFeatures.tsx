@@ -310,12 +310,18 @@ const HeaderFeatures: React.FC = () => {
                                 return (
                                     <>
                                         {trustpilotData ? (
-                                            <>
-                                                <StarRating rating={trustpilotData.stars} starSize={20} />
-                                                <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
-                                                    Trustpilot has rated Vapehub as {trustpilotData.ratingCategory}!
+                                            <div className="flex items-center gap-2">
+                                                {/* Rating category text (e.g., "Excellent") */}
+                                                <span className="text-content-1 font-oswald font-bold text-skin-white whitespace-nowrap">
+                                                    {trustpilotData.ratingCategory}
                                                 </span>
-                                            </>
+                                                {/* Stars in between */}
+                                                <StarRating rating={trustpilotData.stars} starSize={20} />
+                                                {/* Trustpilot text */}
+                                                <span className="text-content-1 font-oswald font-bold text-skin-white whitespace-nowrap">
+                                                    Trustpilot
+                                                </span>
+                                            </div>
                                         ) : (
                                             <span className="text-content-1 font-oswald font-semibold text-skin-neutral-50">
                                                 {f.desc}

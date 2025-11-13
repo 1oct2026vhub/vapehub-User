@@ -48,7 +48,7 @@ const SelectAttributeTerms = ({
                 }}
                 popoverProps={{
                     classNames: {
-                        content: "max-h-[400px] overflow-hidden",
+                        content: "max-h-[400px] overflow-hidden p-0",
                     }
                 }}
                 onChange={(e) => {

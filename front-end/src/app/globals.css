@@ -482,7 +482,9 @@ input[type="checkbox"] + span {
 /* NextUI Select dropdown scrollbar with smooth scrolling - single scrollbar only */
 /* Only wrapper should scroll, listbox should not scroll */
 [data-slot="listboxWrapper"],
-.nextui-listbox-wrapper {
+.nextui-listbox-wrapper,
+[role="listbox"] + div,
+div[data-slot="listboxWrapper"] {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
@@ -490,6 +492,8 @@ input[type="checkbox"] + span {
   overflow-y: auto !important;
   overflow-x: hidden !important;
   position: relative !important;
+  /* Ensure wrapper is the scroll container */
+  max-height: 400px !important;
 }
 
 /* Listbox should not have any overflow - wrapper handles all scrolling */
@@ -505,8 +509,13 @@ input[type="checkbox"] + span {
 .nextui-listbox-wrapper > [data-slot="listbox"],
 div[data-slot="listbox"],
 ul[data-slot="listbox"],
+[role="listbox"],
+ul[role="listbox"],
 .nextui-listbox-wrapper div,
-.nextui-listbox-wrapper ul {
+.nextui-listbox-wrapper ul,
+.nextui-listbox-wrapper [role="listbox"],
+[data-slot="listboxWrapper"] [role="listbox"],
+[data-slot="listboxWrapper"] ul {
   overflow: visible !important;
   overflow-y: visible !important;
   overflow-x: visible !important;
@@ -524,6 +533,9 @@ ul[data-slot="listbox"],
   -ms-overflow-style: none !important;
   /* Force no scrolling capability */
   touch-action: auto !important;
+  /* Additional properties to prevent scrolling */
+  will-change: auto !important;
+  transform: none !important;
 }
 
 /* Only style scrollbar for wrapper, not listbox */
@@ -559,7 +571,11 @@ ul[data-slot="listbox"],
 [data-slot="listboxWrapper"] [data-slot="listbox"]::-webkit-scrollbar,
 [data-slot="listboxWrapper"] .nextui-listbox::-webkit-scrollbar,
 .nextui-listbox-wrapper [data-slot="listbox"]::-webkit-scrollbar,
-.nextui-listbox-wrapper .nextui-listbox::-webkit-scrollbar {
+.nextui-listbox-wrapper .nextui-listbox::-webkit-scrollbar,
+[role="listbox"]::-webkit-scrollbar,
+ul[role="listbox"]::-webkit-scrollbar,
+[data-slot="listboxWrapper"] [role="listbox"]::-webkit-scrollbar,
+.nextui-listbox-wrapper [role="listbox"]::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
@@ -574,7 +590,11 @@ ul[data-slot="listbox"],
 [data-slot="listboxWrapper"] [data-slot="listbox"]::-webkit-scrollbar-track,
 [data-slot="listboxWrapper"] .nextui-listbox::-webkit-scrollbar-track,
 .nextui-listbox-wrapper [data-slot="listbox"]::-webkit-scrollbar-track,
-.nextui-listbox-wrapper .nextui-listbox::-webkit-scrollbar-track {
+.nextui-listbox-wrapper .nextui-listbox::-webkit-scrollbar-track,
+[role="listbox"]::-webkit-scrollbar-track,
+ul[role="listbox"]::-webkit-scrollbar-track,
+[data-slot="listboxWrapper"] [role="listbox"]::-webkit-scrollbar-track,
+.nextui-listbox-wrapper [role="listbox"]::-webkit-scrollbar-track {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -587,7 +607,11 @@ ul[data-slot="listbox"],
 [data-slot="listboxWrapper"] [data-slot="listbox"]::-webkit-scrollbar-thumb,
 [data-slot="listboxWrapper"] .nextui-listbox::-webkit-scrollbar-thumb,
 .nextui-listbox-wrapper [data-slot="listbox"]::-webkit-scrollbar-thumb,
-.nextui-listbox-wrapper .nextui-listbox::-webkit-scrollbar-thumb {
+.nextui-listbox-wrapper .nextui-listbox::-webkit-scrollbar-thumb,
+[role="listbox"]::-webkit-scrollbar-thumb,
+ul[role="listbox"]::-webkit-scrollbar-thumb,
+[data-slot="listboxWrapper"] [role="listbox"]::-webkit-scrollbar-thumb,
+.nextui-listbox-wrapper [role="listbox"]::-webkit-scrollbar-thumb {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;

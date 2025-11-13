@@ -479,55 +479,87 @@ input[type="checkbox"] + span {
   background: #555;
 }
 
-/* NextUI Select dropdown scrollbar */
+/* NextUI Select dropdown scrollbar with smooth scrolling - always visible */
+/* Only apply scroll to wrapper, not listbox to avoid double scrollbars */
+[data-slot="listboxWrapper"],
+.nextui-listbox-wrapper {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+  overflow-y: scroll !important;
+}
+
+/* Listbox should not have its own scrollbar - wrapper handles it */
+[data-slot="listbox"],
+.nextui-listbox {
+  overflow: visible !important;
+  overflow-y: visible !important;
+}
+
+/* Only style scrollbar for wrapper, not listbox */
 [data-slot="listboxWrapper"]::-webkit-scrollbar,
-[data-slot="listbox"]::-webkit-scrollbar,
-.nextui-listbox-wrapper::-webkit-scrollbar,
-.nextui-listbox::-webkit-scrollbar {
-  width: 5px;
+.nextui-listbox-wrapper::-webkit-scrollbar {
+  width: 6px !important;
+  display: block !important;
+  -webkit-appearance: none;
 }
 
 [data-slot="listboxWrapper"]::-webkit-scrollbar-track,
-[data-slot="listbox"]::-webkit-scrollbar-track,
-.nextui-listbox-wrapper::-webkit-scrollbar-track,
-.nextui-listbox::-webkit-scrollbar-track {
-  background: #f1f1f1;
+.nextui-listbox-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
   border-radius: 10px;
 }
 
 [data-slot="listboxWrapper"]::-webkit-scrollbar-thumb,
-[data-slot="listbox"]::-webkit-scrollbar-thumb,
-.nextui-listbox-wrapper::-webkit-scrollbar-thumb,
-.nextui-listbox::-webkit-scrollbar-thumb {
-  background: #888;
+.nextui-listbox-wrapper::-webkit-scrollbar-thumb {
+  background: #888 !important;
   border-radius: 10px;
 }
 
 [data-slot="listboxWrapper"]::-webkit-scrollbar-thumb:hover,
-[data-slot="listbox"]::-webkit-scrollbar-thumb:hover,
-.nextui-listbox-wrapper::-webkit-scrollbar-thumb:hover,
-.nextui-listbox::-webkit-scrollbar-thumb:hover {
-  background: #555;
+.nextui-listbox-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #555 !important;
 }
 
-/* Ensure scrollbar is visible for variant select dropdowns */
+/* Hide scrollbar on listbox itself */
+[data-slot="listbox"]::-webkit-scrollbar,
+.nextui-listbox::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+
+/* Ensure scrollbar is visible for variant select dropdowns with smooth scrolling */
+.overflow-y-auto {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
 .overflow-y-auto::-webkit-scrollbar {
-  width: 5px;
-  display: block;
+  width: 6px !important;
+  display: block !important;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f1f1f1 !important;
   border-radius: 10px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #888 !important;
   border-radius: 10px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #555 !important;
+}
+
+/* Smooth scrolling for scroll-smooth class */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 

@@ -280,20 +280,6 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems, parentMenu }) 
     const parentMenuExtended = parentMenu as ExtendedHeaderMegaMenu | undefined;
     const parentMenuImageUrl = parentMenuExtended?.image_url;
 
-    // Helper function to get navigation href for parent menu
-    const getParentMenuHref = () => {
-        if (!parentMenu) return '#';
-        if (parentMenu.entity_type === 'brand') {
-            const slug = parentMenu.entity_data?.slug || parentMenu.original?.split('/').pop() || '';
-            return `/brand/${slug}`;
-        }
-        if (parentMenu.entity_type === 'deal') {
-            const slug = parentMenu.entity_data?.slug || parentMenu.original?.split('/').pop() || '';
-            return `/product-deals/${slug}`;
-        }
-        return parentMenu.original || '#';
-    };
-
     // Combine parent menu image with all submenu images for slider (matching MegaMenu logic)
     const allSliderItems = useMemo(() => {
         const items: Array<{ id: string | number; imageUrl: string; label: string; original: string | null; entityType?: string; slug?: string; price?: string }> = [];

@@ -275,7 +275,6 @@ export async function generateMetadata({ params, searchParams }: {
   searchParams: Promise<Record<string, string>>
 }) {
   const slug = (await params).slug;
-  console.log('GENERATING METADATA FOR PRODUCT LISTING', slug);
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
   // const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;

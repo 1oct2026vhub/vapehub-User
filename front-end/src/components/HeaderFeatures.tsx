@@ -82,7 +82,6 @@ const ArrowNext: React.FC<ArrowProps> = ({ onClick }) => (
         </svg>
     </button>
 );
-
 // Star Rating Component for dynamic star display
 interface StarRatingProps {
     rating: number;

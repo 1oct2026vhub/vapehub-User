@@ -17,7 +17,7 @@ const NewProducts: React.FC<NewProductsProps> = async ({
   title = "New Products",
   viewAllHref = "/",
 }) => {
-  const productsResponse = await getHomeProductList({ sort_by: "id", order: "DESC", limit: 8, offset: 0 });
+  const productsResponse = await getHomeProductList({ sort_by: "id", order: "DESC", limit: 10, offset: 0 });
   if (productsResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
   }

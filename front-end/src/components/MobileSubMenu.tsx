@@ -22,6 +22,7 @@ interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'h
     show_all?: boolean;
     hide_mobile_view?: boolean;
     hide_desktop_view?: boolean;
+    image_url?: string | null; // image_url is now provided at top level by API
     entity_data?: HeaderMegaMenu['entity_data'] & {
         image_url?: string;
     };
@@ -29,9 +30,10 @@ interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'h
 
 interface MobileSubMenuProps {
     menuItems: HeaderMegaMenu[];
+    parentMenu?: HeaderMegaMenu | null;
 }
 
-const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
+const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems, parentMenu }) => {
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     // const { subscriptionSettings } = useSubscription();
@@ -97,66 +99,33 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
         return false;
     };
 
-    // Helper function to get image URL (matching MegaMenu logic)
-    const getImageUrl = (item: HeaderMegaMenu): string => {
-        const extendedItem = item as ExtendedHeaderMegaMenu;
-        
-        // Deal, Brand, or Category case
-        if ((item.entity_type === 'deal' || item.entity_type === 'brand' || item.entity_type === 'category') && extendedItem.entity_data?.image_url) {
-            return extendedItem.entity_data.image_url;
-        }
-        
-        // Product case
-        if (
-            item.entity_type === 'product' &&
-            Array.isArray(item.entity_data?.ProductImages) &&
-            item.entity_data.ProductImages.length > 0 &&
-            item.entity_data.ProductImages[0]?.image_url
-        ) {
-            return item.entity_data.ProductImages[0].image_url;
-        }
-        
-        return '/images/no-image.png';
-    };
-
-    // Filter product items with images - updated to match MegaMenu logic
-    const productItems = useMemo(() => {
-        const allItems = getAllMenuItems(platformFilteredMenuItems);
-        const itemsWithImages = allItems.filter(item => {
+    // Helper: Recursively collect all menu items with image_url at top level (matching MegaMenu logic)
+    const collectAllImageItems = useCallback((items: HeaderMegaMenu[]): { item: HeaderMegaMenu, imageUrl: string }[] => {
+        let result: { item: HeaderMegaMenu, imageUrl: string }[] = [];
+        for (const item of items) {
             const extendedItem = item as ExtendedHeaderMegaMenu;
             
             // Check platform visibility first
-            if (isMobile && extendedItem.hide_mobile_view) return false;
-            if (!isMobile && extendedItem.hide_desktop_view) return false;
+            if (isMobile && extendedItem.hide_mobile_view) continue;
+            if (!isMobile && extendedItem.hide_desktop_view) continue;
             
-            return item.show_image && item.entity_data;
-        });
+            // Check for image_url at top level (now provided directly by API) - matching MegaMenu
+            if (extendedItem.image_url && typeof extendedItem.image_url === 'string' && extendedItem.image_url.trim() !== '') {
+                result.push({ item, imageUrl: extendedItem.image_url });
+            }
+            
+            // Recursively check children
+            if (item.children) {
+                result = result.concat(collectAllImageItems(item.children));
+            }
+        }
+        return result;
+    }, [isMobile]);
 
-        
-        // Collect all valid images (matching MegaMenu logic)
-        const validImageItems = itemsWithImages.filter(item => {
-            const extendedItem = item as ExtendedHeaderMegaMenu;
-            
-            // Deal, Brand, or Category case
-            if ((item.entity_type === 'deal' || item.entity_type === 'brand' || item.entity_type === 'category') && extendedItem.entity_data?.image_url) {
-                return true;
-            }
-            
-            // Product case
-            if (
-                item.entity_type === 'product' &&
-                Array.isArray(item.entity_data?.ProductImages) &&
-                item.entity_data.ProductImages.length > 0 &&
-                item.entity_data.ProductImages[0]?.image_url
-            ) {
-                return true;
-            }
-            
-            return false;
-        });
-        return validImageItems;
-       
-    }, [platformFilteredMenuItems, getAllMenuItems, isMobile]);
+    // Collect all image items from menu items (matching MegaMenu logic)
+    const allImageResults = useMemo(() => {
+        return collectAllImageItems(platformFilteredMenuItems);
+    }, [platformFilteredMenuItems, collectAllImageItems]);
 
     // Filter menu items based on search keyword
     const filteredMenuItems = useMemo(() => {
@@ -307,40 +276,75 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems }) => {
         );
     };
 
+    // Get parent menu image if available
+    const parentMenuExtended = parentMenu as ExtendedHeaderMegaMenu | undefined;
+    const parentMenuImageUrl = parentMenuExtended?.image_url;
+
+    // Combine parent menu image with all submenu images for slider (matching MegaMenu logic)
+    const allSliderItems = useMemo(() => {
+        const items: Array<{ id: string | number; imageUrl: string; label: string; original: string | null; entityType?: string; slug?: string; price?: string }> = [];
+        
+        // Add parent menu image first if available
+        if (parentMenuImageUrl && parentMenu) {
+            items.push({
+                id: `parent-${parentMenu.id}`,
+                imageUrl: parentMenuImageUrl,
+                label: parentMenu.label,
+                original: parentMenu.original,
+                entityType: parentMenu.entity_type,
+                slug: parentMenu.entity_type === 'brand' || parentMenu.entity_type === 'deal' 
+                    ? (parentMenu.entity_data?.slug || parentMenu.original?.split('/').pop() || '')
+                    : undefined
+            });
+        }
+        
+        // Add all submenu items with image_url (matching MegaMenu logic)
+        allImageResults.forEach(({ item, imageUrl }) => {
+            items.push({
+                id: item.id,
+                imageUrl: imageUrl,
+                label: item.entity_data?.name || item.label,
+                original: item.original,
+                entityType: item.entity_type,
+                slug: item.entity_type === 'brand' || item.entity_type === 'deal'
+                    ? (item.entity_data?.slug || item.original?.split('/').pop() || '')
+                    : undefined,
+                price: item.entity_data?.price
+            });
+        });
+        
+        return items;
+    }, [parentMenuImageUrl, parentMenu, allImageResults]);
+
     return (
         <div className='flex flex-col gap-4'>
-            {/* Dynamic Product Images */}
-            {productItems.length > 0 && (
+            {/* Dynamic Product Images with Parent Menu Image */}
+            {allSliderItems.length > 0 && (
                 <div className="relative">
                     <Slider {...settings}>
-                        {productItems.map(product => (
+                        {allSliderItems.map(item => (
                             <div
-                                key={product.id}
+                                key={item.id}
                                 className="block cursor-pointer px-2"
                                 onClick={() => {
-                                    // Extract slug from original URL or entity_data
-                                    let slug = '';
-                                    if (product.entity_type === 'brand' || product.entity_type === 'deal') {
-                                        slug = product.entity_data?.slug || product.original?.split('/').pop() || '';
-                                    }
-                                    handleMenuClick(product.original, product.entity_type, slug);
+                                    handleMenuClick(item.original, item.entityType, item.slug);
                                 }}
                             >
                                 <div className="relative overflow-hidden rounded-lg">
                                     <Image
-                                        src={getImageUrl(product)}
-                                        alt={product.entity_data?.name || product.label}
+                                        src={item.imageUrl}
+                                        alt={item.label}
                                         width={183}
                                         height={130}
                                         className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
                                     />
                                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
                                         <h4 className="text-white text-xs font-semibold truncate">
-                                            {product.entity_data?.name || product.label}
+                                            {item.label}
                                         </h4>
-                                        {product.entity_data?.price && (
+                                        {item.price && (
                                             <p className="text-white/90 text-xs">
-                                                £{product.entity_data.price}
+                                                £{item.price}
                                             </p>
                                         )}
                                     </div>

@@ -43,8 +43,8 @@ const SelectAttributeTerms = ({
                 classNames={{
                     label: "!text-content-1 !text-skin-neutral-500 !font-opensans",
                     trigger: "shadow-base border-skin-neutral-100 !rounded",
-                    listboxWrapper: "max-h-[400px] overflow-y-auto",
-                    listbox: "max-h-[400px] overflow-y-auto",
+                    listboxWrapper: "max-h-[400px] overflow-y-auto scroll-smooth",
+                    listbox: "overflow-visible",
                 }}
                 popoverProps={{
                     classNames: {

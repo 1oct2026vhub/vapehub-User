@@ -14,22 +14,25 @@ interface BannerImageProps {
   className?: string;
 }
 
-const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false, className }) => (
-  <>
-   
-  <Link href={banner.redirect_url}>
-    <NoImage
-      src={banner.image_url}
-      alt={banner.title}
-      width={width}
-      height={height}
-      priority={priority}
-      sizes="80vw"
-      className={`w-full h-full object-fill aspect-video rounded-md md:rounded-lg ${className}`}
-    />
+const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false, className = '' }) => {
+  // Determine if this is a square banner based on width and height (for mobile only)
+  const isSquare = width === height;
+  const aspectClass = isSquare ? 'aspect-square' : 'aspect-video';
+  
+  return (
+    <Link href={banner.redirect_url}>
+      <NoImage
+        src={banner.image_url}
+        alt={banner.title}
+        width={width}
+        height={height}
+        priority={priority}
+        sizes="80vw"
+        className={`w-full h-full object-fill ${aspectClass} rounded-md md:rounded-lg ${className}`}
+      />
     </Link>
-  </>
-));
+  );
+});
 
 BannerImage.displayName = 'BannerImage';
 
@@ -56,7 +59,7 @@ const PromotionalBanners: React.FC = async () => {
             width={662}
             height={573}
             priority
-            className='max-h-[573px] rounded-md md:rounded-lg'
+            className='max-h-[573px]'
           />
         )}
 
@@ -74,7 +77,16 @@ const PromotionalBanners: React.FC = async () => {
       </section>
 
       <section className="grid grid-cols-1 gap-4 mt-10 md:hidden" role="region" aria-label="Promotional Banners Mobile">
-        {sortedBanners.slice(0, 3).map((banner, index) => (
+        {sortedBanners[0] && (
+          <BannerImage
+            banner={sortedBanners[0]}
+            width={361}
+            height={361}
+            priority
+            className='max-h-[361px]'
+          />
+        )}
+        {sortedBanners.slice(1, 3).map((banner, index) => (
           <BannerImage
             key={`mobile-banner-${banner.title}-${index}`}
             banner={banner}

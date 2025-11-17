@@ -55,7 +55,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({ data, selectedVarian
                     )
                 }
                 <Suspense fallback={<SuspenseLoader />}>
-                    <ProductContent product={data?.product} />
+                    <ProductContent data={data} />
                 </Suspense>
                 <Suspense fallback={<SuspenseLoader height='h-40' />}>
                     <FAQSection type="product" id={data.product.id} />

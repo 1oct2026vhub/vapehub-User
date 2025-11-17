@@ -232,6 +232,7 @@ export interface ProductVariant {
     stock_status: string;
     status: string;
     is_in_stock: boolean;
+    description?: string;
     primary_image: {
         id: number;
         url: string;

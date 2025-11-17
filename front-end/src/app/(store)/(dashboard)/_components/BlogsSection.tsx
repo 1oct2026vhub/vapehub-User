@@ -15,7 +15,7 @@ const BlogsSection: React.FC<BlogsSectionProps> = async ({
   title = "New to Vaping",
   viewAllHref = "/blogs",
 }) => {
-  const blogsResponse = await getBlogList('');
+  const blogsResponse = await getBlogList('', { show_home_page: true });
   if (blogsResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load blogs' />;
   }

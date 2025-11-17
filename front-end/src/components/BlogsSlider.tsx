@@ -9,43 +9,78 @@ interface BlogProps {
   data: BlogResponse[];
 };
 const BlogsSlider: FunctionComponent<BlogProps> = ({ data }) => {
+  const isTwoBlogs = data.length === 2;
+  
+  // Slick slider configuration.
+  // Keep the cards centered whenever we only have two slides and maintain
+  // consistent spacing on larger collections.
   const settings: Settings = {
-    dots: true,
-    infinite: false,
-    speed: 500,
-    slidesToShow: 4,
-    slidesToScroll: 4,
-    lazyLoad:"progressive",
+    dots: true, // Show pagination indicators
+    infinite: false, // Disable looping for predictable UX
+    speed: 500, // Slide transition speed
+    slidesToShow: isTwoBlogs ? 2 : 4, // Dynamic columns based on dataset
+    slidesToScroll: isTwoBlogs ? 2 : 4, // Scroll the same amount we show
+    centerMode: isTwoBlogs, // Center the pair of cards
+    centerPadding: isTwoBlogs ? "24px" : "0px", // Maintain a small gap between centered cards
+    lazyLoad: "progressive",
     responsive: [
       {
         breakpoint: 1280,
-        settings: { slidesToShow: 3, slidesToScroll: 2, infinite: false, dots: true },
+        settings: { 
+          slidesToShow: isTwoBlogs ? 2 : 3,
+          slidesToScroll: isTwoBlogs ? 2 : 2,
+          infinite: false,
+          dots: true,
+          centerMode: isTwoBlogs,
+          centerPadding: isTwoBlogs ? "16px" : "0px",
+        },
       },
       {
         breakpoint: 640,
-        settings: { slidesToShow: 2, slidesToScroll: 2, infinite: false, dots: true },
+        settings: { 
+          slidesToShow: 2, 
+          slidesToScroll: 2, 
+          infinite: false, 
+          dots: true,
+          centerMode: true,
+          centerPadding: "8px",
+        },
       },
     ],
   };
   if (!data.length) {
     return <p className="mt-10 text-skin-neutral-500 text-title-1 md:text-h4 font-semibold text-center">No Blogs Available</p>
   }
+  const wrapperClasses = isTwoBlogs ? "max-w-5xl mx-auto" : "";
+
   return (
-    <Slider {...settings}>
+    <div className={wrapperClasses}>
+      <Slider {...settings}>
       {data.map((blog) => (
-        <Link key={blog.id} href={`/${blog.slug}`} className="px-2 md:px-3 xl:px-5 py-4 relative w-full">
-          {/* <div dangerouslySetInnerHTML={{ __html: blog.content }} /> */}
-          <Image src={blog.image_url ?? "/images/blog-card.jpg"} loading="lazy"
-            alt={blog.name} width={322} height={512}
-            className="rounded-lg shadow-lg cursor-pointer hover:shadow-slider-card w-full aspect-square min-h-[308px] sm:min-h-[336px] md:min-h-[380px] lg:min-h-[478px] xl:min-h-[512px] max-h-[512px]" />
-          <div className="space-y-4 absolute left-6 bottom-3 p-6 flex flex-col w-[95%]">
-            <div className="bg-white/50 py-1 px-2.5 font-semibold text-content-3 sm:text-content-1 text-black w-fit line-clamp-1">{blog.name}</div>
-            {/* <h4 className="text-content-1 md:text-title-1 font-semibold text-skin-white line-clamp-1">{blog.description}</h4> */}
-            <p className="text-content-1 md:text-title-1 text-white font-semibold line-clamp-1" dangerouslySetInnerHTML={{ __html: blog.description }} />
+        <Link
+          key={blog.id}
+          href={`/${blog.slug}`}
+          className={`pt-4 pb-6 relative w-full flex justify-center ${isTwoBlogs ? "px-3 md:px-4" : "px-2 md:px-3"}`}
+        >
+          <div className={`relative w-full ${isTwoBlogs ? "max-w-md" : ""}`}>
+            <Image
+              src={blog.image_url ?? "/images/blog-card.jpg"}
+              loading="lazy"
+              alt={blog.name}
+              width={isTwoBlogs ? 600 : 400}
+              height={isTwoBlogs ? 600 : 400}
+              className="rounded-lg shadow-lg cursor-pointer hover:shadow-slider-card w-full aspect-square object-cover"
+            />
+            <div className="absolute left-4 bottom-4">
+              <div className="bg-white/80 py-1 px-3 font-semibold text-content-3 sm:text-content-1 text-black  line-clamp-1">
+                {blog.name}
+              </div>
+            </div>
           </div>
         </Link>
       ))}
-    </Slider>
+      </Slider>
+    </div>
   );
 };
 

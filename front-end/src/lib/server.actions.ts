@@ -218,9 +218,9 @@ export const subscribeMail = async (email: string): Promise<ServerActionResponse
 };
 
 // blog list api
-export const getBlogList = async (group?: string | number, canCache: boolean = true): Promise<ServerActionResponse<BlogResponse[]>> => {
+export const getBlogList = async (group?: string | number, filters?: { show_home_page?: boolean }, canCache: boolean = true): Promise<ServerActionResponse<BlogResponse[]>> => {
   return await handleRequest<BlogResponse[], unknown>({
-    endpoint: API_ROUTES.GET_BLOGS(group),
+    endpoint: API_ROUTES.GET_BLOGS(group, filters),
     method: 'GET',
     canCache,
   });

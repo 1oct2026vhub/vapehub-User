@@ -71,6 +71,7 @@ export interface DynamicPageSlugResponse {
     entity_type: "category" |  "product" | "blog" | "blog_category";
     entity_id: number; 
     seo: SeoData | null;
+    description?: string;
     deals?: Array<{
         id: number;
         name: string;

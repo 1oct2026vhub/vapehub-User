@@ -1,9 +1,9 @@
 "use client"
 import { Card, CardBody,  Tab, Tabs, Pagination } from '@nextui-org/react'
 // import Image from 'next/image'
-import React, { ReactElement, useEffect, useState } from 'react'
+import React, { ReactElement, useEffect, useState, useMemo } from 'react'
 import ReviewCard from './ReviewCard'; 
-import { ProductViewDetails } from '@/lib/config/product.config';
+import { ProductResponse, ProductVariant } from '@/lib/config/product.config';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'; 
 // import { REVIEWS } from '@/lib/config/order.config';
@@ -12,11 +12,18 @@ import { useReviews } from '@/lib/context/ReviewContext';
 import { getShippingMethodsDisplay } from '@/lib/server.actions';
 import { SHIPPING_METHOD_DISPLAY } from '@/lib/config/order.config';
 import { ServerActionStatus } from '@/lib/config/app.config';
+
+type ProductWithDescription = {
+    description?: string;
+    product_description?: string;
+};
+
 type ProductContentProps = {
-    product: ProductViewDetails;
+    data: ProductResponse;
 }
 
-const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement => {
+const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => {
+    const { product } = data;
     const { reviewData, loading, fetchReviews } = useReviews();
     const [selectedTab, setSelectedTab] = useState('Description');
     const [currentPage, setCurrentPage] = useState(1);
@@ -24,6 +31,38 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
     const [shippingLoading, setShippingLoading] = useState(true);
     const [shippingError, setShippingError] = useState<string | null>(null);
     const limit = 10;
+
+    // Determine the description using the same logic as ProductDetails
+    const description = useMemo(() => {
+        const hasFilteredTerms = (data.filtered_attribute_terms?.length ?? 0) > 0;
+        const hasAvailableTerms = (data.available_terms?.length ?? 0) > 0;
+        
+        // A variant is ready when all attributes have been selected
+        const isReadyVariant = hasFilteredTerms && !hasAvailableTerms && data.variants?.length === 1;
+        
+        // A product is simple if it has no attributes to filter by
+        const isSimpleProduct = !hasFilteredTerms && !hasAvailableTerms;
+        
+        // If a variant is ready, that's our selected variant
+        const productVariant: ProductVariant | null = isReadyVariant ? data.variants[0] : null;
+        
+        // For simple products, use the first variant if available
+        const simpleProductVariant = isSimpleProduct && data.variants.length > 0 ? data.variants[0] : null;
+        
+        // The definitive entity (either a selected variant or a simple product's variant)
+        const cartEntity = productVariant ?? simpleProductVariant;
+        
+        // Determine description: use variant description if available and not empty, otherwise use product description
+        const variantDescription = cartEntity?.description;
+        // Handle both 'description' and 'product_description' fields for product (API might return either)
+        const productWithDescription = product as ProductWithDescription;
+        const productDescription = productWithDescription?.description || productWithDescription?.product_description || '';
+        const finalDescription = (variantDescription && variantDescription.trim() !== '') 
+            ? variantDescription 
+            : productDescription;
+        
+        return finalDescription;
+    }, [data, product]);
 
     useEffect(() => {
         if (selectedTab === 'Reviews' && product.id) {
@@ -119,7 +158,7 @@ const ProductContent: React.FC<ProductContentProps> = ({product}): ReactElement 
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
                                         <h3 className='text-title-1 md:text-h4 font-semibold text-black ml-0.5'>Description</h3>
-                                        <div className='product-content' dangerouslySetInnerHTML={{ __html: product.description }}></div>
+                                        <div className='product-content' dangerouslySetInnerHTML={{ __html: description }}></div>
                                     </div>
                                     {/* <Divider />
                                     <div className='space-y-3.5'>

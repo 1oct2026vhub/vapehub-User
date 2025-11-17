@@ -50,7 +50,17 @@ export const API_ROUTES = {
     GET_CAROUSEL: buildRequestUrl('/api/home/carousel'),
     GET_TESTIMONIALS: buildRequestUrl('/api/testimonials'),
     SUBSCRIBE_MAIL: buildRequestUrl('/api/mailSubscription'),
-    GET_BLOGS: (group?: string | number) => buildRequestUrl(`/api/blogs?blog_group=${group}`),
+    GET_BLOGS: (group?: string | number, filters?: { show_home_page?: boolean }) => {
+        const params = new URLSearchParams();
+        if (group !== undefined && group !== '') {
+            params.append('blog_group', String(group));
+        }
+        if (filters?.show_home_page !== undefined) {
+            params.append('show_home_page', String(filters.show_home_page));
+        }
+        const queryString = params.toString();
+        return buildRequestUrl(`/api/blogs${queryString ? `?${queryString}` : ''}`);
+    },
     GET_PROMOTION_BANNER: buildRequestUrl('/api/home/banner-images'),
     GET_BRAND_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/brands/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
     GET_BLOGS_BY_SLUG: (slug: string) => buildRequestUrl(`/api/blogs/category/${slug}?page=1&limit=10`),

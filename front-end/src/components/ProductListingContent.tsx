@@ -16,19 +16,17 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
     const dealsToDisplay = dynamicPageSlug?.latest_deals || dynamicPageSlug?.deals;
 
     // Only render content if there's deals text or deals images
-    if (!dynamicPageSlug?.deals_text && (!dealsToDisplay || dealsToDisplay.length === 0)) {
-        return null;
-    }
+    // if (!dynamicPageSlug?.deals_text && (!dealsToDisplay || dealsToDisplay.length === 0)) {
+    //     return null;
+    // }
 
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
                 <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name}</h1>
-                {(dynamicPageSlug?.deals_text || dealsToDisplay?.length) && (
-                    <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">
-                        <p>
-                            {dynamicPageSlug?.deals_text}
-                        </p>
+                {(dynamicPageSlug?.description ) && (
+                    <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">                        
+                          <p dangerouslySetInnerHTML={{ __html: dynamicPageSlug?.description }} />
                     </div>
                 )}
             </div>

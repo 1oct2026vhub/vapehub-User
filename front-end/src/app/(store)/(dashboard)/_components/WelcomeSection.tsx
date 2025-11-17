@@ -32,24 +32,16 @@ const WelcomeSection = async () => {
 
             {/* Right: image - only render if image_url exists */}
             {hasImage && (
-                <div className='flex-1 flex items-center justify-center w-full'>
-                    {/*
-                      - Default (mobile): auto height so image stacks naturally
-                      - md: 60% of the column height
-                      - xl: 70% of the column height (i.e. decrease image height by ~30%)
-                      - max-h clamp prevents excessive upscaling on very tall content
-                    */}
-                    <div className='w-full max-w-full rounded-md overflow-hidden h-auto max-h-[350px]'>
+                    <div className='w-full max-w-md aspect-square rounded-md overflow-hidden'>
                         <Image
                             src={image_url}
-                            width={658}
+                            width={500}
                             height={500}
                             alt={title}
-                            className='w-full h-full object-cover rounded-md block max-h-[350px]'
+                            className='w-full h-full object-cover rounded-md block'
                             priority={false}
                         />
                     </div>
-                </div>
             )}
         </section>
     );

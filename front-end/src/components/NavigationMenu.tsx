@@ -2,8 +2,9 @@
 
 import { defaultNavLinks } from "@/lib/config/category.config";
 import { HeaderMegaMenu } from "@/lib/config/header.config";
+import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { MegaMenu } from "./MegaMenu";
 import { DownArrowIcon } from "./Icons";
 import { useRouter } from "next/navigation";
@@ -16,14 +17,49 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
   // console.log('menus', menus);
   const router = useRouter();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const handleMouseEnter = (index: number) => {
-    setTimeout(() => setHoveredIndex(index), 500);
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    if (openTimerRef.current) {
+      clearTimeout(openTimerRef.current);
+    }
+
+    openTimerRef.current = setTimeout(() => {
+      setHoveredIndex(index);
+    }, 150);
   };
 
   const handleMouseLeave = () => {
-    setTimeout(() => setHoveredIndex(null), 500);
+    if (openTimerRef.current) {
+      clearTimeout(openTimerRef.current);
+      openTimerRef.current = null;
+    }
+
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+
+    closeTimerRef.current = setTimeout(() => {
+      setHoveredIndex(null);
+    }, 150);
   };
+
+  useEffect(() => {
+    return () => {
+      if (openTimerRef.current) {
+        clearTimeout(openTimerRef.current);
+      }
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
 
   // Handle menu item click navigation
   const handleMenuClick = (original: string | null, entityType?: string, slug?: string) => {
@@ -50,7 +86,7 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
         {/* Static NEW IN menu item */}
         <li>
           <Link 
-            href="/shop?is_new=true" 
+            href={ROUTES.NEW_PRODUCTS} 
             className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold font-oswald hover:text-skin-primary-300 transition-all duration-300 ease-in flex items-center gap-2"
           >
             NEW IN

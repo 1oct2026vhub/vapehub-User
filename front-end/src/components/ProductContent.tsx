@@ -157,7 +157,8 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
                             <CardBody className='p-0'>
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
-                                        <h3 className='text-title-1 md:text-h4 font-semibold text-black ml-0.5'>Description</h3>
+                                        <h3 className='text-h5 lg:text-h3 font-bold text-black'>Description</h3>
+                                        {/* <h3 className='text-title-1 md:text-h4 font-semibold text-black ml-0.5'>Description</h3> */}
                                         <div className='product-content' dangerouslySetInnerHTML={{ __html: description }}></div>
                                     </div>
                                     {/* <Divider />

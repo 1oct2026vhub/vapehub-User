@@ -4,14 +4,14 @@ import Image from 'next/image'
 import { REVIEWS } from '@/lib/config/order.config';
 
 const ReviewCard: React.FC<{ review: REVIEWS }> = ({ review }) => {
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-    };
+    // const formatDate = (dateString: string) => {
+    //     const date = new Date(dateString);
+    //     return date.toLocaleDateString('en-GB', {
+    //         day: 'numeric',
+    //         month: 'long',
+    //         year: 'numeric'
+    //     });
+    // };
 
     const getDisplayName = () => {
         const userName = review.user_name?.trim();

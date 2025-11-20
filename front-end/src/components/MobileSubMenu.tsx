@@ -31,9 +31,10 @@ interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'h
 interface MobileSubMenuProps {
     menuItems: HeaderMegaMenu[];
     parentMenu?: HeaderMegaMenu | null;
+    onItemSelect?: () => void;
 }
 
-const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems, parentMenu }) => {
+const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems, parentMenu, onItemSelect }) => {
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     // const { subscriptionSettings } = useSubscription();
@@ -185,6 +186,8 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems, parentMenu }) 
             } else {
                 router.push(original);
             }
+
+            onItemSelect?.();
         }
     };
 

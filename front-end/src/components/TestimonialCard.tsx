@@ -66,7 +66,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
     return (
         <Link
             href={href}
-            className="flex flex-col h-full bg-skin-white p-3.5 md:p-6 border space-y-3 border-neutral-50 rounded-xl shadow-card hover:shadow-brand-card transition-all duration-300"
+            className="flex flex-col h-full bg-skin-white p-3.5 md:p-6 border space-y-3 border-neutral-50 rounded-xl shadow-card hover:shadow-brand-card transition-all duration-300 cursor-default"
         >
             <div className="flex items-start justify-between">
                 {hasProfileImage ? (

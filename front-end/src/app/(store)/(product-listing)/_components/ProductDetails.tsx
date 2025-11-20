@@ -107,17 +107,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     const [error, setError] = useState<string | null>(null);
     const { reviewData } = useReviews();
     const [bundleProducts, setBundleProducts] = useState<ProductInDeal[]>([]);
-    const [bundlePagination, setBundlePagination] = useState<{
-        total_count: number;
-        total_pages: number;
-        current_page: number;
-        limit: number;
-        offset: number;
-        has_next: boolean;
-        has_prev: boolean;
-    } | null>(null);
     const [isLoadingBundles, setIsLoadingBundles] = useState(false);
-    const [currentBundlePage, setCurrentBundlePage] = useState(1);
     const handleReviewsClick = (e: React.MouseEvent) => {
         e.preventDefault();
         const reviewsSection = document.getElementById('reviews');
@@ -211,11 +201,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     // Reviews data is now provided by ReviewContext
 
     useEffect(() => {
-        const fetchBundleProducts = async (page = 1) => {
+        const fetchBundleProducts = async () => {
             if (!mixAndMatchDeal?.id) return;
             setIsLoadingBundles(true);
             const limit = 2;
-            const offset = (page - 1) * limit;
+            const offset = 0;
             const response = await getDealProducts(mixAndMatchDeal.id, {
                 limit,
                 offset,
@@ -223,21 +213,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             });
             if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
                 const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id);
-                setBundleProducts(filteredProducts);
-                setBundlePagination(response.data.pagination);
+                // Limit to only 2 products
+                setBundleProducts(filteredProducts.slice(0, 2));
             }
             setIsLoadingBundles(false);
         };
         if (mixAndMatchDeal?.id) {
-            fetchBundleProducts(currentBundlePage);
+            fetchBundleProducts();
         }
-    }, [mixAndMatchDeal?.id, product.id, currentBundlePage]);
+    }, [mixAndMatchDeal?.id, product.id]);
 
-    const handleBundlePageChange = (page: number) => {
-        if (page !== currentBundlePage) {
-            setCurrentBundlePage(page);
-        }
-    };
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -480,80 +465,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>Add more products from this deal and unlock extra savings</h2>
                     <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
                         {bundleProducts?.map((bundleProduct, index) => (
-                            <BundleProductCard key={`bundle-${bundleProduct.id}-${currentBundlePage}-${index}`} product={bundleProduct} />
+                            <BundleProductCard key={`bundle-${bundleProduct.id}-${index}`} product={bundleProduct} />
                         ))}
                     </div>
                     {isLoadingBundles && (
                         <div className='flex justify-center'><span>Loading...</span></div>
-                    )}
-                    {bundlePagination && bundlePagination.total_pages > 1 && bundleProducts.length > 0 && (
-                        <div className="flex justify-center items-center gap-1 mt-4">
-                            {/* Previous button */}
-                            {bundlePagination.has_prev && (
-                                <Button
-                                    size="sm"
-                                    radius="full"
-                                    variant="light"
-                                    className="w-7 h-7 min-w-0 px-0 text-xs"
-                                    onPress={() => handleBundlePageChange(currentBundlePage - 1)}
-                                    disabled={isLoadingBundles}
-                                >
-                                    ‹
-                                </Button>
-                            )}
-
-                            {/* Page numbers with dots */}
-                            {(() => {
-                                const totalPages = bundlePagination.total_pages;
-                                const current = currentBundlePage;
-                                const pages = [];
-
-                                if (totalPages <= 5) {
-                                    for (let i = 1; i <= totalPages; i++) pages.push(i);
-                                } else {
-                                    pages.push(1);
-                                    if (current > 3) pages.push('...');
-                                    for (let i = Math.max(2, current - 1); i <= Math.min(totalPages - 1, current + 1); i++) {
-                                        if (i > 1 && i < totalPages) pages.push(i);
-                                    }
-                                    if (current < totalPages - 2) pages.push('...');
-                                    pages.push(totalPages);
-                                }
-
-                                return pages.map((page, idx) =>
-                                    page === '...' ? (
-                                        <span key={`dots-${idx}-${Date.now()}`} className="text-skin-neutral-400 text-xs px-1">…</span>
-                                    ) : (
-                                        <Button
-                                            key={`page-${page}-${idx}-${Date.now()}`}
-                                            size="sm"
-                                            radius="full"
-                                            variant={page === current ? "solid" : "light"}
-                                            color={page === current ? "primary" : "default"}
-                                            className={`w-7 h-7 min-w-0 px-0 text-xs font-semibold ${page === current ? '!bg-skin-primary2-500 text-white' : ''}`}
-                                            onPress={() => handleBundlePageChange(page as number)}
-                                            disabled={isLoadingBundles}
-                                        >
-                                            {page}
-                                        </Button>
-                                    )
-                                );
-                            })()}
-
-                            {/* Next button */}
-                            {bundlePagination.has_next && (
-                                <Button
-                                    size="sm"
-                                    radius="full"
-                                    variant="light"
-                                    className="w-7 h-7 min-w-0 px-0 text-xs"
-                                    onPress={() => handleBundlePageChange(currentBundlePage + 1)}
-                                    disabled={isLoadingBundles}
-                                >
-                                    ›
-                                </Button>
-                            )}
-                        </div>
                     )}
                 </div>
             )}

@@ -10,7 +10,7 @@ const DealsSlider: React.FC = () => {
 
     useEffect(() => {
         const fetchDeals = async () => {
-            const response = await getAllDeals({ limit: 4, offset: 0 });
+            const response = await getAllDeals({ limit: 4, offset: 0, show_home_page: true });
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setDeals(response.data.deals);
             }

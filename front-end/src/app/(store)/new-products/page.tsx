@@ -16,7 +16,6 @@ export const metadata: Metadata = {
 type SearchParams = {
   searchParams: Promise<Record<string, string>>
 }
-
 const NewProductsPage: NextPage<SearchParams> = async ({ searchParams }): AsyncReactElement => {
   const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0, is_new: true } as const;
   const searchParamsData = await searchParams;

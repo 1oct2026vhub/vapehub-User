@@ -56,6 +56,13 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
     // Use megaMenuData if available, otherwise fall back to categories
     const menuData = megaMenuData.length > 0 ? megaMenuData : [];
 
+    // Ensure the footer is visible when closing the drawer
+    const handleMenuClose = () => {
+        setFooterVisible(true); // Reset footer visibility
+        setOpenItems([]); // Clear open accordion items
+        onMenuClose();
+    };
+
     // Check if there are any menu items with children or images
     const hasMenuContent = menuData.some(menuItem => 
         (menuItem.children && menuItem.children.length > 0) || 
@@ -64,7 +71,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
 
     const filterOptions = menuData.length > 0 ? menuData.map((menuItem) => ({
         title: menuItem.label,
-        content: <MobileSubMenu menuItems={menuItem.children || []} parentMenu={menuItem} />,
+        content: <MobileSubMenu menuItems={menuItem.children || []} parentMenu={menuItem} onItemSelect={handleMenuClose} />,
         link: menuItem.original || '#',
         isLink: false,
     })) : [];
@@ -112,13 +119,6 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
         });
     };
 
-    // Ensure the footer is visible when closing the drawer
-    const handleMenuClose = () => {
-        setFooterVisible(true); // Reset footer visibility
-        setOpenItems([]); // Clear open accordion items
-        onMenuClose();
-    };
-
     // Handle menu item click navigation
     const handleMenuClick = (original: string | null, entityType?: string, slug?: string) => {
         if (original && original !== '#') {
@@ -130,6 +130,8 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
             } else {
                 router.push(original);
             }
+
+            handleMenuClose();
         }
     };
 

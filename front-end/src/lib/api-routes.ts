@@ -88,7 +88,7 @@ export const API_ROUTES = {
     CANCEL_ORDER: (orderId: number) => buildRequestUrl(`/api/order/cancel/${orderId}`),
     UPDATE_ORDER_STATUS: (orderReference: string) => `/api/orders/${orderReference}/status`,
     REVIEWS: (payload: { page?: number, limit?: number, product_id?: number, user_id?: number, is_visible?: boolean, testimonial?: boolean }) => buildRequestUrl(`/api/review?${new URLSearchParams(payload as never).toString()}`),
-    GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }) => buildRequestUrl(`/api/product/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string, show_home_page?: boolean }) => buildRequestUrl(`/api/product/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_MORE_LIKE_THIS: (payload: { product_id: number; limit?: number; offset?: number }) => buildRequestUrl(`/api/product/more-like-this?${new URLSearchParams(payload as never).toString()}`),
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
@@ -158,7 +158,8 @@ export interface BLOG_PAYLOAD {
 
 export interface PRODUCT_VARIANT_PAYLOAD {
     product_id: number;
-    attribute_terms: PRODUCT_VARIANT_ATTRIBUTE[];
+    attribute_terms?: PRODUCT_VARIANT_ATTRIBUTE[];
+    slugs?: string;
 }
 export interface PRODUCT_VARIANT_ATTRIBUTE {
     attribute_id: number;

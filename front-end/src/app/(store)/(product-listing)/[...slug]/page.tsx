@@ -34,61 +34,123 @@ const Page = async ({
   }
 
   if (primarySlug && secondarySlug) {
-    const response = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
-    const variantTerms: AttributeTerms[] | undefined = response?.product.attribute_terms.filter((attrTerm: AttributeTerms) => attrTerm.attribute.used_in_variation === true);
+    // NEW FUNCTIONALITY: First try to use slug-based variant fetching
+    let data: ProductResponse | null = null;
+    let variantSlug: string | undefined = undefined;
     
-    const variant: AttributeProductTerms | null = variantTerms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
-
-      const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
-      if (matchingTerm) {
-        return {
-          attribute: attrTerm.attribute,
-          terms: matchingTerm
-        };
-      } 
-      return result;
-    }, null) ?? null;
-
-    const payload: PRODUCT_VARIANT_ATTRIBUTE[] = [];
-
-    // Add variant payload if exists
-    if (variant) {
-      payload.push({
-        attribute_id: variant.attribute.id,
-        term_id: variant.terms.id
-      });
-    } 
-    // Add search params payload
-    if (searchParamsData) {
-      Object.entries(searchParamsData).forEach(([attributeId, termSlug]) => {
-        const term = variantTerms?.find(term => term.attribute.id === parseInt(attributeId) && term.terms.find(t => t.slug === termSlug));
-        // Skip if this attribute is already in payload from variant
-        if (attributeId !== variant?.attribute.id.toString()) {
-          payload.push({
-            attribute_id: parseInt(attributeId),
-            term_id: term?.terms.find(t => t.slug === termSlug)?.id ?? 0
-          });
-        }
-      });
+    try {
+      // Check if the combined slug (product + variant) exists via getDynamicPageSlug
+      const combinedSlugs = `${primarySlug},${secondarySlug}`;
+      console.log('[page.tsx] getDynamicPageSlug - Payload:', { slugs: combinedSlugs });
+      const dynamicSlugResponse = await getDynamicPageSlug(combinedSlugs, false);
+      console.log('[page.tsx] getDynamicPageSlug - Response:', dynamicSlugResponse);
+      
+      // If API response is successful, use slug-based fetching
+      if (dynamicSlugResponse.status === ServerActionStatus.SUCCESS && dynamicSlugResponse.data) {
+        variantSlug = secondarySlug;
+        data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, [], variantSlug);
+      }
+    } catch (error) {
+      // If getDynamicPageSlug fails, fall through to existing functionality
+      console.error('Error fetching dynamic slug:', error);
     }
 
-    const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
-     
-    if(data && !data.variants.length) {
-      const lastPayload = payload[payload.length - 1];
-      const newSlug = data?.filtered_attribute_terms.find(term => term.attribute.id === lastPayload.attribute_id)?.terms.find(t => t.id === lastPayload.term_id)?.slug;
-      if(newSlug) {
-        redirect(`/${data.product.slug}/${newSlug}`, RedirectType.replace);
-      } else {
-        return notFound();
+    // FALLBACK: Existing functionality based on attribute term slug
+    if (!data) {
+      const response = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
+      const variantTerms: AttributeTerms[] | undefined = response?.product.attribute_terms.filter((attrTerm: AttributeTerms) => attrTerm.attribute.used_in_variation === true);
+      
+      const variant: AttributeProductTerms | null = variantTerms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
+
+        const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
+        if (matchingTerm) {
+          return {
+            attribute: attrTerm.attribute,
+            terms: matchingTerm
+          };
+        } 
+        return result;
+      }, null) ?? null;
+
+      const payload: PRODUCT_VARIANT_ATTRIBUTE[] = [];
+
+      // Add variant payload if exists
+      if (variant) {
+        payload.push({
+          attribute_id: variant.attribute.id,
+          term_id: variant.terms.id
+        });
+      } 
+      // Add search params payload
+      if (searchParamsData) {
+        Object.entries(searchParamsData).forEach(([attributeId, termSlug]) => {
+          const term = variantTerms?.find(term => term.attribute.id === parseInt(attributeId) && term.terms.find(t => t.slug === termSlug));
+          // Skip if this attribute is already in payload from variant
+          if (attributeId !== variant?.attribute.id.toString()) {
+            payload.push({
+              attribute_id: parseInt(attributeId),
+              term_id: term?.terms.find(t => t.slug === termSlug)?.id ?? 0
+            });
+          }
+        });
+      }
+
+      data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
+      
+      // Determine variant for fallback path
+      if (data) {
+        const variantTerms: AttributeTerms[] | undefined = data?.product.attribute_terms.filter((attrTerm: AttributeTerms) => attrTerm.attribute.used_in_variation === true);
+        const variant: AttributeProductTerms | null = variantTerms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
+          const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
+          if (matchingTerm) {
+            return {
+              attribute: attrTerm.attribute,
+              terms: matchingTerm
+            };
+          } 
+          return result;
+        }, null) ?? null;
+        
+        if(data && !data.variants.length) {
+          const lastPayload = payload[payload.length - 1];
+          const newSlug = data?.filtered_attribute_terms.find(term => term.attribute.id === lastPayload.attribute_id)?.terms.find(t => t.id === lastPayload.term_id)?.slug;
+          if(newSlug) {
+            redirect(`/${data.product.slug}/${newSlug}`, RedirectType.replace);
+          } else {
+            return notFound();
+          }
+        }
+        
+        if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
+          return notFound();
+        }
+
+        return <ProductView data={data} isVariant={true} selectedVariant={variant} />;
       }
     }
     
-    if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return notFound();
-    }
+    // For slug-based path, determine variant from the response
+    if (data) {
+      const variantTerms: AttributeTerms[] | undefined = data?.product.attribute_terms.filter((attrTerm: AttributeTerms) => attrTerm.attribute.used_in_variation === true);
+      const variant: AttributeProductTerms | null = variantTerms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
+        const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
+        if (matchingTerm) {
+          return {
+            attribute: attrTerm.attribute,
+            terms: matchingTerm
+          };
+        } 
+        return result;
+      }, null) ?? null;
+      
+      if (!data || !data.variants.length || !data.product || !data.product.category) {
+        return notFound();
+      }
 
-    return <ProductView data={data} isVariant={true} selectedVariant={variant} />;
+      return <ProductView data={data} isVariant={true} selectedVariant={variant ?? undefined} />;
+    }
+    
+    return notFound();
   }
 
 
@@ -209,14 +271,23 @@ const fetchCategory = async (slug: string, params: PRODUCT_PAYLOAD): Promise<Cat
   return response.data;
 };
 
-const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Promise<ProductResponse | null> => {
+const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[], variantSlug?: string): Promise<ProductResponse | null> => {
 
   const payload: PRODUCT_VARIANT_PAYLOAD = {
     product_id: id,
-    attribute_terms: params
+  };
+
+  // NEW FUNCTIONALITY: If variant slug is provided, use slug-based fetching
+  if (variantSlug) {
+    payload.slugs = variantSlug;
+  } else {
+    // FALLBACK: Use existing attribute_terms-based fetching
+    payload.attribute_terms = params;
   }
 
+  console.log('[page.tsx] getProductVariantByID - Payload:', payload);
   const response = await getProductVariantByID(payload);
+  console.log('[page.tsx] getProductVariantByID - Response:', response);
 
   if (response.status === ServerActionStatus.ERROR) {
     return null;
@@ -287,72 +358,141 @@ export async function generateMetadata({ params, searchParams }: {
   }
 
   if (primarySlug && secondarySlug) {
-    const response = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
-    const variant: AttributeProductTerms | null = response?.product.attribute_terms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
-      const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
-      if (matchingTerm) {
+    // NEW FUNCTIONALITY: First try to use slug-based variant fetching
+    let data: ProductResponse | null = null;
+    
+    try {
+      // Check if the combined slug (product + variant) exists via getDynamicPageSlug
+      const combinedSlugs = `${primarySlug},${secondarySlug}`;
+      console.log('[page.tsx - generateMetadata] getDynamicPageSlug - Payload:', { slugs: combinedSlugs });
+      const dynamicSlugResponse = await getDynamicPageSlug(combinedSlugs, false);
+      console.log('[page.tsx - generateMetadata] getDynamicPageSlug - Response:', dynamicSlugResponse);
+      
+      // If API response is successful, use slug-based fetching
+      if (dynamicSlugResponse.status === ServerActionStatus.SUCCESS && dynamicSlugResponse.data) {
+        data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, [], secondarySlug);
+      }
+    } catch (error) {
+      // If getDynamicPageSlug fails, fall through to existing functionality
+      console.error('Error fetching dynamic slug:', error);
+    }
+
+    // FALLBACK: Existing functionality based on attribute term slug
+    if (!data) {
+      const response = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
+      const variant: AttributeProductTerms | null = response?.product.attribute_terms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
+        const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
+        if (matchingTerm) {
+          return {
+            attribute: attrTerm.attribute,
+            terms: matchingTerm
+          };
+        }
+        return result;
+      }, null) ?? null;
+      const payload = [];
+
+      // Add variant payload if exists
+      if (variant) {
+        payload.push({
+          attribute_id: variant.attribute.id,
+          term_id: variant.terms.id
+        });
+      }
+
+      // Add search params payload
+      if (searchParamsData) {
+        Object.entries(searchParamsData).forEach(([attributeId, termSlug]) => {
+          const term = response?.product.attribute_terms?.find(term => term.attribute.id === parseInt(attributeId) && term.terms.find(t => t.slug === termSlug));
+          // Skip if this attribute is already in payload from variant
+          if (attributeId !== variant?.attribute.id.toString()) {
+            payload.push({
+              attribute_id: parseInt(attributeId),
+              term_id: term?.terms.find(t => t.slug === termSlug)?.id ?? 0
+            });
+          }
+        });
+      }
+
+      data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
+      
+      // Determine variant for fallback path
+      if (data) {
+        const variant: AttributeProductTerms | null = data?.product.attribute_terms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
+          const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
+          if (matchingTerm) {
+            return {
+              attribute: attrTerm.attribute,
+              terms: matchingTerm
+            };
+          }
+          return result;
+        }, null) ?? null;
+        
+        if(data && !data.variants.length) {
+          return {
+            title: dynamicPageSlug.seo?.title ?? data.product.name,
+            description: dynamicPageSlug.seo?.description ?? data.product.description,
+            openGraph: {
+              title: dynamicPageSlug.seo?.title ?? data.product.name,
+              description: dynamicPageSlug.seo?.description ?? data.product.description,
+            }
+          };
+        }
+        
+        if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
+          return notFound();
+        }
+        
         return {
-          attribute: attrTerm.attribute,
-          terms: matchingTerm
+          title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
+          description: dynamicPageSlug.seo?.description ?? data.product.description,
+          openGraph: {
+            title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
+            description: dynamicPageSlug.seo?.description ?? data.product.description,
+            images: data.variants[0].primary_image?.url ? [{
+              url: data.variants[0].primary_image?.url,
+              width: 1200,
+              height: 630
+            }] : undefined
+          }
         };
       }
-      return result;
-    }, null) ?? null;
-    const payload = [];
-
-    // Add variant payload if exists
-    if (variant) {
-      payload.push({
-        attribute_id: variant.attribute.id,
-        term_id: variant.terms.id
-      });
     }
-
-    // Add search params payload
-    if (searchParamsData) {
-      Object.entries(searchParamsData).forEach(([attributeId, termSlug]) => {
-        const term = response?.product.attribute_terms?.find(term => term.attribute.id === parseInt(attributeId) && term.terms.find(t => t.slug === termSlug));
-        // Skip if this attribute is already in payload from variant
-        if (attributeId !== variant?.attribute.id.toString()) {
-          payload.push({
-            attribute_id: parseInt(attributeId),
-            term_id: term?.terms.find(t => t.slug === termSlug)?.id ?? 0
-          });
-        }
-      });
-    }
-
-    const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
-    if(data &&!data.variants.length) {
-       return {
-        title: dynamicPageSlug.seo?.title ?? data.product.name,
-        description: dynamicPageSlug.seo?.description ?? data.product.description,
-        openGraph: {
-          title: dynamicPageSlug.seo?.title ?? data.product.name,
-          description: dynamicPageSlug.seo?.description ?? data.product.description,
-          
-        }
-       };
-    }
-   
     
-    if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return notFound();
-    }
-     
-    return {
-      title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
-      description: dynamicPageSlug.seo?.description ?? data.product.description,
-      openGraph: {
+    // For slug-based path, determine variant from the response
+    if (data) {
+      const variant: AttributeProductTerms | null = data?.product.attribute_terms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
+        const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
+        if (matchingTerm) {
+          return {
+            attribute: attrTerm.attribute,
+            terms: matchingTerm
+          };
+        }
+        return result;
+      }, null) ?? null;
+      
+      if (!data || !data.variants.length || !data.product || !data.product.category) {
+        return notFound();
+      }
+      
+      return {
         title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
         description: dynamicPageSlug.seo?.description ?? data.product.description,
-        images: data.variants[0].primary_image?.url ? [{
-          url: data.variants[0].primary_image?.url,
-          width: 1200,
-          height: 630
-        }] : undefined
-      }
-    };
+        openGraph: {
+          title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
+          description: dynamicPageSlug.seo?.description ?? data.product.description,
+          images: data.variants[0].primary_image?.url ? [{
+            url: data.variants[0].primary_image?.url,
+            width: 1200,
+            height: 630
+          }] : undefined
+        }
+      };
+    }
+    
+    return notFound();
 
   }
 

@@ -796,7 +796,7 @@ export const getDealProducts = async (
   }
 };
 
-export const getAllDeals = async (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string }, canCache: boolean = true): Promise<ServerActionResponse<AllDealsResponse>> => {
+export const getAllDeals = async (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string, show_home_page?: boolean }, canCache: boolean = true): Promise<ServerActionResponse<AllDealsResponse>> => {
     return await handleRequest<AllDealsResponse, unknown>({
         endpoint: API_ROUTES.GET_ALL_DEALS(payload),
         method: 'GET',

@@ -93,7 +93,8 @@ export interface productAttributesTerms {
     is_visible_page: boolean;
     used_in_variation: boolean;
     is_selected: boolean;
-
+    description?: string;
+    variant_slugs?: string[];
 }
 export interface AttributeProductTerms {
     attribute: productAttributes;

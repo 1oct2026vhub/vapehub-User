@@ -1,28 +1,36 @@
 import { Button, Select, SelectItem } from '@nextui-org/react'
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo, useState, useEffect } from 'react';
 import { AttributeTerms, AttributeProductTerms, ProductVariant } from '@/lib/config/product.config';
 import { useVariantFilter } from '@/lib/hooks/useVariantFilter';
 
 type ProductVariantFilterProps = {
     attributeTerms: AttributeTerms[];
     productSlug: string;
+    productId?: number;
     selectedVariant?: AttributeProductTerms;
     availableAttributes: AttributeTerms[];
     allVariants: ProductVariant[];
+    filteredAttributeTerms: AttributeTerms[];
 }
 
 const SelectAttributeTerms = ({
     attributeTerm,
     handleVariantFilter,
     isFiltering,
-    getDefaultSelectedTerm
+    getDefaultSelectedTerm,
 }: {
     attributeTerm: AttributeTerms,
     handleVariantFilter: (attributeTerm: AttributeTerms, selectedTerm: { id: number; slug: string }) => void,
     isFiltering: boolean,
-    getDefaultSelectedTerm: (attributeId: number) => string | undefined
+    getDefaultSelectedTerm: (attributeId: number) => string | undefined,
 }) => {
-    const selectedTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
+    const selectedTermSlug = getDefaultSelectedTerm(attributeTerm.attribute.id);
+    
+    // Memoize the selectedKeys to ensure proper re-rendering
+    const selectedKeys = useMemo(() => {
+        return selectedTermSlug ? new Set([selectedTermSlug]) : new Set<string>();
+    }, [selectedTermSlug]);
+    
     return (
         <>
             <div>
@@ -38,8 +46,10 @@ const SelectAttributeTerms = ({
                 className="w-full"
                 variant='bordered'
                 label="Choose your flavour"
-                selectedKeys={selectedTerm ? new Set([selectedTerm]) : undefined}
+                selectedKeys={selectedKeys}
                 isDisabled={isFiltering}
+                disallowEmptySelection={false}
+                selectionMode="single"
                 classNames={{
                     label: "!text-content-1 !text-skin-neutral-500 !font-opensans",
                     trigger: "shadow-base border-skin-neutral-100 !rounded",
@@ -51,10 +61,15 @@ const SelectAttributeTerms = ({
                         content: "max-h-[400px] overflow-hidden p-0",
                     }
                 }}
-                onChange={(e) => {
-                    const term = attributeTerm.terms.find(t => t.slug === e.target.value);
-                    if (term) {
-                        handleVariantFilter(attributeTerm, term);
+                onSelectionChange={(keys) => {
+                    const selectedKey = Array.from(keys)[0] as string;
+                    // Only proceed if a key is selected (not empty selection)
+                    if (selectedKey) {
+                        const term = attributeTerm.terms.find(t => t.slug === selectedKey);
+                        if (term) {
+                            // Always call handleVariantFilter to replace the existing selection
+                            handleVariantFilter(attributeTerm, term);
+                        }
                     }
                 }}
             >
@@ -62,6 +77,7 @@ const SelectAttributeTerms = ({
                     <SelectItem
                         key={term.slug}
                         value={term.slug}
+                        textValue={term.name}
                     >
                         {term.name}
                     </SelectItem>
@@ -119,19 +135,47 @@ const ButtonAttributeTerms = ({
 
 const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     attributeTerms,
-    // productSlug,
+    productSlug,
+    productId,
     selectedVariant,
     availableAttributes,
-    // allVariants
+    allVariants,
+    filteredAttributeTerms
 }) => {
-    // Filter out attributes that are not used in variation and not used in
-    const attributeTermData = attributeTerms.filter(
+    // Store the original attributeTerms to ensure we always show all variants
+    // This prevents the select box from losing options after a variant is selected
+    const [originalAttributeTerms, setOriginalAttributeTerms] = useState<AttributeTerms[]>(attributeTerms);
+    const [storedProductId, setStoredProductId] = useState<number | undefined>(productId);
+    
+    // Update the stored original terms only when the product actually changes (different productId)
+    // This ensures we always show all variants for the current product, even after selection
+    useEffect(() => {
+        if (productId && productId !== storedProductId) {
+            // Product changed, update the stored original terms
+            setOriginalAttributeTerms(attributeTerms);
+            setStoredProductId(productId);
+        } else if (attributeTerms && attributeTerms.length > 0 && !storedProductId) {
+            // Initial load, store the original terms
+            setOriginalAttributeTerms(attributeTerms);
+            if (productId) {
+                setStoredProductId(productId);
+            }
+        }
+    }, [attributeTerms, productId, storedProductId]);
+    
+    // Filter out attributes that are not used in variation
+    // Always use the original attributeTerms to show all variants
+    const attributeTermData = originalAttributeTerms.filter(
         (attributeTerm) => attributeTerm.attribute.used_in_variation
     );
 
     const { handleVariantFilter, isFiltering, getDefaultSelectedTerm } = useVariantFilter(
         availableAttributes,
-        selectedVariant
+        selectedVariant,
+        productSlug,
+        productId,
+        allVariants,
+        filteredAttributeTerms
     );
 
     // useEffect(() => {

@@ -390,9 +390,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     <ProductVariantFilter
                         attributeTerms={product?.attribute_terms}
                         productSlug={product?.slug}
+                        productId={product?.id}
                         selectedVariant={selectedVariant}
                         availableAttributes={availableAttributes ?? []}
                         allVariants={data.variants ?? []}
+                        filteredAttributeTerms={data.filtered_attribute_terms ?? []}
                     />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {

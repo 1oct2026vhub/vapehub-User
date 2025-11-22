@@ -71,7 +71,6 @@ const settings: Settings = {
 const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selectedVariant: initialSelectedVariant }) => {
     const [productData, setProductData] = useState<ProductResponse>(initialData);
     const [selectedVariant, setSelectedVariant] = useState<AttributeProductTerms | undefined>(initialSelectedVariant);
-    const [isLoadingVariant, setIsLoadingVariant] = useState(false);
     const [attributeSelections, setAttributeSelections] = useState<Record<number, AttributeSelection>>(() => {
         if (initialSelectedVariant) {
             return {
@@ -238,7 +237,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     // Fetch variant data when attribute selections change
     const fetchVariantData = useCallback(async (selections: Record<number, AttributeSelection>) => {
         if (!Object.keys(selections).length) return;
-        setIsLoadingVariant(true);
         try {
             const payload: PRODUCT_VARIANT_ATTRIBUTE[] = Object.values(selections).map((selection) => ({
                 attribute_id: selection.attributeId,
@@ -255,8 +253,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             }
         } catch (error) {
             console.error('Error fetching variant data:', error);
-        } finally {
-            setIsLoadingVariant(false);
         }
     }, [product.id]);
 

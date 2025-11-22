@@ -364,11 +364,14 @@ export const getDynamicPageSlug = async (slug: string, canCache: boolean = true)
 
 // checkout
 export const checkout = async (payload: CHECKOUT_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
-  return await handleRequest<{message: string}, unknown>({
+  console.log('🔵 [CHECKOUT API] Payload:', JSON.stringify(payload, null, 2));
+  const response = await handleRequest<{message: string}, unknown>({
     endpoint: API_ROUTES.CHECKOUT,
     payload,
     method: 'POST',
   });
+  console.log('🟢 [CHECKOUT API] Response:', JSON.stringify(response, null, 2));
+  return response;
 };
 
 // apply coupon
@@ -1265,7 +1268,7 @@ export const getSeoMetaBySlug = async (slug: string, canCache: boolean = true): 
 };
 
 // Legal content types
-export type LegalContentKey = 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions';
+export type LegalContentKey = 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions' | 'loyalty-points';
 
 export interface LegalContentResponse {
   content_key: LegalContentKey;

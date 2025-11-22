@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
@@ -17,15 +17,23 @@ import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 
 // import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
-import { getDealProducts } from '@/lib/server.actions'
+import { getDealProducts, getProductVariantByID } from '@/lib/server.actions'
 import { ProductInDeal } from '@/lib/config/deal.config'
 import { Product } from '@/lib/config/product.config'
 import { useReviews } from '@/lib/context/ReviewContext'
+import { PRODUCT_VARIANT_ATTRIBUTE } from '@/lib/api-routes'
+import { VariantSelectionPayload } from '@/lib/hooks/useVariantFilter'
 
 type ProductViewProps = {
     data: ProductResponse;
     selectedVariant?: AttributeProductTerms
 }
+
+type AttributeSelection = {
+    attributeId: number;
+    termId: number;
+    termSlug: string;
+};
 const settings: Settings = {
     slidesToShow: 4, // Change to 4 if needed
     slidesToScroll: 1,
@@ -60,14 +68,48 @@ const settings: Settings = {
     ],
 
 };
-const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) => {
-    const { product } = data;
-    const hasFilteredTerms = (data.filtered_attribute_terms?.length ?? 0) > 0;
-    const hasAvailableTerms = (data.available_terms?.length ?? 0) > 0;
+const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selectedVariant: initialSelectedVariant }) => {
+    const [productData, setProductData] = useState<ProductResponse>(initialData);
+    const [selectedVariant, setSelectedVariant] = useState<AttributeProductTerms | undefined>(initialSelectedVariant);
+    const [attributeSelections, setAttributeSelections] = useState<Record<number, AttributeSelection>>(() => {
+        if (initialSelectedVariant) {
+            return {
+                [initialSelectedVariant.attribute.id]: {
+                    attributeId: initialSelectedVariant.attribute.id,
+                    termId: initialSelectedVariant.terms.id,
+                    termSlug: initialSelectedVariant.terms.slug
+                }
+            };
+        }
+        return {};
+    });
+
+    const variantAttributes = useMemo(
+        () => initialData.product.attribute_terms.filter(attr => attr.attribute.used_in_variation),
+        [initialData.product.attribute_terms]
+    );
+
+    const primaryAttributeId = useMemo(() => {
+        if (initialSelectedVariant?.attribute.id) {
+            return initialSelectedVariant.attribute.id;
+        }
+        return variantAttributes[0]?.attribute.id ?? null;
+    }, [initialSelectedVariant, variantAttributes]);
+
+    const selectedAttributeSlugs = useMemo(() => {
+        return Object.values(attributeSelections).reduce<Record<number, string>>((acc, selection) => {
+            acc[selection.attributeId] = selection.termSlug;
+            return acc;
+        }, {});
+    }, [attributeSelections]);
+
+    const { product } = productData;
+    const hasFilteredTerms = (productData.filtered_attribute_terms?.length ?? 0) > 0;
+    const hasAvailableTerms = (productData.available_terms?.length ?? 0) > 0;
 
     // A variant is ready to be added when all of its attributes have been selected.
     // This state is signified by `available_terms` being empty while `filtered_attribute_terms` is not.
-    const isReadyVariant = hasFilteredTerms && !hasAvailableTerms && data.variants?.length === 1;
+    const isReadyVariant = hasFilteredTerms && !hasAvailableTerms && productData.variants?.length === 1;
 
     // A product is simple if it has no attributes to filter by from the start.
     const isSimpleProduct = !hasFilteredTerms && !hasAvailableTerms;
@@ -75,10 +117,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
     const canAddToCart = isSimpleProduct || isReadyVariant;
 
     // If a variant is ready, that's our selected variant.
-    const productVariant: ProductVariant | null = isReadyVariant ? data.variants[0] : null;
+    const productVariant: ProductVariant | null = isReadyVariant ? productData.variants[0] : null;
 
     // For simple products, the API provides the necessary details in the first entry of the variants array.
-    const simpleProductVariant = isSimpleProduct && data.variants.length > 0 ? data.variants[0] : null;
+    const simpleProductVariant = isSimpleProduct && productData.variants.length > 0 ? productData.variants[0] : null;
 
     // This is the definitive entity (either a selected variant or a simple product's variant) to be used for cart operations.
     const cartEntity = productVariant ?? simpleProductVariant;
@@ -96,7 +138,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
         ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`
         : product?.name;
 
-    const availableAttributes: AttributeTerms[] = data.available_terms;
+    const availableAttributes: AttributeTerms[] = productData.available_terms;
     const minQuantity = 1;
 
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
@@ -192,12 +234,80 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
         });
     };
 
+    // Fetch variant data when attribute selections change
+    const fetchVariantData = useCallback(async (selections: Record<number, AttributeSelection>) => {
+        if (!Object.keys(selections).length) return;
+        try {
+            const payload: PRODUCT_VARIANT_ATTRIBUTE[] = Object.values(selections).map((selection) => ({
+                attribute_id: selection.attributeId,
+                term_id: selection.termId
+            }));
+
+            const response = await getProductVariantByID({
+                product_id: product.id,
+                attribute_terms: payload
+            });
+
+            if (response.status === ServerActionStatus.SUCCESS && response.data) {
+                setProductData(response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching variant data:', error);
+        }
+    }, [product.id]);
+
+    const handleVariantSelectionChange = useCallback((payload: VariantSelectionPayload) => {
+        setAttributeSelections((prev) => {
+            const updatedSelections = {
+                ...prev,
+                [payload.attributeTerm.attribute.id]: {
+                    attributeId: payload.attributeTerm.attribute.id,
+                    termId: payload.selectedTerm.id,
+                    termSlug: payload.selectedTerm.slug
+                }
+            };
+
+            void fetchVariantData(updatedSelections);
+            return updatedSelections;
+        });
+
+        if (payload.isPrimaryAttribute) {
+            const attributeTerm = product?.attribute_terms?.find(
+                (attr) => attr.attribute.id === payload.attributeTerm.attribute.id
+            );
+            const term = attributeTerm?.terms.find((t) => t.id === payload.selectedTerm.id);
+            if (attributeTerm && term) {
+                setSelectedVariant({
+                    attribute: attributeTerm.attribute,
+                    terms: term
+                });
+            }
+        }
+    }, [fetchVariantData, productData.product.attribute_terms]);
+
     useEffect(() => {
         scrollToTop();
     }, []);
+    
     useEffect(() => {
         setMainImage(cartEntity?.primary_image ?? product?.primary_image);
     }, [cartEntity, product]);
+
+    useEffect(() => {
+        if (!primaryAttributeId) return;
+        const selection = attributeSelections[primaryAttributeId];
+        if (!selection) return;
+
+        const attributeTerm = product?.attribute_terms?.find(attr => attr.attribute.id === primaryAttributeId);
+        const term = attributeTerm?.terms.find(t => t.slug === selection.termSlug);
+
+        if (attributeTerm && term) {
+            setSelectedVariant({
+                attribute: attributeTerm.attribute,
+                terms: term
+            });
+        }
+    }, [attributeSelections, primaryAttributeId, productData.product.attribute_terms]);
     // Reviews data is now provided by ReviewContext
 
     useEffect(() => {
@@ -222,7 +332,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
             fetchBundleProducts();
         }
     }, [mixAndMatchDeal?.id, product.id]);
-
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -373,13 +482,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data, selectedVariant }) =
                     </div>
                     <Divider className='max-lg:hidden' />
                     <ProductVariantFilter
-                        attributeTerms={product?.attribute_terms}
+                        attributeTerms={product?.attribute_terms ?? []}
                         productSlug={product?.slug}
-                        productId={product?.id}
                         selectedVariant={selectedVariant}
                         availableAttributes={availableAttributes ?? []}
-                        allVariants={data.variants ?? []}
-                        filteredAttributeTerms={data.filtered_attribute_terms ?? []}
+                        allVariants={productData.variants ?? []}
+                        onVariantChange={handleVariantSelectionChange}
+                        selectedAttributeSlugs={selectedAttributeSlugs}
+                        primaryAttributeId={primaryAttributeId}
                     />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {

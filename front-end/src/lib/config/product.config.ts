@@ -94,7 +94,7 @@ export interface productAttributesTerms {
     used_in_variation: boolean;
     is_selected: boolean;
     description?: string;
-    variant_slugs?: string[];
+    // variant_slugs?: string[];
 }
 export interface AttributeProductTerms {
     attribute: productAttributes;

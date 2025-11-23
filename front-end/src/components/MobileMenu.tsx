@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Button } from '@nextui-org/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Accordion, AccordionItem, Badge, Divider } from '@nextui-org/react';
 import { CloseIcon, DownArrowFilledIcon, MenuCartIcon, MenuIcon, MenuUserIcon } from '@/components/Icons';
-import Logo from './ui/Logo';
 import Link from 'next/link';
 import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
 import ShippingProgress from './ShippingProgress';

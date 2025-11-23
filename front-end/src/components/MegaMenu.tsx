@@ -380,7 +380,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
     };
 
     return (
-        <div className={`absolute left-0 right-0 top-[100%] w-full shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-500 ease-in min-h-[250px] max-h-[300px] overflow-y-auto flex items-start justify-between opacity-0 invisible transform translate-y-2 pointer-events-none max-w-[1520px] mx-auto ${isOpen ? '!opacity-100 !visible !translate-y-0 pointer-events-auto' : ''}`}>
+        <div className={`absolute left-0 right-0 top-[100%] w-full shadow-card bg-skin-base z-20 px-12.5 py-9 transition-all duration-500 ease-in min-h-[250px] max-h-[400px] overflow-y-auto flex items-start justify-between invisible transform pointer-events-none max-w-[1520px] mx-auto ${isOpen ? '!visible pointer-events-auto' : ''}`}>
             <div className={`${(parentMenuImageUrl || allImageResults.length > 0) ? 'w-[68%] pr-7 border-r border-skin-neutral-200' : 'w-full'} space-y-6`}>
                 <Form {...searchFromConfig}>
                     <form noValidate className="w-3/4">

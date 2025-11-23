@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Button } from '@nextui-org/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Accordion, AccordionItem, Badge, Divider } from '@nextui-org/react';
 import { CloseIcon, DownArrowFilledIcon, MenuCartIcon, MenuIcon, MenuUserIcon } from '@/components/Icons';
-import Logo from './ui/Logo';
 import Link from 'next/link';
 import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
 import ShippingProgress from './ShippingProgress';
@@ -23,6 +22,7 @@ import { ROUTES } from '@/lib/routes';
 import { useRouter, usePathname } from 'next/navigation';
 import { defaultNavLinks } from '@/lib/config/category.config';
 import { HeaderMegaMenu } from '@/lib/config/header.config';
+import MobileLogo from './ui/MobileLogo';
 
 type Props = {
     megaMenuData?: HeaderMegaMenu[];
@@ -144,7 +144,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
             >
                 {<MenuIcon className='z-10 relative' />}
             </div>
-            <Drawer isOpen={isMenuOpen} onOpenChange={handleMenuClose} placement='bottom' className='max-h-[95vh] min-h-[95vh] rounded-t-32' classNames={{
+            <Drawer isOpen={isMenuOpen} onOpenChange={handleMenuClose} placement='bottom' className='max-h-[90vh] min-h-[90vh] rounded-t-32' classNames={{
                 closeButton: '!hidden'
             }}>
                 <DrawerContent>
@@ -155,7 +155,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                         >
                             {<CloseIcon className='z-10 relative w-6 h-6' />}
                         </div>
-                        <Logo className="max-w-[174px] max-h-[28px] ml-6" />
+                        <MobileLogo className='ml-6' />
                         <div className="flex items-center gap-1">
                             {!isVerificationPage && (
                                 <>

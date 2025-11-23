@@ -5,7 +5,7 @@ import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
-import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD } from "./config/checkout.config";
+import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from "./config/checkout.config";
 import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse, SeoMetaResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
@@ -371,6 +371,18 @@ export const checkout = async (payload: CHECKOUT_PAYLOAD): Promise<ServerActionR
     method: 'POST',
   });
   console.log('🟢 [CHECKOUT API] Response:', JSON.stringify(response, null, 2));
+  return response;
+};
+
+// guest checkout and order (combined)
+export const guestCheckoutAndOrder = async (payload: GUEST_CHECKOUT_AND_ORDER_PAYLOAD): Promise<ServerActionResponse<ORDER_RESPONSE_DATA>> => {
+  console.log('🔵 [GUEST CHECKOUT AND ORDER API] Payload:', JSON.stringify(payload, null, 2));
+  const response = await handleRequest<ORDER_RESPONSE_DATA, unknown>({
+    endpoint: API_ROUTES.GUEST_CHECKOUT_AND_ORDER,
+    payload,
+    method: 'POST',
+  });
+  console.log('🟢 [GUEST CHECKOUT AND ORDER API] Response:', JSON.stringify(response, null, 2));
   return response;
 };
 

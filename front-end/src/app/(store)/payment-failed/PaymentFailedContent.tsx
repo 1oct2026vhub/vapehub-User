@@ -6,14 +6,12 @@ import { ROUTES } from '@/lib/routes';
 import { toast } from 'sonner';
 import { Button } from '@nextui-org/button';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { getTransactionDetails, worldpayPaymentCancel } from '@/lib/server.actions';
 
 const PaymentFailedContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { status } = useSession();
     const [transactionDetails, setTransactionDetails] = useState({
         id: '',
         amount: 0,
@@ -87,19 +85,6 @@ const PaymentFailedContent = () => {
         verifyPayment();
     }, [router, searchParams]);
 
-    useEffect(() => {
-        if (status === 'unauthenticated') {
-            router.replace(ROUTES.MY_ACCOUNT);
-        }
-    }, [status, router]);
-
-    if (status === 'loading') {
-        return <div>Loading...</div>;
-    }
-
-    if (status === 'unauthenticated') {
-        return <div>Redirecting to login...</div>;
-    }
 
     return (
         <div className="auth-form-container md:!py-[84px]">

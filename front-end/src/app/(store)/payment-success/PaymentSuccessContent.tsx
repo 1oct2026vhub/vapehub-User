@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { getTransactionDetails, worldpayPaymentSuccess } from '@/lib/server.actions';
@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { useCart } from '@/lib/context/CartContext';
 
 const PaymentSuccessContent = () => {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const { status } = useSession();
     const { clearCart } = useCart();
@@ -241,19 +240,11 @@ const PaymentSuccessContent = () => {
             hasApiBeenCalledRef.current = false;
             isProcessingRef.current = false;
         };
-    }, []); // Empty dependency array to run only once
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency array - guarded by refs to prevent multiple executions
 
-    useEffect(() => {        
-        if (status === 'unauthenticated') {
-            router.replace(ROUTES.MY_ACCOUNT);
-        }
-    }, [status, router]);
-
-    if (status === 'loading' || isVerifyingPayment) {
+    if (isVerifyingPayment) {
         return <div>Loading...</div>;
-    }
-    if (status === 'unauthenticated') {
-        return <div>Redirecting to login...</div>;
     }
     return (
         <div className="auth-form-container md:!py-[84px]">
@@ -295,16 +286,29 @@ const PaymentSuccessContent = () => {
                     </div>
                 </div>
 
-                <Button
-                    as={Link}
-                    href={ROUTES.MY_ACCOUNT_ORDERS}
-                    size="lg"
-                    radius="md"
-                    color="primary"
-                    className="btn primary-btn shadow-input text-content-1 !font-semibold !font-oswald h-11 mx-auto"
-                >
-                    View Orders
-                </Button>
+                {status === 'authenticated' ? (
+                    <Button
+                        as={Link}
+                        href={ROUTES.MY_ACCOUNT_ORDERS}
+                        size="lg"
+                        radius="md"
+                        color="primary"
+                        className="btn primary-btn shadow-input text-content-1 !font-semibold !font-oswald h-11 mx-auto"
+                    >
+                        View Orders
+                    </Button>
+                ) : (
+                    <Button
+                        as={Link}
+                        href={ROUTES.WELCOME}
+                        size="lg"
+                        radius="md"
+                        color="primary"
+                        className="btn primary-btn shadow-input text-content-1 !font-semibold !font-oswald h-11 mx-auto"
+                    >
+                        Continue Shopping
+                    </Button>
+                )}
             </div>
         </div>
     );

@@ -119,6 +119,7 @@ export const API_ROUTES = {
     GET_DEALS_BY_CATEGORY: (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }) => buildRequestUrl(`/api/product/category/${categoryId}/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_DEAL_PRODUCTS: (dealId: number, params?: { limit?: number; offset?: number; product_id?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
     GET_PRODUCTS_BY_DEAL_SLUG: (slug: string, params?: Record<string, unknown>) => buildRequestUrl(`/api/deals/slug/${slug}${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
+    GET_LINKED_PRODUCTS: (productId: number, params?: { limit?: number; offset?: number; page?: number }) => buildRequestUrl(`/api/product/${productId}/linked-products${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
     GET_MAIL_SUBSCRIPTION_SETTINGS: buildRequestUrl('/api/mailSubscription/settings'),
     GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
     GET_WELCOME_CONTENT: buildRequestUrl('/api/home/welcome-content'),

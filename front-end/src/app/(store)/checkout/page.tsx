@@ -9,9 +9,6 @@ import { CheckoutProvider } from '@/lib/context/CheckoutContext'
 import { AddressProvider } from '@/lib/context/AddressContext'
 import { useCart } from '@/lib/context/CartContext'
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder'
-import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import { ROUTES } from '@/lib/routes'
 import { getReviewOrderByProductId } from '@/lib/server.actions'
 import { ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config'
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config'
@@ -21,16 +18,8 @@ import GoogleMapsScript from '@/components/GoogleMapsScript'
 const CheckoutPage: NextPage = (): ReactElement => {
 
     const { itemCount, cartItems } = useCart();
-    const { status } = useSession();
-    const router = useRouter();
     const { features } = useFeatureData();
     const [reviews, setReviews] = React.useState<ServerActionResponse<REVIEW_ORDER_RESPONSE>[]>([]);
-
-    useEffect(() => {
-        if (status === 'unauthenticated') {
-            router.replace(ROUTES.MY_ACCOUNT);
-        }
-    }, [status, router]);
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -40,14 +29,6 @@ const CheckoutPage: NextPage = (): ReactElement => {
         }
         if(cartItems.length > 0) fetchReviews();
     }, [cartItems]);
-
-    if (status === 'loading') {
-        return <div className='text-center font-bold h-scree'>Loading...</div>;
-    }
-
-    if (status === 'unauthenticated') {
-        return <div className='text-center font-bold h-screen'>Redirecting to login...</div>;
-    }
 
     if (itemCount === 0) {
         return (

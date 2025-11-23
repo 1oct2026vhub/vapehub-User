@@ -170,3 +170,45 @@ export interface CHECKOUT_PAYLOAD {
     total: number;
     loyalty?: boolean;
 }
+
+export interface GUEST_CHECKOUT_AND_ORDER_PAYLOAD {
+    email: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    cartItems: Array<{
+        product_id: number;
+        variant_id: number;
+        quantity: number;
+    }>;
+    couponCode?: string;
+    shipping_method_id: number;
+    shipping_address: {
+        first_name: string;
+        last_name: string;
+        address_line_1: string;
+        address_line_2?: string;
+        city: string;
+        region: string;
+        post_code: string;
+        country: string;
+        shipping_address_id: number | null;
+    };
+    billing_address: {
+        first_name: string;
+        last_name: string;
+        address_line_1: string;
+        address_line_2?: string;
+        city: string;
+        region: string;
+        post_code: string;
+        country: string;
+    };
+    useShippingAsBilling: boolean;
+    payment_method: {
+        method: string;
+    };
+    total: number;
+    loyalty?: boolean;
+    receive_promotions: boolean;
+}

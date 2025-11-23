@@ -243,17 +243,8 @@ const PaymentSuccessContent = () => {
         };
     }, []); // Empty dependency array to run only once
 
-    useEffect(() => {        
-        if (status === 'unauthenticated') {
-            router.replace(ROUTES.MY_ACCOUNT);
-        }
-    }, [status, router]);
-
-    if (status === 'loading' || isVerifyingPayment) {
+    if (isVerifyingPayment) {
         return <div>Loading...</div>;
-    }
-    if (status === 'unauthenticated') {
-        return <div>Redirecting to login...</div>;
     }
     return (
         <div className="auth-form-container md:!py-[84px]">
@@ -295,16 +286,29 @@ const PaymentSuccessContent = () => {
                     </div>
                 </div>
 
-                <Button
-                    as={Link}
-                    href={ROUTES.MY_ACCOUNT_ORDERS}
-                    size="lg"
-                    radius="md"
-                    color="primary"
-                    className="btn primary-btn shadow-input text-content-1 !font-semibold !font-oswald h-11 mx-auto"
-                >
-                    View Orders
-                </Button>
+                {status === 'authenticated' ? (
+                    <Button
+                        as={Link}
+                        href={ROUTES.MY_ACCOUNT_ORDERS}
+                        size="lg"
+                        radius="md"
+                        color="primary"
+                        className="btn primary-btn shadow-input text-content-1 !font-semibold !font-oswald h-11 mx-auto"
+                    >
+                        View Orders
+                    </Button>
+                ) : (
+                    <Button
+                        as={Link}
+                        href={ROUTES.WELCOME}
+                        size="lg"
+                        radius="md"
+                        color="primary"
+                        className="btn primary-btn shadow-input text-content-1 !font-semibold !font-oswald h-11 mx-auto"
+                    >
+                        Continue Shopping
+                    </Button>
+                )}
             </div>
         </div>
     );

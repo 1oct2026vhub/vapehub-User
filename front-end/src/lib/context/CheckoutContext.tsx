@@ -39,48 +39,69 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
         try {
             setIsProcessing(true);
            
-                const orderData = response.data;
-                if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
-                    // Initiate Viva Wallet payment
+            console.log('🛒 [handlePlaceOrder] Called with:', {
+                paymentMethod: data.payment_method.method,
+                response: response,
+                responseData: response?.data
+            });
+           
+            // Check if response.data exists
+            if (!response || !response.data) {
+                console.error('❌ [handlePlaceOrder] Invalid response data:', response);
+                toast.error('Invalid order response. Please try again.');
+                return;
+            }
+
+            const orderData = response.data;
+            console.log('🛒 [handlePlaceOrder] Order data:', orderData);
+            
+            if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
+                // Initiate Viva Wallet payment
+                if (orderData && typeof orderData === 'object' && 'order_code' in orderData) {
                     await initiateVivaPayment({                        
                         orderReference: String(orderData.order_code)
                     });
-                } else if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
-                    // // Initiate WorldPay Smart Checkout
-                    // await initiateWorldPayPayment({
-                    //     amount: data.total,
-                    //     currency: 'EUR', // Adjust based on your needs
-                    //     orderReference: String(orderData.order_code),
-                    //     customerEmail: data.email,
-                    //     customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
-                    //     orderDescription: `Order #${response.message}`,
-                    //     returnUrl: `${window.location.origin}${ROUTES.PAYMENT_SUCCESS}`,
-                    //     cancelUrl: `${window.location.origin}${ROUTES.PAYMENT_FAILED}`,
-                    //     billingAddress: {
-                    //         address1: data.billing_address.address_line_1,
-                    //         address2: data.billing_address.address_line_2,
-                    //         city: data.billing_address.city,
-                    //         state: data.billing_address.region,
-                    //         postalCode: data.billing_address.post_code,
-                    //         country: data.billing_address.country,
-                    //     },
-                    //     shippingAddress: {
-                    //         address1: data.shipping_address.address_line_1,
-                    //         address2: data.shipping_address.address_line_2,
-                    //         city: data.shipping_address.city,
-                    //         state: data.shipping_address.region,
-                    //         postalCode: data.shipping_address.post_code,
-                    //         country: data.shipping_address.country,
-                    //     }
-                    // });
-                  // Redirect to WorldPay URL from the API response
-                    if ('worldpay_url' in orderData) {
-                        window.location.href = orderData.worldpay_url;
-                    } else {
-                        toast.error('Worldpay payment URL not found. Please try again.');
-                    }
+                } else {
+                    console.error('Invalid order data for VivaWallet:', orderData);
+                    toast.error('Invalid order data. Please try again.');
                 }
-                // clearCart();
+            } else if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
+                // // Initiate WorldPay Smart Checkout
+                // await initiateWorldPayPayment({
+                //     amount: data.total,
+                //     currency: 'EUR', // Adjust based on your needs
+                //     orderReference: String(orderData.order_code),
+                //     customerEmail: data.email,
+                //     customerName: `${data.shipping_address.first_name} ${data.shipping_address.last_name}`,
+                //     orderDescription: `Order #${response.message}`,
+                //     returnUrl: `${window.location.origin}${ROUTES.PAYMENT_SUCCESS}`,
+                //     cancelUrl: `${window.location.origin}${ROUTES.PAYMENT_FAILED}`,
+                //     billingAddress: {
+                //         address1: data.billing_address.address_line_1,
+                //         address2: data.billing_address.address_line_2,
+                //         city: data.billing_address.city,
+                //         state: data.billing_address.region,
+                //         postalCode: data.billing_address.post_code,
+                //         country: data.billing_address.country,
+                //     },
+                //     shippingAddress: {
+                //         address1: data.shipping_address.address_line_1,
+                //         address2: data.shipping_address.address_line_2,
+                //         city: data.shipping_address.city,
+                //         state: data.shipping_address.region,
+                //         postalCode: data.shipping_address.post_code,
+                //         country: data.shipping_address.country,
+                //     }
+                // });
+              // Redirect to WorldPay URL from the API response
+                if (orderData && typeof orderData === 'object' && 'worldpay_url' in orderData) {
+                    window.location.href = (orderData as any).worldpay_url;
+                } else {
+                    console.error('Worldpay URL not found in order data:', orderData);
+                    toast.error('Worldpay payment URL not found. Please try again.');
+                }
+            }
+            // clearCart();
                  
         } catch (error) {
             console.error('Place order error:', error);

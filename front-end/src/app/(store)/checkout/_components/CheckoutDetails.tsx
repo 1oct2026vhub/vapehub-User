@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CHECKOUT_FORM_SCHEMA, CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS, type CHECKOUT_FORM_TYPE } from '@/lib/config/checkout.config';
-import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config';
+import { SHIPPING_METHOD_DATA, ORDER_RESPONSE_DATA } from '@/lib/config/order.config';
 import InputForm from '@/components/InputForm';
 import CustomCheckbox from '@/components/FormCheckbox';
 import { CustomRadio } from '@/components/CustomRadio';
@@ -18,14 +18,20 @@ import { Address } from '@/lib/config/user.config';
 import { useUserProfile } from '@/lib/hooks/useUserProfile';
 import Flag from '@/components/ui/Flag';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
-import { getShippingMethods, placeOrder } from '@/lib/server.actions';
+import { getShippingMethods, placeOrder, guestCheckoutAndOrder } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
 import { toast } from 'sonner';
 import UnavailableItemsModal from './UnavailableItemsModal';
+import { useSession } from 'next-auth/react';
+import { getCookie } from 'cookies-next';
+import { GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config';
+import { CartItem } from '@/lib/config/cart.config';
 
 const CheckoutDetails: React.FC = () => {
+    const { status } = useSession();
+    const isAuthenticated = status === 'authenticated';
     const { fetchProfile } = useUserProfile();
     const [shippingAsBilling, setShippingAsBilling] = useState(true);
     const [shippingMethods, setShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
@@ -67,7 +73,7 @@ const CheckoutDetails: React.FC = () => {
     });
     const { handlePlaceOrder, isProcessing, setSelectedShippingMethod } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
-    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
+    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption, cartItems } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
@@ -83,6 +89,136 @@ const CheckoutDetails: React.FC = () => {
         // Handle form submission
         if (!data) return;
 
+        // For guest users, use the combined checkout and order API
+        if (!isAuthenticated) {
+            // Get cart items from cookies
+            const guestCartCookie = getCookie('guest_cart');
+            let guestCartItems: CartItem[] = [];
+            
+            try {
+                if (guestCartCookie) {
+                    guestCartItems = JSON.parse(guestCartCookie as string);
+                }
+            } catch (e) {
+                console.error('Error parsing guest cart cookie:', e);
+                toast.error('Error loading cart items. Please try again.');
+                return;
+            }
+
+            // Build cart items array for API
+            const cartItemsForApi = guestCartItems.map(item => ({
+                product_id: item.product_id,
+                variant_id: item.variant_id,
+                quantity: item.quantity
+            }));
+
+            const guestOrderPayload: GUEST_CHECKOUT_AND_ORDER_PAYLOAD = {
+                email: data.email,
+                first_name: data.shippingFirstName || '',
+                last_name: data.shippingLastName || '',
+                phone: data.phone,
+                cartItems: cartItemsForApi,
+                couponCode: couponDiscount.code || undefined,
+                shipping_method_id: Number(selectedCarrier?.id) || 0,
+                shipping_address: {
+                    first_name: data.shippingFirstName || '',
+                    last_name: data.shippingLastName || '',
+                    address_line_1: data.shippingAddress1 || '',
+                    address_line_2: data.shippingAddress2 || '',
+                    city: data.shippingCity || '',
+                    region: data.shippingRegion || '',
+                    post_code: data.shippingPostcode || '',
+                    country: data.shippingCountry || DEFAULT_COUNTRY,
+                    shipping_address_id: null
+                },
+                billing_address: {
+                    first_name: !data.useShippingAsBilling ? data.shippingFirstName || '' : data.billingFirstName || '',
+                    last_name: !data.useShippingAsBilling ? data.shippingLastName || '' : data.billingLastName || '',
+                    address_line_1: !data.useShippingAsBilling ? data.shippingAddress1 || '' : data.billingAddress1 || '',
+                    address_line_2: !data.useShippingAsBilling ? data.shippingAddress2 || '' : data.billingAddress2 || '',
+                    city: !data.useShippingAsBilling ? data.shippingCity || '' : data.billingCity || '',
+                    region: !data.useShippingAsBilling ? data.shippingRegion || '' : data.billingRegion || '',
+                    post_code: !data.useShippingAsBilling ? data.shippingPostcode || '' : data.billingPostcode || '',
+                    country: !data.useShippingAsBilling ? data.shippingCountry || DEFAULT_COUNTRY : data.billingCountry || DEFAULT_COUNTRY
+                },
+                useShippingAsBilling: !data.useShippingAsBilling,
+                payment_method: {
+                    method: data.paymentMethod
+                },
+                total: (cartTotal + 0) - couponDiscount.value - (loyaltyRedemption.discountValue || 0),
+                loyalty: loyaltyRedemption.isRedeemed,
+                receive_promotions: data.marketingConsent || false
+            };
+
+            console.log('👤 [GUEST] Guest checkout and order payload:', guestOrderPayload);
+
+            const response = await guestCheckoutAndOrder(guestOrderPayload);
+            console.log("👤 [GUEST] guestCheckoutAndOrder response:", response);
+            console.log("👤 [GUEST] response.status:", response.status);
+            
+            if (response.status == ServerActionStatus.SUCCESS) {
+                // TypeScript now knows response.data exists because status is SUCCESS
+                console.log("👤 [GUEST] response.data:", response.data);
+                
+                // Transform the guest checkout response to match the expected ORDER_RESPONSE_DATA structure
+                // The guest API returns: { data: { order: { order_code, worldpay_url, ... } } }
+                // But handlePlaceOrder expects: { data: { order_code, worldpay_url } }
+                const guestResponseData = response.data as any;
+                const transformedResponse: ORDER_RESPONSE_DATA = {
+                    message: 'Order placed successfully',
+                    data: guestResponseData.order ? {
+                        order_code: guestResponseData.order.order_code,
+                        worldpay_url: guestResponseData.order.worldpay_url
+                    } : guestResponseData
+                };
+                
+                console.log('👤 [GUEST] Transformed response for handlePlaceOrder:', transformedResponse);
+                console.log('👤 [GUEST] Calling handlePlaceOrder with:', {
+                    payload: {
+                        email: data.email,
+                        phone: data.phone,
+                        receive_promotions: data.marketingConsent || false,
+                        shipping_address_id: 0,
+                        shipping_address: guestOrderPayload.shipping_address,
+                        billing_address: guestOrderPayload.billing_address,
+                        useShippingAsBilling: guestOrderPayload.useShippingAsBilling,
+                        couponCode: guestOrderPayload.couponCode,
+                        shipping_method_id: guestOrderPayload.shipping_method_id,
+                        payment_method: guestOrderPayload.payment_method,
+                        total: guestOrderPayload.total,
+                        loyalty: guestOrderPayload.loyalty
+                    },
+                    responseData: transformedResponse
+                });
+                
+                await handlePlaceOrder({
+                    email: data.email,
+                    phone: data.phone,
+                    receive_promotions: data.marketingConsent || false,
+                    shipping_address_id: 0,
+                    shipping_address: guestOrderPayload.shipping_address,
+                    billing_address: guestOrderPayload.billing_address,
+                    useShippingAsBilling: guestOrderPayload.useShippingAsBilling,
+                    couponCode: guestOrderPayload.couponCode,
+                    shipping_method_id: guestOrderPayload.shipping_method_id,
+                    payment_method: guestOrderPayload.payment_method,
+                    total: guestOrderPayload.total,
+                    loyalty: guestOrderPayload.loyalty
+                } as CHECKOUT_PAYLOAD, transformedResponse);
+                form.reset();
+                if (shippingMethods.length > 0) {
+                    setSelectedCarrier(shippingMethods[0]);
+                    setSelectedShippingMethod(shippingMethods[0]);
+                    form.setValue('shippingMethodId', shippingMethods[0].id);
+                }
+                setShowNewAddressForm(false);
+            } else {
+                toast.error(response.message);
+            }
+            return;
+        }
+
+        // For authenticated users, use the existing place order flow
         const orderPayload: CHECKOUT_PAYLOAD = {
             email: data.email,
             phone: data.phone,
@@ -202,6 +338,8 @@ const CheckoutDetails: React.FC = () => {
         const loadProfile = async () => {
             const profile = await fetchProfile();
             const response = await getShippingMethods();
+            console.log("getShippingMethods", response);
+            
             if (response.status == ServerActionStatus.SUCCESS) {
                 // Filter only enabled shipping methods and sort by method_order
                 const enabledMethods = response.data

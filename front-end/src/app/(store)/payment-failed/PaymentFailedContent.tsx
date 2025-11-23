@@ -87,19 +87,6 @@ const PaymentFailedContent = () => {
         verifyPayment();
     }, [router, searchParams]);
 
-    useEffect(() => {
-        if (status === 'unauthenticated') {
-            router.replace(ROUTES.MY_ACCOUNT);
-        }
-    }, [status, router]);
-
-    if (status === 'loading') {
-        return <div>Loading...</div>;
-    }
-
-    if (status === 'unauthenticated') {
-        return <div>Redirecting to login...</div>;
-    }
 
     return (
         <div className="auth-form-container md:!py-[84px]">

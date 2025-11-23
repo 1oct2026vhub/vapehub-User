@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CHECKOUT_FORM_SCHEMA, CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS, type CHECKOUT_FORM_TYPE } from '@/lib/config/checkout.config';
-import { SHIPPING_METHOD_DATA, ORDER_RESPONSE_DATA } from '@/lib/config/order.config';
+import { SHIPPING_METHOD_DATA, ORDER_RESPONSE_DATA, GuestCheckoutResponseData } from '@/lib/config/order.config';
 import InputForm from '@/components/InputForm';
 import CustomCheckbox from '@/components/FormCheckbox';
 import { CustomRadio } from '@/components/CustomRadio';
@@ -73,7 +73,7 @@ const CheckoutDetails: React.FC = () => {
     });
     const { handlePlaceOrder, isProcessing, setSelectedShippingMethod } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
-    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption, cartItems } = useCart();
+    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
@@ -163,13 +163,16 @@ const CheckoutDetails: React.FC = () => {
                 // Transform the guest checkout response to match the expected ORDER_RESPONSE_DATA structure
                 // The guest API returns: { data: { order: { order_code, worldpay_url, ... } } }
                 // But handlePlaceOrder expects: { data: { order_code, worldpay_url } }
-                const guestResponseData = response.data as any;
+                const guestResponseData = response.data as unknown as GuestCheckoutResponseData;
                 const transformedResponse: ORDER_RESPONSE_DATA = {
                     message: 'Order placed successfully',
                     data: guestResponseData.order ? {
                         order_code: guestResponseData.order.order_code,
                         worldpay_url: guestResponseData.order.worldpay_url
-                    } : guestResponseData
+                    } : {
+                        order_code: '',
+                        worldpay_url: ''
+                    }
                 };
                 
                 console.log('👤 [GUEST] Transformed response for handlePlaceOrder:', transformedResponse);

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { getTransactionDetails, worldpayPaymentSuccess } from '@/lib/server.actions';
@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { useCart } from '@/lib/context/CartContext';
 
 const PaymentSuccessContent = () => {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const { status } = useSession();
     const { clearCart } = useCart();
@@ -241,7 +240,8 @@ const PaymentSuccessContent = () => {
             hasApiBeenCalledRef.current = false;
             isProcessingRef.current = false;
         };
-    }, []); // Empty dependency array to run only once
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency array - guarded by refs to prevent multiple executions
 
     if (isVerifyingPayment) {
         return <div>Loading...</div>;

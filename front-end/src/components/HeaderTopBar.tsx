@@ -24,6 +24,7 @@ import { Product } from "@/lib/config/product.config";
 import ProductSuggestions from './ProductSuggestions';
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { scrollToTop } from "@/lib/utils/scrollToTop";
+import MobileLogo from "./ui/MobileLogo";
 
 type Props = {
     categories: Category[];
@@ -164,7 +165,7 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
             <div className="flex flex-col space-y-3.5 lg:hidden">
                 <div className="flex items-center justify-between gap-5">
                     <MobileMenu megaMenuData={megaMenuData} />
-                    <Logo className="max-w-[174px] max-h-[28px] ml-6" />
+                    <MobileLogo className='ml-6' />
                     {!isVerificationPage && (
                         <div className="flex items-center gap-1">
                             <NotificationAction />

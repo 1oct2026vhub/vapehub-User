@@ -17,7 +17,7 @@ import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 
 // import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
-import { getDealProducts, getProductVariantByID } from '@/lib/server.actions'
+import { getProductVariantByID, getLinkedProducts, LinkedProduct } from '@/lib/server.actions'
 import { ProductInDeal } from '@/lib/config/deal.config'
 import { Product } from '@/lib/config/product.config'
 import { useReviews } from '@/lib/context/ReviewContext'
@@ -148,8 +148,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     const [inputValue, setInputValue] = useState(quantity.toString());
     const [error, setError] = useState<string | null>(null);
     const { reviewData } = useReviews();
-    const [bundleProducts, setBundleProducts] = useState<ProductInDeal[]>([]);
-    const [isLoadingBundles, setIsLoadingBundles] = useState(false);
+    const [linkedProducts, setLinkedProducts] = useState<LinkedProduct[]>([]);
+    const [isLoadingLinkedProducts, setIsLoadingLinkedProducts] = useState(false);
     const handleReviewsClick = (e: React.MouseEvent) => {
         e.preventDefault();
         const reviewsSection = document.getElementById('reviews');
@@ -311,27 +311,26 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     // Reviews data is now provided by ReviewContext
 
     useEffect(() => {
-        const fetchBundleProducts = async () => {
-            if (!mixAndMatchDeal?.id) return;
-            setIsLoadingBundles(true);
-            const limit = 2;
-            const offset = 0;
-            const response = await getDealProducts(mixAndMatchDeal.id, {
-                limit,
-                offset,
-                product_id: product.id  // Exclude current product from bundle
-            });
-            if (response.status === ServerActionStatus.SUCCESS && response.data?.products) {
-                const filteredProducts = response.data.products.filter((p: ProductInDeal) => p.id);
-                // Limit to only 2 products
-                setBundleProducts(filteredProducts.slice(0, 2));
+        const fetchLinkedProducts = async () => {
+            if (!product.id) return;
+            setIsLoadingLinkedProducts(true);
+            try {
+                const response = await getLinkedProducts(product.id, {
+                    limit: 2,
+                    offset: 0
+                });
+                if (response.status === ServerActionStatus.SUCCESS && response.data?.linked_products) {
+                    // Limit to only 2 products
+                    setLinkedProducts(response.data.linked_products.slice(0, 2));
+                }
+            } catch (error) {
+                console.error('Error fetching linked products:', error);
+            } finally {
+                setIsLoadingLinkedProducts(false);
             }
-            setIsLoadingBundles(false);
         };
-        if (mixAndMatchDeal?.id) {
-            fetchBundleProducts();
-        }
-    }, [mixAndMatchDeal?.id, product.id]);
+        fetchLinkedProducts();
+    }, [product.id]);    
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -562,23 +561,65 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 </div>
             </div>
             <Divider />
-            {bundleProducts.length > 0 && (
+            {linkedProducts.length > 0 && (
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
-                    {/* Green Banner with Bundle Discount */}
-                    {/* {mixAndMatchDeal && (
-                        <div className='bg-green-500 text-white text-center py-3 px-4 rounded-md'>
-                            <p className='text-content-1 md:text-title-1 font-bold !font-oswald'>
-                                Bundle together and save {(mixAndMatchDeal as any).discount_percent ? `${(mixAndMatchDeal as any).discount_percent}%` : '5%'}
-                            </p>
-                        </div>
-                    )} */}
-                    <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>Add more products from this deal and unlock extra savings</h2>
+                    <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>You may also like</h2>
                     <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
-                        {bundleProducts?.map((bundleProduct, index) => (
-                            <BundleProductCard key={`bundle-${bundleProduct.id}-${index}`} product={bundleProduct} />
-                        ))}
+                        {linkedProducts?.map((linkedProduct, index) => {
+                            // Convert LinkedProduct to ProductInDeal format for BundleProductCard
+                            const imageUrl = linkedProduct.image?.image_url;
+                            const productForCard: ProductInDeal = {
+                                id: linkedProduct.id,
+                                name: linkedProduct.name,
+                                slug: linkedProduct.slug,
+                                description: linkedProduct.description,
+                                price: String(linkedProduct.price),
+                                regular_price: String(linkedProduct.price),
+                                discount_price: linkedProduct.discount_price ? String(linkedProduct.discount_price) : String(linkedProduct.price),
+                                stock_quantity: null,
+                                created_at: linkedProduct.created_at,
+                                updated_at: linkedProduct.updated_at,
+                                flavor_count: 0,
+                                category: linkedProduct.categories && linkedProduct.categories.length > 0 ? {
+                                    id: linkedProduct.categories[0].id,
+                                    name: linkedProduct.categories[0].name,
+                                    slug: linkedProduct.categories[0].slug
+                                } : {
+                                    id: 0,
+                                    name: '',
+                                    slug: ''
+                                },
+                                brand: linkedProduct.brands && linkedProduct.brands.length > 0 ? {
+                                    id: linkedProduct.brands[0].id,
+                                    name: linkedProduct.brands[0].name,
+                                    slug: linkedProduct.brands[0].slug
+                                } : {
+                                    id: 0,
+                                    name: '',
+                                    slug: ''
+                                },
+                                primary_image: linkedProduct.image ? {
+                                    id: linkedProduct.image.id,
+                                    url: imageUrl || '',
+                                    is_primary: linkedProduct.image.is_primary
+                                } : null,
+                                image: linkedProduct.image ? {
+                                    id: linkedProduct.image.id,
+                                    image_url: imageUrl || '',
+                                    is_primary: linkedProduct.image.is_primary,
+                                    product_id: linkedProduct.id
+                                } : undefined,
+                                deals: [],
+                                Flavors: [],
+                                puff_count: 0,
+                                ProductImages: linkedProduct.image && imageUrl ? [{ image_url: imageUrl }] : []
+                            };
+                            return (
+                                <BundleProductCard key={`linked-${linkedProduct.id}-${index}`} product={productForCard} />
+                            );
+                        })}
                     </div>
-                    {isLoadingBundles && (
+                    {isLoadingLinkedProducts && (
                         <div className='flex justify-center'><span>Loading...</span></div>
                     )}
                 </div>

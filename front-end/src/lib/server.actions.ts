@@ -736,6 +736,57 @@ export const getDealsByCategory = async (categoryId: number, payload?: { limit?:
     });
 };
 
+export interface LinkedProduct {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  price: string | number;
+  discount_price: string | number;
+  status: string;
+  image: {
+    id: number;
+    image_url: string;
+    image_url_high?: string | null;
+    image_url_low?: string | null;
+    image_url_mid?: string | null;
+    is_primary: boolean;
+  } | null;
+  created_at: string;
+  updated_at: string;
+  brands?: Array<{ id: number; name: string; slug: string }>;
+  categories?: Array<{ id: number; name: string; slug: string }>;
+}
+
+export interface LinkedProductsResponse {
+  product_id: number;
+  linked_products: LinkedProduct[];
+  count: number;
+  pagination: {
+    total_count: number;
+    total_pages: number;
+    current_page: number;
+    limit: number;
+    offset: number;
+  };
+}
+
+export const getLinkedProducts = async (
+  productId: number,
+  params?: {
+    limit?: number;
+    offset?: number;
+    page?: number;
+  },
+  canCache: boolean = true
+): Promise<ServerActionResponse<LinkedProductsResponse>> => {
+  return await handleRequest<LinkedProductsResponse, unknown>({
+    endpoint: API_ROUTES.GET_LINKED_PRODUCTS(productId, params),
+    method: 'GET',
+    canCache,
+  });
+};
+
 export const getDealProducts = async (
   dealId: number, 
   params?: { 

@@ -133,6 +133,41 @@ export interface WorldPayOrderData {
     // Include other properties from the nested 'data' object if needed
 }
 
+export interface GuestCheckoutResponseData {
+    checkout: {
+        totalItems: number;
+        shippingCost: number;
+        subTotal: number;
+        total: number;
+        deals: {
+            total_deals_discount: number;
+            applicable_deals: unknown[];
+        };
+        mail_subscription_data: unknown | null;
+        loyalty_redemption_info: {
+            user_points: number;
+            minimum_points_required: number;
+            can_redeem: boolean;
+            points_needed: number;
+            redemption_amount: number;
+            redemption_type: string;
+            points_value: string;
+            min_amount_for_loyalty_points: string;
+            amount_divisor: string;
+        };
+    };
+    order: {
+        order_code: string;
+        worldpay_url: string;
+        order_details: unknown;
+    };
+    tokens: {
+        accessToken: string;
+        refreshToken: string;
+    };
+    is_temporary: boolean;
+}
+
 export interface ORDER_RESPONSE_DATA {
     message: string;
     data: ORDER_LIST_RESPONSE | WorldPayOrderData;

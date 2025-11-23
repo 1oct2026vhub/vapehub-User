@@ -95,7 +95,8 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                 // });
               // Redirect to WorldPay URL from the API response
                 if (orderData && typeof orderData === 'object' && 'worldpay_url' in orderData) {
-                    window.location.href = (orderData as any).worldpay_url;
+                    const worldpayOrderData = orderData as { worldpay_url: string };
+                    window.location.href = worldpayOrderData.worldpay_url;
                 } else {
                     console.error('Worldpay URL not found in order data:', orderData);
                     toast.error('Worldpay payment URL not found. Please try again.');

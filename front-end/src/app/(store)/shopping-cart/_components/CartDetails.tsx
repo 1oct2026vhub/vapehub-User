@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react'
 import CouponForm from '@/components/CouponForm'
 import { CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
 import { getCookie } from 'cookies-next'
+import { CartItem } from '@/lib/config/cart.config'
 
 const CartDetails: React.FC = () => {
     const { status } = useSession();
@@ -60,13 +61,13 @@ const CartDetails: React.FC = () => {
         const loyaltyCookie = getCookie('loyalty_redemption');
         
         // Parse cookie data
-        let parsedGuestCart = null;
-        let parsedCoupon = null;
-        let parsedLoyalty = null;
+        let parsedGuestCart: CartItem[] | null = null;
+        let parsedCoupon: unknown = null;
+        let parsedLoyalty: unknown = null;
         
         try {
             if (guestCartCookie) {
-                parsedGuestCart = JSON.parse(guestCartCookie as string);
+                parsedGuestCart = JSON.parse(guestCartCookie as string) as CartItem[];
             }
         } catch (e) {
             console.error('Error parsing guest_cart cookie:', e);
@@ -94,7 +95,7 @@ const CartDetails: React.FC = () => {
                 raw: guestCartCookie,
                 parsed: parsedGuestCart,
                 itemCount: parsedGuestCart?.length || 0,
-                items: parsedGuestCart?.map((item: any) => ({
+                items: parsedGuestCart?.map((item: CartItem) => ({
                     id: item.id,
                     product_id: item.product_id,
                     variant_id: item.variant_id,

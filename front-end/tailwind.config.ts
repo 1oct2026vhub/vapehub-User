@@ -125,13 +125,13 @@ export default {
         '32': '2rem' //32px
       },
       boxShadow: {
-        'card': '4px 4px 10px 0px rgba(0, 0, 0, 0.09);',
+        'card': '0px 4px 10px 0 rgba(0, 0, 0, 0.24);',
         'slider-card': '4px 17px 10px 0px rgba(0, 0, 0, 0.07);',
         'brand-card': '2px 2px 16px 0px rgba(0, 0, 0, 0.16);',
         'deal-card': '4px 4px 10px 0px rgba(0, 0, 0, 0.24);',
         'deal-card-mob': '4px 4px 6px 0px rgba(0, 0, 0, 0.24);',
         'subscription': '1px 1px 25px 0px rgba(0, 0, 0, 0.30);',
-        'blog-card': '4px 4px 30px 11px rgba(0, 0, 0, 0.12);',
+        'blog-card': '-1px 4px 6px 0 rgba(0, 0, 0, 0.24);',
         'image-box': ' 2px 0px 23px 0px rgba(0, 0, 0, 0.23);',
         'product-offer': '4px -3px 12px 0px rgba(0, 0, 0, 0.04)',
         'base': '0px 2px 4px 0px rgba(0, 0, 0, 0.25)',

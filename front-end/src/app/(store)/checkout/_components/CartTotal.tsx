@@ -24,7 +24,6 @@ const CartTotal: React.FC = () => {
             setLoyaltyRedemption(prev => ({ ...prev, isRedeemed: false, discountValue: 0, message: null }));
         }
     }, [couponDiscount, setLoyaltyRedemption]);
-
     useEffect(() => {
         if (itemCount === 0) {
             // Reset loyalty points when cart becomes empty

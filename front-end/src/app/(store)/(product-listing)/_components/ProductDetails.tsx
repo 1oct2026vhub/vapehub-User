@@ -459,10 +459,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                     )}
                     <div className='space-y-4 max-md:order-4'>
                         <div className='bg-skin-white border border-skin-neutral-100 rounded-xl shadow-product-offer p-3.5 space-y-2.5'>
+                            {product?.key_highlights &&
                             <div className='flex gap-1 items-center'>
                                 <DispatchIcon className='min-w-6'/>
-                                <p className='text-content-2 md:text-content-1 font-semibold red-gradient-100'>Same day dispatch for orders before 3pm!</p>
+                                <p className='text-content-2 md:text-content-1 font-semibold red-gradient-100'>{product?.key_highlights}</p>
                             </div>
+                            }
                             {product?.loyaltySettings && product.loyaltySettings.status && product.loyaltySettings.points_value > 0 && (
                                 <div className='flex gap-1 items-center'>
                                     <BenefitIcon className='min-w-6' />

@@ -294,6 +294,7 @@ export interface ProductViewDetails {
     name: string;
     slug: string;
     description: string;
+    key_highlights?: string;
     category: Category | null;
     brand: BrandConfig | null;
     product_brands: BrandConfig[];

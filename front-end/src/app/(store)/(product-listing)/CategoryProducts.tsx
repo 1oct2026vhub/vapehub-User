@@ -3,6 +3,7 @@ import React, { ReactElement } from 'react';
 import ProductListingContent from "@/components/ProductListingContent";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import { CategoryResponseData } from '@/lib/config/product.config';
+import { CategoryDetails } from '@/lib/config/category.config';
 import FAQSection from '@/components/FAQSection';
 import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
@@ -22,10 +23,36 @@ type CategoryProps = {
 
 
 const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageSlug }): ReactElement => {  
+  const formatSlugToTitle = (slug?: string | null) => {
+    if (!slug) return "";
+    return slug
+      .split("/")
+      .pop()
+      ?.replace(/[-_]+/g, " ")
+      .replace(/\b\w/g, char => char.toUpperCase()) ?? "";
+  };
+
+  const derivedName =
+    data?.name?.trim() ||
+    data?.category?.[0]?.name ||
+    dynamicPageSlug?.slug && formatSlugToTitle(dynamicPageSlug.slug) ||
+    "";
+
+  const derivedSlug = data?.slug || data?.category?.[0]?.slug || dynamicPageSlug?.slug || "";
+  const enhancedCategoryData: ExtendedCategoryData = {
+    ...data,
+    name: derivedName || data?.name || "",
+    slug: derivedSlug || data?.slug || "",
+    description: data?.description || dynamicPageSlug?.description || "",
+  };
+
   const breadcrumbs = [
     { label: "Home", href: "/" },
-    { label: data.name, href: `/${data.slug}`, isActive: true },
+    { label: "Categories", href: CategoryDetails.viewAllHref },
+    { label: enhancedCategoryData.name, href: `/${enhancedCategoryData.slug}`, isActive: true },
   ];  
+  console.log("category data", enhancedCategoryData);
+  
   
   // Try to get category ID from different possible sources
   const categoryId = data.id || 
@@ -37,7 +64,7 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
     <div className='w-full max-w-[1520px] mx-auto'>
       <section className="product-listing-container flex-col">
         <BreadCrumbs items={breadcrumbs} />
-        <ProductListingContent data={data} dynamicPageSlug={dynamicPageSlug} />
+        <ProductListingContent data={enhancedCategoryData} dynamicPageSlug={dynamicPageSlug} />
       </section>
       <ProductList data={data} reviews={reviews} />
       <section className="product-listing-container">

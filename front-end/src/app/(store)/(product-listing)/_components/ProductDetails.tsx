@@ -465,11 +465,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                                 <p className='text-content-2 md:text-content-1 font-semibold red-gradient-100'>{product?.key_highlights}</p>
                             </div>
                             }
-                            {product?.loyaltySettings && product.loyaltySettings.status && product.loyaltySettings.points_value > 0 && (
+                            {product?.loyaltyPoints?.calculated !== undefined && (
                                 <div className='flex gap-1 items-center'>
                                     <BenefitIcon className='min-w-6' />
                                     <p className='text-content-2 md:text-content-1 font-semibold text-skin-neutral-500'>
-                                        Earn at least {product.loyaltySettings.points_value} loyalty points with this purchase!
+                                        Earn at least {product.loyaltyPoints?.calculated ?? 0} loyalty points with this purchase!
                                     </p>
                                 </div>
                             )}

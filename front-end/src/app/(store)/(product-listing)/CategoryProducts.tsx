@@ -3,7 +3,6 @@ import React, { ReactElement } from 'react';
 import ProductListingContent from "@/components/ProductListingContent";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import { CategoryResponseData } from '@/lib/config/product.config';
-import { CategoryDetails } from '@/lib/config/category.config';
 import FAQSection from '@/components/FAQSection';
 import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
@@ -48,7 +47,6 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
 
   const breadcrumbs = [
     { label: "Home", href: "/" },
-    { label: "Categories", href: CategoryDetails.viewAllHref },
     { label: enhancedCategoryData.name, href: `/${enhancedCategoryData.slug}`, isActive: true },
   ];  
   console.log("category data", enhancedCategoryData);

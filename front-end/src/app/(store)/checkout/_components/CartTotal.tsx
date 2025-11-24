@@ -9,12 +9,15 @@ import CouponForm from '@/components/CouponForm'
 import { applyCoupon } from '@/lib/server.actions'
 import { toast } from 'sonner'
 import { APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
+import { useSession } from 'next-auth/react'
 
 const CartTotal: React.FC = () => {
     const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption } = useCart();
     const { selectedShippingMethod } = useCheckout();
     const [isApplyingLoyalty, setIsApplyingLoyalty] = useState(false);
     const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage } = loyaltyRedemption;
+    const { status } = useSession();
+    const isAuthenticated = status === 'authenticated';
 
     useEffect(() => {
         if (couponDiscount.isApplied && couponDiscount.code) {
@@ -88,7 +91,7 @@ const CartTotal: React.FC = () => {
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded w-full shadow-checkout'>
             <h3 className='primary-gradient-600 text-title-2 md:text-2xl font-semibold w-fit'>Cart Total</h3>
             <div className='flex flex-col gap-3'>
-                {!isRedeemed && (
+                {!isRedeemed && isAuthenticated && (
                     <CouponForm
                         onCouponApplied={(discount) => {
                             setCouponDiscount(discount);
@@ -99,6 +102,11 @@ const CartTotal: React.FC = () => {
                         initialCouponCode={couponDiscount.code || ''}
                         cartTotal={cartTotal}
                     />
+                )}
+                {!isAuthenticated && (
+                    <p className='text-content-3 md:text-content-1 text-skin-neutral-400 font-medium'>
+                        Log in to apply coupon codes.
+                    </p>
                 )}
                 {couponDiscount.isApplied && couponDiscount.code && (
                     <div>

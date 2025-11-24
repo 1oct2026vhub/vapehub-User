@@ -10,6 +10,8 @@ import { applyCoupon } from '@/lib/server.actions'
 import { toast } from 'sonner'
 import { APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { ROUTES } from '@/lib/routes'
 
 const CartTotal: React.FC = () => {
     const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption } = useCart();
@@ -104,7 +106,13 @@ const CartTotal: React.FC = () => {
                 )}
                 {!isAuthenticated && (
                     <p className='text-content-3 md:text-content-1 text-skin-neutral-400 font-medium'>
-                        Log in to apply coupon codes.
+                        <Link 
+                            href={`${ROUTES.MY_ACCOUNT}?callbackUrl=${encodeURIComponent('/checkout')}`}
+                            className='text-skin-primary-400 hover:underline font-semibold'
+                        >
+                            Log in
+                        </Link>
+                        {' '}to apply coupon codes.
                     </p>
                 )}
                 {couponDiscount.isApplied && couponDiscount.code && (

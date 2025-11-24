@@ -24,10 +24,11 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
         <div className="space-y-6">
             <div className='space-y-4'>
                 <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name}</h1>
-                {(dynamicPageSlug?.description ) && (
-                    <div className="text-content-2 md:text-content-1 font-semibold md:font-bold text-skin-neutral-400">                        
-                          <p dangerouslySetInnerHTML={{ __html: dynamicPageSlug?.description }} />
-                    </div>
+                {(dynamicPageSlug?.description || data?.description) && (
+                    <div 
+                        className="product-content text-content-1 md:text-title-2 font-semibold text-skin-neutral-500 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: dynamicPageSlug?.description || data?.description || "" }}
+                    />
                 )}
             </div>
             {dealsToDisplay && dealsToDisplay.length > 0 && (

@@ -19,7 +19,6 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
     // if (!dynamicPageSlug?.deals_text && (!dealsToDisplay || dealsToDisplay.length === 0)) {
     //     return null;
     // }
-
     return (
         <div className="space-y-6">
             <div className='space-y-4'>

@@ -19,14 +19,13 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
     // if (!dynamicPageSlug?.deals_text && (!dealsToDisplay || dealsToDisplay.length === 0)) {
     //     return null;
     // }
-
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
                 <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name}</h1>
                 {(dynamicPageSlug?.description || data?.description) && (
                     <div 
-                        className="product-content text-content-1 md:text-title-2 font-semibold text-skin-neutral-500 leading-relaxed"
+                        className="product-content text-content-1 md:text-content-1 font-normal text-skin-neutral-500 leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: dynamicPageSlug?.description || data?.description || "" }}
                     />
                 )}

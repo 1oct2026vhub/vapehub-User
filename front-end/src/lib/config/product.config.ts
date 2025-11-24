@@ -288,6 +288,10 @@ export interface LoyaltySettings {
   status: boolean;
 }
 
+export interface LoyaltyPoints {
+  calculated: number;
+}
+
 export interface ProductViewDetails {
 
     id: number;
@@ -304,6 +308,7 @@ export interface ProductViewDetails {
     attribute_terms: AttributeTerms[];
     deals: Deal[];
     loyaltySettings: LoyaltySettings | null;
+    loyaltyPoints?: LoyaltyPoints | null;
 };
 
 export interface AppliedFilters {

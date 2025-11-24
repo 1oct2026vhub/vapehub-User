@@ -4,6 +4,7 @@ export interface BrandConfig {
     updated_by: number | null;
     slug: string;
     name: string;
+    description?: string;
     logo_url: string;
     createdAt: string;
     updatedAt: string;

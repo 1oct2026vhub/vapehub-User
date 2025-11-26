@@ -144,7 +144,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
             >
                 {<MenuIcon className='z-10 relative' />}
             </div>
-            <Drawer isOpen={isMenuOpen} onOpenChange={handleMenuClose} placement='bottom' className='max-h-[90vh] min-h-[90vh] rounded-t-32' classNames={{
+            <Drawer isOpen={isMenuOpen} onOpenChange={handleMenuClose} placement='bottom' className='max-h-[85vh] min-h-[85vh] rounded-t-32' classNames={{
                 closeButton: '!hidden'
             }}>
                 <DrawerContent>
@@ -228,7 +228,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                         ))}
                     </DrawerBody>
                     {isFooterVisible && openItems.length === 0 && (
-                        <DrawerFooter className='py-4 px-4 space-y-6 flex-col border-t border-skin-neutral-200 max-lg:landscape:hidden'>
+                        <DrawerFooter className='py-4 px-4 space-y-2 flex-col border-t border-skin-neutral-200 max-lg:landscape:hidden'>
                             <div className='p-4.5 bg-subscription-banner-mob bg-no-repeat bg-top rounded-lg bg-cover space-y-4 w-full'>
                                 <h2 className='text-content-2 font-semibold text-skin-white'>Signup Now to get rewarded</h2>
                                 <Form {...subscribeFromConfig}>

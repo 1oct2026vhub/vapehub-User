@@ -84,7 +84,6 @@ const CartTotal: React.FC = () => {
             setIsRemoveCoupon(true);
         }
     }
-
     const shippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
     const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
     console.log("loyaltyPoints", loyaltyPoints);

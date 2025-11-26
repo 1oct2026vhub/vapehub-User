@@ -73,7 +73,7 @@ const CheckoutDetails: React.FC = () => {
     });
     const { handlePlaceOrder, isProcessing, setSelectedShippingMethod } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
-    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
+    const { cartTotal, cartSubtotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
@@ -371,15 +371,61 @@ const CheckoutDetails: React.FC = () => {
     }, [form.watch('useShippingAsBilling')]);
 
     useEffect(() => {
-        // For now, show all shipping methods without filtering based on cart total
-        // You can add filtering logic later if needed
-        setShippingMethods(originalShippingMethods);
-        if (originalShippingMethods.length > 0) {
-            setSelectedCarrier(originalShippingMethods[0]);
-            setSelectedShippingMethod(originalShippingMethods[0]);
-            form.setValue('shippingMethodId', originalShippingMethods[0].id);
+        if (originalShippingMethods.length === 0) return;
+
+        // Calculate total amount without discounts (subtotal + shipping cost)
+        // For filtering, we need to check each method's total with its shipping cost
+        const subtotal = Number.isFinite(cartSubtotal) ? cartSubtotal : cartTotal;
+        
+        // Filter shipping methods based on the condition
+        const filteredMethods = originalShippingMethods.filter((method) => {
+            const methodShippingCost = parseFloat(method.shipping_cost || '0');
+            const totalAmount = subtotal + methodShippingCost;
+            
+            const isFreeShipping = method.is_free_shipping ?? false;
+            const freeShippingThreshold = method.free_shipping_threshold;
+            
+            // Log totalAmount for debugging
+            console.log(`Shipping method ${method.id} (${method.shipping_method}): totalAmount = ${totalAmount}, is_free_shipping = ${isFreeShipping}, free_shipping_threshold = ${freeShippingThreshold}`);
+            
+            // Condition: if (!is_free_shipping || (is_free_shipping && free_shipping_threshold <= totalAmount))
+            if (!isFreeShipping) {
+                return true; // Show non-free shipping methods
+            }
+            
+            // For free shipping methods, check if threshold is met
+            if (isFreeShipping) {
+                const threshold = freeShippingThreshold ? parseFloat(freeShippingThreshold) : null;
+                if (threshold === null) {
+                    return true; // No threshold, show it
+                }
+                return threshold <= totalAmount;
+            }
+            
+            return false;
+        });
+
+        // Log the total amount used for filtering (using first method's shipping cost as reference)
+        const referenceShippingCost = parseFloat(originalShippingMethods[0]?.shipping_cost || '0');
+        const totalAmountForFiltering = subtotal + referenceShippingCost;
+        console.log('CheckoutDetails - Total amount (without discounts) for filtering:', totalAmountForFiltering, 'Subtotal:', subtotal);
+
+        setShippingMethods(filteredMethods);
+
+        if (filteredMethods.length === 0) {
+            setSelectedCarrier(null);
+            form.setValue('shippingMethodId', 0);
+            return;
         }
-    }, [cartTotal, originalShippingMethods]);
+
+        const currentMethodId = form.getValues('shippingMethodId');
+        const matchedMethod = filteredMethods.find((method) => method.id === currentMethodId);
+        const nextMethod = matchedMethod || filteredMethods[0];
+
+        setSelectedCarrier(nextMethod);
+        setSelectedShippingMethod(nextMethod);
+        form.setValue('shippingMethodId', nextMethod.id);
+    }, [cartTotal, cartSubtotal, originalShippingMethods, form]);
 
     useEffect(() => {
         if (addresses.length > 0) {

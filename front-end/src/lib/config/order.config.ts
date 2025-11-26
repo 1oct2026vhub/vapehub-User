@@ -370,6 +370,11 @@ export interface SHIPPING_METHOD_DATA {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+    is_free_shipping?: boolean;
+    free_shipping_threshold?: string | null;
+    min_order_total?: string | null;
+    max_order_total?: string | null;
+    shipping_rules?: string | null;
 }
 
 export interface SHIPPING_METHOD_DISPLAY {

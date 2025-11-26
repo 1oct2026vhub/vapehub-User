@@ -14,7 +14,7 @@ import Link from 'next/link'
 import { ROUTES } from '@/lib/routes'
 
 const CartTotal: React.FC = () => {
-    const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption } = useCart();
+    const { cartTotal, cartSubtotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption } = useCart();
     const { selectedShippingMethod } = useCheckout();
     const [isApplyingLoyalty, setIsApplyingLoyalty] = useState(false);
     const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage } = loyaltyRedemption;
@@ -85,7 +85,9 @@ const CartTotal: React.FC = () => {
         }
     }
     const shippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
+    const subtotal = Number.isFinite(cartSubtotal) ? cartSubtotal : cartTotal;
     const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
+    console.log('CartTotal - total amount:', total);
     console.log("loyaltyPoints", loyaltyPoints);
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded w-full shadow-checkout'>
@@ -171,13 +173,15 @@ const CartTotal: React.FC = () => {
                         <p className='text-skin-neutral-500 !font-oswald'>Shipping Cost</p>
                         <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{shippingCost.toFixed(2)}</p>
                     </div>
-                    <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
-                        <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
-                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
-                    </div>
+                    {typeof subtotal === 'number' && (
+                        <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
+                            <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
+                            <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{subtotal.toFixed(2)}</p>
+                        </div>
+                    )}
                 </div>
                 <Divider className='border-2' />
-                <ShippingProgress />
+                <ShippingProgress totalAmount={total} />
                 <Divider className='border-2' />
                 <div className='flex items-center justify-between text-black font-bold'>
                     <p className='text-title-2 md:text-2xl !font-oswald'>Total</p>

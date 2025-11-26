@@ -6,9 +6,14 @@ import React from 'react'
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
  
 
-const ShippingProgress: React.FC = () => {
+interface ShippingProgressProps {
+    totalAmount?: number;
+}
+
+const ShippingProgress: React.FC<ShippingProgressProps> = ({ totalAmount }) => {
     const { cartItems } = useCart();
-    const totalPrice = cartItems.reduce((acc: number, item: CartItem) => acc + parseFloat(item.price) * item.quantity, 0);
+    const calculatedTotalPrice = cartItems.reduce((acc: number, item: CartItem) => acc + parseFloat(item.price) * item.quantity, 0);
+    const totalPrice = totalAmount !== undefined ? totalAmount : calculatedTotalPrice;
     const progress = Math.min((totalPrice / FREE_DELIVERY_THRESHOLD) * 100, 100);
     const remainingAmount = FREE_DELIVERY_THRESHOLD - totalPrice;
 

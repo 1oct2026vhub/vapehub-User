@@ -20,7 +20,7 @@ const SocialMedia = async () => {
                 ]}
             />
             <section className="container-sm my-10 lg:my-20">
-                <div className="space-y-4 text-title-2 text-skin-neutral-500"
+                <div className="space-y-4 text-title-2 text-skin-neutral-500 rich-text"
                     dangerouslySetInnerHTML={{ __html: socialMediaInfo?.social_media || '' }}
                 />
             </section>

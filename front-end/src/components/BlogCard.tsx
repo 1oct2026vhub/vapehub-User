@@ -28,7 +28,7 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
                 <RightArrowIcon stroke='#091410' className='-rotate-45 w-6 h-6 min-w-5 md:min-w-6' />
             </div>
             <div>
-                <div className="line-clamp-3 sm:h-[72px] text-skin-neutral-300" dangerouslySetInnerHTML={{ __html: blog.content }} />
+                <div className="line-clamp-3 sm:h-[72px] text-skin-neutral-300 rich-text" dangerouslySetInnerHTML={{ __html: blog.content }} />
                 <button className="text-skin-primary-300 text-content-3 md:text-content-1 font-semibold mt-2">Read more...</button>
             </div>
             <div className='mt-3.5'>

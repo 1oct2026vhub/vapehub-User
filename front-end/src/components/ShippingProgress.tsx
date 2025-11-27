@@ -8,17 +8,21 @@ import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
 
 interface ShippingProgressProps {
     totalAmount?: number;
+    freeShippingThreshold?: number;
 }
 
-const ShippingProgress: React.FC<ShippingProgressProps> = ({ totalAmount }) => {
-    const { cartItems } = useCart();
+const ShippingProgress: React.FC<ShippingProgressProps> = ({ totalAmount, freeShippingThreshold }) => {
+    const { cartItems, cartTotal } = useCart();
     const calculatedTotalPrice = cartItems.reduce((acc: number, item: CartItem) => acc + parseFloat(item.price) * item.quantity, 0);
-    const totalPrice = totalAmount !== undefined ? totalAmount : calculatedTotalPrice;
-    const progress = Math.min((totalPrice / FREE_DELIVERY_THRESHOLD) * 100, 100);
-    const remainingAmount = FREE_DELIVERY_THRESHOLD - totalPrice;
+
+    // Prefer the explicit prop, then cartTotal (which already reflects deals/discounts), then fallback to raw cart item total
+    const totalPrice = totalAmount ?? (Number.isFinite(cartTotal) ? cartTotal : calculatedTotalPrice);
+    const threshold = freeShippingThreshold ?? FREE_DELIVERY_THRESHOLD;
+    const progress = Math.min((totalPrice / threshold) * 100, 100);
+    const remainingAmount = Math.max(threshold - totalPrice, 0);
 
     const getProgressLabel = () => {
-        if (totalPrice >= FREE_DELIVERY_THRESHOLD) {
+        if (totalPrice >= threshold) {
             return "You've qualified for free shipping!";
         }
         return `You're £${remainingAmount.toFixed(2)} away from free shipping!`;

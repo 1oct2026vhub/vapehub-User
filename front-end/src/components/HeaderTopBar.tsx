@@ -19,7 +19,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Category } from '@/lib/config/category.config';
 import NotificationAction from './NotificationAction';
 import { useEffect, useState } from "react";
-import { getProductList } from "@/lib/server.actions";
+import { getProductList, getShippingMethods } from "@/lib/server.actions";
 import { Product } from "@/lib/config/product.config";
 import ProductSuggestions from './ProductSuggestions';
 import { useDebounce } from "@/lib/hooks/useDebounce";
@@ -47,6 +47,7 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
     const [suggestions, setSuggestions] = useState<Product[]>([]);
     const [isSuggestionLoading, setIsSuggestionLoading] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | undefined>(undefined);
 
     // Check if we're on the verification email page
     const isVerificationPage = pathname.includes('/verify-email');
@@ -78,6 +79,27 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
         setShowSuggestions(false);
         searchFromConfig.reset({ search: '' });
     }, [pathname]);
+
+    useEffect(() => {
+        const fetchFreeShippingThreshold = async () => {
+            const response = await getShippingMethods({ is_free_shipping: true });
+            if (response.status === ServerActionStatus.SUCCESS && Array.isArray(response.data)) {
+                const methodWithThreshold = response.data.find((method) => {
+                    const threshold = method.free_shipping_threshold ? parseFloat(method.free_shipping_threshold) : NaN;
+                    return (method.is_free_shipping ?? false) && Number.isFinite(threshold) && threshold > 0;
+                });
+
+                if (methodWithThreshold?.free_shipping_threshold) {
+                    const thresholdValue = parseFloat(methodWithThreshold.free_shipping_threshold);
+                    if (Number.isFinite(thresholdValue) && thresholdValue > 0) {
+                        setFreeShippingThreshold(thresholdValue);
+                    }
+                }
+            }
+        };
+
+        fetchFreeShippingThreshold();
+    }, []);
 
     const handleSearch = (data: HeaderFormSchema) => {
         if (data.search) {
@@ -237,8 +259,12 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
                             </DrawerBody>
                             {cartItems.length > 0 && (
                                 <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100s'>
-                                    <Divider />
-                                    <ShippingProgress />
+                                    {freeShippingThreshold !== undefined && (
+                                        <>
+                                            <Divider />
+                                            <ShippingProgress totalAmount={cartTotal} freeShippingThreshold={freeShippingThreshold} />
+                                        </>
+                                    )}
                                     <div className='space-y-3'>
                                         <div className='flex items-center justify-between text-black font-semibold'>
                                             <p className='text-content-2 md:text-title-1'>Total</p>

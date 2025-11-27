@@ -1331,7 +1331,7 @@ export const getSeoMetaBySlug = async (slug: string, canCache: boolean = true): 
 };
 
 // Legal content types
-export type LegalContentKey = 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions' | 'loyalty-points';
+export type LegalContentKey = 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions' | 'loyalty_points';
 
 export interface LegalContentResponse {
   content_key: LegalContentKey;

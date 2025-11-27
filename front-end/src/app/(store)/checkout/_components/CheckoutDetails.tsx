@@ -77,7 +77,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     });
     const { handlePlaceOrder, isProcessing, setSelectedShippingMethod } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
-    const { cartTotal, cartSubtotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
+    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {

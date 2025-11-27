@@ -36,7 +36,7 @@ export default async function DeliveryInformationPage() {
       <div className="mt-6">
         <h1 className="text-h5 md:text-h2 font-semibold primary-gradient-100 mb-6">Delivery Information</h1>
         <div 
-          className="prose prose-lg max-w-none"
+          className="prose prose-lg max-w-none rich-text"
           dangerouslySetInnerHTML={{ __html: content }}
         />
       </div>

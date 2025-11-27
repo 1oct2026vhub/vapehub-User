@@ -14,8 +14,7 @@ export default async function LoyaltyPointsPage() {
     { label: 'Loyalty Points', href: '/loyalty-points', isActive: true },
   ];
 
-  const response = await getLegalContentByKey('loyalty-points');
-
+  const response = await getLegalContentByKey('loyalty_points');
   if (response.status !== ServerActionStatus.SUCCESS || !response.data) {
     return (
       <div className="px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10">

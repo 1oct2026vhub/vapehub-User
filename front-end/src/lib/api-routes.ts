@@ -127,7 +127,7 @@ export const API_ROUTES = {
     GET_SHIPSTATION_CARRIERS: buildRequestUrl('/api/admin/shipStation/carriers'),
     GET_ENTITY_SLUGS: buildRequestUrl('/api/home/entity-slugs'),
     GET_SEO_META: (slug: string) => buildRequestUrl(`/api/home/seo-meta?slug=${encodeURIComponent(slug)}`),
-    GET_LEGAL_CONTENT: (contentKey: 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions' | 'loyalty-points') => buildRequestUrl(`/api/settings/legal-content/${contentKey}`),
+    GET_LEGAL_CONTENT: (contentKey: 'delivery_information' | 'privacy_policy' | 'returns_policy' | 'terms_conditions' | 'loyalty_points') => buildRequestUrl(`/api/settings/legal-content/${contentKey}`),
     GET_HOME_BLOCKS: buildRequestUrl('/api/home/blocks'),
     GET_DISPATCH_NOTICE: buildRequestUrl('/api/settings/dispatch-notice'),
     GUEST_CHECKOUT_AND_ORDER: buildRequestUrl('/api/checkout/guest/checkout-and-order'),

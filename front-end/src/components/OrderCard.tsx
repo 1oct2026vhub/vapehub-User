@@ -19,7 +19,7 @@ const OrderCard: React.FC = async () => {
   return (
     <div className='w-full bg-red-gradient-200 py-4.5 px-7.5 rounded-10 shadow-blog-card text-center'>
       <div 
-        className='text-skin-white text-content-1 md:text-title-1 font-semibold !font-oswald mx-auto'
+        className='text-skin-white text-content-1 md:text-title-1 font-semibold !font-oswald mx-auto rich-text'
         dangerouslySetInnerHTML={{ __html: content }}
       />
     </div>

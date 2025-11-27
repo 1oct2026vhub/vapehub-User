@@ -25,7 +25,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
                 <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name}</h1>
                 {(dynamicPageSlug?.description || data?.description) && (
                     <div 
-                        className="product-content text-content-1 md:text-content-1 font-normal text-skin-neutral-500 leading-relaxed"
+                        className="product-content rich-text text-content-1 md:text-content-1 font-normal text-skin-neutral-500 leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: dynamicPageSlug?.description || data?.description || "" }}
                     />
                 )}

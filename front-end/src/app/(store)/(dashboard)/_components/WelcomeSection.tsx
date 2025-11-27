@@ -27,7 +27,7 @@ const WelcomeSection = async () => {
                 <h2 className='text-h4 lg:text-h2 font-bold primary-gradient-600 w-fit'>
                     {mainTitle}{' '}{lastWord}
                 </h2>
-                <div className='welcome-text' dangerouslySetInnerHTML={{ __html: content }} />
+                <div className='welcome-text rich-text' dangerouslySetInnerHTML={{ __html: content }} />
             </div>
 
             {/* Right: image - only render if image_url exists */}

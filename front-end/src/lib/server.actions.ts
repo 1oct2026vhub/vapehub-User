@@ -535,9 +535,13 @@ export const updateOrderStatus = async (
 };
 
 //  get shipping methods
-export const getShippingMethods = async (): Promise<ServerActionResponse<SHIPPING_METHOD_DATA[]>> => {
+export const getShippingMethods = async (params?: { is_free_shipping?: boolean }): Promise<ServerActionResponse<SHIPPING_METHOD_DATA[]>> => {
+  const query = params?.is_free_shipping !== undefined
+    ? `?is_free_shipping=${params.is_free_shipping}`
+    : '';
+
   return await handleRequest<SHIPPING_METHOD_DATA[], unknown>({
-    endpoint: API_ROUTES.GET_SHIPPING_METHODS,
+    endpoint: `${API_ROUTES.GET_SHIPPING_METHODS}${query}`,
     method: 'GET',
   });
 };

@@ -9,9 +9,9 @@ import { CheckoutProvider } from '@/lib/context/CheckoutContext'
 import { AddressProvider } from '@/lib/context/AddressContext'
 import { useCart } from '@/lib/context/CartContext'
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder'
-import { getReviewOrderByProductId } from '@/lib/server.actions'
+import { getReviewOrderByProductId, getShippingMethods } from '@/lib/server.actions'
 import { ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config'
-import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config'
+import { REVIEW_ORDER_RESPONSE, SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
 import { useFeatureData } from '@/lib/hooks/useFeatureData'
 import GoogleMapsScript from '@/components/GoogleMapsScript'
 
@@ -20,6 +20,7 @@ const CheckoutPage: NextPage = (): ReactElement => {
     const { itemCount, cartItems } = useCart();
     const { features } = useFeatureData();
     const [reviews, setReviews] = React.useState<ServerActionResponse<REVIEW_ORDER_RESPONSE>[]>([]);
+    const [shippingMethods, setShippingMethods] = React.useState<SHIPPING_METHOD_DATA[]>([]);
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -29,6 +30,16 @@ const CheckoutPage: NextPage = (): ReactElement => {
         }
         if(cartItems.length > 0) fetchReviews();
     }, [cartItems]);
+
+    useEffect(() => {
+        const fetchShipping = async () => {
+            const response = await getShippingMethods();
+            if (response.status === ServerActionStatus.SUCCESS) {
+                setShippingMethods(response.data || []);
+            }
+        };
+        fetchShipping();
+    }, []);
 
     if (itemCount === 0) {
         return (
@@ -53,11 +64,11 @@ const CheckoutPage: NextPage = (): ReactElement => {
                 <main className='px-4 lg:px-9 xl:px-12.5 pt-5 pb-10 flex flex-col gap-7 lg:gap-10'>
                     <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Checkout</h1>
                     <section className='flex items-start flex-col-reverse lg:flex-row gap-5 xl:gap-7.5'>
-                        <CheckoutDetails />
+                        <CheckoutDetails shippingMethodsData={shippingMethods} />
                         <div className='flex flex-col gap-6 md:gap-7 w-full xl:max-w-[584px]'>
                             {/* product list */}
                             <ProductList reviews={reviews} />
-                            <CartTotal />
+                            <CartTotal shippingMethodsData={shippingMethods} />
                         </div>
                     </section>
                     <FeatureCards features={features || undefined} />

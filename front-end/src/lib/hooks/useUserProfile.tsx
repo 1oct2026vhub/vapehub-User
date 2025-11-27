@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { getUserProfile, updateUserProfile, deleteUserAccount } from '@/lib/server.actions'
 import { UserProfileFormData, UserProfileResponse } from '@/lib/config/user.config'
 import { ServerActionStatus } from '../config/app.config'
@@ -8,7 +8,7 @@ export const useUserProfile = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchProfile = async (): Promise<UserProfileResponse | null> => {
+  const fetchProfile = useCallback(async (): Promise<UserProfileResponse | null> => {
     setIsLoading(true)
     try {
       const response = await getUserProfile()
@@ -23,9 +23,9 @@ export const useUserProfile = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
-  const updateProfile = async (data: UserProfileFormData) => {
+  const updateProfile = useCallback(async (data: UserProfileFormData) => {
     setIsLoading(true)
     try {
       const response = await updateUserProfile(data)
@@ -37,9 +37,9 @@ export const useUserProfile = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
-  const deleteProfile = async () => {
+  const deleteProfile = useCallback(async () => {
     setIsLoading(true)
     try {
       const response = await deleteUserAccount()
@@ -55,7 +55,7 @@ export const useUserProfile = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   return {
     isLoading,

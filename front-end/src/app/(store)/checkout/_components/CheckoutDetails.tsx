@@ -18,7 +18,7 @@ import { Address } from '@/lib/config/user.config';
 import { useUserProfile } from '@/lib/hooks/useUserProfile';
 import Flag from '@/components/ui/Flag';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
-import { getShippingMethods, placeOrder, guestCheckoutAndOrder } from '@/lib/server.actions';
+import { placeOrder, guestCheckoutAndOrder } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
@@ -29,7 +29,11 @@ import { getCookie } from 'cookies-next';
 import { GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config';
 import { CartItem } from '@/lib/config/cart.config';
 
-const CheckoutDetails: React.FC = () => {
+interface CheckoutDetailsProps {
+    shippingMethodsData: SHIPPING_METHOD_DATA[];
+}
+
+const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }) => {
     const { status } = useSession();
     const isAuthenticated = status === 'authenticated';
     const { fetchProfile } = useUserProfile();
@@ -340,31 +344,32 @@ const CheckoutDetails: React.FC = () => {
     useEffect(() => {
         const loadProfile = async () => {
             const profile = await fetchProfile();
-            const response = await getShippingMethods();
-            console.log("getShippingMethods", response);
-            
-            if (response.status == ServerActionStatus.SUCCESS) {
-                // Filter only enabled shipping methods and sort by method_order
-                const enabledMethods = response.data
-                    .filter(method => method.is_enabled && !method.deletedAt)
-                    .sort((a, b) => a.method_order - b.method_order);
-                
-                setOriginalShippingMethods(enabledMethods);
-                setShippingMethods(enabledMethods);
-                if (enabledMethods.length > 0) {
-                    console.log('CheckoutDetails - Initial shipping method:', enabledMethods[0]);
-                    setSelectedCarrier(enabledMethods[0]);
-                    setSelectedShippingMethod(enabledMethods[0]);
-                    form.setValue('shippingMethodId', enabledMethods[0].id);
-                }
-            }
             form.setValue('email', profile?.email || '');
             form.setValue('phone', profile?.phone || '');
-
         }
         loadProfile();
 
-    }, []);
+    }, [fetchProfile, form]);
+
+    useEffect(() => {
+        if (!shippingMethodsData || shippingMethodsData.length === 0) {
+            return;
+        }
+
+        const enabledMethods = shippingMethodsData
+            .filter(method => method.is_enabled && !method.deletedAt)
+            .sort((a, b) => a.method_order - b.method_order);
+
+        setOriginalShippingMethods(enabledMethods);
+        setShippingMethods(enabledMethods);
+
+        if (enabledMethods.length > 0) {
+            console.log('CheckoutDetails - Initial shipping method:', enabledMethods[0]);
+            setSelectedCarrier(enabledMethods[0]);
+            setSelectedShippingMethod(enabledMethods[0]);
+            form.setValue('shippingMethodId', enabledMethods[0].id);
+        }
+    }, [shippingMethodsData, form, setSelectedShippingMethod]);
 
     useEffect(() => {
         setShippingAsBilling(form.watch('useShippingAsBilling'));
@@ -373,42 +378,38 @@ const CheckoutDetails: React.FC = () => {
     useEffect(() => {
         if (originalShippingMethods.length === 0) return;
 
-        // Calculate total amount without discounts (subtotal + shipping cost)
-        // For filtering, we need to check each method's total with its shipping cost
-        const subtotal = Number.isFinite(cartSubtotal) ? cartSubtotal : cartTotal;
+        // Use cartTotal (amount after deals are applied) for free shipping threshold calculation
+        // cartTotal represents the subtotal after discounts/deals, not including shipping
+        const amountAfterDeals = cartTotal;
+        console.log("Amount after deals (cartTotal) for free shipping calculation:", amountAfterDeals);
         
         // Filter shipping methods based on the condition
         const filteredMethods = originalShippingMethods.filter((method) => {
-            const methodShippingCost = parseFloat(method.shipping_cost || '0');
-            const totalAmount = subtotal + methodShippingCost;
-            
             const isFreeShipping = method.is_free_shipping ?? false;
             const freeShippingThreshold = method.free_shipping_threshold;
             
-            // Log totalAmount for debugging
-            console.log(`Shipping method ${method.id} (${method.shipping_method}): totalAmount = ${totalAmount}, is_free_shipping = ${isFreeShipping}, free_shipping_threshold = ${freeShippingThreshold}`);
+            // Log for debugging
+            console.log(`Shipping method ${method.id} (${method.shipping_method}): is_free_shipping = ${isFreeShipping}, free_shipping_threshold = ${freeShippingThreshold}, amount_after_deals = ${amountAfterDeals}`);
             
-            // Condition: if (!is_free_shipping || (is_free_shipping && free_shipping_threshold <= totalAmount))
+            // Condition: if (!is_free_shipping || (is_free_shipping && amount_after_deals >= free_shipping_threshold))
             if (!isFreeShipping) {
                 return true; // Show non-free shipping methods
             }
             
-            // For free shipping methods, check if threshold is met
+            // For free shipping methods, check if threshold is met using amount after deals
             if (isFreeShipping) {
                 const threshold = freeShippingThreshold ? parseFloat(freeShippingThreshold) : null;
                 if (threshold === null) {
                     return true; // No threshold, show it
                 }
-                return threshold <= totalAmount;
+                return amountAfterDeals >= threshold;
             }
             
             return false;
         });
 
-        // Log the total amount used for filtering (using first method's shipping cost as reference)
-        const referenceShippingCost = parseFloat(originalShippingMethods[0]?.shipping_cost || '0');
-        const totalAmountForFiltering = subtotal + referenceShippingCost;
-        console.log('CheckoutDetails - Total amount (without discounts) for filtering:', totalAmountForFiltering, 'Subtotal:', subtotal);
+        console.log('CheckoutDetails - Amount after deals for filtering:', amountAfterDeals);
+        console.log('CheckoutDetails - Filtered shipping methods:', filteredMethods);
 
         setShippingMethods(filteredMethods);
 
@@ -425,7 +426,7 @@ const CheckoutDetails: React.FC = () => {
         setSelectedCarrier(nextMethod);
         setSelectedShippingMethod(nextMethod);
         form.setValue('shippingMethodId', nextMethod.id);
-    }, [cartTotal, cartSubtotal, originalShippingMethods, form]);
+    }, [cartTotal, originalShippingMethods, form]);
 
     useEffect(() => {
         if (addresses.length > 0) {

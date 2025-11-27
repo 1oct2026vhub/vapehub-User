@@ -4,7 +4,7 @@ import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.co
 import { useCart } from '@/lib/context/CartContext'
 import { useCheckout } from '@/lib/context/CheckoutContext'
 import { Divider, Checkbox } from '@nextui-org/react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import CouponForm from '@/components/CouponForm'
 import { applyCoupon } from '@/lib/server.actions'
 import { toast } from 'sonner'
@@ -12,9 +12,15 @@ import { APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { ROUTES } from '@/lib/routes'
+import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
+import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'
 
-const CartTotal: React.FC = () => {
-    const { cartTotal, cartSubtotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption } = useCart();
+interface CartTotalProps {
+    shippingMethodsData: SHIPPING_METHOD_DATA[];
+}
+
+const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
+    const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption } = useCart();
     const { selectedShippingMethod } = useCheckout();
     const [isApplyingLoyalty, setIsApplyingLoyalty] = useState(false);
     const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage } = loyaltyRedemption;
@@ -84,10 +90,27 @@ const CartTotal: React.FC = () => {
             setIsRemoveCoupon(true);
         }
     }
+    const freeShippingThreshold = useMemo(() => {
+        if (!shippingMethodsData || shippingMethodsData.length === 0) {
+            return FREE_DELIVERY_THRESHOLD;
+        }
+
+        const freeShippingMethod = shippingMethodsData.find(
+            method => (method.is_free_shipping ?? false) && method.free_shipping_threshold
+        );
+
+        if (freeShippingMethod?.free_shipping_threshold) {
+            const thresholdValue = parseFloat(freeShippingMethod.free_shipping_threshold);
+            return Number.isFinite(thresholdValue) && thresholdValue > 0
+                ? thresholdValue
+                : FREE_DELIVERY_THRESHOLD;
+        }
+
+        return FREE_DELIVERY_THRESHOLD;
+    }, [shippingMethodsData]);
+
     const shippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
-    const subtotal = Number.isFinite(cartSubtotal) ? cartSubtotal : cartTotal;
     const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
-    console.log('CartTotal - total amount:', total);
     console.log("loyaltyPoints", loyaltyPoints);
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded w-full shadow-checkout'>
@@ -173,15 +196,13 @@ const CartTotal: React.FC = () => {
                         <p className='text-skin-neutral-500 !font-oswald'>Shipping Cost</p>
                         <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{shippingCost.toFixed(2)}</p>
                     </div>
-                    {typeof subtotal === 'number' && (
-                        <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
-                            <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
-                            <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{subtotal.toFixed(2)}</p>
-                        </div>
-                    )}
+                    <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
+                        <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
+                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
+                    </div>
                 </div>
                 <Divider className='border-2' />
-                <ShippingProgress totalAmount={total} />
+                <ShippingProgress totalAmount={cartTotal} freeShippingThreshold={freeShippingThreshold} />
                 <Divider className='border-2' />
                 <div className='flex items-center justify-between text-black font-bold'>
                     <p className='text-title-2 md:text-2xl !font-oswald'>Total</p>

@@ -136,6 +136,17 @@ export interface APPLY_COUPON_PAYLOAD {
     loyalty?: boolean;
 }
 
+export interface APPLY_GUEST_COUPON_PAYLOAD {
+    couponCode: string;
+    cartItems: Array<{
+        product_id: number;
+        variant_id: number;
+        quantity: number;
+    }>;
+    shippingMethodId: number;
+    loyalty?: boolean;
+}
+
 export interface CHECKOUT_PAYLOAD {
     email: string;
     phone: string;

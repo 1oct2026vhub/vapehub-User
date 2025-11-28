@@ -219,6 +219,19 @@ input[type='search'] {
   transform: translateY(-50%);
 }
 
+.testimonial-slider .slick-prev,
+.testimonial-slider .slick-next {
+  @apply !flex max-md:w-6 max-md:h-6;
+}
+
+.testimonial-slider .slick-prev {
+  @apply left-[-10px];
+}
+
+.testimonial-slider .slick-next {
+  @apply right-[-10px];
+}
+
 
 .slick-disabled { pointer-events: none; cursor: default !important; opacity: 0.5; }
 
@@ -481,6 +494,10 @@ input[type="checkbox"] + span {
 .product-content a {
   text-decoration: underline !important;
   font-weight: 500;
+}
+
+.product-listing-container .product-content {
+  @apply text-skin-neutral-400 !text-title-2;
 }
 
 /* Styles for webkit-based browsers */

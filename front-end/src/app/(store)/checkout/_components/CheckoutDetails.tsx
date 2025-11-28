@@ -378,7 +378,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             }
             return 0;
         });
-        
         setShippingMethods(sortedMethods);
 
         if (sortedMethods.length > 0) {

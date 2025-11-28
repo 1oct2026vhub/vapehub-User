@@ -49,7 +49,7 @@ const AllDealsPage: NextPage = () => {
                     </div>
                 ) : deals.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-2 sm:grid-cols-2 w-full gap-6">
+                        <div className="grid sm:grid-cols-2 w-full gap-6">
                             {deals.map((deal) => (
                                 <DealCard
                                     key={deal.id}

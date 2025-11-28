@@ -17,9 +17,9 @@ export interface Testimonial {
     } | null;
 }
 interface TestimonialProps {
-  data: Testimonial[];
+    data: Testimonial[];
 }
- 
+
 
 const settings: Settings = {
     dots: false,
@@ -27,7 +27,7 @@ const settings: Settings = {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 3,
-    lazyLoad:"progressive",
+    lazyLoad: "progressive",
     responsive: [
         {
             breakpoint: 1024,
@@ -35,7 +35,7 @@ const settings: Settings = {
                 slidesToShow: 2,
                 slidesToScroll: 2,
                 infinite: false,
-                dots: false
+                dots: false,
             }
         },
         {
@@ -47,24 +47,34 @@ const settings: Settings = {
                 dots: false,
             }
         },
+
+        {
+            breakpoint: 480,
+            settings: {
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                infinite: false,
+                dots: false,
+            }
+        }
     ]
 };
 
-const TestimonialSlider: FunctionComponent<TestimonialProps> = ({data}) => {
-     if(!data.length) return  <EmptyPlaceholder title='Uh, oh!' description='No testimonials available' />;
+const TestimonialSlider: FunctionComponent<TestimonialProps> = ({ data }) => {
+    if (!data.length) return <EmptyPlaceholder title='Uh, oh!' description='No testimonials available' />;
     return (
         <Slider {...settings}>
             {data.map((testimonial) => (
                 <div key={testimonial.id} className="px-2 md:px-3 xl:px-5 py-3 h-full">
                     <TestimonialCard
-                     imageSrc = {testimonial.user?.profile_pic_url || null}
-                     altText = {testimonial.user_name || ""}
-                     href = "#"
-                     name = {testimonial.user_name || ""}
-                     review = {testimonial.comment}
-                     ratingCount = {testimonial.rating}
-                     verified = {testimonial.verified_by || false}
-                     />
+                        imageSrc={testimonial.user?.profile_pic_url || null}
+                        altText={testimonial.user_name || ""}
+                        href="#"
+                        name={testimonial.user_name || ""}
+                        review={testimonial.comment}
+                        ratingCount={testimonial.rating}
+                        verified={testimonial.verified_by || false}
+                    />
                 </div>
             ))}
         </Slider>

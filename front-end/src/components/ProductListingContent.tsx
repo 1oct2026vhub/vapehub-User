@@ -51,7 +51,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
                                 alt={banner.name || ''}
                                 width={437}
                                 height={162}
-                                className="rounded-xl w-full max-h-[118px] md:max-h-40"
+                                className="rounded-lg md:rounded-xl w-full max-h-[118px] md:max-h-40"
                             />
                         </Link>
                     ))}

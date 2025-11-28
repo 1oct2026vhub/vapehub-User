@@ -111,7 +111,7 @@ const PopularCategories: FunctionComponent = async (): Promise<ReactElement> => 
             <div className="flex-1 min-w-0">
               <SectionHeading title={section.title} />
               {section.description && (
-                <p className="text-content-1 text-skin-neutral-400 mt-2 truncate">
+                <p className="text-title-2 text-skin-neutral-300 font-semibold mt-2 truncate">
                   {section.description}
                 </p>
               )}

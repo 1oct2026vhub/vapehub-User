@@ -31,6 +31,9 @@ const Testimonials: FunctionComponent<TestimonialsProps> = async ({
     return (
         <section className="space-y-3 md:space-y-5">
             <SectionHeading title={title} />
+            <p className="text-title-2 text-skin-neutral-300 font-semibold mt-1 truncate">
+                Latest Trustpilot Reviews
+            </p>
             <div className="slider-container section-slider testimonial-slider">
                 <TestimonialSlider data={testimonials} />
             </div>

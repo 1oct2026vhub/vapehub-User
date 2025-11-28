@@ -10,8 +10,6 @@ import { applyCoupon } from '@/lib/server.actions'
 import { toast } from 'sonner'
 import { APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
 import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { ROUTES } from '@/lib/routes'
 import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'
 
@@ -116,7 +114,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded w-full shadow-checkout'>
             <h3 className='primary-gradient-600 text-title-2 md:text-2xl font-semibold w-fit'>Cart Total</h3>
             <div className='flex flex-col gap-3'>
-                {!isRedeemed && isAuthenticated && (
+                {!isRedeemed && (
                     <CouponForm
                         onCouponApplied={(discount) => {
                             setCouponDiscount(discount);
@@ -126,18 +124,9 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                         }}
                         initialCouponCode={couponDiscount.code || ''}
                         cartTotal={cartTotal}
+                        isGuest={!isAuthenticated}
+                        shippingMethodId={selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0}
                     />
-                )}
-                {!isAuthenticated && (
-                    <p className='text-content-3 md:text-content-1 text-skin-neutral-400 font-medium'>
-                        <Link 
-                            href={`${ROUTES.MY_ACCOUNT}?callbackUrl=${encodeURIComponent('/checkout')}`}
-                            className='text-skin-primary-400 hover:underline font-semibold'
-                        >
-                            Log in
-                        </Link>
-                        {' '}to apply coupon codes.
-                    </p>
                 )}
                 {couponDiscount.isApplied && couponDiscount.code && (
                     <div>

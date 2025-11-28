@@ -6,18 +6,43 @@ import { ROUTES } from '@/lib/routes'
 import { checkout } from '@/lib/server.actions'
 import { Button, Divider } from '@nextui-org/react'
 import { useRouter } from 'next/navigation'
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useSession } from 'next-auth/react'
 import CouponForm from '@/components/CouponForm'
 import { CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
 import { getCookie } from 'cookies-next'
 import { CartItem } from '@/lib/config/cart.config'
+import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
+import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'
 
-const CartDetails: React.FC = () => {
+interface CartDetailsProps {
+    shippingMethodsData: SHIPPING_METHOD_DATA[];
+}
+
+const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
     const { status } = useSession();
     const { cartTotal, itemCount, couponDiscount, setCouponDiscount, checkoutStockValidation, stockValidationLoading, setIsRemoveCoupon, cartItems, cartSubtotal, cartDiscount } = useCart();
     const router = useRouter();
+
+    const freeShippingThreshold = useMemo(() => {
+        if (!shippingMethodsData || shippingMethodsData.length === 0) {
+            return FREE_DELIVERY_THRESHOLD;
+        }
+
+        const freeShippingMethod = shippingMethodsData.find(
+            method => (method.is_free_shipping ?? false) && method.free_shipping_threshold
+        );
+
+        if (freeShippingMethod?.free_shipping_threshold) {
+            const thresholdValue = parseFloat(freeShippingMethod.free_shipping_threshold);
+            return Number.isFinite(thresholdValue) && thresholdValue > 0
+                ? thresholdValue
+                : FREE_DELIVERY_THRESHOLD;
+        }
+
+        return FREE_DELIVERY_THRESHOLD;
+    }, [shippingMethodsData]);
 
     // Console log cart details for guest users
     useEffect(() => {
@@ -226,7 +251,10 @@ const CartDetails: React.FC = () => {
                 </div>
             </div>
             <Divider />
-            <ShippingProgress />
+            <ShippingProgress 
+                totalAmount={cartTotal} 
+                freeShippingThreshold={freeShippingThreshold}
+            />
             <Divider />
             <div className='flex items-center justify-between text-black font-semibold'>
                 <p className='text-content-2 md:text-2xl !font-oswald'>Total</p>

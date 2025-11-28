@@ -37,7 +37,7 @@ const InputField = <T extends FieldValues>({ control, name,showStatus = false, d
           errorMessage={error?.message} // ✅ Display validation errors          
           classNames={{
             label: "!text-skin-neutral-400 !font-bold text-content-2 md:!text-title-2",
-            input: "!bg-skin-white !text-skin-neutral-400 font-bold !text-content-2 md:!text-title-2 placeholder:!text-skin-neutral-400 truncate",
+            input: "!bg-skin-white !text-skin-neutral-400 font-bold !text-title-2 placeholder:!text-skin-neutral-400 truncate",
             innerWrapper: "!bg-skin-white gap-2 hover:!bg-skin-white group-data-[has-label=true]:pt-9 ${className}",
             inputWrapper:
               "pl-3 md:pl-5 pr-3 h-11 md:h-12 shadow-input rounded !bg-skin-white border border-skin-neutral-100 hover:border-skin-primary-500 data-[hover=true]:!bg-skin-white group-data-[focus=true]:border-skin-primary-300 group-data-[focus=true]:!bg-skin-white !cursor-text",

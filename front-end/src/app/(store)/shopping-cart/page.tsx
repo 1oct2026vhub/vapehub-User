@@ -2,17 +2,31 @@
 
 import ShoppingCartCard from '@/components/ShoppingCartCard'
 import { NextPage } from 'next'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import CartDetails from './_components/CartDetails'
 import FeatureCards from '../(dashboard)/_components/FeatureCards'
 import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
 import { ROUTES } from '@/lib/routes'
 import { useFeatureData } from '@/lib/hooks/useFeatureData'
+import { getShippingMethods } from '@/lib/server.actions'
+import { ServerActionStatus } from '@/lib/config/app.config'
+import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
 
 const ShoppingCartPage: NextPage = (): ReactElement => {
     const { cartItems } = useCart();
     const { features } = useFeatureData();
+    const [shippingMethods, setShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
+
+    useEffect(() => {
+        const fetchShipping = async () => {
+            const response = await getShippingMethods();
+            if (response.status === ServerActionStatus.SUCCESS) {
+                setShippingMethods(response.data || []);
+            }
+        };
+        fetchShipping();
+    }, []);
     if (cartItems.length === 0) {
         return (
             <main className="flex flex-col items-center justify-center gap-6 py-20">
@@ -45,7 +59,7 @@ const ShoppingCartPage: NextPage = (): ReactElement => {
                 </div>
 
                 {/* Cart Details */}
-                <CartDetails />
+                <CartDetails shippingMethodsData={shippingMethods} />
             </section>
             <FeatureCards features={features || undefined} />
         </main>

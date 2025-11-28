@@ -87,10 +87,10 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 toast.success('Coupon Applied Successfully');
             }
             if (response.status === ServerActionStatus.SUCCESS) { 
-                if(!response.data?.referral_value) {
-                    toast.error("Invalid coupon code");
-                    return;
-                }
+                // if(!response.data?.referral_value) {
+                //     toast.error("Invalid coupon code");
+                //     return;
+                // }
                 setIsApplied(true);
                 setIsEditing(false);            
                 const discountAmount = (cartTotal - response.data.total).toFixed(2);
@@ -126,10 +126,10 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 toast.success('Coupon Applied Successfully');
             }
             if (response.status === ServerActionStatus.SUCCESS) { 
-                if(!response.data?.referral_value) {
-                    toast.error("Invalid coupon code");
-                    return;
-                }
+                // if(!response.data?.referral_value) {
+                //     toast.error("Invalid coupon code");
+                //     return;
+                // }
                 setIsApplied(true);
                 setIsEditing(false);            
                 const discountAmount = (cartTotal - response.data.total).toFixed(2);

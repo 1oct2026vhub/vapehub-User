@@ -74,6 +74,7 @@ export const API_ROUTES = {
     GET_DYNAMIC_PAGE_SLUG: (slug: string) => buildRequestUrl(`/api/home/slug-relation?slugs=${slug}`),
     CHECKOUT: buildRequestUrl('/api/checkout'),
     APPLY_COUPON: buildRequestUrl('/api/checkout/apply-coupon'),
+    APPLY_GUEST_COUPON: buildRequestUrl('/api/checkout/guest/apply-coupon'),
     GET_USER_PROFILE: buildRequestUrl('/api/users/profile'),
     DELETE_USER_ACCOUNT: buildRequestUrl('/api/users/delete-account'),
     TOGGLE_MAIL_SUBSCRIPTION: buildRequestUrl('/api/mailSubscription/toggle'),

@@ -2,8 +2,10 @@ import { EditIcon2 } from '@/components/Icons'
 import { Button } from '@nextui-org/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_FORM_TYPE, APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
-import { applyCoupon } from '@/lib/server.actions'
+import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_FORM_TYPE, APPLY_COUPON_PAYLOAD, APPLY_GUEST_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
+import { applyCoupon, applyGuestCoupon } from '@/lib/server.actions'
+import { getCookie } from 'cookies-next'
+import { CartItem } from '@/lib/config/cart.config'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
 import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
@@ -26,9 +28,11 @@ interface CouponFormProps {
     }) => void;
     initialCouponCode?: string;
     cartTotal: number;
+    isGuest?: boolean;
+    shippingMethodId?: number;
 }
 
-const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', cartTotal}) => {
+const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', cartTotal, isGuest = false, shippingMethodId = 0}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isApplied, setIsApplied] = useState(!!initialCouponCode);
     // const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -43,48 +47,113 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
     });
 
     const handleApplyCoupon = async (data: APPLY_COUPON_FORM_TYPE) => {
-        const payload: APPLY_COUPON_PAYLOAD = {
-            ...data,
-            shippingMethodId: 0
-        };
-        const response = await applyCoupon(payload);
-        if(response.status === 'SUCCESS') {
-          toast.success('Coupon Applied Successfully');
-        }
-        // if(response.status === 'ERROR') {
-        //     setErrorMessage(response.message);
-        // }
-        // else {
-        //     setErrorMessage(null);
-        // }
-        if (response.status === ServerActionStatus.SUCCESS) { 
-            if(!response.data?.referral_value) {
-                toast.error("Invalid coupon code");
+        if (isGuest) {
+            // For guest users, get cart items from cookie
+            const guestCartCookie = getCookie('guest_cart');
+            let guestCartItems: CartItem[] = [];
+            
+            try {
+                if (guestCartCookie) {
+                    guestCartItems = JSON.parse(guestCartCookie as string);
+                }
+            } catch (e) {
+                console.error('Error parsing guest cart cookie:', e);
+                toast.error('Error loading cart items. Please try again.');
                 return;
             }
-            setIsApplied(true);
-            setIsEditing(false);            
-            const discountAmount = (cartTotal - response.data.total).toFixed(2);
-            onCouponApplied({
-                value: cartTotal - response.data.total,
-                isApplied: true,
-                code: data.couponCode || null,
-                message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
-                discountValue: (discountAmount).toString(),
-                mailSubscriptionData: response.data.mail_subscription_data
-            });
+
+            // Check if cart is empty
+            if (guestCartItems.length === 0) {
+                toast.error('Your cart is empty. Please add items to apply a coupon.');
+                return;
+            }
+
+            // Build cart items array for API
+            const cartItemsForApi = guestCartItems.map(item => ({
+                product_id: item.product_id,
+                variant_id: item.variant_id,
+                quantity: item.quantity
+            }));
+
+            const payload: APPLY_GUEST_COUPON_PAYLOAD = {
+                couponCode: data.couponCode,
+                cartItems: cartItemsForApi,
+                shippingMethodId: shippingMethodId || 0,
+                loyalty: false
+            };
+
+            const response = await applyGuestCoupon(payload);
+            if(response.status === 'SUCCESS') {
+                toast.success('Coupon Applied Successfully');
+            }
+            if (response.status === ServerActionStatus.SUCCESS) { 
+                if(!response.data?.referral_value) {
+                    toast.error("Invalid coupon code");
+                    return;
+                }
+                setIsApplied(true);
+                setIsEditing(false);            
+                const discountAmount = (cartTotal - response.data.total).toFixed(2);
+                onCouponApplied({
+                    value: cartTotal - response.data.total,
+                    isApplied: true,
+                    code: data.couponCode || null,
+                    message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
+                    discountValue: (discountAmount).toString(),
+                    mailSubscriptionData: response.data.mail_subscription_data
+                });
+            } else {
+                toast.error(response.message);
+                form.reset({ couponCode: '', shippingMethodId: 0 });
+                setIsApplied(false);
+                onCouponApplied({
+                    value: 0,
+                    isApplied: false,
+                    code: null,
+                    message: null,
+                    discountValue: '',
+                    mailSubscriptionData: undefined
+                });
+            }
         } else {
-            toast.error(response.message);
-            form.reset({ couponCode: '', shippingMethodId: 0 });
-            setIsApplied(false);
-            onCouponApplied({
-                value: 0,
-                isApplied: false,
-                code: null,
-                message: null,
-                discountValue: '',
-                mailSubscriptionData: undefined
-            });
+            // For authenticated users, use the existing flow
+            const payload: APPLY_COUPON_PAYLOAD = {
+                ...data,
+                shippingMethodId: shippingMethodId || 0
+            };
+            const response = await applyCoupon(payload);
+            if(response.status === 'SUCCESS') {
+                toast.success('Coupon Applied Successfully');
+            }
+            if (response.status === ServerActionStatus.SUCCESS) { 
+                if(!response.data?.referral_value) {
+                    toast.error("Invalid coupon code");
+                    return;
+                }
+                setIsApplied(true);
+                setIsEditing(false);            
+                const discountAmount = (cartTotal - response.data.total).toFixed(2);
+                onCouponApplied({
+                    value: cartTotal - response.data.total,
+                    isApplied: true,
+                    code: data.couponCode || null,
+                    message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
+                    discountValue: (discountAmount).toString(),
+                    mailSubscriptionData: response.data.mail_subscription_data
+                });
+            } else {
+                toast.error(response.message);
+                form.reset({ couponCode: '', shippingMethodId: 0 });
+                setIsApplied(false);
+                onCouponApplied({
+                    value: 0,
+                    isApplied: false,
+                    code: null,
+                    message: null,
+                    discountValue: '',
+                    mailSubscriptionData: undefined
+                });
+            }
         }
     };
 

@@ -5,7 +5,7 @@ import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
-import { APPLY_COUPON_PAYLOAD, CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from "./config/checkout.config";
+import { APPLY_COUPON_PAYLOAD, APPLY_GUEST_COUPON_PAYLOAD, CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from "./config/checkout.config";
 import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse, SeoMetaResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
@@ -390,6 +390,15 @@ export const guestCheckoutAndOrder = async (payload: GUEST_CHECKOUT_AND_ORDER_PA
 export const applyCoupon = async (payload: APPLY_COUPON_PAYLOAD): Promise<ServerActionResponse<CouponResponse>> => {
   return await handleRequest<CouponResponse, unknown>({
     endpoint: API_ROUTES.APPLY_COUPON,
+    payload,
+    method: 'POST',
+  });
+};
+
+// apply guest coupon
+export const applyGuestCoupon = async (payload: APPLY_GUEST_COUPON_PAYLOAD): Promise<ServerActionResponse<CouponResponse>> => {
+  return await handleRequest<CouponResponse, unknown>({
+    endpoint: API_ROUTES.APPLY_GUEST_COUPON,
     payload,
     method: 'POST',
   });

@@ -361,13 +361,33 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             .sort((a, b) => a.method_order - b.method_order);
 
         setOriginalShippingMethods(enabledMethods);
-        setShippingMethods(enabledMethods);
+        
+        // Sort to prioritize free shipping methods initially
+        const sortedMethods = [...enabledMethods].sort((a, b) => {
+            const aIsFree = a.is_free_shipping ?? false;
+            const bIsFree = b.is_free_shipping ?? false;
+            
+            if (aIsFree && bIsFree) {
+                return 0;
+            }
+            if (aIsFree && !bIsFree) {
+                return -1;
+            }
+            if (!aIsFree && bIsFree) {
+                return 1;
+            }
+            return 0;
+        });
+        setShippingMethods(sortedMethods);
 
-        if (enabledMethods.length > 0) {
-            console.log('CheckoutDetails - Initial shipping method:', enabledMethods[0]);
-            setSelectedCarrier(enabledMethods[0]);
-            setSelectedShippingMethod(enabledMethods[0]);
-            form.setValue('shippingMethodId', enabledMethods[0].id);
+        if (sortedMethods.length > 0) {
+            // Prioritize free shipping method if available
+            const freeShippingMethod = sortedMethods.find((method) => (method.is_free_shipping ?? false));
+            const initialMethod = freeShippingMethod || sortedMethods[0];
+            console.log('CheckoutDetails - Initial shipping method:', initialMethod);
+            setSelectedCarrier(initialMethod);
+            setSelectedShippingMethod(initialMethod);
+            form.setValue('shippingMethodId', initialMethod.id);
         }
     }, [shippingMethodsData, form, setSelectedShippingMethod]);
 
@@ -411,22 +431,48 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         console.log('CheckoutDetails - Amount after deals for filtering:', amountAfterDeals);
         console.log('CheckoutDetails - Filtered shipping methods:', filteredMethods);
 
-        setShippingMethods(filteredMethods);
+        // Sort methods to prioritize free shipping methods that meet the threshold
+        const sortedMethods = [...filteredMethods].sort((a, b) => {
+            const aIsFree = a.is_free_shipping ?? false;
+            const bIsFree = b.is_free_shipping ?? false;
+            
+            // If both are free shipping, maintain original order
+            if (aIsFree && bIsFree) {
+                return 0;
+            }
+            
+            // If only one is free shipping, prioritize it
+            if (aIsFree && !bIsFree) {
+                return -1; // a comes first
+            }
+            if (!aIsFree && bIsFree) {
+                return 1; // b comes first
+            }
+            
+            // If neither is free shipping, maintain original order
+            return 0;
+        });
 
-        if (filteredMethods.length === 0) {
+        setShippingMethods(sortedMethods);
+
+        if (sortedMethods.length === 0) {
             setSelectedCarrier(null);
             form.setValue('shippingMethodId', 0);
             return;
         }
 
         const currentMethodId = form.getValues('shippingMethodId');
-        const matchedMethod = filteredMethods.find((method) => method.id === currentMethodId);
-        const nextMethod = matchedMethod || filteredMethods[0];
+        const matchedMethod = sortedMethods.find((method) => method.id === currentMethodId);
+        
+        // Prioritize free shipping method if available, otherwise use matched or first method
+        const freeShippingMethod = sortedMethods.find((method) => (method.is_free_shipping ?? false));
+        const nextMethod = freeShippingMethod || matchedMethod || sortedMethods[0];
 
+        console.log('CheckoutDetails - Selected shipping method:', nextMethod);
         setSelectedCarrier(nextMethod);
         setSelectedShippingMethod(nextMethod);
         form.setValue('shippingMethodId', nextMethod.id);
-    }, [cartTotal, originalShippingMethods, form]);
+    }, [cartTotal, originalShippingMethods, form, setSelectedShippingMethod]);
 
     useEffect(() => {
         if (addresses.length > 0) {

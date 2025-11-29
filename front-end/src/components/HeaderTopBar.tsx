@@ -231,14 +231,14 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
                 <DrawerContent>
                     {(onClose) => (
                         <>
-                            <DrawerHeader className="flex items-center justify-between gap-1 border-b border-skin-neutral-100">
+                            <DrawerHeader className="flex items-center justify-between gap-1 border-b border-skin-neutral-100 py-3 md:py-6 px-4 md:px-6">
                                 <h1 className='primary-gradient-600 text-xl font-semibold w-fit'>Shopping Cart</h1>
-                                <Button isIconOnly variant='light' onPress={onClose}>
+                                <Button isIconOnly variant='light' onPress={onClose} className="!h-fit !w-fit !min-w-fit">
                                     <CloseIcon />
                                 </Button>
                             </DrawerHeader>
                             <DrawerBody className='max-sm:px-4'>
-                                <div className='space-y-5 my-3 h-full'>
+                                <div className='space-y-4 my-2 h-full'>
                                     {cartItems.length > 0 ? (
                                         cartItems.map((item, idx) => (
                                             <ShoppingCartCardDrawer key={idx} item={item} />
@@ -258,10 +258,10 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
                                 </div>
                             </DrawerBody>
                             {cartItems.length > 0 && (
-                                <DrawerFooter className='flex flex-col gap-6 py-6 border-t border-skin-neutral-100s'>
+                                <DrawerFooter className='flex flex-col gap-3 py-4 md:py-6 px-4 md:px-6 border-t border-skin-neutral-100'>
                                     {freeShippingThreshold !== undefined && (
                                         <>
-                                            <Divider />
+
                                             <ShippingProgress totalAmount={cartTotal} freeShippingThreshold={freeShippingThreshold} />
                                         </>
                                     )}

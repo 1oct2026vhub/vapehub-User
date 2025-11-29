@@ -3,7 +3,7 @@ import { CloseIcon, SearchIcon, ShoppingCartIcon, UserIcon } from "@/components/
 import InputField from "@/components/InputField";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@nextui-org/button";
-import { Badge, Divider, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, useDisclosure } from "@nextui-org/react";
+import { Badge, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, useDisclosure } from "@nextui-org/react";
 import Link from 'next/link';
 import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
 import ShippingProgress from './ShippingProgress';

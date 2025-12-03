@@ -1,7 +1,7 @@
 import React from "react";
 import { RatingStarEmpty, RatingStarFilled, RatingStarPartial } from "./Icons";
 import Image from "next/image";
-import Link from "next/link";
+// import Link from "next/link";
 import { formatRelativeTime } from "@/lib/utils/date.utils";
 
 interface TestimonialCardProps {

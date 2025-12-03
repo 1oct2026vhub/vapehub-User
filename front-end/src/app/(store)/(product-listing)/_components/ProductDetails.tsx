@@ -566,7 +566,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             {linkedProducts.length > 0 && (
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
                     <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>You may also like</h2>
-                    <div className='flex flex-row md:flex-col gap-3 md:gap-5.5'>
+                    <div className='flex flex-col gap-3 md:gap-5.5'>
                         {linkedProducts?.map((linkedProduct, index) => {
                             // Convert LinkedProduct to ProductInDeal format for BundleProductCard
                             const imageUrl = linkedProduct.image?.image_url;

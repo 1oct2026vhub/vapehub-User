@@ -111,7 +111,7 @@ const BundleVariantFilter: React.FC<{
 							size='sm'
 							className="w-full"
 							variant='bordered'
-							label="Choose your flavour"
+							label={`Choose your ${attributeTerm?.attribute.name.toLowerCase()}`}
 							selectedKeys={getDefaultSelectedTerm(attributeTerm.attribute.id) ? new Set([getDefaultSelectedTerm(attributeTerm.attribute.id)!]) : undefined}
 							classNames={{
 								label: "!text-content-1 !text-skin-neutral-500 !font-opensans",

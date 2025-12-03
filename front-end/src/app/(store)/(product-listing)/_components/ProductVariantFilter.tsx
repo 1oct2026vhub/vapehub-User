@@ -26,6 +26,9 @@ const SelectAttributeTerms = ({
     getDefaultSelectedTerm: (attributeId: number) => string | undefined
 }) => {
     const selectedTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
+    // Generate dynamic placeholder based on attribute name
+    const placeholderText = `Choose your ${attributeTerm?.attribute.name.toLowerCase()}`;
+    
     return (
         <>
             <div>
@@ -40,7 +43,7 @@ const SelectAttributeTerms = ({
                 size='sm'
                 className="w-full"
                 variant='bordered'
-                label="Choose your flavour"
+                label={placeholderText}
                 selectedKeys={selectedTerm ? new Set([selectedTerm]) : undefined}
                 isDisabled={isFiltering}
                 classNames={{

@@ -88,7 +88,7 @@ const BundleVariantFilter: React.FC<{
 	};
 
 	return (
-		<div className='space-y-2'>
+		<div className='space-y-2 w-full'>
 			{attributeTermData?.map((attributeTerm) => {
 				const availableTerms = getAvailableTerms(attributeTerm);
 				
@@ -98,7 +98,7 @@ const BundleVariantFilter: React.FC<{
 				}
 
 				return attributeTerm.attribute.type === "select" ? (
-					<div key={attributeTerm.attribute.id}>
+					<div key={attributeTerm.attribute.id} className="w-full">
 						<div>
 							<p className='text-content-1 md:text-h5 font-semibold !font-oswald text-black capitalize'>
 								{attributeTerm?.attribute.name}
@@ -109,13 +109,15 @@ const BundleVariantFilter: React.FC<{
 						</div>
 						<Select
 							size='sm'
-							className="w-full"
+							className="w-[240px] md:w-[280px]"
 							variant='bordered'
 							label={`Choose your ${attributeTerm?.attribute.name.toLowerCase()}`}
 							selectedKeys={getDefaultSelectedTerm(attributeTerm.attribute.id) ? new Set([getDefaultSelectedTerm(attributeTerm.attribute.id)!]) : undefined}
 							classNames={{
 								label: "!text-content-1 !text-skin-neutral-500 !font-opensans",
-								trigger: "shadow-base border-skin-neutral-100 !rounded",
+								trigger: "shadow-base border-skin-neutral-100 !rounded !w-[240px] md:!w-[280px]",
+								base: "!w-[240px] md:!w-[280px]",
+								mainWrapper: "!w-[240px] md:!w-[280px]",
 								listboxWrapper: "max-h-[400px] overflow-y-auto scroll-smooth",
 								listbox: "overflow-visible",
 							}}
@@ -411,7 +413,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 							/>
 						</Link>
 					</div>
-					<div className="space-y-4 max-w-lg">
+					<div className="space-y-4 w-full max-w-lg">
 						<Link href={productLink}>
 							<h3 className="text-content-2 xl:text-xl font-semibold text-skin-black mr-10">{name}</h3>
 						</Link>

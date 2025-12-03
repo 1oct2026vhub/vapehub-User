@@ -1,7 +1,8 @@
 import React from "react";
 import { RatingStarEmpty, RatingStarFilled, RatingStarPartial } from "./Icons";
 import Image from "next/image";
-import Link from "next/link";
+// import Link from "next/link";
+import { formatRelativeTime } from "@/lib/utils/date.utils";
 
 interface TestimonialCardProps {
     imageSrc: string | null;
@@ -13,6 +14,7 @@ interface TestimonialCardProps {
     height?: number;
     ratingCount?: number;
     verified?: boolean;
+    createdAt?: string; // ISO date string
 }
 
 // Verified Checkmark Icon
@@ -52,20 +54,20 @@ const getInitials = (name: string): string => {
 const TestimonialCard: React.FC<TestimonialCardProps> = ({
     imageSrc,
     altText,
-    href,
+    // href,
     name,
     review,
     ratingCount = 0,
     width = 60,
     height = 60,
-    verified = false
+    verified = false,
+    createdAt
 }) => {
     const hasProfileImage = imageSrc && imageSrc !== "/images/avatar.png";
     const initials = getInitials(name);
 
     return (
-        <Link
-            href={href}
+        <div
             className="flex flex-col h-full bg-skin-white p-3.5 md:p-6 border space-y-3 border-neutral-50 rounded-xl shadow-card hover:shadow-brand-card transition-all duration-300 cursor-default"
         >
             <div className="flex items-start justify-between">
@@ -113,7 +115,12 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
             <p className="text-content-3 md:text-title-2 font-bold text-skin-neutral-300 line-clamp-6 flex-grow">
                 {review}
             </p>
-        </Link>
+            {createdAt && (
+                <p className="text-content-3 md:text-content-2 text-skin-neutral-400 font-medium mt-2">
+                    {formatRelativeTime(createdAt)}
+                </p>
+            )}
+        </div>
     );
 };
 

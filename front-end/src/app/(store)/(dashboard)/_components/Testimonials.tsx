@@ -13,6 +13,7 @@ const Testimonials: FunctionComponent<TestimonialsProps> = async ({
     title = "Your Stamp of Approval",
 }): AsyncReactElement => {
     const response = await getTrustpilotReviews({ page: 1, per_page: 20 });
+ console.log("Reviews response",response);
 
     if (response.status === ServerActionStatus.ERROR) {
         return <p>{response.message}</p>;
@@ -25,6 +26,7 @@ const Testimonials: FunctionComponent<TestimonialsProps> = async ({
         rating: review.stars,
         comment: review.text,
         verified_by: true, // Trustpilot reviews are always verified
+        createdAt: review.createdAt, // Include createdAt date
         user: null, // Trustpilot doesn't provide user profile data
     })) || [];
 

@@ -10,6 +10,7 @@ export interface Testimonial {
     rating: number;
     comment: string;
     verified_by?: boolean;
+    createdAt?: string; // ISO date string
     user: {
         first_name: string;
         last_name: string;
@@ -74,6 +75,7 @@ const TestimonialSlider: FunctionComponent<TestimonialProps> = ({ data }) => {
                         review={testimonial.comment}
                         ratingCount={testimonial.rating}
                         verified={testimonial.verified_by || false}
+                        createdAt={testimonial.createdAt}
                     />
                 </div>
             ))}

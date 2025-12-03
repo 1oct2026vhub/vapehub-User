@@ -4,14 +4,14 @@ import Image from 'next/image'
 import { REVIEWS } from '@/lib/config/order.config';
 
 const ReviewCard: React.FC<{ review: REVIEWS }> = ({ review }) => {
-    // const formatDate = (dateString: string) => {
-    //     const date = new Date(dateString);
-    //     return date.toLocaleDateString('en-GB', {
-    //         day: 'numeric',
-    //         month: 'long',
-    //         year: 'numeric'
-    //     });
-    // };
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    };
 
     const getDisplayName = () => {
         const userName = review.user_name?.trim();
@@ -78,7 +78,7 @@ const ReviewCard: React.FC<{ review: REVIEWS }> = ({ review }) => {
                             )
                         ))}
                     </div>
-                    {/* <p className='text-skin-blue-500 font-medium text-content-1'>{formatDate(review?.created_at)}</p> */}
+                    <p className='text-skin-blue-500 font-medium text-content-1'>{formatDate(review?.created_at)}</p>
                 </div>
             </div>
             <div className='flex items-center gap-3'>

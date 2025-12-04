@@ -14,7 +14,6 @@ type CategoryProps = {
 const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug}) => {
     // Determine deals to display (prefer latest_deals, fallback to deals)
     const dealsToDisplay = dynamicPageSlug?.latest_deals || dynamicPageSlug?.deals;
-
     // Only render content if there's deals text or deals images
     // if (!dynamicPageSlug?.deals_text && (!dealsToDisplay || dealsToDisplay.length === 0)) {
     //     return null;
@@ -22,7 +21,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
-                <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name}</h1>
+                <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name || dynamicPageSlug?.name}</h1>
                 {(dynamicPageSlug?.description || data?.description) && (
                     <div 
                         className="product-content rich-text text-content-1 md:text-content-1 font-normal text-skin-neutral-500 leading-relaxed"

@@ -19,7 +19,7 @@ const BrandProducts: React.FC<BrandProps> = ({ data, reviews, dynamicPageSlug })
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Brands", href: ROUTES.BRANDS },
-        { label: data.name, href: `/${data.slug}`, isActive: true },
+        { label: data.name || dynamicPageSlug?.name || "", href: `/${data.slug || dynamicPageSlug?.slug || ""}`, isActive: true },
     ];
     return (
         <div>

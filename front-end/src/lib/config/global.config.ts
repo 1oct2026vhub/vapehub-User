@@ -72,6 +72,7 @@ export interface DynamicPageSlugResponse {
     entity_id: number; 
     seo: SeoData | null;
     description?: string;
+    name?: string;
     deals?: Array<{
         id: number;
         name: string;

@@ -54,9 +54,9 @@ const Footer = async (): AsyncReactElement => {
       </Suspense>
       <div className="px-4 lg:px-10 py-7 md:py-10 flex flex-col md:flex-row items-start justify-between gap-x-7 gap-y-6 md:gap-y-0 max-w-[1520px] mx-auto">
         {/* Left Sections */}
-        <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-5 lg:gap-8">
+        <div className="hidden md:flex flex-1 gap-5 lg:gap-8 justify-start">
           {sortedFooterMenu.map((section) => (
-            <div key={section.id} className={`space-y-4 text-skin-white flex flex-col`}>
+            <div key={section.id} className={`space-y-4 text-skin-white flex flex-col flex-1 min-w-0`}>
               <h6 className="text-title-2 lg:text-h5 font-semibold !capitalize">{section.title}</h6>
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
@@ -90,7 +90,7 @@ const Footer = async (): AsyncReactElement => {
                 {socialLinks.email || 'customerservices@vapehub.co.uk'}
               </a>
             </div>
-            <div className='md:hidden space-y-4 mt-2'>
+            <div className='space-y-4 mt-2'>
                 <div>
                   <p className='text-content-2 font-semibold text-skin-neutral-100'>Call us: 07508 373773</p>
                   <p className='text-content-2 font-semibold text-skin-neutral-100'>Support team available 10am to 3pm Monday to Friday</p>

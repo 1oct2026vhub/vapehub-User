@@ -11,6 +11,7 @@ import { ROUTES } from '@/lib/routes';
 import SuspenseLoader from '@/components/ui/SuspenseLoader';
 import { AttributeProductTerms, AttributeTerms, ProductResponse } from '@/lib/config/product.config';
 import { ReviewProvider } from '@/lib/context/ReviewContext';
+import { ProductDataProvider } from '@/lib/context/ProductDataContext';
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -41,30 +42,32 @@ const ProductView: FunctionComponent<ProductViewProps> = ({ data, selectedVarian
 
     return (
         <ReviewProvider productId={data.product.id}>
-            <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
-                <BreadCrumbs items={breadcrumbs} />
-                <ProductDetails data={data} selectedVariant={selectedVariant} />
-                <Suspense fallback={<SuspenseLoader />}>
-                    <OrderCard />
-                </Suspense>
-                {
-                    productFeatures.length > 0 && (
-                        <Suspense fallback={<SuspenseLoader />}>
-                            <ProductFeatures productFeatures={productFeatures} />
-                        </Suspense>
-                    )
-                }
-                <Suspense fallback={<SuspenseLoader />}>
-                    <ProductContent data={data} />
-                </Suspense>
-                <Suspense fallback={<SuspenseLoader height='h-40' />}>
-                    <FAQSection type="product" id={data.product.id} />
-                </Suspense>
-                <Suspense fallback={<SuspenseLoader height='h-64' />}>
-                    <RelatedProducts viewAllHref={viewAllHref} currentProductId={data.product.id} />
-                </Suspense>
+            <ProductDataProvider initialData={data}>
+                <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
+                    <BreadCrumbs items={breadcrumbs} />
+                    <ProductDetails data={data} selectedVariant={selectedVariant} />
+                    <Suspense fallback={<SuspenseLoader />}>
+                        <OrderCard />
+                    </Suspense>
+                    {
+                        productFeatures.length > 0 && (
+                            <Suspense fallback={<SuspenseLoader />}>
+                                <ProductFeatures productFeatures={productFeatures} />
+                            </Suspense>
+                        )
+                    }
+                    <Suspense fallback={<SuspenseLoader />}>
+                        <ProductContent data={data} />
+                    </Suspense>
+                    <Suspense fallback={<SuspenseLoader height='h-40' />}>
+                        <FAQSection type="product" id={data.product.id} />
+                    </Suspense>
+                    <Suspense fallback={<SuspenseLoader height='h-64' />}>
+                        <RelatedProducts viewAllHref={viewAllHref} currentProductId={data.product.id} />
+                    </Suspense>
 
-            </main>
+                </main>
+            </ProductDataProvider>
         </ReviewProvider>
     )
 }

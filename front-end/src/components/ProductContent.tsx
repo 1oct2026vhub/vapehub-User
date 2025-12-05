@@ -12,6 +12,7 @@ import { useReviews } from '@/lib/context/ReviewContext';
 import { getShippingMethodsDisplay } from '@/lib/server.actions';
 import { SHIPPING_METHOD_DISPLAY } from '@/lib/config/order.config';
 import { ServerActionStatus } from '@/lib/config/app.config';
+import { useProductData } from '@/lib/context/ProductDataContext';
 
 type ProductWithDescription = {
     description?: string;
@@ -23,7 +24,10 @@ type ProductContentProps = {
 }
 
 const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => {
-    const { product } = data;
+    const { productData: contextProductData } = useProductData();
+    // Use context data if available (updated when variant is selected), otherwise use prop data
+    const productData = contextProductData ?? data;
+    const { product } = productData;
     const { reviewData, loading, fetchReviews } = useReviews();
     const [selectedTab, setSelectedTab] = useState('Description');
     const [currentPage, setCurrentPage] = useState(1);
@@ -34,20 +38,20 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
 
     // Determine the description using the same logic as ProductDetails
     const description = useMemo(() => {
-        const hasFilteredTerms = (data.filtered_attribute_terms?.length ?? 0) > 0;
-        const hasAvailableTerms = (data.available_terms?.length ?? 0) > 0;
+        const hasFilteredTerms = (productData.filtered_attribute_terms?.length ?? 0) > 0;
+        const hasAvailableTerms = (productData.available_terms?.length ?? 0) > 0;
         
         // A variant is ready when all attributes have been selected
-        const isReadyVariant = hasFilteredTerms && !hasAvailableTerms && data.variants?.length === 1;
+        const isReadyVariant = hasFilteredTerms && !hasAvailableTerms && productData.variants?.length === 1;
         
         // A product is simple if it has no attributes to filter by
         const isSimpleProduct = !hasFilteredTerms && !hasAvailableTerms;
         
         // If a variant is ready, that's our selected variant
-        const productVariant: ProductVariant | null = isReadyVariant ? data.variants[0] : null;
+        const productVariant: ProductVariant | null = isReadyVariant ? productData.variants[0] : null;
         
         // For simple products, use the first variant if available
-        const simpleProductVariant = isSimpleProduct && data.variants.length > 0 ? data.variants[0] : null;
+        const simpleProductVariant = isSimpleProduct && productData.variants.length > 0 ? productData.variants[0] : null;
         
         // The definitive entity (either a selected variant or a simple product's variant)
         const cartEntity = productVariant ?? simpleProductVariant;
@@ -62,7 +66,7 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
             : productDescription;
         
         return finalDescription;
-    }, [data, product]);
+    }, [productData, product]);
 
     useEffect(() => {
         if (selectedTab === 'Reviews' && product.id) {

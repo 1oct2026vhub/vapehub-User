@@ -23,6 +23,7 @@ import { Product } from '@/lib/config/product.config'
 import { useReviews } from '@/lib/context/ReviewContext'
 import { PRODUCT_VARIANT_ATTRIBUTE } from '@/lib/api-routes'
 import { VariantSelectionPayload } from '@/lib/hooks/useVariantFilter'
+import { useProductData } from '@/lib/context/ProductDataContext'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -70,6 +71,7 @@ const settings: Settings = {
 };
 const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selectedVariant: initialSelectedVariant }) => {
     const [productData, setProductData] = useState<ProductResponse>(initialData);
+    const { setProductData: setContextProductData } = useProductData();
     const [selectedVariant, setSelectedVariant] = useState<AttributeProductTerms | undefined>(initialSelectedVariant);
     const [attributeSelections, setAttributeSelections] = useState<Record<number, AttributeSelection>>(() => {
         if (initialSelectedVariant) {
@@ -103,7 +105,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
         }, {});
     }, [attributeSelections]);
 
-    const { product } = productData;
+    const { product } = productData;    
     const hasFilteredTerms = (productData.filtered_attribute_terms?.length ?? 0) > 0;
     const hasAvailableTerms = (productData.available_terms?.length ?? 0) > 0;
 
@@ -250,6 +252,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
 
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setProductData(response.data);
+                setContextProductData(response.data);
             }
         } catch (error) {
             console.error('Error fetching variant data:', error);

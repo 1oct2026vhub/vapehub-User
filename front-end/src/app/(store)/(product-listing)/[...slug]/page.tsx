@@ -73,6 +73,14 @@ const Page = async ({
     }
 
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
+     console.log("product data", data);
+     console.log("payload", payload);
+     console.log("variant", variant);
+     console.log("searchParamsData", searchParamsData);
+     console.log("defaultParams", defaultParams);
+     console.log("dynamicPageSlug", dynamicPageSlug);
+     console.log("primarySlug", primarySlug);
+     console.log("secondarySlug", secondarySlug);
      
     if(data && !data.variants.length) {
       const lastPayload = payload[payload.length - 1];

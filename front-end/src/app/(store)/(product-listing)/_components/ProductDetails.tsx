@@ -250,6 +250,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 attribute_terms: payload
             });
 
+            console.log('Product Details Response:', response);
+
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setProductData(response.data);
                 setContextProductData(response.data);

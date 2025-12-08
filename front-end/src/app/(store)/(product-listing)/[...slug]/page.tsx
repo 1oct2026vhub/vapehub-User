@@ -225,7 +225,7 @@ const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Pr
   }
 
   const response = await getProductVariantByID(payload);
-
+  console.log("fetchProduct response", response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }

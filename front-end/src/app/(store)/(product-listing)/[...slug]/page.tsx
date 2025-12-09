@@ -435,6 +435,14 @@ export async function generateMetadata({ params, searchParams }: {
     },
 
     category: async () => {
+      // Helper function to format slug to title
+      const formatSlugToTitle = (slug: string): string => {
+        return slug
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      };
+
       if (dynamicPageSlug.seo) {
         return {
           title: dynamicPageSlug.seo.title,
@@ -453,15 +461,19 @@ export async function generateMetadata({ params, searchParams }: {
       
       // Use the new SEO meta API instead of fetchCategory
       const seoMeta = await fetchSeoMetaBySlug(primarySlug);
-      if (!seoMeta) return null;
+      
+      // Determine category name with fallbacks
+      const categoryName = seoMeta?.name || 
+                          dynamicPageSlug?.name || 
+                          formatSlugToTitle(primarySlug || '');
 
       return {
-        title:`${seoMeta.name} | VapeHub`,
-        description: seoMeta.description,
+        title: `${categoryName} | VapeHub`,
+        description: seoMeta?.description || dynamicPageSlug?.description || "",
         openGraph: {
-          title: `${seoMeta.name} | VapeHub`,
-          description: seoMeta.description,
-          images: seoMeta.logo_url ? [{
+          title: `${categoryName} | VapeHub`,
+          description: seoMeta?.description || dynamicPageSlug?.description || "",
+          images: seoMeta?.logo_url ? [{
             url: seoMeta.logo_url,
             width: 1200,
             height: 630

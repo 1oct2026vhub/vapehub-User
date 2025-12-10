@@ -117,6 +117,14 @@ const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
 
 
 
+// Helper function to format slug to title
+const formatSlugToTitle = (slug: string): string => {
+  return slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 export async function generateMetadata({ params, searchParams }: {
   params: Promise<RouteParams>,
   searchParams: Promise<Record<string, string>>
@@ -125,15 +133,23 @@ export async function generateMetadata({ params, searchParams }: {
   const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 } as const;
   const combinedParams = { ...defaultParams, ...await searchParams };
 
+  // Fetch dynamic page slug for fallback
+  const dynamicPageSlug = await fetchDynamicPageSlug(slug);
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
-  if (brandProduct) {
+  
+  // Determine brand name with fallbacks
+  const brandName = brandProduct?.name || 
+                    dynamicPageSlug?.name || 
+                    formatSlugToTitle(slug);
+
+  if (brandProduct || dynamicPageSlug) {
     return {
-      title: `${brandProduct.name} | VapeHub`,
-      description: "",
+      title: `${brandName} | VapeHub`,
+      description: brandProduct?.description || dynamicPageSlug?.description || "",
       openGraph: {
-        title: `${brandProduct.name} | VapeHub`,
-        description: "",
-        images: brandProduct.logo_url ? [{
+        title: `${brandName} | VapeHub`,
+        description: brandProduct?.description || dynamicPageSlug?.description || "",
+        images: brandProduct?.logo_url ? [{
           url: brandProduct.logo_url,
           width: 1200,
           height: 630
@@ -141,4 +157,10 @@ export async function generateMetadata({ params, searchParams }: {
       }
     };
   }
+  
+  // Final fallback if nothing is found
+  return {
+    title: `${formatSlugToTitle(slug)} | VapeHub`,
+    description: "",
+  };
 }

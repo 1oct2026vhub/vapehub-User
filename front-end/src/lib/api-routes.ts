@@ -18,7 +18,7 @@ export const WEB_ROUTES = {
         DOWNLOAD_INVOICE: '/orders/download-invoice'
     },
     CONTACT: {
-        CONTACT_US: '/contact-us',
+        CONTACT_US: '/contact',
         SOCIAL_MEDIA: '/social-media',
     }
 }

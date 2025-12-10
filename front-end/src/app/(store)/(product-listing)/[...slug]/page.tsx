@@ -73,14 +73,6 @@ const Page = async ({
     }
 
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
-     console.log("product data", data);
-     console.log("payload", payload);
-     console.log("variant", variant);
-     console.log("searchParamsData", searchParamsData);
-     console.log("defaultParams", defaultParams);
-     console.log("dynamicPageSlug", dynamicPageSlug);
-     console.log("primarySlug", primarySlug);
-     console.log("secondarySlug", secondarySlug);
      
     if(data && !data.variants.length) {
       const lastPayload = payload[payload.length - 1];
@@ -225,7 +217,7 @@ const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Pr
   }
 
   const response = await getProductVariantByID(payload);
-  console.log("fetchProduct response", response);
+
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -435,14 +427,6 @@ export async function generateMetadata({ params, searchParams }: {
     },
 
     category: async () => {
-      // Helper function to format slug to title
-      const formatSlugToTitle = (slug: string): string => {
-        return slug
-          .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-      };
-
       if (dynamicPageSlug.seo) {
         return {
           title: dynamicPageSlug.seo.title,
@@ -461,19 +445,15 @@ export async function generateMetadata({ params, searchParams }: {
       
       // Use the new SEO meta API instead of fetchCategory
       const seoMeta = await fetchSeoMetaBySlug(primarySlug);
-      
-      // Determine category name with fallbacks
-      const categoryName = seoMeta?.name || 
-                          dynamicPageSlug?.name || 
-                          formatSlugToTitle(primarySlug || '');
+      if (!seoMeta) return null;
 
       return {
-        title: `${categoryName} | VapeHub`,
-        description: seoMeta?.description || dynamicPageSlug?.description || "",
+        title:`${seoMeta.name} | VapeHub`,
+        description: seoMeta.description,
         openGraph: {
-          title: `${categoryName} | VapeHub`,
-          description: seoMeta?.description || dynamicPageSlug?.description || "",
-          images: seoMeta?.logo_url ? [{
+          title: `${seoMeta.name} | VapeHub`,
+          description: seoMeta.description,
+          images: seoMeta.logo_url ? [{
             url: seoMeta.logo_url,
             width: 1200,
             height: 630

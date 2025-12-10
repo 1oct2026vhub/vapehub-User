@@ -49,7 +49,7 @@ const GoogleAnalytics: FunctionComponent<{
   GA_MEASUREMENT_ID: string;
 }> = ({ GA_MEASUREMENT_ID }): ReactElement => {
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <AnalyticsContent GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />
     </Suspense>
   );

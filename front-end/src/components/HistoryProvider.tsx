@@ -18,6 +18,7 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
       try {
         sessionStorage.setItem(`scrollPos_${pageKey}`, window.scrollY.toString());
       } catch (e) {
+        console.log(e);
         // Ignore storage errors (e.g., quota exceeded)
       }
     };
@@ -97,6 +98,8 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } catch (e) {
+        console.log(e);
+        
         // Ignore storage errors
       }
       isRestoringRef.current = false;

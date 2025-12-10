@@ -2,7 +2,13 @@ import BreadCrumbs from '@/components/BreadCrumbs'
 import { getContactUs } from '@/lib/server.actions'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import Link from 'next/link';
+import { Metadata } from 'next';
 // import parse from 'html-react-parser';
+
+export const metadata: Metadata = {
+  title: 'Contact | VapeHub',
+  description: 'Get in touch with VapeHub. Send us a message or call us for any inquiries about our products and services.',
+};
 
 const ContactUs = async () => {
     const response = await getContactUs();

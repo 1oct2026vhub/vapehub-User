@@ -1,9 +1,18 @@
+import { Metadata } from "next";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { PropsWithChildren, ReactElement } from "react"
 import { getCategoryList, getFlashNews, getHeaderMegaMenu } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { FlashNewsItem } from '@/lib/config/global.config';
+import HistoryProvider from "@/components/HistoryProvider";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL || ''),
+  alternates: {
+    canonical: './',
+  },
+};
 
 const StoreRootLayout = async ({
   children,
@@ -28,9 +37,11 @@ const StoreRootLayout = async ({
   return (
     <div className="flex flex-col min-h-screen">
       <Header megaMenu={megaMenu} flashNews={flashNews} />
+      <HistoryProvider>
       <div className="w-full max-w-[1520px] mx-auto">
         {children}
       </div>
+      </HistoryProvider>
       <Footer />
     </div>
   )

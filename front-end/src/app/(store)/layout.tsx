@@ -1,4 +1,4 @@
-// import { Metadata } from "next";
+import { Metadata } from "next";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { PropsWithChildren, ReactElement } from "react"
@@ -8,12 +8,12 @@ import { ServerActionStatus } from '@/lib/config/app.config';
 import { FlashNewsItem } from '@/lib/config/global.config';
 // import HistoryProvider from "@/components/HistoryProvider";
 
-// export const metadata: Metadata = {
-//   metadataBase: new URL(process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL || ''),
-//   alternates: {
-//     canonical: './',
-//   },
-// };
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL || ''),
+  alternates: {
+    canonical: './',
+  },
+};
 
 const StoreRootLayout = async ({
   children,

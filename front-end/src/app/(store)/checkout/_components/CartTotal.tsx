@@ -17,7 +17,7 @@ interface CartTotalProps {
     shippingMethodsData: SHIPPING_METHOD_DATA[];
 }
 
-const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
+const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {  
     const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption } = useCart();
     const { selectedShippingMethod } = useCheckout();
     const [isApplyingLoyalty, setIsApplyingLoyalty] = useState(false);
@@ -107,6 +107,16 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         return FREE_DELIVERY_THRESHOLD;
     }, [shippingMethodsData]);
 
+    // Check if any shipping method has is_enabled && is_free_shipping
+    const hasEnabledFreeShipping = useMemo(() => {
+        if (!shippingMethodsData || shippingMethodsData.length === 0) {
+            return false;
+        }
+        return shippingMethodsData.some(
+            method => method.is_enabled === true && method.is_free_shipping === true
+        );
+    }, [shippingMethodsData]);
+
     const shippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
     const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
     console.log("loyaltyPoints", loyaltyPoints);
@@ -191,8 +201,12 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                     </div>
                 </div>
                 <Divider className='border-2' />
-                <ShippingProgress totalAmount={cartTotal} freeShippingThreshold={freeShippingThreshold} />
-                <Divider className='border-2' />
+                {hasEnabledFreeShipping && (
+                    <>
+                        <ShippingProgress totalAmount={cartTotal} freeShippingThreshold={freeShippingThreshold} />
+                        <Divider className='border-2' />
+                    </>
+                )}
                 <div className='flex items-center justify-between text-black font-bold'>
                     <p className='text-title-2 md:text-2xl !font-oswald'>Total</p>
                     <p className='text-title-2 md:text-2xl !font-oswald'>{DEFAULT_CURRENCY_SYMBOL}{total.toFixed(2)}</p>

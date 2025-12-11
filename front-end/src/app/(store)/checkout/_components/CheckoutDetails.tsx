@@ -403,26 +403,34 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         const amountAfterDeals = cartTotal;
         console.log("Amount after deals (cartTotal) for free shipping calculation:", amountAfterDeals);
         
-        // Filter shipping methods based on the condition
+        // Filter shipping methods based on the condition:
+        // (is_enabled && !is_free_shipping && !free_shipping_threshold) || (is_enabled && is_free_shipping && (total >= free_shipping_threshold))
         const filteredMethods = originalShippingMethods.filter((method) => {
+            const isEnabled = method.is_enabled ?? false;
             const isFreeShipping = method.is_free_shipping ?? false;
             const freeShippingThreshold = method.free_shipping_threshold;
             
             // Log for debugging
-            console.log(`Shipping method ${method.id} (${method.shipping_method}): is_free_shipping = ${isFreeShipping}, free_shipping_threshold = ${freeShippingThreshold}, amount_after_deals = ${amountAfterDeals}`);
+            console.log(`Shipping method ${method.id} (${method.shipping_method}): is_enabled = ${isEnabled}, is_free_shipping = ${isFreeShipping}, free_shipping_threshold = ${freeShippingThreshold}, amount_after_deals = ${amountAfterDeals}`);
             
-            // Condition: if (!is_free_shipping || (is_free_shipping && amount_after_deals >= free_shipping_threshold))
-            if (!isFreeShipping) {
-                return true; // Show non-free shipping methods
+            // Must be enabled
+            if (!isEnabled) {
+                return false; // Don't show disabled methods
             }
             
-            // For free shipping methods, check if threshold is met using amount after deals
-            if (isFreeShipping) {
-                const threshold = freeShippingThreshold ? parseFloat(freeShippingThreshold) : null;
-                if (threshold === null) {
-                    return true; // No threshold, show it
+            // Condition 1: (is_enabled && !is_free_shipping && !free_shipping_threshold)
+            // Show enabled non-free shipping methods that don't have a free_shipping_threshold
+            if (!isFreeShipping && !freeShippingThreshold) {
+                return true;
+            }
+            
+            // Condition 2: (is_enabled && is_free_shipping && (total >= free_shipping_threshold))
+            // Show enabled free shipping methods only if threshold is met
+            if (isFreeShipping && freeShippingThreshold) {
+                const threshold = parseFloat(freeShippingThreshold);
+                if (Number.isFinite(threshold) && threshold > 0) {
+                    return amountAfterDeals >= threshold;
                 }
-                return amountAfterDeals >= threshold;
             }
             
             return false;

@@ -32,7 +32,7 @@ interface CouponFormProps {
     shippingMethodId?: number;
 }
 
-const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', cartTotal, isGuest = false, shippingMethodId = 0}) => {
+const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', isGuest = false, shippingMethodId = 0}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isApplied, setIsApplied] = useState(!!initialCouponCode);
     // const [errorMessage, setErrorMessage] = useState<string | null>(null);

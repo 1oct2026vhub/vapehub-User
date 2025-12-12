@@ -68,6 +68,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [stockValidationLoading, setStockValidationLoading] = useState(false);
   const { status, data: session } = useSession();
   const prevSessionRef = useRef(session);
+  const isApplyingCouponRef = useRef(false); // Track if coupon is being applied to prevent revalidation
   const [stockValidationErrors, setStockValidationErrors] = useState<Array<{ itemId: number; message: string; isOutOfStock: boolean }>>([]);
   const isAuthenticated = status === 'authenticated';
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
@@ -812,42 +813,61 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   // Revalidate coupon when cartTotal or itemCount changes
   useEffect(() => {
     const revalidate = async () => {
-      if (couponDiscount.code) {
-        const response = await applyCoupon({
-          couponCode: couponDiscount.code,
-          shippingMethodId: 0, // Adjust if you use shipping method
+      // Skip revalidation if:
+      // 1. Coupon is not applied or no code exists
+      // 2. Coupon is currently being applied (to prevent duplicate API calls)
+      if (!couponDiscount.code || !couponDiscount.isApplied || isApplyingCouponRef.current) {
+        return;
+      }
+
+      console.log('🔄 [CartContext] Revalidating coupon:', couponDiscount.code);
+      const response = await applyCoupon({
+        couponCode: couponDiscount.code,
+        shippingMethodId: 0, // Adjust if you use shipping method
+      });
+      
+      console.log('🔄 [CartContext] Revalidation response:', response);
+      console.log('🔄 [CartContext] Response status:', response.status);
+      // console.log('🔄 [CartContext] Response data:', response.data);
+      
+      // Check for valid response with total and coupon data (not just referral_value)
+      if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.total != null && response.data.coupon) {
+        // Use API's subTotal instead of cartTotal to ensure accurate discount calculation
+        // The API recalculates everything, so we should use its subTotal value
+        const discountValue = response.data.subTotal - response.data.total;
+        console.log('🔄 [CartContext] Revalidation successful. Discount value:', discountValue);
+        setCouponDiscount({
+          value: discountValue,
+          isApplied: true,
+          code: couponDiscount.code,
+          message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
+          discountValue: discountValue.toFixed(2),
+          mailSubscriptionData: response.data.mail_subscription_data || couponDiscount.mailSubscriptionData, // Use new data or preserve existing
         });
-        if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.referral_value != null) {
+      } else {
+        console.log('🔄 [CartContext] Revalidation failed. Removing coupon.');
+        // Only update state if the coupon was previously applied to avoid loops
+        if (couponDiscount.isApplied) {
+          // toast.info("Applied coupon was removed as cart conditions are no longer met.");
           setCouponDiscount({
-            value: cartTotal - response.data.total,
-            isApplied: true,
+            value: 0,
+            isApplied: false,
             code: couponDiscount.code,
-            message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
-            discountValue: (cartTotal - response.data.total).toFixed(2),
+            message: null,
+            discountValue: '',
             mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
           });
-        } else {
-          // Only update state if the coupon was previously applied to avoid loops
-          if (couponDiscount.isApplied) {
-            // toast.info("Applied coupon was removed as cart conditions are no longer met.");
-            setCouponDiscount({
-              value: 0,
-              isApplied: false,
-              code: couponDiscount.code,
-              message: null,
-              discountValue: '',
-              mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
-            });
-          }
         }
       }
     };
 
-    if (!isLoading) {
+    // Only revalidate if not loading and coupon is already applied
+    // This prevents revalidation immediately after coupon application
+    if (!isLoading && couponDiscount.isApplied) {
       revalidate();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartTotal, itemCount, isLoading, couponDiscount.code, couponDiscount.isApplied]);
+  }, [cartTotal, itemCount, isLoading]);
 
   // Restore couponDiscount from cookie on mount
   useEffect(() => {
@@ -887,6 +907,23 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [couponDiscount, loyaltyRedemption]);
 
+  // Wrapper for setCouponDiscount to track when coupon is being applied
+  const setCouponDiscountWrapper = useCallback((discount: CouponDiscount) => {
+    // Set flag when coupon is being applied
+    if (discount.isApplied && discount.code) {
+      isApplyingCouponRef.current = true;
+      setCouponDiscount(discount);
+      // Reset flag after a short delay to allow revalidation to work later
+      setTimeout(() => {
+        isApplyingCouponRef.current = false;
+      }, 1000);
+    } else {
+      // If removing coupon, reset flag immediately
+      isApplyingCouponRef.current = false;
+      setCouponDiscount(discount);
+    }
+  }, []);
+
   const value = {
     cartItems,
     isLoading,
@@ -903,7 +940,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     fetchCartItems,
     clearCart,
     couponDiscount,
-    setCouponDiscount,
+    setCouponDiscount: setCouponDiscountWrapper,
     checkoutStockValidation,
     stockValidationErrors,
     stockValidationLoading,

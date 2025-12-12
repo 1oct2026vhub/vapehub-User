@@ -92,14 +92,17 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 //     return;
                 // }
                 setIsApplied(true);
-                setIsEditing(false);            
-                const discountAmount = (cartTotal - response.data.total).toFixed(2);
+                setIsEditing(false);
+                // Use API's subTotal instead of cartTotal to ensure accurate discount calculation
+                // The API recalculates everything, so we should use its subTotal value
+                const discountValue = response.data.subTotal - response.data.total;
+                const discountAmount = discountValue.toFixed(2);
                 onCouponApplied({
-                    value: cartTotal - response.data.total,
+                    value: discountValue,
                     isApplied: true,
                     code: data.couponCode || null,
                     message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
-                    discountValue: (discountAmount).toString(),
+                    discountValue: discountAmount,
                     mailSubscriptionData: response.data.mail_subscription_data
                 });
             } else {
@@ -131,14 +134,17 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 //     return;
                 // }
                 setIsApplied(true);
-                setIsEditing(false);            
-                const discountAmount = (cartTotal - response.data.total).toFixed(2);
+                setIsEditing(false);
+                // Use API's subTotal instead of cartTotal to ensure accurate discount calculation
+                // The API recalculates everything, so we should use its subTotal value
+                const discountValue = response.data.subTotal - response.data.total;
+                const discountAmount = discountValue.toFixed(2);
                 onCouponApplied({
-                    value: cartTotal - response.data.total,
+                    value: discountValue,
                     isApplied: true,
                     code: data.couponCode || null,
                     message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
-                    discountValue: (discountAmount).toString(),
+                    discountValue: discountAmount,
                     mailSubscriptionData: response.data.mail_subscription_data
                 });
             } else {

@@ -444,9 +444,10 @@ export interface CouponResponse {
     subTotal: number;
     total: number;
     coupon: Coupon;
+    discount_amount?: number; // Discount amount from API
     referral_value: number;
     referral_value_type: "percentage" | "fixed";
-    mail_subscription_data: {
+    mail_subscription_data?: {
         discount_amount: number;
         discount_type: string;
         isDiscountUsed: boolean;

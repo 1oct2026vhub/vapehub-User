@@ -40,7 +40,7 @@ const Dashboard: NextPage = async () => {
 
       <Suspense fallback={<SuspenseLoader />}>
         <NewProducts 
-          viewAllHref={ROUTES.SHOP} 
+          viewAllHref={ROUTES.NEW_PRODUCTS} 
         />
       </Suspense>
 

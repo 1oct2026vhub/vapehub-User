@@ -41,21 +41,27 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             }));
         }
     }, [itemCount, setLoyaltyRedemption]);
-
+console.log("selectedShippingMethod", selectedShippingMethod);
     const handleRedeemToggle = async (checked: boolean) => {
         setIsApplyingLoyalty(true);
         const payload: APPLY_COUPON_PAYLOAD = {
-            shippingMethodId: 0,
+            shippingMethodId: selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0,
             loyalty: checked,
         };
 
         const response = await applyCoupon(payload);
+        console.log('🎫 [CartTotal] Apply Coupon API Response (Loyalty Redemption):', response);
+        console.log('🎫 [CartTotal] Response Status:', response.status);
+        console.log('🎫 [CartTotal] Response Data:', 'data' in response ? response.data : 'No data (error response)');
         if (response.status === ServerActionStatus.SUCCESS && response.data) {
-            const discountAmount = checked ? (cartTotal - response.data.total) : 0;
+            // Use API response values for accurate calculation
+            const apiSubTotal = response.data.subTotal || cartTotal;
+            const apiTotal = response.data.total || cartTotal;
+            const discountAmount = checked ? (apiSubTotal - apiTotal) : 0;
             setLoyaltyRedemption(prev => ({
                 ...prev,
                 isRedeemed: checked,
-                discountValue: discountAmount,
+                discountValue: Number.isFinite(discountAmount) ? discountAmount : 0,
                 message: checked ? 'Loyalty points applied' : null
             }));
             if (checked) {
@@ -73,12 +79,17 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         const { minimum_points_required, user_points, redemption_amount, redemption_type } = loyaltyPoints;
         const pointsPrefix = `You're eligible to use ${minimum_points_required} of your ${user_points} loyalty points to get`;
 
+        // Use API subTotal if available from coupon, otherwise use cartTotal
+        const baseAmount = couponDiscount.isApplied && couponDiscount.subTotal !== undefined
+            ? couponDiscount.subTotal
+            : cartTotal;
+        
         if (redemption_type === 'percentage') {
-            const discountAmount = (Number(redemption_amount) / 100) * cartTotal;
-            return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${discountAmount.toFixed(2)} discount`;
+            const discountAmount = (Number(redemption_amount) / 100) * baseAmount;
+            return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00'} discount`;
         }
 
-        return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${Number(redemption_amount).toFixed(2)} discount`;
+        return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${Number.isFinite(Number(redemption_amount)) ? Number(redemption_amount).toFixed(2) : '0.00'} discount`;
     }
 
     const handleRemoveDiscount = () => {
@@ -117,9 +128,51 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         );
     }, [shippingMethodsData]);
 
-    const shippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
-    const total = (cartTotal + shippingCost) - couponDiscount.value - loyaltyDiscountValue;
+    // Use API response values when coupon is applied, otherwise use calculated values
+    const currentShippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
+    
+    // Subtotal: Use API subTotal if coupon is applied, otherwise use cartTotal
+    const displaySubTotal = couponDiscount.isApplied && couponDiscount.subTotal !== undefined && Number.isFinite(couponDiscount.subTotal)
+        ? couponDiscount.subTotal 
+        : (Number.isFinite(cartTotal) ? cartTotal : 0);
+    
+    // Shipping Cost: Always use current selected shipping method cost (not API shipping cost)
+    // API shipping cost might be from when coupon was applied with different shipping method
+    const safeShippingCost = Number.isFinite(currentShippingCost) ? currentShippingCost : 0;
+    
+    // Total calculation:
+    // When coupon is applied: API total (cart after coupon, before shipping) + current shipping - loyalty
+    // When no coupon: cartTotal + shipping - coupon discount - loyalty discount
+    let displayTotal: number;
+    if (couponDiscount.isApplied && couponDiscount.total !== undefined && Number.isFinite(couponDiscount.total)) {
+        // API total is the cart total AFTER coupon discount but BEFORE shipping
+        // Formula: (subTotal - discount) + shipping - loyalty = total + shipping - loyalty
+        const apiTotalAfterCoupon = couponDiscount.total;
+        const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
+        displayTotal = apiTotalAfterCoupon + safeShippingCost - loyaltyValue;
+    } else {
+        // Calculate locally: cartTotal + shipping - coupon - loyalty
+        const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
+        const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
+        displayTotal = displaySubTotal + safeShippingCost - couponValue - loyaltyValue;
+    }
+    
+    // Ensure no NaN values with final safety check
+    const safeSubTotal = Number.isFinite(displaySubTotal) ? displaySubTotal : 0;
+    const safeTotal = Number.isFinite(displayTotal) ? displayTotal : 0;
+    
     console.log("loyaltyPoints", loyaltyPoints);
+    console.log("🎯 [CartTotal] Display Values:", {
+        couponApplied: couponDiscount.isApplied,
+        apiSubTotal: couponDiscount.subTotal,
+        apiTotal: couponDiscount.total,
+        apiShippingCost: couponDiscount.shippingCost,
+        displaySubTotal: safeSubTotal,
+        displayTotal: safeTotal,
+        displayShippingCost: safeShippingCost,
+        cartTotal,
+        couponDiscountValue: couponDiscount.value
+    });
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded w-full shadow-checkout'>
             <h3 className='primary-gradient-600 text-title-2 md:text-2xl font-semibold w-fit'>Cart Total</h3>
@@ -193,23 +246,23 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
                         <p className='text-skin-neutral-500 !font-oswald'>Shipping Cost</p>
-                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{shippingCost.toFixed(2)}</p>
+                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{safeShippingCost.toFixed(2)}</p>
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
                         <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
-                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{cartTotal.toFixed(2)}</p>
+                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{safeSubTotal.toFixed(2)}</p>
                     </div>
                 </div>
                 <Divider className='border-2' />
                 {hasEnabledFreeShipping && (
                     <>
-                        <ShippingProgress totalAmount={cartTotal} freeShippingThreshold={freeShippingThreshold} />
+                        <ShippingProgress totalAmount={safeSubTotal} freeShippingThreshold={freeShippingThreshold} />
                         <Divider className='border-2' />
                     </>
                 )}
                 <div className='flex items-center justify-between text-black font-bold'>
                     <p className='text-title-2 md:text-2xl !font-oswald'>Total</p>
-                    <p className='text-title-2 md:text-2xl !font-oswald'>{DEFAULT_CURRENCY_SYMBOL}{total.toFixed(2)}</p>
+                    <p className='text-title-2 md:text-2xl !font-oswald'>{DEFAULT_CURRENCY_SYMBOL}{safeTotal.toFixed(2)}</p>
                 </div>
             </div>
         </div>

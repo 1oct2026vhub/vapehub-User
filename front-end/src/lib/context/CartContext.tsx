@@ -2,13 +2,15 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, UnAvailableItem } from '../config/cart.config';
-import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, getLoyaltyPointsRedemption, calculateGuestDeals } from '../server.actions';
+import { APPLY_GUEST_COUPON_PAYLOAD } from '../config/checkout.config';
+import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, applyGuestCoupon, getLoyaltyPointsRedemption, calculateGuestDeals } from '../server.actions';
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '../config/app.config';
 import { useSession } from 'next-auth/react';
 import { Product, ProductImage, ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
 import { LoyaltyPointsRedemptionResponse } from '../config/loyalty-points.config';
+import { CouponResponse } from '../config/order.config';
 
 interface CouponDiscount {
   value: number;
@@ -16,6 +18,10 @@ interface CouponDiscount {
   code: string | null;
   message: string | null;
   discountValue: string;
+  discount_amount?: number; // Direct discount amount from API
+  shippingCost?: number; // Shipping cost from API
+  subTotal?: number; // Subtotal from API
+  total?: number; // Total from API
   mailSubscriptionData?: {
     discount_amount: number;
     discount_type: string;
@@ -512,6 +518,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
          setCartItems(updatedCart);
          setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
          await calculateGuestDealsAndTotals(updatedCart);
+         // Revalidate coupon if applied for guest users
+         if (couponDiscount.isApplied && couponDiscount.code) {
+           await revalidateGuestCoupon(updatedCart, 0); // Use 0 as default shippingMethodId, can be updated later
+         }
          // toast.success('Cart updated successfully');
       }
     } catch (error) {
@@ -713,7 +723,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     handleAuthChange();
-  }, [isAuthenticated])
+  }, [isAuthenticated, hasAttemptedSync, syncCookieCart])
 
   const fetchCartItems = async () => {
     try {
@@ -787,7 +797,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
     deleteCookie('couponDiscount');
     deleteCookie(LOYALTY_COOKIE_NAME);
-  }, [loyaltyRedemption.pointsData]);
+  }, [loyaltyRedemption.pointsData, couponDiscount.mailSubscriptionData]);
 
   useEffect(() => {
     if (prevSessionRef.current?.user?.id && prevSessionRef.current.user.id !== session?.user?.id) {
@@ -808,7 +818,89 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
       });
     }
-  }, [itemCount, isLoading]);
+  }, [itemCount, isLoading, couponDiscount.mailSubscriptionData]);
+
+  // Revalidate guest coupon
+  const revalidateGuestCoupon = useCallback(async (items: CartItem[], shippingMethodId: number = 0) => {
+    // Skip revalidation if:
+    // 1. Coupon is not applied or no code exists
+    // 2. Coupon is currently being applied (to prevent duplicate API calls)
+    if (!couponDiscount.code || !couponDiscount.isApplied || isApplyingCouponRef.current || isAuthenticated) {
+      return;
+    }
+
+    try {
+      console.log('🔄 [CartContext] Revalidating guest coupon:', couponDiscount.code);
+      
+      // Build cart items array for API
+      const cartItemsForApi = items.map(item => ({
+        product_id: item.product_id,
+        variant_id: item.variant_id,
+        quantity: item.quantity
+      }));
+
+      const payload: APPLY_GUEST_COUPON_PAYLOAD = {
+        couponCode: couponDiscount.code,
+        cartItems: cartItemsForApi,
+        shippingMethodId: shippingMethodId,
+        loyalty: false
+      };
+
+      const response = await applyGuestCoupon(payload);
+      console.log('🔄 [CartContext] Guest User - Apply Coupon API Response (Revalidation):', response);
+      console.log('🔄 [CartContext] Guest User - Response Status:', response.status);
+      console.log('🔄 [CartContext] Guest User - Response Data:', 'data' in response ? response.data : 'No data (error response)');
+
+      if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.total != null && response.data.coupon) {
+        const couponData: CouponResponse = response.data;
+        // Use discount_amount directly from API response
+        const discountAmount = couponData.discount_amount || 0;
+        // Parse values - handle both number and string types from API (API sometimes returns strings)
+        const apiSubTotalValue = couponData.subTotal as number | string;
+        const apiSubTotal = typeof apiSubTotalValue === 'string' 
+          ? parseFloat(apiSubTotalValue.replace(/[^\d.-]/g, '')) || 0
+          : (Number.isFinite(apiSubTotalValue) ? apiSubTotalValue : 0);
+        const apiTotalValue = couponData.total as number | string;
+        const apiTotal = typeof apiTotalValue === 'string'
+          ? parseFloat(apiTotalValue.replace(/[^\d.-]/g, '')) || 0
+          : (Number.isFinite(apiTotalValue) ? apiTotalValue : 0);
+        const apiShippingCostValue = couponData.shippingCost as number | string;
+        const apiShippingCost = typeof apiShippingCostValue === 'string'
+          ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
+          : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
+        
+        console.log('🔄 [CartContext] Guest coupon revalidation successful. Discount amount:', discountAmount);
+        console.log('🔄 [CartContext] Guest coupon API values:', { apiSubTotal, apiTotal, apiShippingCost, discountAmount });
+        
+        setCouponDiscount({
+          value: Number.isFinite(discountAmount) ? discountAmount : 0,
+          isApplied: true,
+          code: couponDiscount.code,
+          message: couponData.coupon.discount_type === "percentage" ? `Extra ${couponData.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${couponData.coupon.discount_value} off`,
+          discountValue: Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00',
+          discount_amount: Number.isFinite(couponData.discount_amount) ? couponData.discount_amount : undefined,
+          shippingCost: apiShippingCost,
+          subTotal: apiSubTotal,
+          total: apiTotal,
+          mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData,
+        });
+      } else {
+        console.log('🔄 [CartContext] Guest coupon revalidation failed. Removing coupon.');
+        if (couponDiscount.isApplied) {
+          setCouponDiscount({
+            value: 0,
+            isApplied: false,
+            code: couponDiscount.code,
+            message: null,
+            discountValue: '',
+            mailSubscriptionData: couponDiscount.mailSubscriptionData,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('🔄 [CartContext] Error revalidating guest coupon:', error);
+    }
+  }, [couponDiscount.code, couponDiscount.isApplied, couponDiscount.mailSubscriptionData, isAuthenticated, isApplyingCouponRef]);
 
   // Revalidate coupon when cartTotal or itemCount changes
   useEffect(() => {
@@ -820,29 +912,55 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
+      // For guest users, skip this revalidation (handled separately in updateItemQuantity)
+      if (!isAuthenticated) {
+        return;
+      }
+
       console.log('🔄 [CartContext] Revalidating coupon:', couponDiscount.code);
       const response = await applyCoupon({
         couponCode: couponDiscount.code,
         shippingMethodId: 0, // Adjust if you use shipping method
       });
       
-      console.log('🔄 [CartContext] Revalidation response:', response);
-      console.log('🔄 [CartContext] Response status:', response.status);
+      console.log('🔄 [CartContext] Logged-in User - Apply Coupon API Response (Revalidation):', response);
+      console.log('🔄 [CartContext] Logged-in User - Response Status:', response.status);
+      console.log('🔄 [CartContext] Logged-in User - Response Data:', 'data' in response ? response.data : 'No data (error response)');
       // console.log('🔄 [CartContext] Response data:', response.data);
       
       // Check for valid response with total and coupon data (not just referral_value)
       if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.total != null && response.data.coupon) {
-        // Use API's subTotal instead of cartTotal to ensure accurate discount calculation
-        // The API recalculates everything, so we should use its subTotal value
-        const discountValue = response.data.subTotal - response.data.total;
-        console.log('🔄 [CartContext] Revalidation successful. Discount value:', discountValue);
+        const couponData: CouponResponse = response.data;
+        // Parse values - handle both number and string types from API (API sometimes returns strings)
+        const apiSubTotalValue = couponData.subTotal as number | string;
+        const apiSubTotal = typeof apiSubTotalValue === 'string'
+          ? parseFloat(apiSubTotalValue.replace(/[^\d.-]/g, '')) || 0
+          : (Number.isFinite(apiSubTotalValue) ? apiSubTotalValue : 0);
+        const apiTotalValue = couponData.total as number | string;
+        const apiTotal = typeof apiTotalValue === 'string'
+          ? parseFloat(apiTotalValue.replace(/[^\d.-]/g, '')) || 0
+          : (Number.isFinite(apiTotalValue) ? apiTotalValue : 0);
+        const apiShippingCostValue = couponData.shippingCost as number | string;
+        const apiShippingCost = typeof apiShippingCostValue === 'string'
+          ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
+          : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
+        // Use discount_amount directly from API response if available, otherwise calculate
+        const discountAmount = couponData.discount_amount ?? (apiSubTotal - apiTotal);
+        
+        console.log('🔄 [CartContext] Revalidation successful. Discount amount:', discountAmount);
+        console.log('🔄 [CartContext] Logged-in coupon API values:', { apiSubTotal, apiTotal, apiShippingCost, discountAmount });
+        
         setCouponDiscount({
-          value: discountValue,
+          value: Number.isFinite(discountAmount) ? discountAmount : 0,
           isApplied: true,
           code: couponDiscount.code,
-          message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
-          discountValue: discountValue.toFixed(2),
-          mailSubscriptionData: response.data.mail_subscription_data || couponDiscount.mailSubscriptionData, // Use new data or preserve existing
+          message: couponData.coupon.discount_type === "percentage" ? `Extra ${couponData.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${couponData.coupon.discount_value} off`,
+          discountValue: Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00',
+          discount_amount: Number.isFinite(couponData.discount_amount) ? couponData.discount_amount : undefined,
+          shippingCost: apiShippingCost,
+          subTotal: apiSubTotal,
+          total: apiTotal,
+          mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData, // Use new data or preserve existing
         });
       } else {
         console.log('🔄 [CartContext] Revalidation failed. Removing coupon.');

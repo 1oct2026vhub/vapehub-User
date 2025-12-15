@@ -8,10 +8,11 @@ import { getCookie } from 'cookies-next'
 import { CartItem } from '@/lib/config/cart.config'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
 import { toast } from 'sonner'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Form } from './ui/Form'
 import InputForm from './InputForm'
 import { useCart } from '@/lib/context/CartContext'
+import { CouponResponse } from '@/lib/config/order.config'
 
 interface CouponFormProps {
     onCouponApplied: (discount: {
@@ -20,6 +21,10 @@ interface CouponFormProps {
         code: string | null;
         message: string | null;
         discountValue: string;
+        discount_amount?: number;
+        shippingCost?: number;
+        subTotal?: number;
+        total?: number;
         mailSubscriptionData?: {
             discount_amount: number;
             discount_type: string;
@@ -83,6 +88,9 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             };
 
             const response = await applyGuestCoupon(payload);
+            console.log('🎫 [CouponForm] Guest User - Apply Coupon API Response:', response);
+            console.log('🎫 [CouponForm] Guest User - Response Status:', response.status);
+            console.log('🎫 [CouponForm] Guest User - Response Data:', 'data' in response ? response.data : 'No data (error response)');
             if(response.status === 'SUCCESS') {
                 toast.success('Coupon Applied Successfully');
             }
@@ -93,17 +101,37 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 // }
                 setIsApplied(true);
                 setIsEditing(false);
-                // Use API's subTotal instead of cartTotal to ensure accurate discount calculation
-                // The API recalculates everything, so we should use its subTotal value
-                const discountValue = response.data.subTotal - response.data.total;
-                const discountAmount = discountValue.toFixed(2);
+                // Use discount_amount directly from API response with NaN safety
+                const couponData: CouponResponse = response.data;
+                // Parse values - handle both number and string types from API (API sometimes returns strings)
+                const apiSubTotalValue = couponData.subTotal as number | string;
+                const apiSubTotal = typeof apiSubTotalValue === 'string'
+                  ? parseFloat(apiSubTotalValue.replace(/[^\d.-]/g, '')) || 0
+                  : (Number.isFinite(apiSubTotalValue) ? apiSubTotalValue : 0);
+                const apiTotalValue = couponData.total as number | string;
+                const apiTotal = typeof apiTotalValue === 'string'
+                  ? parseFloat(apiTotalValue.replace(/[^\d.-]/g, '')) || 0
+                  : (Number.isFinite(apiTotalValue) ? apiTotalValue : 0);
+                const apiShippingCostValue = couponData.shippingCost as number | string;
+                const apiShippingCost = typeof apiShippingCostValue === 'string'
+                  ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
+                  : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
+                const discountAmount: number = (couponData.discount_amount !== undefined && Number.isFinite(couponData.discount_amount))
+                    ? couponData.discount_amount 
+                    : 0;
+                
+                const discountValue = Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00';
                 onCouponApplied({
-                    value: discountValue,
+                    value: discountAmount,
                     isApplied: true,
                     code: data.couponCode || null,
-                    message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
-                    discountValue: discountAmount,
-                    mailSubscriptionData: response.data.mail_subscription_data
+                    message: couponData.coupon.discount_type === "percentage" ? `Extra ${couponData.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${couponData.coupon.discount_value} off`,
+                    discountValue: discountValue,
+                    discount_amount: (couponData.discount_amount !== undefined && Number.isFinite(couponData.discount_amount)) ? couponData.discount_amount : undefined,
+                    shippingCost: apiShippingCost,
+                    subTotal: apiSubTotal,
+                    total: apiTotal,
+                    mailSubscriptionData: couponData.mail_subscription_data
                 });
             } else {
                 toast.error(response.message);
@@ -125,6 +153,9 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 shippingMethodId: shippingMethodId || 0
             };
             const response = await applyCoupon(payload);
+            console.log('🎫 [CouponForm] Logged-in User - Apply Coupon API Response:', response);
+            console.log('🎫 [CouponForm] Logged-in User - Response Status:', response.status);
+            console.log('🎫 [CouponForm] Logged-in User - Response Data:', 'data' in response ? response.data : 'No data (error response)');
             if(response.status === 'SUCCESS') {
                 toast.success('Coupon Applied Successfully');
             }
@@ -135,17 +166,38 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 // }
                 setIsApplied(true);
                 setIsEditing(false);
-                // Use API's subTotal instead of cartTotal to ensure accurate discount calculation
-                // The API recalculates everything, so we should use its subTotal value
-                const discountValue = response.data.subTotal - response.data.total;
-                const discountAmount = discountValue.toFixed(2);
+                // Use discount_amount directly from API response if available, otherwise calculate with NaN safety
+                const couponData: CouponResponse = response.data;
+                // Parse values - handle both number and string types from API (API sometimes returns strings)
+                const apiSubTotalValue = couponData.subTotal as number | string;
+                const apiSubTotal = typeof apiSubTotalValue === 'string'
+                  ? parseFloat(apiSubTotalValue.replace(/[^\d.-]/g, '')) || 0
+                  : (Number.isFinite(apiSubTotalValue) ? apiSubTotalValue : 0);
+                const apiTotalValue = couponData.total as number | string;
+                const apiTotal = typeof apiTotalValue === 'string'
+                  ? parseFloat(apiTotalValue.replace(/[^\d.-]/g, '')) || 0
+                  : (Number.isFinite(apiTotalValue) ? apiTotalValue : 0);
+                const apiShippingCostValue = couponData.shippingCost as number | string;
+                const apiShippingCost = typeof apiShippingCostValue === 'string'
+                  ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
+                  : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
+                
+                const discountAmount: number = Number.isFinite(couponData.discount_amount) && couponData.discount_amount !== undefined
+                    ? couponData.discount_amount
+                    : (Number.isFinite(apiSubTotal) && Number.isFinite(apiTotal) ? (apiSubTotal - apiTotal) : 0);
+                
+                const discountValue = Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00';
                 onCouponApplied({
-                    value: discountValue,
+                    value: discountAmount,
                     isApplied: true,
                     code: data.couponCode || null,
-                    message: response.data.coupon.discount_type === "percentage" ? `Extra ${response.data.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${response.data.coupon.discount_value} off`,
-                    discountValue: discountAmount,
-                    mailSubscriptionData: response.data.mail_subscription_data
+                    message: couponData.coupon.discount_type === "percentage" ? `Extra ${couponData.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${couponData.coupon.discount_value} off`,
+                    discountValue: discountValue,
+                    discount_amount: Number.isFinite(couponData.discount_amount) && couponData.discount_amount !== undefined ? couponData.discount_amount : undefined,
+                    shippingCost: apiShippingCost,
+                    subTotal: apiSubTotal,
+                    total: apiTotal,
+                    mailSubscriptionData: couponData.mail_subscription_data
                 });
             } else {
                 toast.error(response.message);
@@ -163,7 +215,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
         }
     };
 
-    const handleEdit = () => {
+    const handleEdit = useCallback(() => {
         setIsEditing(true);
         setIsApplied(false);
         onCouponApplied({
@@ -174,7 +226,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             discountValue: '',
             mailSubscriptionData: undefined
         });
-    };
+    }, [onCouponApplied]);
 
     useEffect(() => {
         if (isRemoveCoupon) {
@@ -183,7 +235,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             setIsRemoveCoupon(false);
 
         } 
-    }, [isRemoveCoupon]);
+    }, [isRemoveCoupon, handleEdit, form, setIsRemoveCoupon]);
 
     return (
         <Form {...form}>

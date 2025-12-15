@@ -7,6 +7,7 @@ import { getHomeProductList } from "@/lib/server.actions";
 import { ServerActionStatus, ServerActionResponse } from "@/lib/config/app.config";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+import { ROUTES } from "@/lib/routes";
 
 interface NewProductsProps {
   title?: string;
@@ -15,7 +16,7 @@ interface NewProductsProps {
 
 const NewProducts: React.FC<NewProductsProps> = async ({
   title = "New Products",
-  viewAllHref = "/",
+  viewAllHref = ROUTES.NEW_PRODUCTS,
 }) => {
   const productsResponse = await getHomeProductList({ sort_by: "id", order: "DESC", limit: 10, offset: 0 });
   if (productsResponse.status !== ServerActionStatus.SUCCESS) {

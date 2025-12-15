@@ -27,6 +27,7 @@ interface CouponDiscount {
     discount_type: string;
     isDiscountUsed: boolean;
   };
+  mailSubscriptionDiscount?: number; // Mail subscription discount amount from API
 }
 
 interface LoyaltyRedemption {
@@ -788,6 +789,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       message: null,
       discountValue: '',
       mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
+      mailSubscriptionDiscount: undefined,
     });
     setLoyaltyRedemption({
       isRedeemed: false,
@@ -816,6 +818,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         message: null,
         discountValue: '',
         mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
+        mailSubscriptionDiscount: undefined,
       });
     }
   }, [itemCount, isLoading, couponDiscount.mailSubscriptionData]);
@@ -872,6 +875,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('🔄 [CartContext] Guest coupon revalidation successful. Discount amount:', discountAmount);
         console.log('🔄 [CartContext] Guest coupon API values:', { apiSubTotal, apiTotal, apiShippingCost, discountAmount });
         
+        // Extract mail subscription discount from API response
+        const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
+          ? couponData.mail_subscription_discount
+          : undefined;
         setCouponDiscount({
           value: Number.isFinite(discountAmount) ? discountAmount : 0,
           isApplied: true,
@@ -883,6 +890,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           subTotal: apiSubTotal,
           total: apiTotal,
           mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData,
+          mailSubscriptionDiscount: mailSubscriptionDiscountValue,
         });
       } else {
         console.log('🔄 [CartContext] Guest coupon revalidation failed. Removing coupon.');
@@ -894,6 +902,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             message: null,
             discountValue: '',
             mailSubscriptionData: couponDiscount.mailSubscriptionData,
+            mailSubscriptionDiscount: undefined,
           });
         }
       }
@@ -950,6 +959,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('🔄 [CartContext] Revalidation successful. Discount amount:', discountAmount);
         console.log('🔄 [CartContext] Logged-in coupon API values:', { apiSubTotal, apiTotal, apiShippingCost, discountAmount });
         
+        // Extract mail subscription discount from API response
+        const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
+          ? couponData.mail_subscription_discount
+          : undefined;
         setCouponDiscount({
           value: Number.isFinite(discountAmount) ? discountAmount : 0,
           isApplied: true,
@@ -961,6 +974,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           subTotal: apiSubTotal,
           total: apiTotal,
           mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData, // Use new data or preserve existing
+          mailSubscriptionDiscount: mailSubscriptionDiscountValue,
         });
       } else {
         console.log('🔄 [CartContext] Revalidation failed. Removing coupon.');

@@ -276,10 +276,11 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
                     </div>
                 </div>
             )}
-            {couponDiscount.mailSubscriptionData && couponDiscount.mailSubscriptionData.isDiscountUsed === false && (
-                <p className='text-green-600 text-content-3 md:text-content-1 font-semibold'>
-                    Subscription discount applied with coupon.
-                </p>
+            {couponDiscount.mailSubscriptionData && couponDiscount.mailSubscriptionData.isDiscountUsed === false && couponDiscount.mailSubscriptionDiscount && couponDiscount.mailSubscriptionDiscount > 0 && (
+                <div className='flex items-center justify-between text-green-600 text-content-3 md:text-content-1 font-bold'>
+                    <p>Mail Subscription Discount</p>
+                    <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.mailSubscriptionDiscount.toFixed(2)}</p>
+                </div>
             )}
             <Divider />
             <div className='space-y-1.5'>
@@ -305,11 +306,16 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
             <div className='flex items-center justify-between text-black font-semibold'>
                 <p className='text-content-2 md:text-2xl !font-oswald'>Total</p>
                 <p className='text-title-2 md:text-2xl !font-oswald'>
-                    {DEFAULT_CURRENCY_SYMBOL} {
-                        couponDiscount.isApplied 
-                            ? (cartTotal - couponDiscount.value + safeShippingCost).toFixed(2)
-                            : (cartTotal + safeShippingCost).toFixed(2)
-                    }
+                    {DEFAULT_CURRENCY_SYMBOL} {(() => {
+                        const mailSubscriptionDiscount = (couponDiscount.mailSubscriptionDiscount !== undefined && Number.isFinite(couponDiscount.mailSubscriptionDiscount))
+                            ? couponDiscount.mailSubscriptionDiscount
+                            : 0;
+                        if (couponDiscount.isApplied) {
+                            return (cartTotal - couponDiscount.value - mailSubscriptionDiscount + safeShippingCost).toFixed(2);
+                        } else {
+                            return (cartTotal - mailSubscriptionDiscount + safeShippingCost).toFixed(2);
+                        }
+                    })()}
                 </p>
             </div>
             <Button

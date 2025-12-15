@@ -30,6 +30,7 @@ interface CouponFormProps {
             discount_type: string;
             isDiscountUsed: boolean;
         };
+        mailSubscriptionDiscount?: number;
     }) => void;
     initialCouponCode?: string;
     cartTotal: number;
@@ -121,6 +122,10 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     : 0;
                 
                 const discountValue = Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00';
+                // Extract mail subscription discount from API response
+                const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
+                    ? couponData.mail_subscription_discount
+                    : undefined;
                 onCouponApplied({
                     value: discountAmount,
                     isApplied: true,
@@ -131,7 +136,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     shippingCost: apiShippingCost,
                     subTotal: apiSubTotal,
                     total: apiTotal,
-                    mailSubscriptionData: couponData.mail_subscription_data
+                    mailSubscriptionData: couponData.mail_subscription_data,
+                    mailSubscriptionDiscount: mailSubscriptionDiscountValue
                 });
             } else {
                 toast.error(response.message);
@@ -143,7 +149,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     code: null,
                     message: null,
                     discountValue: '',
-                    mailSubscriptionData: undefined
+                    mailSubscriptionData: undefined,
+                    mailSubscriptionDiscount: undefined
                 });
             }
         } else {
@@ -187,6 +194,10 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     : (Number.isFinite(apiSubTotal) && Number.isFinite(apiTotal) ? (apiSubTotal - apiTotal) : 0);
                 
                 const discountValue = Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00';
+                // Extract mail subscription discount from API response
+                const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
+                    ? couponData.mail_subscription_discount
+                    : undefined;
                 onCouponApplied({
                     value: discountAmount,
                     isApplied: true,
@@ -197,7 +208,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     shippingCost: apiShippingCost,
                     subTotal: apiSubTotal,
                     total: apiTotal,
-                    mailSubscriptionData: couponData.mail_subscription_data
+                    mailSubscriptionData: couponData.mail_subscription_data,
+                    mailSubscriptionDiscount: mailSubscriptionDiscountValue
                 });
             } else {
                 toast.error(response.message);
@@ -209,7 +221,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     code: null,
                     message: null,
                     discountValue: '',
-                    mailSubscriptionData: undefined
+                    mailSubscriptionData: undefined,
+                    mailSubscriptionDiscount: undefined
                 });
             }
         }

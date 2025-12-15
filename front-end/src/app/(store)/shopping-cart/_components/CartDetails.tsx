@@ -6,7 +6,7 @@ import { ROUTES } from '@/lib/routes'
 import { checkout } from '@/lib/server.actions'
 import { Button, Divider } from '@nextui-org/react'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useSession } from 'next-auth/react'
 import CouponForm from '@/components/CouponForm'
@@ -24,7 +24,27 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
     const { status } = useSession();
     const { cartTotal, itemCount, couponDiscount, setCouponDiscount, checkoutStockValidation, stockValidationLoading, setIsRemoveCoupon, cartItems, cartSubtotal, cartDiscount } = useCart();
     const router = useRouter();
+    const [selectedShippingMethod, setSelectedShippingMethod] = useState<SHIPPING_METHOD_DATA | null>(null);
+    console.log("shippingMethodsData",shippingMethodsData);
+    
+    // Initialize selected shipping method when shipping methods data is available
+    useEffect(() => {
+        if (!shippingMethodsData || shippingMethodsData.length === 0) {
+            return;
+        }
 
+        const enabledMethods = shippingMethodsData
+            .filter(method => method.is_enabled && !method.deletedAt)
+            .sort((a, b) => a.method_order - b.method_order);
+
+        if (enabledMethods.length > 0) {
+            // Prioritize free shipping method if available
+            const freeShippingMethod = enabledMethods.find((method) => (method.is_free_shipping ?? false));
+            const initialMethod = freeShippingMethod || enabledMethods[0];
+            setSelectedShippingMethod(initialMethod);
+        }
+    }, [shippingMethodsData]);
+    
     const freeShippingThreshold = useMemo(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {
             return FREE_DELIVERY_THRESHOLD;
@@ -211,39 +231,65 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
         }
     }
 
+    const isAuthenticated = status === 'authenticated';
+    
+    // Calculate shipping cost from selected shipping method
+    const shippingCost = selectedShippingMethod 
+        ? parseFloat(selectedShippingMethod.shipping_cost || '0')
+        : 0;
+    const safeShippingCost = Number.isFinite(shippingCost) ? shippingCost : 0;
+    
+    // Get shipping method ID for API calls
+    const shippingMethodId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0;
+    
+    console.log('🛒 [CartDetails] Shipping Info:', {
+        selectedShippingMethod,
+        shippingCost: safeShippingCost,
+        shippingMethodId
+    });
+
     return (
         <div className='flex flex-col p-3 md:p-5 gap-3 bg-white border border-skin-neutral-100 rounded-14 w-full lg:w-4/6 xl:w-full xl:max-w-[584px]'>
-            {status === 'authenticated' && (
-                <>
-                    <CouponForm 
-                        onCouponApplied={setCouponDiscount}
-                        initialCouponCode={couponDiscount.code || ''}
-                        cartTotal={cartTotal}
-                    />
-                    {couponDiscount.isApplied && (
-                        <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
-                            <div className='flex flex-col'> 
-                                <p>{couponDiscount.message}</p>
-                                <p>Coupon: {couponDiscount.code}</p>
-                            </div>
-                            <div className='flex items-center'>
-                                <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
-                                <button 
-                                    className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
-                                    onClick={() => setIsRemoveCoupon(true)}
-                                >
-                                    [Remove]
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                    <Divider />
-                </>
+            <CouponForm 
+                onCouponApplied={(discount) => {
+                    setCouponDiscount(discount);
+                }}
+                initialCouponCode={couponDiscount.code || ''}
+                cartTotal={cartTotal}
+                isGuest={!isAuthenticated}
+                shippingMethodId={shippingMethodId}
+            />
+            {couponDiscount.isApplied && couponDiscount.code && (
+                <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>
+                    <div className='flex flex-col'> 
+                        <p>{couponDiscount.message}</p>
+                        <p>Coupon: {couponDiscount.code}</p>
+                    </div>
+                    <div className='flex items-center'>
+                        <p>-{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.discountValue}</p>
+                        <button 
+                            className='text-red-500 hover:underline text-content-3 md:text-content-1 font-bold'
+                            onClick={() => setIsRemoveCoupon(true)}
+                        >
+                            [Remove]
+                        </button>
+                    </div>
+                </div>
             )}
+            {couponDiscount.mailSubscriptionData && couponDiscount.mailSubscriptionData.isDiscountUsed === false && (
+                <p className='text-green-600 text-content-3 md:text-content-1 font-semibold'>
+                    Subscription discount applied with coupon.
+                </p>
+            )}
+            <Divider />
             <div className='space-y-1.5'>
                 <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
                     <p className='text-skin-neutral-500 !font-oswald'>Number of Items</p>
                     <p className='text-skin-neutral-300'>{itemCount}</p>
+                </div>
+                <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
+                    <p className='text-skin-neutral-500 !font-oswald'>Shipping Cost</p>
+                    <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL} {safeShippingCost.toFixed(2)}</p>
                 </div>
                 <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
                     <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
@@ -258,7 +304,13 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
             <Divider />
             <div className='flex items-center justify-between text-black font-semibold'>
                 <p className='text-content-2 md:text-2xl !font-oswald'>Total</p>
-                <p className='text-title-2 md:text-2xl !font-oswald'>{DEFAULT_CURRENCY_SYMBOL} {couponDiscount.isApplied ?  (cartTotal - couponDiscount.value).toFixed(2): (cartTotal).toFixed(2)}</p>
+                <p className='text-title-2 md:text-2xl !font-oswald'>
+                    {DEFAULT_CURRENCY_SYMBOL} {
+                        couponDiscount.isApplied 
+                            ? (cartTotal - couponDiscount.value + safeShippingCost).toFixed(2)
+                            : (cartTotal + safeShippingCost).toFixed(2)
+                    }
+                </p>
             </div>
             <Button
                 size="lg"

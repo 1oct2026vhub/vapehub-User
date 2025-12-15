@@ -452,6 +452,7 @@ export interface CouponResponse {
         discount_type: string;
         isDiscountUsed: boolean;
     };
+    mail_subscription_discount?: number; // Mail subscription discount amount from API
 }
 
 export interface REVIEW_ORDER_PAYLOAD {

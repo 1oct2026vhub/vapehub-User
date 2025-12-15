@@ -142,22 +142,27 @@ console.log("selectedShippingMethod", selectedShippingMethod);
     // API shipping cost might be from when coupon was applied with different shipping method
     const safeShippingCost = Number.isFinite(currentShippingCost) ? currentShippingCost : 0;
     
+    // Calculate mail subscription discount if available
+    const mailSubscriptionDiscount = (couponDiscount.mailSubscriptionDiscount !== undefined && Number.isFinite(couponDiscount.mailSubscriptionDiscount))
+        ? couponDiscount.mailSubscriptionDiscount
+        : 0;
+    
     // Total calculation:
-    // When coupon is applied: cartTotal (with deals) - coupon discount + shipping - loyalty
-    // When no coupon: cartTotal + shipping - coupon discount - loyalty discount
+    // When coupon is applied: cartTotal (with deals) - coupon discount - mail subscription discount + shipping - loyalty
+    // When no coupon: cartTotal + shipping - coupon discount - mail subscription discount - loyalty discount
     let displayTotal: number;
     if (couponDiscount.isApplied && couponDiscount.value !== undefined && Number.isFinite(couponDiscount.value)) {
         // Use cartTotal (includes deals) as base, then apply coupon discount
         // This ensures deal discounts are preserved in the calculation
         const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
         const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
-        // Formula: (cartTotal with deals) - coupon discount + shipping - loyalty
-        displayTotal = displaySubTotal - couponValue + safeShippingCost - loyaltyValue;
+        // Formula: (cartTotal with deals) - coupon discount - mail subscription discount + shipping - loyalty
+        displayTotal = displaySubTotal - couponValue - mailSubscriptionDiscount + safeShippingCost - loyaltyValue;
     } else {
-        // Calculate locally: cartTotal + shipping - coupon - loyalty
+        // Calculate locally: cartTotal + shipping - coupon - mail subscription discount - loyalty
         const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
         const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
-        displayTotal = displaySubTotal + safeShippingCost - couponValue - loyaltyValue;
+        displayTotal = displaySubTotal + safeShippingCost - couponValue - mailSubscriptionDiscount - loyaltyValue;
     }
     
     // Ensure no NaN values with final safety check
@@ -213,8 +218,8 @@ console.log("selectedShippingMethod", selectedShippingMethod);
                         </div>
                     </div>
                 )}
-                {couponDiscount.mailSubscriptionData && couponDiscount.mailSubscriptionData.isDiscountUsed === false && (
-                    <p className='text-green-600 text-content-3 md:text-content-1 font-semibold'>
+                {couponDiscount.mailSubscriptionData && couponDiscount.mailSubscriptionData.isDiscountUsed === false && mailSubscriptionDiscount > 0 && (
+                  <p className='text-green-600 text-content-3 md:text-content-1 font-semibold'>
                         Subscription discount applied with coupon.
                     </p>
                 )}

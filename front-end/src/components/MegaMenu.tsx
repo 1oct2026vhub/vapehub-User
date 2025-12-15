@@ -391,7 +391,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                             placeholder="Search..."
                             className="w-3/4"
                             classNames={{
-                                input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
+                                input: '!text-base md:!text-title-2 font-normal md:font-bold',
                             }}
                             startContent={<SearchIcon className='w-4 h-4 md:w-max md:h-max' />}
                             value={searchKeyword}

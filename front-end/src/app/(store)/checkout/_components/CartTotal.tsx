@@ -131,25 +131,28 @@ console.log("selectedShippingMethod", selectedShippingMethod);
     // Use API response values when coupon is applied, otherwise use calculated values
     const currentShippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
     
-    // Subtotal: Use API subTotal if coupon is applied, otherwise use cartTotal
-    const displaySubTotal = couponDiscount.isApplied && couponDiscount.subTotal !== undefined && Number.isFinite(couponDiscount.subTotal)
-        ? couponDiscount.subTotal 
-        : (Number.isFinite(cartTotal) ? cartTotal : 0);
+    // Subtotal: CRITICAL - Always use cartTotal (which includes deal discounts) instead of API subTotal
+    // API subTotal (couponDiscount.subTotal) is the original subtotal WITHOUT deal discounts
+    // cartTotal is calculated with deal discounts applied via calculateGuestDealsAndTotals
+    // This ensures deal discounts are always shown in the subtotal, even after coupon is applied
+    // DO NOT use couponDiscount.subTotal as it doesn't include deal discounts
+    const displaySubTotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0;
     
     // Shipping Cost: Always use current selected shipping method cost (not API shipping cost)
     // API shipping cost might be from when coupon was applied with different shipping method
     const safeShippingCost = Number.isFinite(currentShippingCost) ? currentShippingCost : 0;
     
     // Total calculation:
-    // When coupon is applied: API total (cart after coupon, before shipping) + current shipping - loyalty
+    // When coupon is applied: cartTotal (with deals) - coupon discount + shipping - loyalty
     // When no coupon: cartTotal + shipping - coupon discount - loyalty discount
     let displayTotal: number;
-    if (couponDiscount.isApplied && couponDiscount.total !== undefined && Number.isFinite(couponDiscount.total)) {
-        // API total is the cart total AFTER coupon discount but BEFORE shipping
-        // Formula: (subTotal - discount) + shipping - loyalty = total + shipping - loyalty
-        const apiTotalAfterCoupon = couponDiscount.total;
+    if (couponDiscount.isApplied && couponDiscount.value !== undefined && Number.isFinite(couponDiscount.value)) {
+        // Use cartTotal (includes deals) as base, then apply coupon discount
+        // This ensures deal discounts are preserved in the calculation
+        const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
         const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
-        displayTotal = apiTotalAfterCoupon + safeShippingCost - loyaltyValue;
+        // Formula: (cartTotal with deals) - coupon discount + shipping - loyalty
+        displayTotal = displaySubTotal - couponValue + safeShippingCost - loyaltyValue;
     } else {
         // Calculate locally: cartTotal + shipping - coupon - loyalty
         const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;

@@ -145,7 +145,7 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
                                         placeholder={Header_FORM_CONFIG.SEARCH.PH}
                                         className="w-full"
                                         classNames={{
-                                            input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
+                                            input: '!text-base md:!text-title-2 font-normal md:font-bold',
                                         }}
                                         startContent={<SearchIcon className='w-4 h-4 md:w-max md:h-max' />}
                                     />
@@ -212,6 +212,9 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
                                     type={Header_FORM_CONFIG.SEARCH.TYPE}
                                     placeholder={Header_FORM_CONFIG.SEARCH.PH}
                                     className="w-full"
+                                    classNames={{
+                                        input: '!text-base md:!text-title-2',
+                                    }}
                                     startContent={<SearchIcon />}
                                 />
                             </form>

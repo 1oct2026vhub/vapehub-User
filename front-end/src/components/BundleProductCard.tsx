@@ -99,14 +99,15 @@ const BundleVariantFilter: React.FC<{
 
 				return attributeTerm.attribute.type === "select" ? (
 					<div key={attributeTerm.attribute.id} className="w-full">
-						<div className="hidden md:block">
+						{/* Hidden attribute name and count for Bundle cards */}
+						{/* <div className="hidden md:block">
 							<p className='text-content-1 md:text-h5 font-semibold !font-oswald text-black capitalize'>
 								{attributeTerm?.attribute.name}
 							</p>
 							<p className='primary-gradient-100 text-content-2 md:text-content-1'>
 								{`${availableTerms.length} available`}
 							</p>
-						</div>
+						</div> */}
 						<Select
 							size='sm'
 							className="w-full"
@@ -415,7 +416,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 					</div>
 					<div className="space-y-4 w-full max-w-lg">
 						<Link href={productLink}>
-							<h3 className="text-content-2 xl:text-xl font-semibold text-skin-black mr-10">{name}</h3>
+							<h3 className="!font-oswald font-semibold text-[20px] leading-[100%] tracking-normal text-skin-black mr-10">{name}</h3>
 						</Link>
 						{isLoading ? (
 							<div className="space-y-2">
@@ -484,7 +485,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 				</Link>
 				<div className="flex flex-col px-2.5 pb-2.5 pt-2 gap-2 h-full justify-between">
 					<Link href={productLink}>
-						<h4 className="text-content-1 font-semibold text-skin-neutral-500 line-clamp-2">
+						<h4 className="text-content-1 font-semibold text-[12px] md:text-[20px] text-skin-neutral-500 line-clamp-2">
 							{name}
 						</h4>
 					</Link>

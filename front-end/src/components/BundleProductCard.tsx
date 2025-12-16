@@ -1,5 +1,5 @@
 "use client"
-import { Button, Divider, Select, SelectItem } from '@nextui-org/react';
+import { Button, Select, SelectItem } from '@nextui-org/react';
 import React, { useState, useEffect } from 'react';
 import { ProductInDeal } from '@/lib/config/deal.config';
 import NoImage from './NoImage';
@@ -99,7 +99,7 @@ const BundleVariantFilter: React.FC<{
 
 				return attributeTerm.attribute.type === "select" ? (
 					<div key={attributeTerm.attribute.id} className="w-full">
-						<div>
+						<div className="hidden md:block">
 							<p className='text-content-1 md:text-h5 font-semibold !font-oswald text-black capitalize'>
 								{attributeTerm?.attribute.name}
 							</p>
@@ -109,15 +109,15 @@ const BundleVariantFilter: React.FC<{
 						</div>
 						<Select
 							size='sm'
-							className="w-[240px] md:w-[280px]"
+							className="w-full"
 							variant='bordered'
-							label={`Choose your ${attributeTerm?.attribute.name.toLowerCase()}`}
+							label={attributeTerm?.attribute.name.toLowerCase() === 'flavour' || attributeTerm?.attribute.name.toLowerCase() === 'flavor' ? 'Choose flavour' : `Choose your ${attributeTerm?.attribute.name.toLowerCase()}`}
 							selectedKeys={getDefaultSelectedTerm(attributeTerm.attribute.id) ? new Set([getDefaultSelectedTerm(attributeTerm.attribute.id)!]) : undefined}
 							classNames={{
-								label: "!text-content-1 !text-skin-neutral-500 !font-opensans",
-								trigger: "shadow-base border-skin-neutral-100 !rounded !w-[240px] md:!w-[280px]",
-								base: "!w-[240px] md:!w-[280px]",
-								mainWrapper: "!w-[240px] md:!w-[280px]",
+								label: "!text-content-1 !text-skin-neutral-500 !font-opensans truncate w-full max-[450px]:max-w-[120px]",
+								trigger: "shadow-base border-skin-neutral-100 !rounded !w-full md:!w-[280px] text-start truncate",
+								base: "!w-full md:!w-[280px]",
+								mainWrapper: "!w-full md:!w-[280px]",
 								listboxWrapper: "max-h-[400px] overflow-y-auto scroll-smooth",
 								listbox: "overflow-visible",
 							}}
@@ -469,7 +469,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 			</div>
 
 			{/* Mobile Card */}
-			<div className="bg-skin-white w-full rounded-md flex flex-col gap-2.5 md:hidden shadow-product-card">
+			<div className="bg-skin-white w-full rounded-md flex flex-col md:hidden shadow-product-card">
 				<Link
 					href={productLink}
 					className="bg-skin-neutral-50 rounded-t-md p-1.5"
@@ -482,21 +482,22 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 						className="w-full aspect-square mix-blend-multiply"
 					/>
 				</Link>
-				<div className="space-y-2 flex flex-col px-2.5 pb-2.5">
+				<div className="flex flex-col px-2.5 pb-2.5 pt-2 gap-2 h-full justify-between">
 					<Link href={productLink}>
-						<h4 className="text-content-1 sm:text-content-2 font-semibold text-skin-neutral-400 line-clamp-2 min-h-10">
+						<h4 className="text-content-1 font-semibold text-skin-neutral-500 line-clamp-2">
 							{name}
 						</h4>
 					</Link>
-					<div className="flex items-end gap-2.5">
+					<div className="flex items-center gap-2">
 						{/* Show discount price if it exists, otherwise show regular price */}
-						<p className="text-skin-neutral-500 text-content-1 font-semibold">
+						<p className="text-skin-neutral-500 text-content-1 font-bold">
 							{DEFAULT_CURRENCY_SYMBOL}
 							{productVariant?.discount_price || productVariant?.price || discount_price || price}
 						</p>
-						{/* Show strikethrough regular price only if discount exists */}
-						{((productVariant?.discount_price && productVariant?.regular_price) || (discount_price && regular_price)) && (
-							<p className="text-content-2 sm:text-content-1 text-skin-neutral-300 line-through font-normal">
+						{/* Show strikethrough regular price if it exists and is different, or if regular_price exists */}
+						{((productVariant?.regular_price && (productVariant?.regular_price !== (productVariant?.discount_price || productVariant?.price))) || 
+						  (regular_price && (regular_price !== (discount_price || price)))) && (
+							<p className="text-content-2 text-skin-neutral-500 line-through opacity-60 font-bold">
 								{DEFAULT_CURRENCY_SYMBOL}
 								{productVariant?.regular_price || regular_price}
 							</p>
@@ -522,12 +523,11 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 							)}
 						</>
 					) : null}
-					<Divider />
 					<Button
 						size="sm"
 						radius="sm"
 						color="primary"
-						className="btn primary-btn w-full shadow-input !rounded uppercase font-oswald text-content-1 !leading-none !h-9"
+						className="btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald text-content-1 !leading-none !h-9 !mt-1"
 						onPress={handleAddToCart}
 						isLoading={isAddingToCart}
 						isDisabled={!canAddToCart || isAddingToCart}

@@ -467,7 +467,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                             {product?.key_highlights &&
                             <div className='flex gap-1 items-center'>
                                 <DispatchIcon className='min-w-6'/>
-                                <p className='text-content-2 md:text-content-1 font-semibold red-gradient-100'>{product?.key_highlights}</p>
+                                <div className='text-content-2 md:text-content-1 font-semibold red-gradient-100' dangerouslySetInnerHTML={{ __html: product?.key_highlights ?? '' }}></div>
                             </div>
                             }
                             {product?.loyaltyPoints?.calculated !== undefined && (

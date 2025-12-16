@@ -124,8 +124,10 @@ const BundleVariantFilter: React.FC<{
 							}}
 							popoverProps={{
 								classNames: {
-									content: "max-h-[400px] overflow-hidden p-0",
-								}
+									content: "max-h-[400px] overflow-hidden p-0 !w-full md:!w-[280px]",
+								},
+								placement: "bottom-start",
+								offset: 5,
 							}}
 							onChange={(e) => {
 								const term = availableTerms.find(t => t.slug === e.target.value);
@@ -138,6 +140,10 @@ const BundleVariantFilter: React.FC<{
 								<SelectItem
 									key={term.slug}
 									value={term.slug}
+									classNames={{
+										base: "!w-full",
+										title: "!whitespace-normal !break-words !text-wrap",
+									}}
 								>
 									{term.name}
 								</SelectItem>

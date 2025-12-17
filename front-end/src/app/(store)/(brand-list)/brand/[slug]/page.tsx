@@ -24,6 +24,7 @@ const BrandPage: NextPage<Props> = async ({
   
   // Fetch dynamic page slug data
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
+  console.log('DynamicPageSlugResponse (brand):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return notFound();
   }

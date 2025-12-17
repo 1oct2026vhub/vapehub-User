@@ -20,6 +20,7 @@ const Page = async ({ params, searchParams }: {
 
   // Fetch dynamic page slug data
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
+  console.log('DynamicPageSlugResponse (product-deals):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return notFound();
   }
@@ -102,6 +103,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   // Fetch dynamic page slug data for metadata
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
+  console.log('DynamicPageSlugResponse (product-deals metadata):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return {
       title: 'Deal not found',

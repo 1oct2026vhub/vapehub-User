@@ -29,6 +29,7 @@ const Page = async ({
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
+  console.log('DynamicPageSlugResponse (product-listing):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return notFound();
   }
@@ -282,6 +283,7 @@ export async function generateMetadata({ params, searchParams }: {
 
 
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
+  console.log('DynamicPageSlugResponse (product-listing metadata):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return notFound();
   }
@@ -489,6 +491,78 @@ export async function generateMetadata({ params, searchParams }: {
           description: data.product.description,
           images: data.product.primary_image?.url ? [{
             url: data.product.primary_image?.url,
+            width: 1200,
+            height: 630
+          }] : undefined
+        }
+      };
+    },
+
+    brand: async () => {
+      if (dynamicPageSlug.seo) {
+        return {
+          title: dynamicPageSlug.seo.title,
+          description: dynamicPageSlug.seo.description,
+          openGraph: {
+            title: dynamicPageSlug.seo.title,
+            description: dynamicPageSlug.seo.description,
+            images: dynamicPageSlug.seo.ogImage ? [{
+              url: dynamicPageSlug.seo.ogImage,
+              width: 1200,
+              height: 630
+            }] : undefined
+          }
+        };
+      }
+      
+      // Use the new SEO meta API for brand
+      const seoMeta = await fetchSeoMetaBySlug(primarySlug);
+      if (!seoMeta) return null;
+
+      return {
+        title: `${seoMeta.name} | VapeHub`,
+        description: seoMeta.description,
+        openGraph: {
+          title: `${seoMeta.name} | VapeHub`,
+          description: seoMeta.description,
+          images: seoMeta.logo_url ? [{
+            url: seoMeta.logo_url,
+            width: 1200,
+            height: 630
+          }] : undefined
+        }
+      };
+    },
+
+    deal: async () => {
+      if (dynamicPageSlug.seo) {
+        return {
+          title: dynamicPageSlug.seo.title,
+          description: dynamicPageSlug.seo.description,
+          openGraph: {
+            title: dynamicPageSlug.seo.title,
+            description: dynamicPageSlug.seo.description,
+            images: dynamicPageSlug.seo.ogImage ? [{
+              url: dynamicPageSlug.seo.ogImage,
+              width: 1200,
+              height: 630
+            }] : undefined
+          }
+        };
+      }
+      
+      // Use the new SEO meta API for deal
+      const seoMeta = await fetchSeoMetaBySlug(primarySlug);
+      if (!seoMeta) return null;
+
+      return {
+        title: `${seoMeta.name} | VapeHub`,
+        description: seoMeta.description,
+        openGraph: {
+          title: `${seoMeta.name} | VapeHub`,
+          description: seoMeta.description,
+          images: seoMeta.logo_url ? [{
+            url: seoMeta.logo_url,
             width: 1200,
             height: 630
           }] : undefined

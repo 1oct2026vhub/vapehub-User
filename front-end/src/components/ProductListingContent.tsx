@@ -3,7 +3,7 @@ import React from 'react'
 import { Category } from '@/lib/config/category.config';
 import { BrandConfig } from '@/lib/config/brand.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
-// import Link from 'next/link';
+import Link from 'next/link';
 import NoImage from './NoImage';
 
 type CategoryProps = {
@@ -12,12 +12,15 @@ type CategoryProps = {
 }
 
 const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug}) => {
-    // Determine deals to display (prefer latest_deals, fallback to deals)
-    const dealsToDisplay = dynamicPageSlug?.latest_deals || dynamicPageSlug?.deals;
-    // Only render content if there's deals text or deals images
-    // if (!dynamicPageSlug?.deals_text && (!dealsToDisplay || dealsToDisplay.length === 0)) {
-    //     return null;
-    // }
+    // Only use banners from API - no fallback to deals
+    const banners = dynamicPageSlug?.banners || [];
+    
+    // Filter and sort banners with valid images
+    const validBanners = banners
+        .filter(banner => banner.image && banner.image.trim() !== '')
+        .sort((a, b) => a.order - b.order)
+        .slice(0, 3);
+    
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
@@ -29,36 +32,45 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
                     />
                 )}
             </div>
-            {dealsToDisplay && dealsToDisplay.length > 0 && (
+            {validBanners.length > 0 && (
                 <div className={`grid gap-3.5 ${
-                    dealsToDisplay.filter(banner => banner.image_url && banner.image_url.trim() !== '').length === 1 
+                    validBanners.length === 1 
                         ? 'grid-cols-1 justify-items-center' 
                         : 'grid-cols-1 md:grid-cols-3'
                 }`}>
-                    {dealsToDisplay
-                        .filter(banner => banner.image_url && banner.image_url.trim() !== '')
-                        .slice(0, 3)
-                        .map((banner, index) => (
-                        // <Link 
-                        //     href="#" 
-                        //     key={index} 
-                        //     aria-label={`View details of ${banner.name}`}
-                        //     className={dealsToDisplay.filter(banner => banner.image_url && banner.image_url.trim() !== '').length === 1 ? 'flex justify-center w-[30%]' : ''}
-                        // >
-                        <div
-                         key={index}
-                         className={dealsToDisplay.filter(banner => banner.image_url && banner.image_url.trim() !== '').length === 1 ? 'flex justify-center w-[30%]' : ''}
-                         >
-                            <NoImage
-                                src={banner.image_url || ''}
-                                alt={banner.name || ''}
-                                width={437}
-                                height={162}
-                                className="rounded-lg md:rounded-xl w-full max-h-[118px] md:max-h-40"
-                            />
+                    {validBanners.map((banner, index) => {
+                        const redirectUrl = banner.url && banner.url.trim() !== '' && banner.url !== '#' ? banner.url : null;
+                        
+                        return redirectUrl ? (
+                            <Link 
+                                href={redirectUrl} 
+                                key={index} 
+                                aria-label={banner.alt || 'Banner'}
+                                className={validBanners.length === 1 ? 'flex justify-center w-[30%]' : ''}
+                            >
+                                <NoImage
+                                    src={banner.image}
+                                    alt={banner.alt || ''}
+                                    width={437}
+                                    height={162}
+                                    className="rounded-lg md:rounded-xl w-full max-h-[118px] md:max-h-40"
+                                />
+                            </Link>
+                        ) : (
+                            <div
+                                key={index}
+                                className={validBanners.length === 1 ? 'flex justify-center w-[30%]' : ''}
+                            >
+                                <NoImage
+                                    src={banner.image}
+                                    alt={banner.alt || ''}
+                                    width={437}
+                                    height={162}
+                                    className="rounded-lg md:rounded-xl w-full max-h-[118px] md:max-h-40"
+                                />
                             </div>
-                        // </Link>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>

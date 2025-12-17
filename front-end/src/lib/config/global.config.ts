@@ -68,7 +68,7 @@ export interface SeoData {
 
 export interface DynamicPageSlugResponse {
     slug: string;
-    entity_type: "category" |  "product" | "blog" | "blog_category";
+    entity_type: "category" |  "product" | "blog" | "blog_category" | "brand" | "deal";
     entity_id: number; 
     seo: SeoData | null;
     description?: string;
@@ -91,6 +91,12 @@ export interface DynamicPageSlugResponse {
         createdAt: string;
     }>;
     deals_text?: string;
+    banners?: Array<{
+        image: string;
+        alt: string;
+        url: string;
+        order: number;
+    }>;
 }
 
 export type FlashNewsResponse = FlashNewsItem[];

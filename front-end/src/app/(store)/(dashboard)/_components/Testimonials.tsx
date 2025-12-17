@@ -13,8 +13,6 @@ const Testimonials: FunctionComponent<TestimonialsProps> = async ({
     title = "Your Stamp of Approval",
 }): AsyncReactElement => {
     const response = await getTrustpilotReviews({ page: 1, per_page: 20 });
- console.log("Reviews response",response);
-
     if (response.status === ServerActionStatus.ERROR) {
         return <p>{response.message}</p>;
     }

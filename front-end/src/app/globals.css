@@ -496,6 +496,25 @@ input[type="checkbox"] + span {
   font-weight: 500;
 }
 
+.ck-content a,
+.rich-text a {
+  color: #000000 !important;
+  text-decoration: underline !important;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.ck-content a:hover,
+.rich-text a:hover {
+  color: #000000 !important;
+  text-decoration: underline !important;
+}
+
+/* .ck-content a:visited,
+.rich-text a:visited {
+  color: #551a8b !important;
+} */
+
 .product-listing-container .product-content {
   @apply text-skin-neutral-400 !text-title-2;
 }

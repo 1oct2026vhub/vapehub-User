@@ -755,7 +755,8 @@ export interface LinkedProduct {
   slug: string;
   description: string;
   price: string | number;
-  discount_price: string | number;
+  regular_price?: string | number;
+  discount_price?: string | number;
   status: string;
   image: {
     id: number;

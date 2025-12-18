@@ -190,7 +190,7 @@ type BundleProductCardProps = {
 };
 
 const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ product }) => {
-	const { name, primary_image, image, price, discount_price, regular_price, slug, id } = product;
+	const { name, primary_image, image, discount_price, regular_price, slug, id } = product;
 	const productLink = `/${slug}`;
 	const { addItemToCart } = useCart();
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -460,7 +460,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 									<>
 										<p className="primary-gradient-100 text-title-1 md:text-h5 font-semibold !font-oswald">
 											{DEFAULT_CURRENCY_SYMBOL}
-											{variantDiscountPrice || propDiscountPrice || productVariant?.price || price}
+											{variantDiscountPrice || propDiscountPrice}
 										</p>
 										{(productVariant?.regular_price || regular_price) && (
 											<p className="text-skin-neutral-300 text-title-2 xl:text-title-1 line-through font-bold">
@@ -474,7 +474,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 							return (
 								<p className="primary-gradient-100 text-title-1 md:text-h5 font-semibold !font-oswald">
 									{DEFAULT_CURRENCY_SYMBOL}
-									{productVariant?.price || price}
+									{productVariant?.regular_price || regular_price}
 								</p>
 							);
 						})()}
@@ -526,7 +526,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 									<>
 										<p className="text-skin-neutral-500 text-content-1 font-bold">
 											{DEFAULT_CURRENCY_SYMBOL}
-											{variantDiscountPrice || propDiscountPrice || productVariant?.price || price}
+											{variantDiscountPrice || propDiscountPrice}
 										</p>
 										{(productVariant?.regular_price || regular_price) && (
 											<p className="text-content-2 text-skin-neutral-500 line-through opacity-60 font-bold">
@@ -540,7 +540,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 							return (
 								<p className="text-skin-neutral-500 text-content-1 font-bold">
 									{DEFAULT_CURRENCY_SYMBOL}
-									{productVariant?.price || price}
+									{productVariant?.regular_price || regular_price}
 								</p>
 							);
 						})()}

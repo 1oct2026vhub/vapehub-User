@@ -165,7 +165,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             }
         }
     };
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
         setInputValue(value);
@@ -581,8 +580,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                                 slug: linkedProduct.slug,
                                 description: linkedProduct.description,
                                 price: String(linkedProduct.price),
-                                regular_price: String(linkedProduct.price),
-                                discount_price: linkedProduct.discount_price ? String(linkedProduct.discount_price) : String(linkedProduct.price),
+                                regular_price: String(linkedProduct.regular_price),
+                                discount_price: linkedProduct.discount_price ? String(linkedProduct.discount_price) : '0.00',
                                 stock_quantity: null,
                                 created_at: linkedProduct.created_at,
                                 updated_at: linkedProduct.updated_at,

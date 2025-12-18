@@ -34,7 +34,24 @@ export const ProductListingActionsWeb: React.FC<ProductListingActionsWebProps> =
     isFilterVisible = true,
     onFilterToggle
 }) => {
-    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([initialValue]));
+    // Normalize initialValue to a valid option value, defaulting to "popularity"
+    const getValidInitialValue = (value: string | undefined): string => {
+        if (!value || value === "Sort By") {
+            return "popularity"; // Default to Popularity
+        }
+        // Check if the value exists in sortByOptions
+        const isValid = sortByOptions.some(option => option.value === value);
+        return isValid ? value : "popularity"; // Default to "popularity" if invalid
+    };
+
+    const validInitialValue = getValidInitialValue(initialValue);
+    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([validInitialValue]));
+
+    // Update selectedKeys when initialValue changes (e.g., from URL params)
+    React.useEffect(() => {
+        const newValidValue = getValidInitialValue(initialValue);
+        setSelectedKeys(new Set([newValidValue]));
+    }, [initialValue]);
 
     const onChangeSortChange = (keys: Selection) => {
         const selected = Array.from(keys)[0];
@@ -54,7 +71,7 @@ export const ProductListingActionsWeb: React.FC<ProductListingActionsWebProps> =
                         endContent={<DownArrowIcon />}
                         className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
                     >
-                        {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label || initialValue}
+                        {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label || "Popularity"}
                     </Button>
                 </DropdownTrigger>
 
@@ -96,7 +113,25 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
 
    
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([initialValue]));
+    
+    // Normalize initialValue to a valid option value, defaulting to "popularity"
+    const getValidInitialValue = (value: string | undefined): string => {
+        if (!value || value === "Sort By") {
+            return "popularity"; // Default to Popularity
+        }
+        // Check if the value exists in sortByOptions
+        const isValid = sortByOptions.some(option => option.value === value);
+        return isValid ? value : "popularity"; // Default to "popularity" if invalid
+    };
+
+    const validInitialValue = getValidInitialValue(initialValue);
+    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([validInitialValue]));
+
+    // Update selectedKeys when initialValue changes (e.g., from URL params)
+    React.useEffect(() => {
+        const newValidValue = getValidInitialValue(initialValue);
+        setSelectedKeys(new Set([newValidValue]));
+    }, [initialValue]);
 
     const onChangeSortChange = (keys: Selection) => {
         const selected = Array.from(keys)[0];
@@ -125,7 +160,7 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
                         endContent={<DownArrowIcon />}
                         className="border-skin-neutral-500 text-content-1 font-extrabold text-skin-neutral-500 !px-4 !py-5"
                     >
-                        {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label || initialValue}
+                        {sortByOptions.find(option => option.value === Array.from(selectedKeys)[0])?.label || "Popularity"}
                     </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Static Actions"

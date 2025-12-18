@@ -5,10 +5,10 @@ export type SortByOption = {
 }
 
 export const sortByOptions: SortByOption[] = [
-    {
-        label: "Default",
-        value: "",
-    },
+    // {
+    //     label: "Default",
+    //     value: "",
+    // },
     {
         label: "Latest",
         value: "DESC",
@@ -16,6 +16,18 @@ export const sortByOptions: SortByOption[] = [
     {
         label: "Oldest",
         value: "ASC",
+    },
+    {
+        label: "Popularity",
+        value: "popularity",
+    },
+    {
+        label: "Price: Low to High",
+        value: "price_asc",
+    },
+    {
+        label: "Price: High to Low",
+        value: "price_desc",
     },
 ]
  

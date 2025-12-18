@@ -448,18 +448,36 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 				</div>
 				<div className="space-y-7 text-right">
 					<div>
-						{/* Show discount price if it exists, otherwise show regular price */}
-						<p className="primary-gradient-100 text-title-1 md:text-h5 font-semibold !font-oswald">
-							{DEFAULT_CURRENCY_SYMBOL}
-							{productVariant?.discount_price || productVariant?.price || discount_price || price}
-						</p>
-						{/* Show strikethrough regular price only if discount exists */}
-						{((productVariant?.discount_price && productVariant?.regular_price) || (discount_price && regular_price)) && (
-							<p className="text-skin-neutral-300 text-title-2 xl:text-title-1 line-through font-bold">
-								{DEFAULT_CURRENCY_SYMBOL}
-								{productVariant?.regular_price || regular_price}
-							</p>
-						)}
+						{/* Show discount price if it exists and is greater than zero, otherwise show regular price */}
+						{(() => {
+							const variantDiscountPrice = productVariant?.discount_price;
+							const propDiscountPrice = discount_price;
+							const hasValidDiscount = (variantDiscountPrice != null && Number(variantDiscountPrice) > 0) || 
+													  (propDiscountPrice != null && Number(propDiscountPrice) > 0);
+							
+							if (hasValidDiscount) {
+								return (
+									<>
+										<p className="primary-gradient-100 text-title-1 md:text-h5 font-semibold !font-oswald">
+											{DEFAULT_CURRENCY_SYMBOL}
+											{variantDiscountPrice || propDiscountPrice || productVariant?.price || price}
+										</p>
+										{(productVariant?.regular_price || regular_price) && (
+											<p className="text-skin-neutral-300 text-title-2 xl:text-title-1 line-through font-bold">
+												{DEFAULT_CURRENCY_SYMBOL}
+												{productVariant?.regular_price || regular_price}
+											</p>
+										)}
+									</>
+								);
+							}
+							return (
+								<p className="primary-gradient-100 text-title-1 md:text-h5 font-semibold !font-oswald">
+									{DEFAULT_CURRENCY_SYMBOL}
+									{productVariant?.price || price}
+								</p>
+							);
+						})()}
 					</div>
 					<Button
 						size="sm"
@@ -496,19 +514,36 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 						</h4>
 					</Link>
 					<div className="flex items-center gap-2">
-						{/* Show discount price if it exists, otherwise show regular price */}
-						<p className="text-skin-neutral-500 text-content-1 font-bold">
-							{DEFAULT_CURRENCY_SYMBOL}
-							{productVariant?.discount_price || productVariant?.price || discount_price || price}
-						</p>
-						{/* Show strikethrough regular price if it exists and is different, or if regular_price exists */}
-						{((productVariant?.regular_price && (productVariant?.regular_price !== (productVariant?.discount_price || productVariant?.price))) || 
-						  (regular_price && (regular_price !== (discount_price || price)))) && (
-							<p className="text-content-2 text-skin-neutral-500 line-through opacity-60 font-bold">
-								{DEFAULT_CURRENCY_SYMBOL}
-								{productVariant?.regular_price || regular_price}
-							</p>
-						)}
+						{/* Show discount price if it exists and is greater than zero, otherwise show regular price */}
+						{(() => {
+							const variantDiscountPrice = productVariant?.discount_price;
+							const propDiscountPrice = discount_price;
+							const hasValidDiscount = (variantDiscountPrice != null && Number(variantDiscountPrice) > 0) || 
+													  (propDiscountPrice != null && Number(propDiscountPrice) > 0);
+							
+							if (hasValidDiscount) {
+								return (
+									<>
+										<p className="text-skin-neutral-500 text-content-1 font-bold">
+											{DEFAULT_CURRENCY_SYMBOL}
+											{variantDiscountPrice || propDiscountPrice || productVariant?.price || price}
+										</p>
+										{(productVariant?.regular_price || regular_price) && (
+											<p className="text-content-2 text-skin-neutral-500 line-through opacity-60 font-bold">
+												{DEFAULT_CURRENCY_SYMBOL}
+												{productVariant?.regular_price || regular_price}
+											</p>
+										)}
+									</>
+								);
+							}
+							return (
+								<p className="text-skin-neutral-500 text-content-1 font-bold">
+									{DEFAULT_CURRENCY_SYMBOL}
+									{productVariant?.price || price}
+								</p>
+							);
+						})()}
 					</div>
 					{isLoading ? (
 						<div className="space-y-2">

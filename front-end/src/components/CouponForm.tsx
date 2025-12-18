@@ -285,7 +285,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                             type='submit'
                             isDisabled={!form.formState.isValid}
                         >
-                            Apply Code
+                            {form.formState.isSubmitting ? '' : 'Apply Code'}
                         </Button>
                 }
             </form>

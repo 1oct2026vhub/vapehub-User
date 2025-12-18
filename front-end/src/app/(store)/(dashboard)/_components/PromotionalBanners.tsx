@@ -56,10 +56,10 @@ const PromotionalBanners: React.FC = async () => {
         {sortedBanners[0] && (
           <BannerImage
             banner={sortedBanners[0]}
-            width={662}
-            height={573}
+            width={600}
+            height={600}
             priority
-            className='max-h-[573px]'
+            // className='max-h-[573px]'
           />
         )}
 
@@ -70,7 +70,7 @@ const PromotionalBanners: React.FC = async () => {
               banner={banner}
               width={662}
               height={274}
-              className='max-h-[274px] rounded-md md:rounded-lg'
+              className='h-full rounded-md md:rounded-lg max-h-[334px]'
             />
           ))}
         </div>
@@ -83,7 +83,7 @@ const PromotionalBanners: React.FC = async () => {
             width={361}
             height={361}
             priority
-            className='max-h-[361px]'
+            className=''
           />
         )}
         {sortedBanners.slice(1, 3).map((banner, index) => (

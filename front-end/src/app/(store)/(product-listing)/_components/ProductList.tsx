@@ -18,7 +18,7 @@ import {
   NON_VARIANT_FILTERS 
 } from '@/lib/config/product.config';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FunctionComponent, ReactElement, useState } from "react";
+import { FunctionComponent, ReactElement, useState, useEffect } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
@@ -58,6 +58,19 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { getFilterParams, getAppliedFilters, removeFilter, updateFilters, clearAllFilters } = useProductFilters();
+
+  // Set default sort_by=popularity in URL if not present
+  useEffect(() => {
+    const sortBy = searchParams.get("sort_by");
+    const order = searchParams.get("order");
+    
+    // If no sort_by and no order params, set default to popularity
+    if (!sortBy && !order) {
+      const params = new URLSearchParams(searchParams);
+      params.set("sort_by", "popularity");
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  }, []); // Run only once on mount
 
   const productAttributeTerms: AttributeTerms[] = (data?.attributes || [])
     .filter(attr => attr.attribute?.is_visible === true);
@@ -211,13 +224,65 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
     scrollToTop();
   };
 
+  // Helper function to get sort value from URL params
+  const getSortValueFromParams = (): string => {
+    const sortBy = searchParams.get("sort_by");
+    const order = searchParams.get("order");
+    
+    // If no params, return "popularity" as default
+    if (!sortBy && !order) {
+      return "popularity";
+    }
+    
+    // Handle price sorting
+    if (sortBy === "price") {
+      if (order === "ASC") {
+        return "price_asc";
+      } else if (order === "DESC") {
+        return "price_desc";
+      }
+    }
+    
+    // Handle popularity
+    if (sortBy === "popularity") {
+      return "popularity";
+    }
+    
+    // Handle legacy order-only params (for backward compatibility)
+    // Latest: order=DESC without sort_by
+    // Oldest: order=ASC without sort_by
+    if (!sortBy && order) {
+      return order; // "ASC" or "DESC"
+    }
+    
+    return "popularity"; // Default to popularity if no match
+  };
+
   const handleSortChange = (sort: string) => {
     const params = new URLSearchParams(searchParams);
-    if (!sort) {
+    
+    if (!sort || sort === "") {
+      // Default: set to popularity
+      params.set("sort_by", "popularity");
       params.delete("order");
-    } else {
+    } else if (sort === "popularity") {
+      // Popularity: sort_by=popularity
+      params.set("sort_by", "popularity");
+      params.delete("order");
+    } else if (sort === "price_asc") {
+      // Price Low to High: sort_by=price, order=ASC
+      params.set("sort_by", "price");
+      params.set("order", "ASC");
+    } else if (sort === "price_desc") {
+      // Price High to Low: sort_by=price, order=DESC
+      params.set("sort_by", "price");
+      params.set("order", "DESC");
+    } else if (sort === "ASC" || sort === "DESC") {
+      // Legacy: Only order param (Latest/Oldest)
+      params.delete("sort_by");
       params.set("order", sort);
     }
+    
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     // Scroll to top after sort change
     scrollToTop();
@@ -247,14 +312,14 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
         <div className="flex flex-col gap-7.5 md:gap-9 w-full">
           <ProductListingActionsWeb
             onSortChange={handleSortChange}
-            initialValue={searchParams.get("order") ?? "Sort By"}
+            initialValue={getSortValueFromParams()}
             isFilterVisible={isFilterVisible}
             onFilterToggle={() => setIsFilterVisible(!isFilterVisible)}
             
           />
           <ProductListingActionsMob
             onSortChange={handleSortChange}
-            initialValue={searchParams.get("order") ?? "Sort By"}
+            initialValue={getSortValueFromParams()}
             appliedFilters={appliedFilters}
             onRemoveFilter={handleRemoveFilter}
             filterOptions={filterOptions}

@@ -34,7 +34,8 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
   const derivedName =
     data?.name?.trim() ||
     data?.category?.[0]?.name ||
-    dynamicPageSlug?.slug && formatSlugToTitle(dynamicPageSlug.slug) ||
+    dynamicPageSlug?.name?.trim() ||
+    (dynamicPageSlug?.slug && formatSlugToTitle(dynamicPageSlug.slug)) ||
     "";
 
   const derivedSlug = data?.slug || data?.category?.[0]?.slug || dynamicPageSlug?.slug || "";

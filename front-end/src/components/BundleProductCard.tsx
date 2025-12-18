@@ -190,7 +190,7 @@ type BundleProductCardProps = {
 };
 
 const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ product }) => {
-	const { name, primary_image, image, price, discount_price, regular_price, slug, id } = product;
+	const { name, primary_image, image, discount_price, regular_price, slug, id } = product;
 	const productLink = `/${slug}`;
 	const { addItemToCart } = useCart();
 	const [isAddingToCart, setIsAddingToCart] = useState(false);

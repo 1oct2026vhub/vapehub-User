@@ -74,6 +74,16 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
     
     const restoreScroll = () => {
       try {
+        // Check if we're navigating to landing page from logo click
+        const skipRestore = sessionStorage.getItem('skipScrollRestore_/');
+        if (skipRestore && pathname === '/') {
+          // Clear the flag and ensure we're at top
+          sessionStorage.removeItem('skipScrollRestore_/');
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          isRestoringRef.current = false;
+          return;
+        }
+        
         const savedPosition = sessionStorage.getItem(`scrollPos_${pageKey}`);
         if (savedPosition) {
           const position = parseInt(savedPosition, 10);
@@ -121,7 +131,7 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, [pageKey]);
+  }, [pageKey, pathname]);
 
   return <>{children}</>;
 }

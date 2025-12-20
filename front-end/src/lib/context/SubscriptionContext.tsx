@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getMailSubscriptionSettings } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
-import { loadEnvFile } from 'node:process';
 
 interface SubscriptionSettings {
   id: number;

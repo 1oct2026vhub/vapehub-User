@@ -9,6 +9,7 @@ export const useUserProfile = () => {
   const [error, setError] = useState<string | null>(null)
 
   const fetchProfile = useCallback(async (): Promise<UserProfileResponse | null> => {
+    console.log('fetchProfile', fetchProfile)
     setIsLoading(true)
     try {
       const response = await getUserProfile()
@@ -18,6 +19,7 @@ export const useUserProfile = () => {
         
       return response.data
     } catch (err) {
+      console.log('fetchProfile', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch profile')
       return null
     } finally {

@@ -10,16 +10,16 @@ export const sortByOptions: SortByOption[] = [
     //     value: "",
     // },
     {
+        label: "Popularity",
+        value: "popularity",
+    },
+    {
         label: "Latest",
         value: "DESC",
     },
     {
         label: "Oldest",
         value: "ASC",
-    },
-    {
-        label: "Popularity",
-        value: "popularity",
     },
     {
         label: "Price: Low to High",

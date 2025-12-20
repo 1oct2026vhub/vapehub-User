@@ -7,9 +7,21 @@ import { redirect } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
 
 const LoyaltyPointsPage = async () => {
+  console.log('[LoyaltyPointsPage] Starting to fetch loyalty points redemption');
   const response = await getLoyaltyPointsRedemption();
+  console.log('[LoyaltyPointsPage] Response received:', {
+    status: response.status,
+    hasData: response.status === ServerActionStatus.SUCCESS ? !!response.data : false,
+    message: response.status === ServerActionStatus.ERROR ? response.message : undefined,
+    fullResponse: response
+  });
 
   if (response.status === ServerActionStatus.ERROR) {
+    console.error('[LoyaltyPointsPage] Error response:', {
+      status: response.status,
+      message: response.message,
+      errorData: 'errorData' in response ? response.errorData : undefined
+    });
     // Check if the error is due to unauthorized session
     if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
       // Redirect to login page for unauthorized sessions
@@ -23,6 +35,7 @@ const LoyaltyPointsPage = async () => {
   }
 
   const loyaltyPointsData = response.data;
+  console.log('[LoyaltyPointsPage] Success! Loyalty points data:', loyaltyPointsData);
 
   return (
     <div className="space-y-6">

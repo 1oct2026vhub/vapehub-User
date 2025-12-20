@@ -238,13 +238,28 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   
   useEffect(() => {
     const fetchLoyaltyPoints = async () => {
+        console.log('[CartContext] fetchLoyaltyPoints - Starting to fetch loyalty points redemption');
+        console.log('[CartContext] fetchLoyaltyPoints - isAuthenticated:', isAuthenticated);
+        
         // if (isAuthenticated) {
             // Add 2-second delay to handle database lag for loyalty points data
+            console.log('[CartContext] fetchLoyaltyPoints - Waiting 2 seconds before API call...');
             await new Promise(resolve => setTimeout(resolve, 2000));
             
+            console.log('[CartContext] fetchLoyaltyPoints - Calling getLoyaltyPointsRedemption...');
             const response = await getLoyaltyPointsRedemption();
+            console.log('[CartContext] fetchLoyaltyPoints - Response received:', {
+                status: response.status,
+                hasData: response.status === ServerActionStatus.SUCCESS ? !!response.data : false,
+                message: response.status === ServerActionStatus.ERROR ? response.message : undefined,
+                fullResponse: response
+            });
+            
             if (response.status === ServerActionStatus.SUCCESS) {
+                console.log('[CartContext] fetchLoyaltyPoints - Success! Setting loyalty redemption data:', response.data);
                 setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));
+            } else {
+                console.warn('[CartContext] fetchLoyaltyPoints - Failed with status:', response.status, 'Message:', response.message);
             }
         // }
     };

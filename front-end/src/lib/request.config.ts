@@ -48,13 +48,30 @@ export const handleRequest = async <T, G>(
     try {
       const headers = await buildHeaders(requestData, canCache);
       
+      // Log API call request
+      const hasPayloadData = ['POST', 'PUT', 'PATCH'].includes(method);
+      console.log(`[API Request] ${method} ${endpoint}`, {
+        method,
+        endpoint,
+        hasPayload: hasPayloadData,
+        canCache,
+      });
+      
       const response = await fetchWithRetry(endpoint, {
         method,
         headers,
         body: buildRequestBody(requestData),
         cache: canCache ? 'force-cache' : 'no-store',
         next: canCache ? { revalidate: 60 } : undefined,
-      }, MAX_RETRIES);   
+      }, MAX_RETRIES);
+      
+      // Log API call response
+      console.log(`[API Response] ${method} ${endpoint}`, {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+      });
+      
       const responseJson = await response.json();
 
       if (response.status === 401) {                
@@ -85,7 +102,16 @@ export const handleRequest = async <T, G>(
         let errMessage = "An unexpected error occurred"; // Default error message
         if (err instanceof Error) {
             errMessage = err.message; // ✅ Safe access to error message
-          } 
+          }
+      
+      // Log API call error
+      console.error(`[API Error] ${method} ${endpoint}`, {
+        method,
+        endpoint,
+        error: errMessage,
+        errorObject: err,
+      });
+      
       if (errMessage === UNAUTHORIZED_RESPONSE_NAME) {
         await handleUnauthorizedSession();
       }

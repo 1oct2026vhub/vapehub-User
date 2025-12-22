@@ -114,7 +114,7 @@ const Footer = async (): AsyncReactElement => {
       {/* Bottom Section */}
       <div className="border-t border-skin-primary-300 py-3 text-center">
         <p className="text-content-2 font-semibold text-skin-white font-oswald">
-          © Copyright 2024 VapeHub - All Rights Reserved
+          © Copyright {new Date().getFullYear()} VapeHub - All Rights Reserved
         </p>
       </div>
     </footer>

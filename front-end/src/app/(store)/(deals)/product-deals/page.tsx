@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { NextPage } from 'next';
 import { Pagination } from '@nextui-org/react';
 import BreadCrumbs from '@/components/BreadCrumbs';
@@ -8,13 +8,23 @@ import DealCard from '@/components/DealCard';
 import { Deal } from '@/lib/config/deal.config';
 import { getAllDeals } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import SuspenseLoader from '@/components/ui/SuspenseLoader';
 
-const AllDealsPage: NextPage = () => {
+// Disable static generation for this page since it uses dynamic search params
+export const dynamic = 'force-dynamic';
+
+const AllDealsContent: React.FC = () => {
     const [deals, setDeals] = useState<Deal[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const limit = 10;
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // Get current page from URL, default to 1
+    const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
     useEffect(() => {
         const fetchDeals = async () => {
@@ -29,19 +39,20 @@ const AllDealsPage: NextPage = () => {
         };
         fetchDeals();
     }, [currentPage]);
-    const breadcrumbs = [
-        { label: "Home", href: "/" },
-        { label: "Deals", href: "/deals", isActive: true },
-    ];
+
+    // Handle page change - update URL with page parameter
+    const handlePageChange = (page: number) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (page === 1) {
+            params.delete('page'); // Remove page param for page 1 to keep URL clean
+        } else {
+            params.set('page', page.toString());
+        }
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
     return (
-        <main className='flex flex-col'>
-            <section className="product-listing-container flex-col py-8">
-                <BreadCrumbs items={breadcrumbs} />
-                <div className='space-y-4 mt-4'>
-                    <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Shop a Deal</h1>
-                    <h2 className="text-content-2 md:text-title-1 text-skin-neutral-300 font-semibold">Fantastic deals, all year round!</h2>
-                </div>
-            </section>
+        <>
             <section className='border-t border-skin-neutral-200 product-listing-container py-8'>
                 {loading ? (
                     <div className="flex justify-center items-center min-h-[400px]">
@@ -69,19 +80,41 @@ const AllDealsPage: NextPage = () => {
                 )}
             </section>
             {totalPages > 1 && (
-                            <div className="flex justify-center mt-8">
-                                <Pagination
-                                    total={totalPages}
-                                    initialPage={1}
-                                    page={currentPage}
-                                    onChange={setCurrentPage}
-                                    showControls
-                                    classNames={{
-                                        cursor: "bg-skin-primary-500 text-white",
-                                    }}
-                                />
-                            </div>
-                        )}
+                <div className="flex justify-center mt-8">
+                    <Pagination
+                        total={totalPages}
+                        initialPage={1}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        showControls
+                        classNames={{
+                            cursor: "bg-skin-primary-500 text-white",
+                        }}
+                    />
+                </div>
+            )}
+        </>
+    );
+};
+
+const AllDealsPage: NextPage = () => {
+    const breadcrumbs = [
+        { label: "Home", href: "/" },
+        { label: "Deals", href: "/deals", isActive: true },
+    ];
+    
+    return (
+        <main className='flex flex-col'>
+            <section className="product-listing-container flex-col py-8">
+                <BreadCrumbs items={breadcrumbs} />
+                <div className='space-y-4 mt-4'>
+                    <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Shop a Deal</h1>
+                    <h2 className="text-content-2 md:text-title-1 text-skin-neutral-300 font-semibold">Fantastic deals, all year round!</h2>
+                </div>
+            </section>
+            <Suspense fallback={<SuspenseLoader height="min-h-[400px]" />}>
+                <AllDealsContent />
+            </Suspense>
         </main>
     );
 };

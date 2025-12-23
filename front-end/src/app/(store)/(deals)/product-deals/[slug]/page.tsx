@@ -95,10 +95,9 @@ const Page = async ({ params, searchParams }: {
   }
 
   const products = productsResponse.data?.products || [];
-  
-  if (products.length === 0) {
-    return notFound();
-  }
+  // if (products.length === 0) {
+  //   return notFound();
+  // }
 
   // If we don't have the deal object from getAllDeals, try to get it from dynamicPageSlug
   // The dynamicPageSlug response might contain deal information

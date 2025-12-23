@@ -1,6 +1,6 @@
 import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
 import { Metadata } from "next";

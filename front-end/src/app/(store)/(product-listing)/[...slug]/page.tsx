@@ -29,12 +29,12 @@ const Page = async ({
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
-  console.log('DynamicPageSlugResponse (product-listing):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return notFound();
   }
 
-  if (primarySlug && secondarySlug) {
+  // Only handle product variants when entity_type is "product" and there are two slugs
+  if (primarySlug && secondarySlug && dynamicPageSlug?.entity_type === 'product') {
     const response = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
     const variantTerms: AttributeTerms[] | undefined = response?.product.attribute_terms.filter((attrTerm: AttributeTerms) => attrTerm.attribute.used_in_variation === true);
     
@@ -99,7 +99,12 @@ const Page = async ({
       return blogs && <BlogListView selectedId={blogs.id.toString()} />;
     },
     blog: async () => {
-      const categoryBlogs = await fetchBlogByCategoryAndSlug(primarySlug);
+      // For blog posts with two slugs (category/blog), use the secondary slug (blog post slug)
+      // For single slug, use primary slug
+      const blogSlug = secondarySlug || primarySlug;
+      const categoryBlogs = await fetchBlogByCategoryAndSlug(blogSlug);
+      if (!categoryBlogs) {
+      }
       return categoryBlogs && <CategoryBlogs data={categoryBlogs} />;
     },
     category: async () => {
@@ -288,7 +293,8 @@ export async function generateMetadata({ params, searchParams }: {
     return notFound();
   }
 
-  if (primarySlug && secondarySlug) {
+  // Only handle product variants when entity_type is "product" and there are two slugs
+  if (primarySlug && secondarySlug && dynamicPageSlug?.entity_type === 'product') {
     const response = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
     const variant: AttributeProductTerms | null = response?.product.attribute_terms?.reduce((result: AttributeProductTerms | null, attrTerm: AttributeTerms) => {
       const matchingTerm = attrTerm.terms.find(term => term.slug === secondarySlug);
@@ -338,7 +344,7 @@ export async function generateMetadata({ params, searchParams }: {
     }
    
     
-    if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
+     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
       return notFound();
     }
      
@@ -356,6 +362,7 @@ export async function generateMetadata({ params, searchParams }: {
       }
     };
 
+  } else if (primarySlug && secondarySlug) {
   }
 
 
@@ -410,8 +417,12 @@ export async function generateMetadata({ params, searchParams }: {
           }
         };
       }
-      const categoryBlogs = await fetchBlogByCategoryAndSlug(primarySlug);
-      if (!categoryBlogs) return null;
+      // For blog posts with two slugs (category/blog), use the secondary slug (blog post slug)
+      const blogSlug = secondarySlug || primarySlug;
+      const categoryBlogs = await fetchBlogByCategoryAndSlug(blogSlug);
+      if (!categoryBlogs) {
+        return null;
+      }
 
       return {
         title: `${categoryBlogs.title} | VapeHub`,

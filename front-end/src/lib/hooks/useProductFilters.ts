@@ -2,7 +2,6 @@ import { AppliedFilters, AttributeTerms, NON_VARIANT_FILTERS as EXISTING_NON_VAR
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { ProductFilters } from "@/lib/config/product.config";
-import { scrollToTop } from "@/lib/utils/scrollToTop";
 
 export const NON_VARIANT_FILTERS = [
   ...EXISTING_NON_VARIANT_FILTERS,
@@ -64,9 +63,7 @@ export const useProductFilters = () => {
       }
     });
 
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });    
-    // Scroll to top after filter change
-    scrollToTop();
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [pathname, router, searchParams]);
 
   const getAppliedFilters = useCallback((attributes: AttributeTerms[]) => {
@@ -142,9 +139,7 @@ export const useProductFilters = () => {
   }, [getFilterParams, updateFilters]);
 
   const clearAllFilters = useCallback(() => {
-    router.replace(pathname, { scroll: false });    
-    // Scroll to top after clearing filters
-    scrollToTop();
+    router.replace(pathname, { scroll: false });
   }, [pathname, router]);
 
   return {

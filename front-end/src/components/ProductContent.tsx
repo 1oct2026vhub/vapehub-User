@@ -361,7 +361,7 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
                                                         const uniqueKey = `shipping-method-${method.id}-${method.display_text.replace(/\s+/g, '-')}-${index}`;
                                                         return (
                                                             <li key={uniqueKey}>
-                                                                {method.display_text}
+                                                              <div dangerouslySetInnerHTML={{ __html: method.display_text }} /> 
                                                             </li>
                                                         );
                                                     })}
@@ -379,7 +379,7 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
                         }}>
                             <CardBody className='p-0'>
                                 <div className='flex flex-col gap-7.5 pb-2'>
-                                    <h3 className='text-h5 lg:text-h3 primary-gradient-100 font-bold'>Reviews</h3>
+                                    <h3 className='text-h5 lg:text-h3 font-bold'>Reviews</h3>
                                     {loading ? (
                                         <p>Loading reviews...</p>
                                     ) : reviewData?.reviews && reviewData.reviews.length > 0 ? (

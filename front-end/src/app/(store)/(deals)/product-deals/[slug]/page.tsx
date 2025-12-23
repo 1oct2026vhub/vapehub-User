@@ -1,6 +1,6 @@
 import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
 import { Metadata } from "next";
@@ -95,10 +95,9 @@ const Page = async ({ params, searchParams }: {
   }
 
   const products = productsResponse.data?.products || [];
-  
-  if (products.length === 0) {
-    return notFound();
-  }
+  // if (products.length === 0) {
+  //   return notFound();
+  // }
 
   // If we don't have the deal object from getAllDeals, try to get it from dynamicPageSlug
   // The dynamicPageSlug response might contain deal information

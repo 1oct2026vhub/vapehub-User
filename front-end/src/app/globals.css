@@ -496,6 +496,84 @@ input[type="checkbox"] + span {
   font-weight: 500;
 }
 
+/* Product description heading styles - H1 to H6 with responsive sizes */
+.product-content h1 {
+  @apply !font-oswald;
+  font-size: 28px !important;
+  font-weight: 600 !important;
+}
+
+.product-content h2 {
+  @apply !font-oswald;
+  font-size: 24px !important;
+  font-weight: 600 !important;
+}
+
+.product-content h3 {
+  @apply !font-oswald;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  line-height: 100% !important;
+}
+
+.product-content h4 {
+  @apply !font-oswald;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+}
+
+.product-content h6 {
+  @apply !font-oswald;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* Tablet sizes (md: 768px and up) */
+@media (min-width: 768px) {
+  .product-content h1 {
+    font-size: 36px !important;
+  }
+
+  .product-content h2 {
+    font-size: 30px !important;
+  }
+
+  .product-content h3 {
+    font-size: 24px !important;
+  }
+
+  .product-content h4 {
+    font-size: 20px !important;
+  }
+
+  .product-content h6 {
+    font-size: 15px !important;
+  }
+}
+
+/* Desktop sizes (lg: 1024px and up) */
+@media (min-width: 1024px) {
+  .product-content h1 {
+    font-size: 44px !important;
+  }
+
+  .product-content h2 {
+    font-size: 36px !important;
+  }
+
+  .product-content h3 {
+    font-size: 28px !important;
+  }
+
+  .product-content h4 {
+    font-size: 22px !important;
+  }
+
+  .product-content h6 {
+    font-size: 16px !important;
+  }
+}
+
 .ck-content a,
 .rich-text a {
   color: #000000 !important;
@@ -711,7 +789,7 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
 /* CKEditor rich text defaults */
 .ck-content,
 .rich-text {
-  font-family: Arial, sans-serif;
+  /* font-family: Arial, sans-serif; */
   line-height: 1.5;
   color: inherit;
 }
@@ -1051,7 +1129,6 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
 		transform: rotate(360deg);
 	}
 }
-
 /* .table , tr, td { border : 1px solid #000 ! important; } */
 
 

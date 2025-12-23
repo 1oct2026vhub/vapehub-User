@@ -711,7 +711,7 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
 /* CKEditor rich text defaults */
 .ck-content,
 .rich-text {
-  font-family: Arial, sans-serif;
+  /* font-family: Arial, sans-serif; */
   line-height: 1.5;
   color: inherit;
 }

@@ -20,21 +20,51 @@ const Page = async ({ params, searchParams }: {
 
   // Fetch dynamic page slug data
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
-  console.log('DynamicPageSlugResponse (product-deals):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return notFound();
   }
 
-  const dealResponse = await getAllDeals();
+  // Try to fetch deals with a reasonable limit (API has validation limits, max seems to be around 100-200)
+  // We'll fetch in batches if needed
+  let deal: Deal | null = null;
+  const limit = 100; // Use a reasonable limit that the API accepts
+  let offset = 0;
+  let hasMore = true;
+  let allDeals: Deal[] = [];
   
-  if (dealResponse.status === ServerActionStatus.ERROR) {
-    return notFound();
+  // Fetch deals in batches until we find the deal or exhaust all pages
+  while (hasMore && !deal) {
+    const dealResponse = await getAllDeals({ limit, offset, deal_type: 'BUY_N_FOR_FIXED' }, false);    
+    if (dealResponse.status === ServerActionStatus.SUCCESS && dealResponse.data) {
+      const batchDeals = dealResponse.data.deals || [];
+      allDeals = [...allDeals, ...batchDeals];      
+      // Check if we found the deal in this batch
+      deal = batchDeals.find((d: Deal) => d.slug.replace(/ /g, '-') === slug) || null;
+      
+      if (deal) {
+        break;
+      }
+      
+      // Check if there are more pages
+      const pagination = dealResponse.data.pagination;
+      hasMore = pagination?.has_next || false;
+      offset += limit;
+      
+      // Safety check: don't loop forever
+      if (offset > 1000) {
+        hasMore = false;
+      }
+    } else {
+      hasMore = false;
+    }
   }
-
-  const deal = dealResponse.data.deals.find((d: Deal) => d.slug.replace(/ /g, '-') === slug);
   
-  if (!deal) {
-    return notFound();
+  // Log all deal slugs for comparison (first 20 to avoid console spam)
+  if (allDeals.length > 0) {
+    allDeals.slice(0, 20).forEach((d: Deal) => {
+      const normalizedSlug = d.slug.replace(/ /g, '-');
+      console.log(`  - ${normalizedSlug} ${normalizedSlug === slug ? '(MATCH)' : ''}`);
+    });
   }
 
   const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
@@ -59,25 +89,90 @@ const Page = async ({ params, searchParams }: {
     }, { ...defaultParams });
     
   const combinedParams = { ...defaultParams, ...variantParams };
-
   const productsResponse = await getProductsByDealSlug(slug, combinedParams);
-  if (productsResponse.status === ServerActionStatus.ERROR || !productsResponse.data?.products) {
+  if (productsResponse.status === ServerActionStatus.ERROR) {
     return notFound();
   }
 
-  const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = productsResponse.status === ServerActionStatus.SUCCESS && productsResponse.data.products ? await Promise.all(
-    productsResponse.data.products.map(p => getReviewOrderByProductId(p.id, 1, 1))
+  const products = productsResponse.data?.products || [];
+  
+  if (products.length === 0) {
+    return notFound();
+  }
+
+  // If we don't have the deal object from getAllDeals, try to get it from dynamicPageSlug
+  // The dynamicPageSlug response might contain deal information
+  if (!deal && dynamicPageSlug?.deals && dynamicPageSlug.deals.length > 0) {
+    const dealFromSlug = dynamicPageSlug.deals.find((d) => d.slug.replace(/ /g, '-') === slug);
+    if (dealFromSlug) {
+      // Convert the deal from dynamicPageSlug to the Deal type
+      deal = {
+        id: dealFromSlug.id,
+        name: dealFromSlug.name,
+        slug: dealFromSlug.slug,
+        deal_type: dealFromSlug.deal_type,
+        required_qty: dealFromSlug.required_qty,
+        get_qty: dealFromSlug.get_qty || null,
+        fixed_price: dealFromSlug.fixed_price,
+        discount_percent: dealFromSlug.discount_percent || null,
+        tiered_qty_json: dealFromSlug.tiered_qty_json || null,
+        valid_from: dealFromSlug.valid_from,
+        valid_to: dealFromSlug.valid_to,
+        createdAt: dealFromSlug.createdAt,
+        bundle_product_ids_json: dealFromSlug.bundle_product_ids_json 
+          ? (() => {
+              try {
+                return typeof dealFromSlug.bundle_product_ids_json === 'string' 
+                  ? JSON.parse(dealFromSlug.bundle_product_ids_json) 
+                  : dealFromSlug.bundle_product_ids_json;
+              } catch {
+                return null;
+              }
+            })()
+          : null,
+        image_url: dealFromSlug.image_url || undefined,
+      };
+    }
+  }
+  
+  // If still not found, try fetching without deal_type filter
+  // The deal might be a different type than BUY_N_FOR_FIXED
+  if (!deal) {    
+    // Try fetching without deal_type filter
+    const dealResponseWithoutType = await getAllDeals({ limit: 100, offset: 0 }, false);
+    if (dealResponseWithoutType.status === ServerActionStatus.SUCCESS && dealResponseWithoutType.data) {
+      const dealsWithoutType = dealResponseWithoutType.data.deals || [];
+      deal = dealsWithoutType.find((d: Deal) => d.slug.replace(/ /g, '-') === slug) || null;
+      
+      if (deal) {
+      }
+    }
+  }
+  
+  // Final check: if we still don't have a deal, return notFound
+  // We need the deal object for the component to work properly
+  if (!deal) {
+    return notFound();
+  }
+
+  const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = products.length > 0 ? await Promise.all(
+    products.map(p => getReviewOrderByProductId(p.id, 1, 1))
   ) : [];
+  
+  const responseData = productsResponse.data;
+  if (!responseData) {
+    return notFound();
+  }
   
   return <DealProduct 
     deal={deal} 
     data={{
-      products: productsResponse.data.products,
-      category: productsResponse.data.category_items,
-      brand: productsResponse.data.brand_items,
-      attributes: productsResponse.data.attributes,
-      price_ranges: productsResponse.data.price_ranges,
-      pagination: productsResponse.data.pagination
+      products: products,
+      category: responseData.category_items,
+      brand: responseData.brand_items,
+      attributes: responseData.attributes,
+      price_ranges: responseData.price_ranges,
+      pagination: responseData.pagination
     }} 
     reviews={reviews} 
     dynamicPageSlug={dynamicPageSlug}
@@ -88,10 +183,13 @@ export default Page;
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
+  
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
-  return response.data;
+  
+  const data = response.data;
+  return data || null;
 };
 
 export async function generateMetadata({ params, searchParams }: {

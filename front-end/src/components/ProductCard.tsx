@@ -53,8 +53,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   }, [title]);
   
   return (
-    <Link prefetch={false} href={link} className="block">
-      <div className="bg-skin-white rounded-md flex flex-col content-stretch shadow-mob-product-card md:shadow-product-card hover:shadow-card transition-all duration-300">
+    <Link prefetch={false} href={link} className="block h-full">
+      <div className="bg-skin-white rounded-md flex flex-col h-full shadow-mob-product-card md:shadow-product-card hover:shadow-card transition-all duration-300">
         <div className="relative p-1.5 md:py-6 md:px-3 bg-skin-neutral-50 rounded-t-md">
           <NoImage
             src={imageSrc}
@@ -79,13 +79,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }
 
         </div>
-        <div className="flex flex-col space-y-2.5 px-2.5 py-3 md:py-5">
-          <div className="flex flex-col justify-between gap-2.5">
-            <div className='min-h-[45px] md:min-h-[60px]'>
+        <div className="flex flex-col space-y-2.5 px-2.5 py-3 md:py-5 flex-grow">
+          <div className="flex flex-col justify-between gap-2.5 flex-grow">
+            <div className='h-[60px] md:h-[75px] flex flex-col justify-start'>
               <div className="relative">
                 <h4 
                   ref={titleRef}
-                  className="text-title-2 md:text-h5 text-skin-neutral-500 font-semibold line-clamp-2 xl:mr-8 cursor-pointer"
+                  className="text-title-2 md:text-h5 text-skin-neutral-500 font-semibold line-clamp-3 xl:mr-8 cursor-pointer"
                   onMouseEnter={() => isTitleTruncated && setShowTitleTooltip(true)}
                   onMouseLeave={() => setShowTitleTooltip(false)}
                 >
@@ -101,7 +101,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1 -mt-2">
+            <div className="flex items-center gap-1">
               <div className="flex items-center">
                 {Array.from({ length: 5 }, (_, i) => {
                   if (i < Math.round(averageRating)) {
@@ -110,14 +110,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   return <RatingStarEmpty key={i} className='w-3 md:w-4' />;
                 })}
               </div>
-              <p className="text-content-3 md:text-title-2 text-skin-neutral-400 font-semibold mt-0.5">({totalReviews} {totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
+              <p className="text-content-3 md:text-title-2 text-skin-neutral-400 font-semibold">({totalReviews} {totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
             </div>
           </div>
-          <div className='flex items-center justify-between'>
+          <div className='flex items-center justify-between min-h-[20px] md:min-h-[24px]'>
           <p className="text-content-3 md:text-content-1 text-skin-neutral-400 font-semibold md:font-bold h-3 md:h-4 xl:h-5">
             {flavors ? `${flavors} ${flavors > 1 ? 'Flavours' : 'Flavour'}` : ''}
           </p>
-          <div>
+          <div className="min-h-[20px] md:min-h-[24px] flex items-center">
             {outOfStock && (
               <p className="text-content-3 md:text-content-2 xl:text-content-1 text-red-500 font-bold">
                 Out of Stock

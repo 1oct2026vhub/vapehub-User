@@ -1,10 +1,8 @@
-// import Image from 'next/image'
 import React from 'react'
-// import { RightArrowIcon } from './Icons'
-import Image from 'next/image'
 import Link from 'next/link'
 import { BlogList, BlogContent } from '@/lib/config/blog.config'
 import { RightArrowIcon } from '@/components/Icons'
+import NoImage from '@/components/NoImage'
 
 type Props = {
     blog: BlogList | BlogContent
@@ -14,13 +12,13 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
     return (
         // <div dangerouslySetInnerHTML={{ __html: blog.content }} />
         <Link href={blog?.slug?.startsWith('/') ? blog.slug : `/${blog?.slug ?? ''}`} className='bg-skin-white p-4 items-start shadow-card hover:shadow-blog-card rounded-lg w-full'>
-            <div className='w-full max-h-60 rounded-lg mb-4.5'>
-                <Image
-                    src={blog.image_url ?? '/images/blog-list-card.jpg'}
+            <div className='min-h-60 flex justify-center items-center w-full max-h-60 rounded-lg mb-4.5 bg-white'>
+                <NoImage
+                    src={blog.image_url}
                     alt='Blog Card'
                     width={399}
                     height={240}
-                    className='rounded-lg w-full max-h-60 min-h-60'
+                    className='rounded-lg w-full max-h-60 object-contain'
                 />
             </div>
             <div className='flex gap-4 items-start justify-between mb-4 w-full'>

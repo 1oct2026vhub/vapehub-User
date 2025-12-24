@@ -146,8 +146,16 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
 
     // Render a single menu item with its children
     const renderMenuItem = (menuItem: HeaderMegaMenu, level = 0) => {
+        // Filter and sort children by order to maintain API order
         const visibleChildren = menuItem.children && menuItem.children.length > 0 
-            ? menuItem.children.filter(child => !child.hide_text) 
+            ? menuItem.children
+                .filter(child => !child.hide_text)
+                .sort((a, b) => {
+                    if (a.order !== undefined && b.order !== undefined) {
+                        return a.order - b.order;
+                    }
+                    return 0;
+                })
             : [];
 
         // Check if any item in this tree has the flags
@@ -222,40 +230,59 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
         );
     };
 
+    // Helper function to sort menu items by order field
+    const sortMenuItemsByOrder = (items: HeaderMegaMenu[]): HeaderMegaMenu[] => {
+        return [...items].sort((a, b) => {
+            // Sort by order field, maintaining API order
+            if (a.order !== undefined && b.order !== undefined) {
+                return a.order - b.order;
+            }
+            // If order is not defined, maintain original order
+            return 0;
+        }).map(item => {
+            // Recursively sort children as well
+            if (item.children && item.children.length > 0) {
+                return {
+                    ...item,
+                    children: sortMenuItemsByOrder(item.children)
+                };
+            }
+            return item;
+        });
+    };
+
     // Render menu items in columns with overflow handling
     const renderMenuColumns = (items: HeaderMegaMenu[]) => {
         const visibleItems = items.filter(item => !item.hide_text);
         if (visibleItems.length === 0) return null;
 
+        // Sort items by order to maintain API order
+        const sortedItems = sortMenuItemsByOrder(visibleItems);
+
         // Check if any items have children
-        const hasChildren = visibleItems.some(item => item.children && item.children.length > 0);
+        const hasChildren = sortedItems.some(item => item.children && item.children.length > 0);
 
         if (hasChildren) {
             // When items have children, always use 3 columns to display main menus as titles
-            const firstRowItems = visibleItems.slice(0, 3);
-            const remainingItems = visibleItems.slice(3);
+            // Display items in rows, flowing horizontally (left to right)
+            const itemsPerRow = 3;
+            const rows: HeaderMegaMenu[][] = [];
+            
+            for (let i = 0; i < sortedItems.length; i += itemsPerRow) {
+                rows.push(sortedItems.slice(i, i + itemsPerRow));
+            }
 
             return (
                 <div className="space-y-6">
-                    {/* First row with 3 columns */}
-                    <div className="grid grid-cols-3 gap-8">
-                        {Array.from({ length: 3 }, (_, colIdx) => (
-                            <div key={colIdx} className="space-y-4">
-                                {firstRowItems[colIdx] && renderMenuItem(firstRowItems[colIdx])}
-                            </div>
-                        ))}
-                    </div>
-                    
-                    {/* Remaining items in 3 columns */}
-                    {remainingItems.length > 0 && (
-                        <div className="grid grid-cols-3 gap-8">
-                            {Array.from({ length: 3 }, (_, colIdx) => (
+                    {rows.map((rowItems, rowIdx) => (
+                        <div key={rowIdx} className="grid grid-cols-3 gap-8">
+                            {Array.from({ length: itemsPerRow }, (_, colIdx) => (
                                 <div key={colIdx} className="space-y-4">
-                                    {remainingItems.filter((_, idx) => idx % 3 === colIdx).map(item => renderMenuItem(item))}
+                                    {rowItems[colIdx] && renderMenuItem(rowItems[colIdx])}
                                 </div>
                             ))}
                         </div>
-                    )}
+                    ))}
                 </div>
             );
         } else {
@@ -263,30 +290,57 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
             if (!shouldShowImageSection) {
                 // Dynamic column count based on item count for no image section
                 let columnCount = 1;
-                if (visibleItems.length >= 7) {
+                if (sortedItems.length >= 7) {
                     columnCount = 3;
-                } else if (visibleItems.length >= 4) {
+                } else if (sortedItems.length >= 4) {
                     columnCount = 2;
                 } else {
                     columnCount = 1;
                 }
 
+                // Display items in rows, flowing horizontally (left to right)
+                const itemsPerRow = columnCount;
+                const rows: HeaderMegaMenu[][] = [];
+                
+                for (let i = 0; i < sortedItems.length; i += itemsPerRow) {
+                    rows.push(sortedItems.slice(i, i + itemsPerRow));
+                }
+
+                // Use conditional classes for grid columns (Tailwind requires full class names)
+                const gridClass = columnCount === 3 ? 'grid-cols-3' : columnCount === 2 ? 'grid-cols-2' : 'grid-cols-1';
+
                 return (
-                    <div className={`grid grid-cols-${columnCount} gap-8`}>
-                        {Array.from({ length: columnCount }, (_, colIdx) => (
-                            <div key={colIdx} className="space-y-3">
-                                {visibleItems.filter((_, idx) => idx % columnCount === colIdx).map(item => renderMenuItem(item))}
+                    <div className="space-y-6">
+                        {rows.map((rowItems, rowIdx) => (
+                            <div key={rowIdx} className={`grid ${gridClass} gap-8`}>
+                                {Array.from({ length: itemsPerRow }, (_, colIdx) => (
+                                    <div key={colIdx} className="space-y-3">
+                                        {rowItems[colIdx] && renderMenuItem(rowItems[colIdx])}
+                                    </div>
+                                ))}
                             </div>
                         ))}
                     </div>
                 );
             } else {
                 // For image section: use 2 columns to maximize space
+                // Display items in rows, flowing horizontally (left to right)
+                const itemsPerRow = 2;
+                const rows: HeaderMegaMenu[][] = [];
+                
+                for (let i = 0; i < sortedItems.length; i += itemsPerRow) {
+                    rows.push(sortedItems.slice(i, i + itemsPerRow));
+                }
+
                 return (
-                    <div className="grid grid-cols-2 gap-6">
-                        {Array.from({ length: 2 }, (_, colIdx) => (
-                            <div key={colIdx} className="space-y-3">
-                                {visibleItems.filter((_, idx) => idx % 2 === colIdx).map(item => renderMenuItem(item))}
+                    <div className="space-y-6">
+                        {rows.map((rowItems, rowIdx) => (
+                            <div key={rowIdx} className="grid grid-cols-2 gap-6">
+                                {Array.from({ length: itemsPerRow }, (_, colIdx) => (
+                                    <div key={colIdx} className="space-y-3">
+                                        {rowItems[colIdx] && renderMenuItem(rowItems[colIdx])}
+                                    </div>
+                                ))}
                             </div>
                         ))}
                     </div>

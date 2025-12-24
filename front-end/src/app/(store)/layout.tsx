@@ -9,7 +9,7 @@ import { FlashNewsItem } from '@/lib/config/global.config';
 import HistoryProvider from "@/components/HistoryProvider";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL || ''),
+  metadataBase: new URL(process.env.NEXTAUTH_URL || ''),
   alternates: {
     canonical: './',
   },

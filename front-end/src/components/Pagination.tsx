@@ -3,7 +3,10 @@ import { Button, Pagination, PaginationItemRenderProps, PaginationItemType } fro
 import { LeftArrowIcon, MoreHorizontalIcon, RightArrowIcon } from "./Icons";
 import { cn } from "@/lib/utils";
 
-const renderItem = ({ ref, key, value, isActive, onNext, onPrevious, setPage }: PaginationItemRenderProps) => {
+const createRenderItem = (total: number, currentPage: number) => ({ ref, key, value, isActive, onNext, onPrevious, setPage }: PaginationItemRenderProps) => {
+    const isFirstPage = currentPage === 1;
+    const isLastPage = currentPage === total;
+    
     if (value === PaginationItemType.NEXT) {
         return (
             
@@ -14,6 +17,7 @@ const renderItem = ({ ref, key, value, isActive, onNext, onPrevious, setPage }: 
                 size="sm"
                 radius="sm"
                 isIconOnly
+                isDisabled={isLastPage}
                 className="bg-skin-neutral-50 rounded-10 !text-skin-neutral-500 !w-9 !h-9"
                 startContent={<RightArrowIcon stroke="#3A4340" className="w-4.5 h-4.5" />}
             />
@@ -29,6 +33,7 @@ const renderItem = ({ ref, key, value, isActive, onNext, onPrevious, setPage }: 
             size="sm"
             radius="sm"
             isIconOnly
+            isDisabled={isFirstPage}
             className="min-w-fit bg-skin-neutral-50 !w-9 !h-9 rounded-10 !p-2"
             
             startContent={<LeftArrowIcon stroke="#6B7270" className="" />}
@@ -85,7 +90,7 @@ type PaginationProps = {
             className="gap-2"
             page={currentPage}
             radius="full"
-            renderItem={renderItem}
+            renderItem={createRenderItem(total, currentPage)}
             total={total}
             variant="light"
             onChange={onPageChange}

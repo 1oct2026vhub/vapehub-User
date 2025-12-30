@@ -66,7 +66,7 @@ const AllDealsContent: React.FC = () => {
                                     key={deal.id}
                                     title={deal.name}
                                     imageSrc={deal.image_url || ""}
-                                    altText={deal.name}
+                                    altText={deal.alt_text ?? deal.name}
                                     href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
                                 />
                             ))}

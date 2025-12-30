@@ -23,7 +23,7 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
     <Link href={banner.redirect_url}>
       <NoImage
         src={banner.image_url}
-        alt={banner.title}
+        alt={banner.alt_text ?? banner.title}
         width={width}
         height={height}
         priority={priority}
@@ -38,7 +38,7 @@ BannerImage.displayName = 'BannerImage';
 
 const PromotionalBanners: React.FC = async () => {
   const bannersResponse = await getPromotionBanner();
-  
+  console.log("bannersResponseeee",bannersResponse);
   if (bannersResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load banners' />;
   }

@@ -11,6 +11,7 @@ import { RatingStarEmpty, RatingStarFilled } from './Icons';
 
 interface ProductCardProps {
   title: string;
+  altText?: string;
   imageSrc: string;
   price: string;
   buttonText: string;
@@ -26,6 +27,7 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({
   title,
+  altText,
   imageSrc,
   price,
   buttonText,
@@ -58,7 +60,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="relative p-1.5 md:py-6 md:px-3 bg-skin-neutral-50 rounded-t-md">
           <NoImage
             src={imageSrc}
-            alt={title}
+            alt={altText ?? title}
             width={275}
             height={275}
             className="w-full aspect-square rounded mix-blend-multiply"

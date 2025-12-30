@@ -64,6 +64,7 @@ const ProductsSlider: React.FC<ProductProps> = ({data, isListing = false, review
             <ProductCard
               title={product?.name} 
               imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ""}
+              altText={product.ProductImages?.find(img => img.is_primary)?.alt_text ?? product.ProductImages?.[0]?.alt_text ?? ""}
               price={product?.price}
               buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
               productId={product.id}

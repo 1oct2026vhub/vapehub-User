@@ -249,7 +249,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 attribute_terms: payload
             });
 
-            console.log('Product Details Response:', response);
 
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setProductData(response.data);
@@ -334,7 +333,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             }
         };
         fetchLinkedProducts();
-    }, [product.id]);    
+    }, [product.id]);  
+    console.log("productData",productData);
+    console.log("linkedProducts",linkedProducts);
+    
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
@@ -370,7 +372,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                     <div className='bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
                         <CustomImageMagnifier
                             src={mainImage?.url || ''}
-                            alt={product?.name || ''}
+                            alt={mainImage?.alt_text ?? product?.name ?? ''}
                             width={320}
                             height={396}
                             className='aspect-square  mix-blend-multiply'
@@ -400,7 +402,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                                         >
                                             <NoImage
                                                 src={image?.url}
-                                                alt={`product ${index}`}
+                                                alt={image?.alt_text ?? product?.name ?? `product ${index}`}
                                                 width={110}
                                                 height={100}
                                                 className={`lg:max-w-max cursor-pointer object-contain rounded shadow-brand-card shrink border border-skin-neutral-100 mix-blend-multiply`}

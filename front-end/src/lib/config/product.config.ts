@@ -48,6 +48,7 @@ export interface ProductImage {
     product_id?: number;
     image_url: string;
     is_primary: boolean;
+    alt_text?: string;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -165,6 +166,7 @@ export interface SimilarProduct extends Product {
         id: number;
         url: string;
         is_primary: boolean;
+        alt_text?: string | null;
     };
 }
 
@@ -267,6 +269,8 @@ export interface productAllImages {
     id: number;
     url: string;
     is_primary: boolean;
+    alt_text?: string | null;
+    sort_order?: number;
 }
 
 export interface Deal {

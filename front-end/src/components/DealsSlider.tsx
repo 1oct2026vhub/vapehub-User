@@ -17,6 +17,8 @@ const DealsSlider: React.FC = () => {
         };
         fetchDeals();
     }, []);
+    console.log("deals",deals);
+    
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {deals.map((deal) => (
@@ -24,7 +26,7 @@ const DealsSlider: React.FC = () => {
                     key={deal.id}
                     title={deal.name}
                     imageSrc={deal?.image_url ?? "/images/deal-placeholder.jpg"} // Placeholder image
-                    altText={deal.name}
+                    altText={deal.alt_text ?? deal.name}
                     href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
                 />
             ))}

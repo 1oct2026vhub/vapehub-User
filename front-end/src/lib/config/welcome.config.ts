@@ -4,6 +4,7 @@ export interface WelcomeContentData {
     title: string;
     content: string;
     image_url: string;
+    alt_text?: string;
     status: string;
     updated_by: number;
     createdAt: string;

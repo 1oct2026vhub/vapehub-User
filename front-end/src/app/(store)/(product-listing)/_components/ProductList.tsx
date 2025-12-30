@@ -330,11 +330,13 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
                   const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
                   const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
 
+                  const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
                   return (
                     <ProductCard
                       key={index}
                       title={product.name}
-                      imageSrc={product.ProductImages?.find(img => img.is_primary)?.image_url || product.ProductImages?.[0]?.image_url || ''}
+                      imageSrc={primaryImage?.image_url || ''}
+                      altText={primaryImage?.alt_text ?? product.name}
                       price={product.price}
                       buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
                       // flavors={product?.Flavors?.length}

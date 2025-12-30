@@ -19,6 +19,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
   currentProductId
 }): AsyncReactElement => {
   const response = await getMoreLikeThis({product_id: currentProductId, limit: 10, offset: 0});
+  console.log("responseRelatedProducts",response);
   if (response.status === ServerActionStatus.ERROR) {
     return <EmptyPlaceholder title='Uh, oh!' description={response.message} />
   }
@@ -30,6 +31,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
       ProductImages: p.primary_image ? [{
         id: p.primary_image.id,
         image_url: p.primary_image.url,
+        alt_text: p.primary_image.alt_text ?? "",
         is_primary: p.primary_image.is_primary,
       }] : [],
     })),

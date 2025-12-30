@@ -6,6 +6,7 @@ export interface CarouselConfig {
     image_url_low: string;
     title: string;
     description: string;
+    alt_text?: string;
     updated_by: number;
     createdAt: string;
     updatedAt: string;

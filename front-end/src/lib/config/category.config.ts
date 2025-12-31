@@ -5,6 +5,7 @@ export interface Category extends SubCategory {
     updated_by: string | null;    
     parent_id: number | null;
     logo_url: string;
+    alt_text?: string;
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;

@@ -40,8 +40,7 @@ const PopularCategories: FunctionComponent = async (): Promise<ReactElement> => 
       const description = popularCategory.description;
       const viewAllHref = `/${slug}`;
 
-      const catResponse = await getProductByCategory(slug, { sort_by: "id", order: "DESC", limit: 10, offset: 0, homepage: 1 });
-      
+      const catResponse = await getProductByCategory(slug, { order: "DESC", limit: 10, offset: 0, homepage: 1 });
       if (catResponse.status !== ServerActionStatus.SUCCESS) {
         return null;
       }

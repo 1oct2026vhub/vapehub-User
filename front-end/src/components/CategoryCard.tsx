@@ -7,12 +7,14 @@ interface CategoryCardProps {
   title: string;
   imageSrc?: string | null;
   link: string;
+  altText: string;
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({
   title,
   imageSrc,
-  link
+  link,
+  altText
 }) => {
   const isValidImageUrl = imageSrc && typeof imageSrc === 'string' && imageSrc.trim() !== '' && imageSrc.startsWith('http');
 
@@ -23,7 +25,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           <div className="w-[58px] h-[58px] aspect-square bg-white rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
             <Image
               src={imageSrc}
-              alt={`${title} Image`}
+              alt={altText}
               width={58}
               height={58}
               className="object-cover w-full h-full rounded-full"

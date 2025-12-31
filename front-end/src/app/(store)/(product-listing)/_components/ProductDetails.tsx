@@ -342,7 +342,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 {/* Title section mobile */}
                 <div className='space-y-2 lg:hidden'>
-                    <h1 className='text-h4 text-skin-neutral-500 font-semibold'>{product?.name}</h1>
+                    <h1 className='text-h4 text-skin-neutral-500 font-semibold'>{productName}</h1>
                     <div className='block text-content-1 text-skin-neutral-500 w-fit'>
                         Brand:
                         {product?.product_brands?.map((brand, index) => (

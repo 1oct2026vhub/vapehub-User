@@ -23,6 +23,7 @@ const CategorySlider: React.FC<props> = ({ categories }): ReactElement => {
                         title={category.name}
                         imageSrc={category.logo_url || undefined}
                         link={category.slug}
+                        altText={category.alt_text ?? category.name}
                     />
                 ))
             }

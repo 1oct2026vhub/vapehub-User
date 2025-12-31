@@ -30,7 +30,7 @@ const HottestCollections: React.FC = async () => {
                     <BrandCard
                         key={index}
                         imageSrc={brand.logo_url}
-                        altText={brand.name}
+                        altText={brand.alt_text ?? brand.name}
                         href={ROUTES.BRAND.replace(':slug', brand.slug)}
                     />
                 ))}

@@ -5,6 +5,7 @@ export interface BrandConfig {
     slug: string;
     name: string;
     description?: string;
+    alt_text?: string;
     logo_url: string;
     createdAt: string;
     updatedAt: string;

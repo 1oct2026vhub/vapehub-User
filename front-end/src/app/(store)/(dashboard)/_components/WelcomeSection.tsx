@@ -6,13 +6,13 @@ import React from 'react'
 
 const WelcomeSection = async () => {
     const welcomeContentResponse = await getWelcomeContent();
+console.log('welcomeContentResponse', welcomeContentResponse);
 
     if (welcomeContentResponse.status === ServerActionStatus.ERROR || !welcomeContentResponse.data?.welcomeContent) {
         return null;
     }
 
-    const { title, content, image_url } = welcomeContentResponse.data.welcomeContent;
-
+    const { title, content, image_url ,alt_text} = welcomeContentResponse.data.welcomeContent;
     const titleParts = title.split(' ');
     const lastWord = titleParts.pop();
     const mainTitle = titleParts.join(' ');
@@ -37,7 +37,7 @@ const WelcomeSection = async () => {
                             src={image_url}
                             width={500}
                             height={500}
-                            alt={title}
+                            alt={alt_text ?? title}
                             className='w-full h-full object-cover rounded-md block'
                             priority={false}
                         />

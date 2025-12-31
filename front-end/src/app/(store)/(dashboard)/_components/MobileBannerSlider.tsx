@@ -38,7 +38,7 @@ const MobileBannerSlider: FunctionComponent<BannerSliderProps> = ({banners}) => 
         >
           <Image
             src={banner?.image_url_low || banner?.image_url}
-            alt={banner.title}
+            alt={banner?.alt_text ?? banner?.title}
             width={361}
             height={382}
             className="w-full h-full rounded-md object-fill max-[450px]:!aspect-square aspect-video !outline-none focus-visible:!outline-none"

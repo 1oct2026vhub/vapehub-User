@@ -139,6 +139,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     const productName = productVariant
         ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`
         : product?.name;
+console.log("productName",productName);
+console.log("productVariant",productVariant);
 
     const availableAttributes: AttributeTerms[] = productData.available_terms;
     const minQuantity = 1;
@@ -451,7 +453,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                                 <Button
                                     size="sm"
                                     radius="md"
-                                    className="btn primary-btn w-fit gap-1 cursor-pointer !min-w-fit text-content-1 md:text-title-1 !leading-none !font-bold !font-oswald uppercase !tap-highlight-transparent !px-1.5 !py-1 md:!px-4 md:!py-2 text-white"
+                                    className="btn primary-btn w-fit gap-1 !cursor-default !min-w-fit text-content-1 md:text-title-1 !leading-none !font-bold !font-oswald uppercase !tap-highlight-transparent !px-1.5 !py-1 md:!px-4 md:!py-2 text-white"
                                 >
                                      <span className='mr-0.5'>MIX & MATCH</span>
                                     {mixAndMatchDeal?.name}

@@ -43,14 +43,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const [showTitleTooltip, setShowTitleTooltip] = useState(false);
   const [isTitleTruncated, setIsTitleTruncated] = useState(false);
+  const [ratingMarginTop, setRatingMarginTop] = useState(0);
   const titleRef = useRef<HTMLParagraphElement>(null);
+  const titleContainerRef = useRef<HTMLDivElement>(null);
   
-  // Check if title is actually truncated
+  // Check if title is truncated and calculate spacing
   useEffect(() => {
-    if (titleRef.current) {
+    if (titleRef.current && titleContainerRef.current) {
       const element = titleRef.current;
+      const container = titleContainerRef.current;
       const isTruncated = element.scrollHeight > element.clientHeight;
       setIsTitleTruncated(isTruncated);
+      
+      // Calculate gap: container height - title height, with minimum gap
+      const containerHeight = container.clientHeight;
+      const titleHeight = element.offsetHeight;
+      const calculatedGap = containerHeight - titleHeight;
+      const minGap = 12; // Minimum 12px gap between name and rating
+      const gap = Math.max(minGap, calculatedGap);
+      setRatingMarginTop(gap);
     }
   }, [title]);
   
@@ -83,7 +94,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <div className="flex flex-col space-y-2.5 px-2.5 py-3 md:py-5 flex-grow">
           <div className="flex flex-col justify-between gap-2.5 flex-grow">
-            <div className='h-[60px] md:h-[75px] flex flex-col justify-start'>
+            <div ref={titleContainerRef} className='h-[60px] md:h-[75px] flex flex-col justify-start'>
               <div className="relative">
                 <h4 
                   ref={titleRef}
@@ -103,7 +114,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1" style={{ marginTop: `${ratingMarginTop}px` }}>
               <div className="flex items-center">
                 {Array.from({ length: 5 }, (_, i) => {
                   if (i < Math.round(averageRating)) {

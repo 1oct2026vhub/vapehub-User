@@ -52,11 +52,7 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
       /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i,
       "Please enter a valid UK postcode"
     ),
-    shippingRegion: z.string().min(1, 'Region is required')
-    .max(50, 'Region must not exceed 50 characters')
-    .refine((val) => val.trim().length > 0, {
-      message: "Region cannot be only whitespace"
-    }),
+    shippingRegion: z.string().optional(),
     shippingCountry: z.string().min(1, 'Country is required')
     .max(50, 'Country must not exceed 50 characters')
     .refine((val) => val.trim().length > 0, {
@@ -96,12 +92,7 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
       /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i,
       "Please enter a valid UK postcode"
     ),
-    billingRegion: !useShippingAsBilling ? z.string().optional() : z.string()
-    .min(1, 'Region is required')
-    .max(50, 'Region must not exceed 50 characters')
-    .refine((val) => val.trim().length > 0, {
-      message: "Region cannot be only whitespace"
-    }),
+    billingRegion: z.string().optional(),
     billingCountry: !useShippingAsBilling ? z.string().optional() : z.string()
     .min(1, 'Country is required')
     .max(50, 'Country must not exceed 50 characters')

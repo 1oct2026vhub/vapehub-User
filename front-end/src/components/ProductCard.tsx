@@ -43,25 +43,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const [showTitleTooltip, setShowTitleTooltip] = useState(false);
   const [isTitleTruncated, setIsTitleTruncated] = useState(false);
-  const [ratingMarginTop, setRatingMarginTop] = useState(0);
   const titleRef = useRef<HTMLParagraphElement>(null);
-  const titleContainerRef = useRef<HTMLDivElement>(null);
   
-  // Check if title is truncated and calculate spacing
+  // Check if title is truncated
   useEffect(() => {
-    if (titleRef.current && titleContainerRef.current) {
+    if (titleRef.current) {
       const element = titleRef.current;
-      const container = titleContainerRef.current;
       const isTruncated = element.scrollHeight > element.clientHeight;
       setIsTitleTruncated(isTruncated);
-      
-      // Calculate gap: container height - title height, with minimum gap
-      const containerHeight = container.clientHeight;
-      const titleHeight = element.offsetHeight;
-      const calculatedGap = containerHeight - titleHeight;
-      const minGap = 12; // Minimum 12px gap between name and rating
-      const gap = Math.max(minGap, calculatedGap);
-      setRatingMarginTop(gap);
     }
   }, [title]);
   
@@ -92,10 +81,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }
 
         </div>
-        <div className="flex flex-col space-y-2.5 px-2.5 py-3 md:py-5 flex-grow">
-          <div className="flex flex-col justify-between gap-2.5 flex-grow">
-            <div ref={titleContainerRef} className='h-[60px] md:h-[75px] flex flex-col justify-start'>
-              <div className="relative">
+        <div className="flex flex-col px-2.5 py-3 md:py-5 flex-grow">
+          <div className="flex flex-col flex-grow">
+            <div className='h-[108px] md:h-[127px] relative'>
+              <div className="relative h-full">
                 <h4 
                   ref={titleRef}
                   className="text-title-2 md:text-h5 text-skin-neutral-500 font-semibold line-clamp-3 xl:mr-8 cursor-pointer"
@@ -113,20 +102,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   </div>
                 )}
               </div>
-            </div>
-            <div className="flex items-center gap-1" style={{ marginTop: `${ratingMarginTop}px` }}>
-              <div className="flex items-center">
-                {Array.from({ length: 5 }, (_, i) => {
-                  if (i < Math.round(averageRating)) {
-                    return <RatingStarFilled key={i} className='w-3 md:w-4' />;
-                  }
-                  return <RatingStarEmpty key={i} className='w-3 md:w-4' />;
-                })}
+              <div className="flex items-center gap-1 absolute top-[84px] md:top-[99px]">
+                <div className="flex items-center">
+                  {Array.from({ length: 5 }, (_, i) => {
+                    if (i < Math.round(averageRating)) {
+                      return <RatingStarFilled key={i} className='w-3 md:w-4' />;
+                    }
+                    return <RatingStarEmpty key={i} className='w-3 md:w-4' />;
+                  })}
+                </div>
+                <p className="text-content-3 md:text-title-2 text-skin-neutral-400 font-semibold">({totalReviews} {totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
               </div>
-              <p className="text-content-3 md:text-title-2 text-skin-neutral-400 font-semibold">({totalReviews} {totalReviews <= 1 ? 'Review' : 'Reviews'})</p>
             </div>
           </div>
-          <div className='flex items-center justify-between min-h-[20px] md:min-h-[24px]'>
+          <div className='flex items-center justify-between min-h-[20px] md:min-h-[24px] mt-2.5'>
           <p className="text-content-3 md:text-content-1 text-skin-neutral-400 font-semibold md:font-bold h-3 md:h-4 xl:h-5">
             {flavors ? `${flavors} ${flavors > 1 ? 'Flavours' : 'Flavour'}` : ''}
           </p>
@@ -138,7 +127,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
         </div>
-          <div className="flex items-center justify-between gap-2 min-h-8 self-stretch">
+          <div className="flex items-center justify-between gap-2 min-h-8 self-stretch mt-2.5">
             <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
             {buttonText && (
               <div className="relative">

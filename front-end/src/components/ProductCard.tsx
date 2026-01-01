@@ -44,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [showTitleTooltip, setShowTitleTooltip] = useState(false);
   const [isTitleTruncated, setIsTitleTruncated] = useState(false);
   const titleRef = useRef<HTMLParagraphElement>(null);
-  
+
   // Check if title is truncated
   useEffect(() => {
     if (titleRef.current) {

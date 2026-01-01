@@ -136,8 +136,22 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     const regularPrice = Number(rawRegularPrice) || 0;
     // When sale price is zero, fall back to regular price for display only
     const effectivePrice = price > 0 ? price : (regularPrice > 0 ? regularPrice : 0);
+    
+    // Create a set of attribute IDs that are used in variation for filtering
+    const variationAttributeIds = useMemo(() => {
+        return new Set(
+            product?.attribute_terms
+                ?.filter(attr => attr.attribute.used_in_variation)
+                .map(attr => attr.attribute.id) ?? []
+        );
+    }, [product?.attribute_terms]);
+    
+    // Only include attributes that are used in variation when constructing product name
     const productName = productVariant
-        ? `${product?.name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`
+        ? `${product?.name} - ${productVariant.attributes
+            .filter(attr => variationAttributeIds.has(attr.attribute_id))
+            .map(attr => attr.term_name)
+            .join(', ')}`
         : product?.name;
 console.log("productName",productName);
 console.log("productVariant",productVariant);

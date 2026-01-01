@@ -65,7 +65,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
             height={275}
             className="w-full aspect-square rounded mix-blend-multiply"
           />
-
           {totalPuffs && (
             <div className='quantity'>
               <span>{totalPuffs}</span>

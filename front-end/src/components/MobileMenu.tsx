@@ -258,7 +258,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             <div className='text-center space-y-2'>
                                 <h2 className='primary-gradient-600 text-title-1 font-bold'>Customer Support Hours</h2>
                                 <div>
-                                    <p className='text-content-2 font-semibold text-skin-neutral-400'>10:00am - 3:30pm</p>
+                                    <p className='text-content-2 font-semibold text-skin-neutral-400'>10:00am - 4:00pm</p>
                                     <div className='text-content-2 font-semibold text-skin-neutral-400'>
                                         Email us: <Link href='mailto:customerservices@vapehub.co.uk' className=''>customerservices@vapehub.co.uk</Link>
                                     </div>

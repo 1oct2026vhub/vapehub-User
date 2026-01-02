@@ -638,7 +638,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                             name="shippingRegion"
                                             type='text'
                                             label='Region'
-                                            isRequired
                                             className='w-full'
                                         />
                                         <InputForm
@@ -738,7 +737,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                                 name="billingRegion"
                                                 type='text'
                                                 label='Region'
-                                                isRequired
                                                 className='w-full'
                                             />
                                             <InputForm

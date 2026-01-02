@@ -26,34 +26,6 @@ interface ApiFeature {
     } | null;
 }
 
-// Static fallback features
-const fallbackFeatures: Feature[] = [
-    {
-        id: 'delivery',
-        title: 'Free Delivery',
-        desc: 'Free delivery on UK orders £30 and over',
-        image: '/images/free-delivery.svg',
-    },
-    {
-        id: 'trustpilot',
-        title: 'Trustpilot',
-        desc: 'Trustpilot has rated Vapehub as Excellent!',
-        image: '/images/trustpilot.svg',
-        isTrustpilot: true,
-    },
-    {
-        id: 'offers',
-        title: 'Exclusive Offers',
-        desc: 'Subscribe to our newsletter for great deals',
-        image: '/images/exclusive-offers.svg',
-    },
-    {
-        id: 'loyalty',
-        title: 'Loyalty Scheme',
-        desc: 'Earn loyalty points and get cashback',
-        image: '/images/loyalty-scheme.svg',
-    },
-];
 
 interface ArrowProps {
     onClick?: () => void;
@@ -145,7 +117,7 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, totalStars = 5, starSiz
 };
 
 const HeaderFeatures: React.FC = () => {
-    const [features, setFeatures] = useState<Feature[]>(fallbackFeatures);
+    const [features, setFeatures] = useState<Feature[]>([]);
     const [trustpilotData, setTrustpilotData] = useState<{
         stars: number;
         ratingCategory: string;
@@ -160,45 +132,73 @@ const HeaderFeatures: React.FC = () => {
                     getTrustpilotReviews()
                 ]);
                 console.log("trustpilot response", trustpilotResponse);
+                console.log("features response", featuresResponse);
 
-                // Process feature content
+                // Process feature content - only set if API returns data
+                let apiFeatures: Feature[] = [];
                 if (featuresResponse.status === ServerActionStatus.SUCCESS && featuresResponse.data?.featureContent) {
-                    const apiFeatures: Feature[] = featuresResponse.data.featureContent.map((feature: ApiFeature) => ({
-                        id: feature.id,
-                        title: feature.title,
-                        desc: feature.subtitle,
-                        image: feature.icon?.icon_url || null,
-                        isTrustpilot: feature.title.toLowerCase().includes('trustpilot'),
-                        link: feature.link || null,
-                    }));
-                    
-                    // Ensure Trustpilot feature is always present at second position
-                    const hasTrustpilot = apiFeatures.some(f => f.isTrustpilot);
-                    if (!hasTrustpilot) {
-                        // Find and add the trustpilot fallback feature at index 1 (second position)
-                        const trustpilotFallback = fallbackFeatures.find(f => f.isTrustpilot);
-                        if (trustpilotFallback) {
-                            apiFeatures.splice(1, 0, trustpilotFallback);
-                        }
-                    }
-                    
-                    setFeatures(apiFeatures.length > 0 ? apiFeatures : fallbackFeatures);
+                    apiFeatures = featuresResponse.data.featureContent.map((feature: ApiFeature) => {
+                        const isTrustpilot = feature.title.toLowerCase().includes('trustpilot');
+                        return {
+                            id: feature.id,
+                            title: feature.title,
+                            desc: feature.subtitle,
+                            // Use static Trustpilot icon if it's a Trustpilot feature and no icon from API
+                            image: isTrustpilot && !feature.icon?.icon_url 
+                                ? '/images/trustpilot.svg' 
+                                : (feature.icon?.icon_url || null),
+                            isTrustpilot,
+                            link: feature.link || null,
+                        };
+                    });
                 }
 
                 // Process trustpilot data from API
+                let trustpilotFeature: Feature | null = null;
                 if (trustpilotResponse.status === ServerActionStatus.SUCCESS && 
                     trustpilotResponse.data?.overallStats?.scoreBreakdown) {
                     const scoreBreakdown = trustpilotResponse.data.overallStats.scoreBreakdown;
+                    console.log("scoreBreakdown", scoreBreakdown);
                     if (scoreBreakdown.stars && scoreBreakdown.ratingCategory) {
                         setTrustpilotData({
                             stars: scoreBreakdown.stars,
                             ratingCategory: scoreBreakdown.ratingCategory,
                         });
+                        
+                        // Check if Trustpilot feature already exists in apiFeatures
+                        const hasTrustpilot = apiFeatures.some(f => f.isTrustpilot);
+                        console.log("hasTrustpilot in features", hasTrustpilot);
+                        
+                        // If Trustpilot data is available but no Trustpilot feature exists, create one
+                        if (!hasTrustpilot) {
+                            trustpilotFeature = {
+                                id: 'trustpilot',
+                                title: 'Trustpilot',
+                                desc: `Trustpilot has rated Vapehub as ${scoreBreakdown.ratingCategory}!`,
+                                image: '/images/trustpilot.svg', // Static Trustpilot icon
+                                isTrustpilot: true,
+                                link: 'https://uk.trustpilot.com/review/vapehub.co.uk',
+                            };
+                            console.log("Created trustpilot feature", trustpilotFeature);
+                        }
                     }
+                }
+                
+                // Combine features: add Trustpilot feature at position 1 (second position) if it doesn't exist
+                if (trustpilotFeature && !apiFeatures.some(f => f.isTrustpilot)) {
+                    apiFeatures.splice(1, 0, trustpilotFeature);
+                }
+                
+                console.log("Final apiFeatures", apiFeatures);
+                console.log("trustpilotData state", trustpilotData);
+                
+                // Only set features if we have any
+                if (apiFeatures.length > 0) {
+                    setFeatures(apiFeatures);
                 }
             } catch (error) {
                 console.error('Error fetching header features data:', error);
-                // Keep static fallback data on error
+                // Don't set any features on error - component will render nothing
             }
         };
 
@@ -217,15 +217,18 @@ const HeaderFeatures: React.FC = () => {
         nextArrow: <ArrowNext />,
     };
 
+    // Don't render anything if there are no features
+    if (features.length === 0) {
+        return null;
+    }
+
     return (
         <div className="w-full bg-footer-gradient">
             {/* Desktop / tablet view */}
             <div className="hidden lg:flex items-center justify-between gap-6 px-4 lg:px-12 py-3 lg:py-5 text-white max-w-[1520px] mx-auto">
                 {features.map((f) => {
-                    // Determine the link to use: for Trustpilot, use API link if available, otherwise use hardcoded link
-                    const link = f.isTrustpilot 
-                        ? (f.link || "https://uk.trustpilot.com/review/vapehub.co.uk")
-                        : f.link;
+                    // Use the link from API data
+                    const link = f.link;
                     
                     const isExternalLink = link && (link.startsWith('http://') || link.startsWith('https://'));
                     const isRelativeLink = link && link.startsWith('/');
@@ -295,10 +298,8 @@ const HeaderFeatures: React.FC = () => {
             <div className="lg:hidden text-white">
                 <Slider {...settings} className="py-2.5">
                     {features.map((f) => {
-                        // Determine the link to use: for Trustpilot, use API link if available, otherwise use hardcoded link
-                        const link = f.isTrustpilot 
-                            ? (f.link || "https://uk.trustpilot.com/review/vapehub.co.uk")
-                            : f.link;
+                        // Use the link from API data
+                        const link = f.link;
                         
                         const isExternalLink = link && (link.startsWith('http://') || link.startsWith('https://'));
                         const isRelativeLink = link && link.startsWith('/');

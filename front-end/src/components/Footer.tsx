@@ -93,7 +93,7 @@ const Footer = async (): AsyncReactElement => {
             <div className='space-y-4 mt-2'>
                 <div>
                   <p className='text-content-2 font-semibold text-skin-neutral-100'>Call us: 07508 373773</p>
-                  <p className='text-content-2 font-semibold text-skin-neutral-100'>Support team available 10am to 3pm Monday to Friday</p>
+                  <p className='text-content-2 font-semibold text-skin-neutral-100'>Support team available 10am to 4pm Monday to Friday</p>
                 </div>
                 <div>
                   <p className='text-content-2 font-semibold text-skin-neutral-100'>VH International Limited</p>

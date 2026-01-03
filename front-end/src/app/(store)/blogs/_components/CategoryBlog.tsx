@@ -25,6 +25,7 @@ const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
   if (!data) {
     return <EmptyPlaceholder title='Uh, oh!' description='No blogs found' />
   }
+  console.log("blog data", data);
   
   const breadcrumbs = [ 
     { label: "Home", href: ROUTES.WELCOME },
@@ -46,7 +47,7 @@ const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
       <BreadCrumbs items={breadcrumbs} />
       <Image
         src={data.image_url ?? '/images/blog-list-card.jpg'}
-        alt={data.title ?? 'Blog Image'}
+        alt={data.alt_text ?? data.title}
         width={0}
         height={0}
         sizes="100vw"

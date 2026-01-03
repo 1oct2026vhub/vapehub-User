@@ -5,6 +5,7 @@ interface BaseBlogEntity {
     slug: string;
     description: string;
     image_url: string;
+    alt_text?: string;
 }
 
 // Base interface for timestamp and deletion fields
@@ -30,6 +31,7 @@ export interface BlogContent extends TimeStampFields {
     slug: string;
     content: string;
     image_url: string;
+    alt_text?: string;
     author_id: number;
     published_at: string;
     author: Author;

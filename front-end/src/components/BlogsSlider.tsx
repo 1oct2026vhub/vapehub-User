@@ -66,7 +66,7 @@ const BlogsSlider: FunctionComponent<BlogProps> = ({ data }) => {
             <Image
               src={blog.image_url ?? "/images/blog-card.jpg"}
               loading="lazy"
-              alt={blog.name}
+              alt={blog.alt_text ?? blog.name}
               width={isTwoBlogs ? 600 : 400}
               height={isTwoBlogs ? 600 : 400}
               className="rounded-lg shadow-lg cursor-pointer hover:shadow-slider-card w-full aspect-square object-cover"

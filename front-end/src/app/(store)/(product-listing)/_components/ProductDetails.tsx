@@ -396,10 +396,18 @@ console.log("productVariant",productVariant);
                         />
 
                         {
-                            product?.createdAt && isLessThanOneMonth(product?.createdAt) &&
+                            product?.created_at && isLessThanOneMonth(product?.created_at) &&
                             <div className='new-product'>
                                 <span>New</span>
                             </div>
+                        }
+
+                        {
+                            product?.puff_count && (
+                                <div className='quantity'>
+                                    <span>{String(product.puff_count).replace(/\bpuffs\b/gi, 'Puffs')}</span>
+                                </div>
+                            )
                         }
 
                     </div>

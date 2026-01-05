@@ -45,13 +45,98 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [isTitleTruncated, setIsTitleTruncated] = useState(false);
   const titleRef = useRef<HTMLParagraphElement>(null);
 
-  // Check if title is truncated
+  // Check if title exceeds 4 lines
   useEffect(() => {
-    if (titleRef.current) {
-      const element = titleRef.current;
-      const isTruncated = element.scrollHeight > element.clientHeight;
-      setIsTitleTruncated(isTruncated);
-    }
+    const checkTruncation = () => {
+      if (titleRef.current) {
+        const element = titleRef.current;
+        
+        // Wait for element to be rendered
+        if (!element.offsetWidth || !element.offsetHeight) {
+          setTimeout(checkTruncation, 50);
+          return;
+        }
+        
+        // Get the actual text content from the element (works with both prop and static text)
+        const textContent = element.textContent || element.innerText || title;
+        
+        if (!textContent || !textContent.trim()) {
+          setIsTitleTruncated(false);
+          return;
+        }
+        
+        const computedStyle = window.getComputedStyle(element);
+        const fontSize = parseFloat(computedStyle.fontSize);
+        const lineHeightValue = computedStyle.lineHeight;
+        
+        // Calculate line height
+        let lineHeight: number;
+        if (lineHeightValue === 'normal') {
+          lineHeight = fontSize * 1.2;
+        } else if (lineHeightValue.includes('px')) {
+          lineHeight = parseFloat(lineHeightValue);
+        } else {
+          lineHeight = fontSize * parseFloat(lineHeightValue);
+        }
+        
+        // Height for exactly 4 lines (with some tolerance)
+        const fourLineHeight = lineHeight * 4;
+        
+        // Get actual rendered width
+        const rect = element.getBoundingClientRect();
+        const actualWidth = rect.width || element.offsetWidth;
+        
+        if (!actualWidth) {
+          setTimeout(checkTruncation, 50);
+          return;
+        }
+        
+        // Create temporary element to measure actual content height without line-clamp
+        const tempElement = document.createElement('div');
+        tempElement.style.position = 'absolute';
+        tempElement.style.visibility = 'hidden';
+        tempElement.style.width = `${actualWidth}px`;
+        tempElement.style.fontSize = computedStyle.fontSize;
+        tempElement.style.fontWeight = computedStyle.fontWeight;
+        tempElement.style.fontFamily = computedStyle.fontFamily;
+        tempElement.style.lineHeight = computedStyle.lineHeight;
+        tempElement.style.padding = '0';
+        tempElement.style.margin = '0';
+        tempElement.style.wordBreak = 'break-word';
+        tempElement.style.whiteSpace = 'normal';
+        tempElement.style.boxSizing = 'border-box';
+        tempElement.style.overflow = 'visible';
+        tempElement.style.top = '-9999px';
+        tempElement.style.left = '-9999px';
+        tempElement.textContent = textContent;
+        
+        document.body.appendChild(tempElement);
+        // Force layout calculation
+        void tempElement.offsetHeight;
+        const actualHeight = tempElement.scrollHeight || tempElement.offsetHeight;
+        document.body.removeChild(tempElement);
+        
+        // Show tooltip only if actual content height STRICTLY exceeds 4 lines (truncated with ellipsis)
+        // Only show when content is clearly more than 4 lines (ellipsis appears)
+        // Use small positive tolerance to ensure we only catch actual truncation
+        const isTruncated = actualHeight > fourLineHeight + 1;
+        setIsTitleTruncated(isTruncated);
+      }
+    };
+    
+    // Use requestAnimationFrame for better timing
+    const rafId = requestAnimationFrame(() => {
+      setTimeout(checkTruncation, 100);
+      setTimeout(checkTruncation, 300);
+      setTimeout(checkTruncation, 600);
+    });
+    
+    window.addEventListener('resize', checkTruncation);
+    
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', checkTruncation);
+    };
   }, [title]);
   
   return (
@@ -67,7 +152,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           />
           {totalPuffs && (
             <div className='quantity'>
-              <span>{totalPuffs}</span>
+              <span>{totalPuffs.replace(/\bpuffs\b/gi, 'Puffs')}</span>
             </div>
           )}
 
@@ -82,11 +167,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <div className="flex flex-col px-2.5 py-3 md:py-5 flex-grow">
           <div className="flex flex-col flex-grow">
-            <div className='h-[108px] md:h-[127px] relative'>
+            <div className='h-[132px] md:h-[155px] relative'>
               <div className="relative h-full">
                 <h4 
                   ref={titleRef}
-                  className="text-title-2 md:text-h5 text-skin-neutral-500 font-semibold line-clamp-3 xl:mr-8 cursor-pointer"
+                  className="text-title-2 md:text-h5 text-skin-neutral-500 font-semibold line-clamp-4 xl:mr-8 cursor-pointer"
                   onMouseEnter={() => isTitleTruncated && setShowTitleTooltip(true)}
                   onMouseLeave={() => setShowTitleTooltip(false)}
                 >
@@ -95,13 +180,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 {showTitleTooltip && isTitleTruncated && (
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-white text-sm rounded-lg shadow-lg z-50 max-w-xs break-words" style={{ backgroundColor: '#02643E' }}>
                     <div className="whitespace-normal leading-relaxed">
-                      {title}
+                      {titleRef.current?.textContent || titleRef.current?.innerText || title}
                     </div>
                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent" style={{ borderTopColor: '#02643E' }}></div>
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-1 absolute top-[84px] md:top-[99px]">
+              <div className="flex items-center gap-1 absolute top-[108px] md:top-[127px]">
                 <div className="flex items-center">
                   {Array.from({ length: 5 }, (_, i) => {
                     if (i < Math.round(averageRating)) {

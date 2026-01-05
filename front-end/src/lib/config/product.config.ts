@@ -307,12 +307,14 @@ export interface ProductViewDetails {
     brand: BrandConfig | null;
     product_brands: BrandConfig[];
     createdAt: string;
+    created_at: string;
     primary_image: productAllImages;
     all_images: productAllImages[];
     attribute_terms: AttributeTerms[];
     deals: Deal[];
     loyaltySettings: LoyaltySettings | null;
     loyaltyPoints?: LoyaltyPoints | null;
+    puff_count?: number | string;
 };
 
 export interface AppliedFilters {

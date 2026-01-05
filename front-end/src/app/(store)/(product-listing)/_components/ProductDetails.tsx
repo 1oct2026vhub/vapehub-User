@@ -405,7 +405,7 @@ console.log("productVariant",productVariant);
                         {
                             product?.puff_count && (
                                 <div className='quantity'>
-                                    <span>{product.puff_count}</span>
+                                    <span>{String(product.puff_count).replace(/\bpuffs\b/gi, 'Puffs')}</span>
                                 </div>
                             )
                         }

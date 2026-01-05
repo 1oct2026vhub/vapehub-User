@@ -152,7 +152,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           />
           {totalPuffs && (
             <div className='quantity'>
-              <span>{totalPuffs}</span>
+              <span>{totalPuffs.replace(/\bpuffs\b/gi, 'Puffs')}</span>
             </div>
           )}
 

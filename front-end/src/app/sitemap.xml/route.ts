@@ -1,6 +1,25 @@
 import { NextResponse } from 'next/server';
+import { getBaseUrl } from '@/lib/utils/metadata';
 
 const API_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL;
+
+// Static pages that should always be included in the sitemap
+const STATIC_PAGES = [
+  '/',
+  '/shop',
+  '/brands',
+  '/blogs',
+  '/vapehub-deals',
+  '/new-products',
+  '/faq',
+  '/contact',
+  '/delivery-information',
+  '/privacy-policy',
+  '/returns-policy',
+  '/terms-conditions',
+  '/loyalty-points',
+  '/social-media',
+];
 
 // Log environment variable at module load time (runs once when server starts)
 console.log('=== Sitemap Route Environment Check ===');
@@ -47,9 +66,12 @@ export async function GET() {
 
         if (response.ok) {
           console.log(`[Sitemap Request] Success! Found at: ${fullUrl}`);
-          const sitemapContent = await response.text();
+          const apiSitemapContent = await response.text();
           
-          return new NextResponse(sitemapContent, {
+          // Merge static pages with API sitemap
+          const mergedSitemap = mergeStaticPagesWithSitemap(apiSitemapContent);
+          
+          return new NextResponse(mergedSitemap, {
             status: 200,
             headers: {
               'Content-Type': 'application/xml',
@@ -93,5 +115,47 @@ export async function GET() {
     }
     console.error('===========================');
     return new NextResponse('Error generating sitemap.', { status: 500 });
+  }
+}
+
+/**
+ * Merge static pages with the API sitemap XML
+ * Adds static page URLs before the closing </urlset> tag
+ */
+function mergeStaticPagesWithSitemap(apiSitemap: string): string {
+  const baseUrl = getBaseUrl();
+  const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  
+  // Remove trailing slash from baseUrl to avoid double slashes
+  const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  
+  // Generate XML entries for static pages
+  const staticPagesXml = STATIC_PAGES.map(path => {
+    // Ensure path starts with / (or is empty for homepage)
+    const cleanPath = path === '/' ? '' : (path.startsWith('/') ? path : `/${path}`);
+    const fullUrl = `${cleanBaseUrl}${cleanPath}`;
+    return `  <url>
+    <loc>${fullUrl}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+  }).join('\n');
+
+  // Check if the API sitemap has a proper XML structure
+  if (apiSitemap.includes('</urlset>')) {
+    // Insert static pages before the closing </urlset> tag
+    return apiSitemap.replace('</urlset>', `${staticPagesXml}\n</urlset>`);
+  } else if (apiSitemap.includes('<?xml')) {
+    // If it's XML but no urlset, wrap it properly
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticPagesXml}
+</urlset>`;
+  } else {
+    // If API sitemap is empty or invalid, create a new one with static pages
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticPagesXml}
+</urlset>`;
   }
 } 

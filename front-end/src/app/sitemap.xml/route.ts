@@ -66,8 +66,7 @@ export async function GET() {
 
         if (response.ok) {
           console.log(`[Sitemap Request] Success! Found at: ${fullUrl}`);
-          const apiSitemapContent = await response.text();
-          
+          const apiSitemapContent = await response.text();          
           // Merge static pages with API sitemap
           const mergedSitemap = mergeStaticPagesWithSitemap(apiSitemapContent);
           

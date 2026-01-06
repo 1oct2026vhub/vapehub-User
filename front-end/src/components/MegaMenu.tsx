@@ -25,7 +25,9 @@ interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'h
 }
 
 export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; parentMenu?: HeaderMegaMenu | null }> = ({ isOpen, menuItems, parentMenu }) => {
-    const router = useRouter();
+    console.log("menuItems",menuItems);
+    console.log("parentMenu",parentMenu);
+  const router = useRouter();
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
         mode: 'onBlur',
@@ -414,6 +416,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
 
     const shouldShowImageSection = hasAnyShowImage(menuItems);
     const allImageResults = collectAllImageItems(menuItems);
+console.log("allImageResults",allImageResults);
 
     // Get parent menu image if available
     const parentMenuExtended = parentMenu as ExtendedHeaderMegaMenu | undefined;
@@ -445,7 +448,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                             placeholder="Search..."
                             className="w-3/4"
                             classNames={{
-                                input: '!text-base md:!text-title-2 font-normal md:font-bold',
+                                input: '!text-content-3 md:!text-title-2 font-normal md:font-bold',
                             }}
                             startContent={<SearchIcon className='w-4 h-4 md:w-max md:h-max' />}
                             value={searchKeyword}
@@ -467,7 +470,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                                     <div className="relative w-full h-[100px]">
                                         <Image
                                             src={parentMenuImageUrl}
-                                            alt={parentMenu?.label || 'Menu Image'}
+                                            alt={parentMenu?.alt_text || parentMenu?.label || ''}
                                             fill
                                             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                                             className="object-contain rounded-10"
@@ -493,6 +496,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                                 }
                                 return item.original || '#';
                             };
+           console.log("item alt text",item.entity_data?.alt_text);
 
                             return (
                                 <Link href={getHref()} key={item.id} className="block">
@@ -500,7 +504,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                                         <div className="relative w-full h-[100px]">
                                             <Image
                                                 src={imageUrl}
-                                                alt={item.entity_data?.name || item.label}
+                                                alt={item.alt_text || item.entity_data?.alt_text || item.label}
                                                 fill
                                                 sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                                                 className="object-contain rounded-10"

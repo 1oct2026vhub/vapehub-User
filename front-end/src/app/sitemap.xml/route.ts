@@ -124,7 +124,7 @@ export async function GET() {
  */
 function mergeStaticPagesWithSitemap(apiSitemap: string): string {
   const baseUrl = getBaseUrl();
-  const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  // const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
   
   // Remove trailing slash from baseUrl to avoid double slashes
   const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;

@@ -76,6 +76,7 @@ export interface HeaderMegaMenu {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  alt_text?: string;
   parent: {
     id: number;
     label: string;
@@ -88,6 +89,7 @@ export interface HeaderMegaMenu {
     slug: string;
     price?: string;
     discount_price?: string;
+    alt_text?: string;
     ProductImages?: {
       image_url: string;
     }[];

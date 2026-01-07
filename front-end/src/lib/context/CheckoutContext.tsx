@@ -39,12 +39,6 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
         try {
             setIsProcessing(true);
            
-            console.log('🛒 [handlePlaceOrder] Called with:', {
-                paymentMethod: data.payment_method.method,
-                response: response,
-                responseData: response?.data
-            });
-           
             // Check if response.data exists
             if (!response || !response.data) {
                 console.error('❌ [handlePlaceOrder] Invalid response data:', response);
@@ -52,9 +46,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                 return;
             }
 
-            const orderData = response.data;
-            console.log('🛒 [handlePlaceOrder] Order data:', orderData);
-            
+            const orderData = response.data;            
             if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.VIVA_WALLET) {
                 // Initiate Viva Wallet payment
                 if (orderData && typeof orderData === 'object' && 'order_code' in orderData) {

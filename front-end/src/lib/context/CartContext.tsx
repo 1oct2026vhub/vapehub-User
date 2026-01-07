@@ -238,28 +238,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   
   useEffect(() => {
     const fetchLoyaltyPoints = async () => {
-        console.log('[CartContext] fetchLoyaltyPoints - Starting to fetch loyalty points redemption');
-        console.log('[CartContext] fetchLoyaltyPoints - isAuthenticated:', isAuthenticated);
         
         // if (isAuthenticated) {
             // Add 2-second delay to handle database lag for loyalty points data
-            console.log('[CartContext] fetchLoyaltyPoints - Waiting 2 seconds before API call...');
             await new Promise(resolve => setTimeout(resolve, 2000));
             
-            console.log('[CartContext] fetchLoyaltyPoints - Calling getLoyaltyPointsRedemption...');
             const response = await getLoyaltyPointsRedemption();
-            console.log('[CartContext] fetchLoyaltyPoints - Response received:', {
-                status: response.status,
-                hasData: response.status === ServerActionStatus.SUCCESS ? !!response.data : false,
-                message: response.status === ServerActionStatus.ERROR ? response.message : undefined,
-                fullResponse: response
-            });
-            
+          
             if (response.status === ServerActionStatus.SUCCESS) {
-                console.log('[CartContext] fetchLoyaltyPoints - Success! Setting loyalty redemption data:', response.data);
                 setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));
             } else {
-                console.warn('[CartContext] fetchLoyaltyPoints - Failed with status:', response.status, 'Message:', response.message);
             }
         // }
     };
@@ -847,9 +835,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    try {
-      console.log('🔄 [CartContext] Revalidating guest coupon:', couponDiscount.code);
-      
+    try {      
       // Build cart items array for API
       const cartItemsForApi = items.map(item => ({
         product_id: item.product_id,
@@ -865,9 +851,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       };
 
       const response = await applyGuestCoupon(payload);
-      console.log('🔄 [CartContext] Guest User - Apply Coupon API Response (Revalidation):', response);
-      console.log('🔄 [CartContext] Guest User - Response Status:', response.status);
-      console.log('🔄 [CartContext] Guest User - Response Data:', 'data' in response ? response.data : 'No data (error response)');
 
       if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.total != null && response.data.coupon) {
         const couponData: CouponResponse = response.data;
@@ -887,9 +870,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
           : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
         
-        console.log('🔄 [CartContext] Guest coupon revalidation successful. Discount amount:', discountAmount);
-        console.log('🔄 [CartContext] Guest coupon API values:', { apiSubTotal, apiTotal, apiShippingCost, discountAmount });
-        
         // Extract mail subscription discount from API response
         const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
           ? couponData.mail_subscription_discount
@@ -908,7 +888,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           mailSubscriptionDiscount: mailSubscriptionDiscountValue,
         });
       } else {
-        console.log('🔄 [CartContext] Guest coupon revalidation failed. Removing coupon.');
         if (couponDiscount.isApplied) {
           setCouponDiscount({
             value: 0,
@@ -941,15 +920,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      console.log('🔄 [CartContext] Revalidating coupon:', couponDiscount.code);
       const response = await applyCoupon({
         couponCode: couponDiscount.code,
         shippingMethodId: 0, // Adjust if you use shipping method
       });
       
-      console.log('🔄 [CartContext] Logged-in User - Apply Coupon API Response (Revalidation):', response);
-      console.log('🔄 [CartContext] Logged-in User - Response Status:', response.status);
-      console.log('🔄 [CartContext] Logged-in User - Response Data:', 'data' in response ? response.data : 'No data (error response)');
       // console.log('🔄 [CartContext] Response data:', response.data);
       
       // Check for valid response with total and coupon data (not just referral_value)
@@ -971,9 +946,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         // Use discount_amount directly from API response if available, otherwise calculate
         const discountAmount = couponData.discount_amount ?? (apiSubTotal - apiTotal);
         
-        console.log('🔄 [CartContext] Revalidation successful. Discount amount:', discountAmount);
-        console.log('🔄 [CartContext] Logged-in coupon API values:', { apiSubTotal, apiTotal, apiShippingCost, discountAmount });
-        
         // Extract mail subscription discount from API response
         const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
           ? couponData.mail_subscription_discount
@@ -992,7 +964,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           mailSubscriptionDiscount: mailSubscriptionDiscountValue,
         });
       } else {
-        console.log('🔄 [CartContext] Revalidation failed. Removing coupon.');
         // Only update state if the coupon was previously applied to avoid loops
         if (couponDiscount.isApplied) {
           // toast.info("Applied coupon was removed as cart conditions are no longer met.");

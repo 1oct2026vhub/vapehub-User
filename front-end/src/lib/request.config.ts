@@ -64,14 +64,7 @@ export const handleRequest = async <T, G>(
         cache: canCache ? 'force-cache' : 'no-store',
         next: canCache ? { revalidate: 60 } : undefined,
       }, MAX_RETRIES);
-      
-      // Log API call response
-      console.log(`[API Response] ${method} ${endpoint}`, {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-      });
-      
+          
       const responseJson = await response.json();
 
       if (response.status === 401) {                
@@ -104,13 +97,13 @@ export const handleRequest = async <T, G>(
             errMessage = err.message; // ✅ Safe access to error message
           }
       
-      // Log API call error
-      console.error(`[API Error] ${method} ${endpoint}`, {
-        method,
-        endpoint,
-        error: errMessage,
-        errorObject: err,
-      });
+      // // Log API call error
+      // console.error(`[API Error] ${method} ${endpoint}`, {
+      //   method,
+      //   endpoint,
+      //   error: errMessage,
+      //   errorObject: err,
+      // });
       
       if (errMessage === UNAUTHORIZED_RESPONSE_NAME) {
         await handleUnauthorizedSession();

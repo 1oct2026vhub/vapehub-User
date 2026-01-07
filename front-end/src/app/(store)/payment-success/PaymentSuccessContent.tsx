@@ -30,7 +30,6 @@ const PaymentSuccessContent = () => {
     useEffect(() => {
         // Prevent multiple executions
         if (hasApiBeenCalledRef.current || isProcessingRef.current) {
-            console.log('Payment verification already executed, skipping...');
             return;
         }
 
@@ -98,10 +97,7 @@ const PaymentSuccessContent = () => {
                     }));
                     
                     try {
-                        console.log("Calling Worldpay API after page load...");
-                        const worldpayResponse = await worldpayPaymentSuccess(worldpayPayload);
-                        console.log("worldpayResponse", worldpayResponse);
-                        
+                        const worldpayResponse = await worldpayPaymentSuccess(worldpayPayload);                        
                         // Check if response is valid and has expected structure
                         if (worldpayResponse && typeof worldpayResponse === 'object') {
                             if (worldpayResponse.status === ServerActionStatus.SUCCESS) {
@@ -109,9 +105,6 @@ const PaymentSuccessContent = () => {
                                 clearCart();
                                 toast.success('Payment processed successfully!');
                             } else {
-                                // Handle ERROR status (like stock validation errors) without throwing
-                                console.log('Worldpay API returned error status:', worldpayResponse.message);
-                                
                                 // Check if it's a stock validation error
                                 const isStockValidationError = worldpayResponse.message?.includes('stock') || worldpayResponse.message?.includes('Validation min on stock');
                                 
@@ -126,7 +119,6 @@ const PaymentSuccessContent = () => {
                             }
                         } else {
                             // Invalid response format
-                            console.log('Invalid response format from Worldpay API');
                             toast.success('Payment completed! (Details verified from URL)');
                         }
                         
@@ -144,7 +136,6 @@ const PaymentSuccessContent = () => {
                             // For JSON parsing errors, still clear the cart since payment was successful
                             clearCart();
                             toast.success('Payment completed successfully! (Payment verified)');
-                            console.log('JSON parsing error handled - payment was successful');
                         } else {
                             toast.success('Payment completed! (Details verified from URL)');
                         }
@@ -175,8 +166,6 @@ const PaymentSuccessContent = () => {
                                     ...newTransactionDetails
                                 })); 
                             } else {
-                                // Handle ERROR status without throwing
-                                console.log('Viva Wallet API returned error status:', response.message);
                                 // Still show basic transaction details
                                 const newTransactionDetails = {
                                     id: transactionId,
@@ -191,7 +180,6 @@ const PaymentSuccessContent = () => {
                             }
                         } else {
                             // Invalid response format
-                            console.log('Invalid response format from Viva Wallet API');
                             const newTransactionDetails = {
                                 id: transactionId,
                                 method: 'Viva Wallet',

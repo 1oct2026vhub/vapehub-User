@@ -24,9 +24,7 @@ const processBlogContent = (html: string): string => {
 const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
   if (!data) {
     return <EmptyPlaceholder title='Uh, oh!' description='No blogs found' />
-  }
-  console.log("blog data", data);
-  
+  }  
   const breadcrumbs = [ 
     { label: "Home", href: ROUTES.WELCOME },
     { label: "Blogs", href: ROUTES.BLOGS },

@@ -18,9 +18,7 @@ const breadcrumbs = [
 
 const ReferFriend: NextPage = async (): Promise<ReactElement> => {
     await redirectIfUnauthenticated();
-    const response = await getUserProfile();
-    console.log("fetching user profile",response);
-    
+    const response = await getUserProfile();    
     const referralCode = response.status === ServerActionStatus.SUCCESS ? response.data?.referral_code: "";
 
     return (

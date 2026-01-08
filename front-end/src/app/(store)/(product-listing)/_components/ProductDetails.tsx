@@ -153,9 +153,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             .map(attr => attr.term_name)
             .join(', ')}`
         : product?.name;
-console.log("productName",productName);
-console.log("productVariant",productVariant);
-
     const availableAttributes: AttributeTerms[] = productData.available_terms;
     const minQuantity = 1;
 
@@ -350,8 +347,6 @@ console.log("productVariant",productVariant);
         };
         fetchLinkedProducts();
     }, [product.id]);  
-    console.log("productData",productData);
-    console.log("linkedProducts",linkedProducts);
     
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>

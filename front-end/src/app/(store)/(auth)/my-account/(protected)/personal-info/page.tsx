@@ -48,9 +48,6 @@ const PersonalInfo: NextPage = () => {
             if (result?.subscription && 'subscribed' in result.subscription) {
                 setNewsletterSubscribed(Boolean(result.subscription.subscribed))
             } 
-            // else {
-            //     console.log("No subscription.subscribed field found in result");
-            // }
             setLoading(false)
         }
     }

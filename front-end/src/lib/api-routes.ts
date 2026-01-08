@@ -29,7 +29,7 @@ export const API_ROUTES = {
         REGISTER: (referralCode: string) => buildRequestUrl(referralCode ? `/api/auth/register?referral_code=${referralCode}` : '/api/auth/register'),
         GET_VERIFY_EMAIL: (token: string | string[]) => buildRequestUrl(`/api/auth/verify-email?token=${token}`),
         FORGOT_PASSWORD: buildRequestUrl("/api/auth/forgot-password"),
-        RESET_PASSWORD: buildRequestUrl('api/auth/reset-password'),
+        RESET_PASSWORD: buildRequestUrl('/api/auth/reset-password'),
         VALIDATE_USER: '/users/validate',
         LOYALTY_POINTS: '/users/loyalty-points',
         USER_NOTIFICATION: 'users/notifications',

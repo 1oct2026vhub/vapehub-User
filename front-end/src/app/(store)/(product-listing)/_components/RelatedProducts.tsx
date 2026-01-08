@@ -19,7 +19,6 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
   currentProductId
 }): AsyncReactElement => {
   const response = await getMoreLikeThis({product_id: currentProductId, limit: 10, offset: 0});
-  console.log("responseRelatedProducts",response);
   if (response.status === ServerActionStatus.ERROR) {
     return <EmptyPlaceholder title='Uh, oh!' description={response.message} />
   }

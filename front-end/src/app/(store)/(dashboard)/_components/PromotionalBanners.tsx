@@ -38,7 +38,6 @@ BannerImage.displayName = 'BannerImage';
 
 const PromotionalBanners: React.FC = async () => {
   const bannersResponse = await getPromotionBanner();
-  console.log("bannersResponseeee",bannersResponse);
   if (bannersResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load banners' />;
   }

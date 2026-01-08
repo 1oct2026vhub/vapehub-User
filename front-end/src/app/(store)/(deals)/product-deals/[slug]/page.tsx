@@ -59,13 +59,6 @@ const Page = async ({ params, searchParams }: {
     }
   }
   
-  // Log all deal slugs for comparison (first 20 to avoid console spam)
-  if (allDeals.length > 0) {
-    allDeals.slice(0, 20).forEach((d: Deal) => {
-      const normalizedSlug = d.slug.replace(/ /g, '-');
-      console.log(`  - ${normalizedSlug} ${normalizedSlug === slug ? '(MATCH)' : ''}`);
-    });
-  }
 
   const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
   
@@ -200,7 +193,6 @@ export async function generateMetadata({ params, searchParams }: {
 
   // Fetch dynamic page slug data for metadata
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
-  console.log('DynamicPageSlugResponse (product-deals metadata):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return {
       title: 'Deal not found',

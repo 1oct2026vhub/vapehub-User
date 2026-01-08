@@ -207,7 +207,6 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 		// Check if data is already in cache
 		const cachedData = productDataCache.get(id);
 		if (cachedData) {
-			console.log(`[BundleProductCard] ✓ Using cached data for product ${id}`);
 			setProductResponse(cachedData.productResponse);
 			setProductData(cachedData.productData);
 			setIsLoading(false);
@@ -216,7 +215,6 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 		
 		// Skip if already fetching this product
 		if (fetchingProducts.has(id)) {
-			console.log(`[BundleProductCard] Skipping fetch for product ${id} - already fetching`);
 			return;
 		}
 		
@@ -235,30 +233,26 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 					setProductResponse(response.data);
 					const fetchedProduct = response.data.product;
 					
-					// Console log all variants with stock and price details
-					console.log(`[BundleProductCard] ✓ Fetched Product ID: ${id}, Product Name: ${fetchedProduct.name}`);
-					console.log(`[BundleProductCard] Total Variants: ${response.data.variants?.length || 0}`);
-					
-					if (response.data.variants && response.data.variants.length > 0) {
-						console.log('[BundleProductCard] Variant List:', response.data.variants.map((variant: ProductVariant) => ({
-							id: variant.id,
-							slug: variant.slug,
-							attributes: variant.attributes.map(attr => ({
-								attribute_name: attr.attribute_name,
-								term_name: attr.term_name,
-								term_slug: attr.term_slug
-							})),
-							price: variant.price,
-							regular_price: variant.regular_price,
-							discount_price: variant.discount_price,
-							stock: variant.stock,
-							stock_status: variant.stock_status,
-							is_in_stock: variant.is_in_stock,
-							status: variant.status
-						})));
-					} else {
-						console.log('[BundleProductCard] No variants found for this product');
-					}
+					// if (response.data.variants && response.data.variants.length > 0) {
+					// 	console.log('[BundleProductCard] Variant List:', response.data.variants.map((variant: ProductVariant) => ({
+					// 		id: variant.id,
+					// 		slug: variant.slug,
+					// 		attributes: variant.attributes.map(attr => ({
+					// 			attribute_name: attr.attribute_name,
+					// 			term_name: attr.term_name,
+					// 			term_slug: attr.term_slug
+					// 		})),
+					// 		price: variant.price,
+					// 		regular_price: variant.regular_price,
+					// 		discount_price: variant.discount_price,
+					// 		stock: variant.stock,
+					// 		stock_status: variant.stock_status,
+					// 		is_in_stock: variant.is_in_stock,
+					// 		status: variant.status
+					// 	})));
+					// } else {
+					// 	console.log('[BundleProductCard] No variants found for this product');
+					// }
 					
 					const productForState: Product = {
 						...fetchedProduct,
@@ -282,9 +276,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 						productResponse: response.data,
 						productData: productForState
 					});
-					
-					console.log(`[BundleProductCard] ✓ Cached data for product ${id}. Cache size: ${productDataCache.size}`);
-				}
+									}
 			} catch (error) {
 				console.error(`[BundleProductCard] Error fetching product ${id}:`, error);
 			} finally {
@@ -322,25 +314,6 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 				if (variantResponse.data.variants?.[0]) {
 					const selectedVariant = variantResponse.data.variants[0];
 					setProductVariant(selectedVariant);
-					
-					// Console log selected variant details
-					console.log('[BundleProductCard] Selected Variant Details:', {
-						variant_id: selectedVariant.id,
-						variant_slug: selectedVariant.slug,
-						attributes: selectedVariant.attributes.map(attr => ({
-							attribute_name: attr.attribute_name,
-							term_name: attr.term_name,
-							term_slug: attr.term_slug
-						})),
-						price: selectedVariant.price,
-						regular_price: selectedVariant.regular_price,
-						discount_price: selectedVariant.discount_price,
-						stock: selectedVariant.stock,
-						stock_status: selectedVariant.stock_status,
-						is_in_stock: selectedVariant.is_in_stock,
-						status: selectedVariant.status,
-						selected_attributes: variantPayload
-					});
 				} else {
 					setProductVariant(null);
 				}

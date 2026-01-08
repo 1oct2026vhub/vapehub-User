@@ -14,7 +14,6 @@ type Props = {
 }
  
 const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
-  // console.log('menus', menus);
   const router = useRouter();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

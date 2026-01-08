@@ -41,7 +41,6 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             }));
         }
     }, [itemCount, setLoyaltyRedemption]);
-console.log("selectedShippingMethod", selectedShippingMethod);
     const handleRedeemToggle = async (checked: boolean) => {
         setIsApplyingLoyalty(true);
         const payload: APPLY_COUPON_PAYLOAD = {
@@ -50,9 +49,6 @@ console.log("selectedShippingMethod", selectedShippingMethod);
         };
 
         const response = await applyCoupon(payload);
-        console.log('🎫 [CartTotal] Apply Coupon API Response (Loyalty Redemption):', response);
-        console.log('🎫 [CartTotal] Response Status:', response.status);
-        console.log('🎫 [CartTotal] Response Data:', 'data' in response ? response.data : 'No data (error response)');
         if (response.status === ServerActionStatus.SUCCESS && response.data) {
             // Use API response values for accurate calculation
             const apiSubTotal = response.data.subTotal || cartTotal;
@@ -169,18 +165,6 @@ console.log("selectedShippingMethod", selectedShippingMethod);
     const safeSubTotal = Number.isFinite(displaySubTotal) ? displaySubTotal : 0;
     const safeTotal = Number.isFinite(displayTotal) ? displayTotal : 0;
     
-    console.log("loyaltyPoints", loyaltyPoints);
-    console.log("🎯 [CartTotal] Display Values:", {
-        couponApplied: couponDiscount.isApplied,
-        apiSubTotal: couponDiscount.subTotal,
-        apiTotal: couponDiscount.total,
-        apiShippingCost: couponDiscount.shippingCost,
-        displaySubTotal: safeSubTotal,
-        displayTotal: safeTotal,
-        displayShippingCost: safeShippingCost,
-        cartTotal,
-        couponDiscountValue: couponDiscount.value
-    });
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded w-full shadow-checkout'>
             <h3 className='primary-gradient-600 text-title-2 md:text-2xl font-semibold w-fit'>Cart Total</h3>

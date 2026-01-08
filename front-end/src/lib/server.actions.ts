@@ -364,25 +364,21 @@ export const getDynamicPageSlug = async (slug: string, canCache: boolean = true)
 
 // checkout
 export const checkout = async (payload: CHECKOUT_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
-  console.log('🔵 [CHECKOUT API] Payload:', JSON.stringify(payload, null, 2));
   const response = await handleRequest<{message: string}, unknown>({
     endpoint: API_ROUTES.CHECKOUT,
     payload,
     method: 'POST',
   });
-  console.log('🟢 [CHECKOUT API] Response:', JSON.stringify(response, null, 2));
   return response;
 };
 
 // guest checkout and order (combined)
 export const guestCheckoutAndOrder = async (payload: GUEST_CHECKOUT_AND_ORDER_PAYLOAD): Promise<ServerActionResponse<ORDER_RESPONSE_DATA>> => {
-  console.log('🔵 [GUEST CHECKOUT AND ORDER API] Payload:', JSON.stringify(payload, null, 2));
   const response = await handleRequest<ORDER_RESPONSE_DATA, unknown>({
     endpoint: API_ROUTES.GUEST_CHECKOUT_AND_ORDER,
     payload,
     method: 'POST',
   });
-  console.log('🟢 [GUEST CHECKOUT AND ORDER API] Response:', JSON.stringify(response, null, 2));
   return response;
 };
 

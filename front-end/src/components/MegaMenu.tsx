@@ -25,8 +25,6 @@ interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'h
 }
 
 export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; parentMenu?: HeaderMegaMenu | null }> = ({ isOpen, menuItems, parentMenu }) => {
-    console.log("menuItems",menuItems);
-    console.log("parentMenu",parentMenu);
   const router = useRouter();
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
@@ -416,8 +414,6 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
 
     const shouldShowImageSection = hasAnyShowImage(menuItems);
     const allImageResults = collectAllImageItems(menuItems);
-console.log("allImageResults",allImageResults);
-
     // Get parent menu image if available
     const parentMenuExtended = parentMenu as ExtendedHeaderMegaMenu | undefined;
     const parentMenuImageUrl = parentMenuExtended?.image_url;
@@ -496,8 +492,6 @@ console.log("allImageResults",allImageResults);
                                 }
                                 return item.original || '#';
                             };
-           console.log("item alt text",item.entity_data?.alt_text);
-
                             return (
                                 <Link href={getHref()} key={item.id} className="block">
                                     <div className="bg-white rounded-2xl shadow-md p-3">

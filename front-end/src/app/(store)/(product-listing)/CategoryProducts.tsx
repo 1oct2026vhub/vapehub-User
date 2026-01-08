@@ -50,9 +50,7 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
     { label: "Home", href: "/" },
     { label: enhancedCategoryData.name, href: `/${enhancedCategoryData.slug}`, isActive: true },
   ];  
-  console.log("category data", enhancedCategoryData);
-  
-  
+    
   // Try to get category ID from different possible sources
   const categoryId = data.id || 
                     data.category_id || 

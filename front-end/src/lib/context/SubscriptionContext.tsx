@@ -41,17 +41,13 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({
     // Only fetch if we don't have initial settings
     if (!initialSettings) {
       const fetchSubscriptionSettings = async () => {
-        console.log('[fetchSubscriptionSettings] Starting to fetch subscription settings');
         try {
           setLoading(true);
           setError(null);
-          console.log('[fetchSubscriptionSettings] Calling getMailSubscriptionSettings...');
           
           const response = await getMailSubscriptionSettings();
-          console.log('[fetchSubscriptionSettings] Response received:', response);
           
           if (response.status === ServerActionStatus.SUCCESS) {
-            console.log('[fetchSubscriptionSettings] Success - Setting subscription settings:', response.data);
             setSubscriptionSettings(response.data);
           } else {
             const errorMessage = response.message || 'Failed to fetch subscription settings';
@@ -62,7 +58,6 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({
           console.error('[fetchSubscriptionSettings] Error occurred:', err);
           setError('An error occurred while fetching subscription settings');
         } finally {
-          console.log('[fetchSubscriptionSettings] Fetch completed, setting loading to false');
           setLoading(false);
         }
       };

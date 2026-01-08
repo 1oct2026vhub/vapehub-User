@@ -131,9 +131,6 @@ const HeaderFeatures: React.FC = () => {
                     getFeatureContent(),
                     getTrustpilotReviews()
                 ]);
-                console.log("trustpilot response", trustpilotResponse);
-                console.log("features response", featuresResponse);
-
                 // Process feature content - only set if API returns data
                 let apiFeatures: Feature[] = [];
                 if (featuresResponse.status === ServerActionStatus.SUCCESS && featuresResponse.data?.featureContent) {
@@ -158,7 +155,6 @@ const HeaderFeatures: React.FC = () => {
                 if (trustpilotResponse.status === ServerActionStatus.SUCCESS && 
                     trustpilotResponse.data?.overallStats?.scoreBreakdown) {
                     const scoreBreakdown = trustpilotResponse.data.overallStats.scoreBreakdown;
-                    console.log("scoreBreakdown", scoreBreakdown);
                     if (scoreBreakdown.stars && scoreBreakdown.ratingCategory) {
                         setTrustpilotData({
                             stars: scoreBreakdown.stars,
@@ -166,9 +162,7 @@ const HeaderFeatures: React.FC = () => {
                         });
                         
                         // Check if Trustpilot feature already exists in apiFeatures
-                        const hasTrustpilot = apiFeatures.some(f => f.isTrustpilot);
-                        console.log("hasTrustpilot in features", hasTrustpilot);
-                        
+                        const hasTrustpilot = apiFeatures.some(f => f.isTrustpilot);                        
                         // If Trustpilot data is available but no Trustpilot feature exists, create one
                         if (!hasTrustpilot) {
                             trustpilotFeature = {
@@ -179,7 +173,6 @@ const HeaderFeatures: React.FC = () => {
                                 isTrustpilot: true,
                                 link: 'https://uk.trustpilot.com/review/vapehub.co.uk',
                             };
-                            console.log("Created trustpilot feature", trustpilotFeature);
                         }
                     }
                 }
@@ -188,10 +181,6 @@ const HeaderFeatures: React.FC = () => {
                 if (trustpilotFeature && !apiFeatures.some(f => f.isTrustpilot)) {
                     apiFeatures.splice(1, 0, trustpilotFeature);
                 }
-                
-                console.log("Final apiFeatures", apiFeatures);
-                console.log("trustpilotData state", trustpilotData);
-                
                 // Only set features if we have any
                 if (apiFeatures.length > 0) {
                     setFeatures(apiFeatures);

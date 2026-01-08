@@ -9,7 +9,6 @@ export const useUserProfile = () => {
   const [error, setError] = useState<string | null>(null)
 
   const fetchProfile = useCallback(async (): Promise<UserProfileResponse | null> => {
-    console.log('fetchProfile', fetchProfile)
     setIsLoading(true)
     try {
       const response = await getUserProfile()

@@ -288,7 +288,6 @@ export async function generateMetadata({ params, searchParams }: {
 
 
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
-  console.log('DynamicPageSlugResponse (product-listing metadata):', dynamicPageSlug);
   if (!dynamicPageSlug) {
     return notFound();
   }

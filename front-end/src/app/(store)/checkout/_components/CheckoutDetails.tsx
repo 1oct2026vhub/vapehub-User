@@ -154,16 +154,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 receive_promotions: data.marketingConsent || false
             };
 
-            console.log('👤 [GUEST] Guest checkout and order payload:', guestOrderPayload);
 
             const response = await guestCheckoutAndOrder(guestOrderPayload);
-            console.log("👤 [GUEST] guestCheckoutAndOrder response:", response);
-            console.log("👤 [GUEST] response.status:", response.status);
             
             if (response.status == ServerActionStatus.SUCCESS) {
-                // TypeScript now knows response.data exists because status is SUCCESS
-                console.log("👤 [GUEST] response.data:", response.data);
-                
                 // Transform the guest checkout response to match the expected ORDER_RESPONSE_DATA structure
                 // The guest API returns: { data: { order: { order_code, worldpay_url, ... } } }
                 // But handlePlaceOrder expects: { data: { order_code, worldpay_url } }
@@ -179,24 +173,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                     }
                 };
                 
-                console.log('👤 [GUEST] Transformed response for handlePlaceOrder:', transformedResponse);
-                console.log('👤 [GUEST] Calling handlePlaceOrder with:', {
-                    payload: {
-                        email: data.email,
-                        phone: data.phone,
-                        receive_promotions: data.marketingConsent || false,
-                        shipping_address_id: 0,
-                        shipping_address: guestOrderPayload.shipping_address,
-                        billing_address: guestOrderPayload.billing_address,
-                        useShippingAsBilling: guestOrderPayload.useShippingAsBilling,
-                        couponCode: guestOrderPayload.couponCode,
-                        shipping_method_id: guestOrderPayload.shipping_method_id,
-                        payment_method: guestOrderPayload.payment_method,
-                        total: guestOrderPayload.total,
-                        loyalty: guestOrderPayload.loyalty
-                    },
-                    responseData: transformedResponse
-                });
+                
                 
                 await handlePlaceOrder({
                     email: data.email,
@@ -384,7 +361,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             // Prioritize free shipping method if available
             const freeShippingMethod = sortedMethods.find((method) => (method.is_free_shipping ?? false));
             const initialMethod = freeShippingMethod || sortedMethods[0];
-            console.log('CheckoutDetails - Initial shipping method:', initialMethod);
             setSelectedCarrier(initialMethod);
             setSelectedShippingMethod(initialMethod);
             form.setValue('shippingMethodId', initialMethod.id);
@@ -401,7 +377,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         // Use cartTotal (amount after deals are applied) for free shipping threshold calculation
         // cartTotal represents the subtotal after discounts/deals, not including shipping
         const amountAfterDeals = cartTotal;
-        console.log("Amount after deals (cartTotal) for free shipping calculation:", amountAfterDeals);
         
         // Filter shipping methods based on the condition:
         // (is_enabled && !is_free_shipping && !free_shipping_threshold) || (is_enabled && is_free_shipping && (total >= free_shipping_threshold))
@@ -410,8 +385,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             const isFreeShipping = method.is_free_shipping ?? false;
             const freeShippingThreshold = method.free_shipping_threshold;
             
-            // Log for debugging
-            console.log(`Shipping method ${method.id} (${method.shipping_method}): is_enabled = ${isEnabled}, is_free_shipping = ${isFreeShipping}, free_shipping_threshold = ${freeShippingThreshold}, amount_after_deals = ${amountAfterDeals}`);
             
             // Must be enabled
             if (!isEnabled) {
@@ -436,8 +409,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             return false;
         });
 
-        console.log('CheckoutDetails - Amount after deals for filtering:', amountAfterDeals);
-        console.log('CheckoutDetails - Filtered shipping methods:', filteredMethods);
 
         // Sort methods to prioritize free shipping methods that meet the threshold
         const sortedMethods = [...filteredMethods].sort((a, b) => {
@@ -475,8 +446,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         // Prioritize free shipping method if available, otherwise use matched or first method
         const freeShippingMethod = sortedMethods.find((method) => (method.is_free_shipping ?? false));
         const nextMethod = freeShippingMethod || matchedMethod || sortedMethods[0];
-
-        console.log('CheckoutDetails - Selected shipping method:', nextMethod);
         setSelectedCarrier(nextMethod);
         setSelectedShippingMethod(nextMethod);
         form.setValue('shippingMethodId', nextMethod.id);
@@ -768,7 +737,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                     const method = e.target.value;
                                     form.setValue('shippingMethodId', Number(method));
                                     const selectedMethod = shippingMethods.find(m => m.id.toString() === method.toString()) || shippingMethods[0];
-                                    console.log('CheckoutDetails - Setting shipping method:', selectedMethod);
                                     setSelectedCarrier(selectedMethod);
                                     setSelectedShippingMethod(selectedMethod);
                                 }}
@@ -873,10 +841,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                             </Button>
                             <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-semibold'>We Respect Your Privacy & Information</p>
                             <div className='flex items-center gap-5 flex-wrap justify-center'>
-                                <a href="" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Delivery Policy</a>
-                                <a href="" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Returns Policy</a>
-                                <a href="" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Privacy Policy</a>
-                                <a href="" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Terms of Service</a>
+                                <a href="https://vapehub-live.devateam.com/delivery-information/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Delivery Policy</a>
+                                <a href="https://vapehub-live.devateam.com/returns-policy/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Returns Policy</a>
+                                <a href="https://vapehub-live.devateam.com/privacy-policy/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Privacy Policy</a>
+                                <a href="https://vapehub-live.devateam.com/terms-conditions/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Terms of Service</a>
                             </div>
                         </div>
                     </div>

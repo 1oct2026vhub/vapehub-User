@@ -6,8 +6,6 @@ import React from 'react'
 
 const WelcomeSection = async () => {
     const welcomeContentResponse = await getWelcomeContent();
-console.log('welcomeContentResponse', welcomeContentResponse);
-
     if (welcomeContentResponse.status === ServerActionStatus.ERROR || !welcomeContentResponse.data?.welcomeContent) {
         return null;
     }

@@ -89,9 +89,6 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             };
 
             const response = await applyGuestCoupon(payload);
-            console.log('🎫 [CouponForm] Guest User - Apply Coupon API Response:', response);
-            console.log('🎫 [CouponForm] Guest User - Response Status:', response.status);
-            console.log('🎫 [CouponForm] Guest User - Response Data:', 'data' in response ? response.data : 'No data (error response)');
             if(response.status === 'SUCCESS') {
                 toast.success('Coupon Applied Successfully');
             }
@@ -160,9 +157,6 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                 shippingMethodId: shippingMethodId || 0
             };
             const response = await applyCoupon(payload);
-            console.log('🎫 [CouponForm] Logged-in User - Apply Coupon API Response:', response);
-            console.log('🎫 [CouponForm] Logged-in User - Response Status:', response.status);
-            console.log('🎫 [CouponForm] Logged-in User - Response Data:', 'data' in response ? response.data : 'No data (error response)');
             if(response.status === 'SUCCESS') {
                 toast.success('Coupon Applied Successfully');
             }

@@ -80,7 +80,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                                         isIconOnly
                                         type="button"
                                         onPress={() => setPwdVisibility(prev => !prev)}
-                                        startContent={pwdVisibility ? <EyeOpenIcon className="z-10 mb-10" /> : <EyeClosedIcon className="z-10 mb-10" />}
+                                        startContent={pwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
                                         className="!p-0 h-fit hover:!bg-transparent"
                                     />
                                 }
@@ -102,7 +102,7 @@ const ResetPasswordForm: FunctionComponent<Props> = ({
                                         isIconOnly
                                         type="button"
                                         onPress={() => setCPwdVisibility(prev => !prev)}
-                                        startContent={cPwdVisibility ? <EyeOpenIcon className="z-10 mb-10" /> : <EyeClosedIcon className="z-10 mb-10" />}
+                                        startContent={cPwdVisibility ? <EyeOpenIcon className="z-10" /> : <EyeClosedIcon className="z-10" />}
                                         className="!p-0 h-fit hover:!bg-transparent"
                                     />
                                 }

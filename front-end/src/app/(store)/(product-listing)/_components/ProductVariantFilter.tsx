@@ -1,4 +1,4 @@
-import { Button, Select, SelectItem } from '@nextui-org/react'
+import { Button } from '@nextui-org/react'
 import { FunctionComponent } from 'react';
 import { AttributeTerms, AttributeProductTerms, ProductVariant } from '@/lib/config/product.config';
 import { useVariantFilter, VariantSelectionPayload } from '@/lib/hooks/useVariantFilter';
@@ -28,7 +28,7 @@ const SelectAttributeTerms = ({
     const selectedTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
     // Generate dynamic placeholder based on attribute name
     const placeholderText = `Choose your ${attributeTerm?.attribute.name.toLowerCase()}`;
-    
+
     return (
         <>
             <div>
@@ -39,40 +39,33 @@ const SelectAttributeTerms = ({
                     {`${attributeTerm?.terms.length} available`}
                 </p>
             </div>
-            <Select
-                size='sm'
-                className="w-full"
-                variant='bordered'
-                label={placeholderText}
-                selectedKeys={selectedTerm ? new Set([selectedTerm]) : undefined}
-                isDisabled={isFiltering}
-                classNames={{
-                    label: "!text-content-1 !text-skin-neutral-500 !font-opensans",
-                    trigger: "shadow-base border-skin-neutral-100 !rounded",
-                    listboxWrapper: "max-h-[400px] overflow-y-auto scroll-smooth",
-                    listbox: "overflow-visible",
-                }}
-                popoverProps={{
-                    classNames: {
-                        content: "max-h-[400px] overflow-hidden p-0",
-                    }
-                }}
+            <select
+                value={selectedTerm || ''}
                 onChange={(e) => {
                     const term = attributeTerm.terms.find(t => t.slug === e.target.value);
                     if (term) {
                         handleVariantFilter(attributeTerm, term);
                     }
                 }}
+                disabled={isFiltering}
+                className='shadow-base border-2 border-skin-neutral-100 rounded-lg w-full h-12 bg-white hover:bg-gray-50 text-left px-4 py-2 font-opensans text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:cursor-not-allowed'
+                style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 0.5rem center',
+                    backgroundSize: '1.5em 1.5em',
+                    paddingRight: '2.5rem'
+                }}
             >
+                <option value="" disabled>
+                    {placeholderText}
+                </option>
                 {attributeTerm.terms.map((term) => (
-                    <SelectItem
-                        key={term.slug}
-                        value={term.slug}
-                    >
+                    <option key={term.slug} value={term.slug}>
                         {term.name}
-                    </SelectItem>
+                    </option>
                 ))}
-            </Select>
+            </select>
         </>
     );
 };

@@ -13,6 +13,10 @@ function getBaseUrl(request?: NextRequest): string {
   throw new Error('Base URL cannot be determined. Please set NEXTAUTH_URL environment variable.');
 }
 
+// Force dynamic rendering to prevent caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   try {
     if (!API_URL) throw new Error('NEXT_PUBLIC_VAPE_HUB_API_BASE_URL environment variable is not set');
@@ -20,9 +24,10 @@ export async function GET(request: NextRequest) {
     const apiBaseUrl = API_URL.endsWith('/') ? API_URL : `${API_URL}/`;
     const sitemapUrl = `${apiBaseUrl}api/seo/sitemap.xml`;
     
+    // Fetch fresh data without caching
     const response = await fetch(sitemapUrl, {
       headers: { Accept: 'application/xml' },
-      next: { revalidate: 86400 },
+      cache: 'no-store', // Disable caching to always get fresh data
     });
 
     if (!response.ok) {
@@ -35,7 +40,12 @@ export async function GET(request: NextRequest) {
     
     return new NextResponse(mergedSitemap, {
       status: 200,
-      headers: { 'Content-Type': 'application/xml' },
+      headers: { 
+        'Content-Type': 'application/xml',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     console.error('Sitemap Fetch Error:', error instanceof Error ? error.message : String(error));

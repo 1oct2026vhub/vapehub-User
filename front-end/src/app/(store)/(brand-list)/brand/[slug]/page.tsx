@@ -124,16 +124,21 @@ export async function generateMetadata({ params, searchParams }: {
   const slug = (await params).slug as string;
   const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 } as const;
   const combinedParams = { ...defaultParams, ...await searchParams };
-
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
+  
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
     return {
-      title: `${brandProduct.name} | VapeHub`,
-      description: "",
+      title: `${dynamicPageSlug?.seo?.title || brandProduct.name} | VapeHub`,
+      description: dynamicPageSlug?.seo?.description || "",
       openGraph: {
-        title: `${brandProduct.name} | VapeHub`,
-        description: "",
-        images: brandProduct.logo_url ? [{
+        title: `${dynamicPageSlug?.seo?.title || brandProduct.name} | VapeHub`,
+        description: dynamicPageSlug?.seo?.description || "",
+        images: dynamicPageSlug?.seo?.ogImage ? [{
+          url: dynamicPageSlug?.seo?.ogImage,
+          width: 1200,
+          height: 630
+        }] : brandProduct.logo_url ? [{
           url: brandProduct.logo_url,
           width: 1200,
           height: 630

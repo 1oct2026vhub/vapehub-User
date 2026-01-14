@@ -24,7 +24,7 @@ interface ExtendedHeaderMegaMenu extends Omit<HeaderMegaMenu, 'entity_data' | 'h
     };
 }
 
-export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; parentMenu?: HeaderMegaMenu | null }> = ({ isOpen, menuItems, parentMenu }) => {
+export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; parentMenu?: HeaderMegaMenu | null; onClose?: () => void }> = ({ isOpen, menuItems, parentMenu, onClose }) => {
   const router = useRouter();
     const searchFromConfig = useForm<HeaderFormSchema>({
         resolver: zodResolver(HEADER_IN_SCHEMA),
@@ -118,6 +118,10 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
     // Handle menu item click navigation
     const handleMenuClick = (original: string | null, entityType?: string) => {
         if (original && original !== '#') {
+            // Close the menu when navigation occurs
+            if (onClose) {
+                onClose();
+            }
             if (entityType === 'brand') {
                 router.push(`/brand${original}`);
             } else if (entityType === 'deal') {
@@ -461,7 +465,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                     <div className="grid grid-cols-3 gap-4">
                         {/* Parent menu main image - same size as child images */}
                         {parentMenuImageUrl && (
-                            <Link href={getParentMenuHref()} className="block">
+                            <Link href={getParentMenuHref()} className="block" onClick={() => onClose && onClose()}>
                                 <div className="bg-white rounded-2xl shadow-md p-3">
                                     <div className="relative w-full h-[100px]">
                                         <Image
@@ -493,7 +497,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                                 return item.original || '#';
                             };
                             return (
-                                <Link href={getHref()} key={item.id} className="block">
+                                <Link href={getHref()} key={item.id} className="block" onClick={() => onClose && onClose()}>
                                     <div className="bg-white rounded-2xl shadow-md p-3">
                                         <div className="relative w-full h-[100px]">
                                             <Image

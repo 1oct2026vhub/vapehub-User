@@ -49,13 +49,13 @@ export const handleRequest = async <T, G>(
       const headers = await buildHeaders(requestData, canCache);
       
       // Log API call request
-      const hasPayloadData = ['POST', 'PUT', 'PATCH'].includes(method);
-      console.log(`[API Request] ${method} ${endpoint}`, {
-        method,
-        endpoint,
-        hasPayload: hasPayloadData,
-        canCache,
-      });
+      // const hasPayloadData = ['POST', 'PUT', 'PATCH'].includes(method);
+      // console.log(`[API Request] ${method} ${endpoint}`, {
+      //   method,
+      //   endpoint,
+      //   hasPayload: hasPayloadData,
+      //   canCache,
+      // });
       
       const response = await fetchWithRetry(endpoint, {
         method,

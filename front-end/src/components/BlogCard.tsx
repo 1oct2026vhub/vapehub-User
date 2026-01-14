@@ -15,7 +15,7 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
             <div className='min-h-60 flex justify-center items-center w-full max-h-60 rounded-lg mb-4.5 bg-white'>
                 <NoImage
                     src={blog.image_url}
-                    alt={blog.alt_text}
+                    alt={blog.alt_text || blog.title}
                     width={399}
                     height={240}
                     className='rounded-lg w-full max-h-60 object-contain'

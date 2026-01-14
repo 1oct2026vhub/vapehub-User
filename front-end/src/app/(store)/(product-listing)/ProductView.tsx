@@ -45,7 +45,9 @@ const ProductView: FunctionComponent<ProductViewProps> = ({ data, selectedVarian
             <ProductDataProvider initialData={data}>
                 <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
                     <BreadCrumbs items={breadcrumbs} />
+                    <Suspense fallback={<SuspenseLoader />}>
                     <ProductDetails data={data} selectedVariant={selectedVariant} />
+                    </Suspense>
                     <Suspense fallback={<SuspenseLoader />}>
                         <OrderCard />
                     </Suspense>

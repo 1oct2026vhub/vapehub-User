@@ -124,7 +124,7 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
                 </Link>
               )}
               {activeMenu && activeMenu.children && activeMenu.children.length > 0 && (
-                <MegaMenu isOpen={hoveredIndex === index} menuItems={activeMenu.children} parentMenu={activeMenu} />
+                <MegaMenu isOpen={hoveredIndex === index} menuItems={activeMenu.children} parentMenu={activeMenu} onClose={() => setHoveredIndex(null)} />
               )}
             </li>
           );

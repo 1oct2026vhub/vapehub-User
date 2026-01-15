@@ -287,7 +287,7 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
                 initialCouponCode={couponDiscount.code || ''}
                 cartTotal={cartTotal}
                 isGuest={!isAuthenticated}
-                shippingMethodId={shippingMethodId}
+                shippingMethodId={0}
             />
             {couponDiscount.isApplied && couponDiscount.code && (
                 <div className='flex items-center justify-between text-skin-primary-400 text-content-3 md:text-content-1 font-bold'>

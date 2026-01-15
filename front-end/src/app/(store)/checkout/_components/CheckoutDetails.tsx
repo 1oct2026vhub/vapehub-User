@@ -28,6 +28,7 @@ import { useSession } from 'next-auth/react';
 import { getCookie } from 'cookies-next';
 import { GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config';
 import { CartItem } from '@/lib/config/cart.config';
+import { getGuestCart } from '@/lib/utils/storage';
 
 interface CheckoutDetailsProps {
     shippingMethodsData: SHIPPING_METHOD_DATA[];
@@ -95,17 +96,23 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
 
         // For guest users, use the combined checkout and order API
         if (!isAuthenticated) {
-            // Get cart items from cookies
-            const guestCartCookie = getCookie('guest_cart');
-            let guestCartItems: CartItem[] = [];
+            // Get cart items from localStorage (with fallback to cookie for backward compatibility)
+            let guestCartItems: CartItem[] | null = getGuestCart<CartItem[]>();
             
-            try {
-                if (guestCartCookie) {
-                    guestCartItems = JSON.parse(guestCartCookie as string);
+            // Fallback to cookie for backward compatibility
+            if (!guestCartItems) {
+                const guestCartCookie = getCookie('guest_cart');
+                try {
+                    if (guestCartCookie) {
+                        guestCartItems = JSON.parse(guestCartCookie as string);
+                    }
+                } catch (e) {
+                    console.error('Error parsing guest cart cookie:', e);
                 }
-            } catch (e) {
-                console.error('Error parsing guest cart cookie:', e);
-                toast.error('Error loading cart items. Please try again.');
+            }
+            
+            if (!guestCartItems || guestCartItems.length === 0) {
+                toast.error('Your cart is empty. Please add items to your cart.');
                 return;
             }
 

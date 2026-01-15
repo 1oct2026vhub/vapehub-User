@@ -13,6 +13,7 @@ import CouponForm from '@/components/CouponForm'
 import { CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
 import { getCookie } from 'cookies-next'
 import { CartItem } from '@/lib/config/cart.config'
+import { getGuestCart } from '@/lib/utils/storage'
 import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'
 
@@ -67,7 +68,19 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
     // Console log cart details for guest users
     useEffect(() => {
         if (status !== 'authenticated') {
-            const guestCart = getCookie('guest_cart');
+            // Get from localStorage (with fallback to cookie for backward compatibility)
+            let guestCart = getGuestCart<CartItem[]>();
+            if (!guestCart) {
+                const guestCartCookie = getCookie('guest_cart');
+                try {
+                    if (guestCartCookie) {
+                        guestCart = JSON.parse(guestCartCookie as string);
+                    }
+                } catch {
+                    // Ignore parse errors
+                }
+            }
+            
             const guestCoupon = getCookie('couponDiscount');
             const guestLoyalty = getCookie('loyalty_redemption');
             
@@ -80,7 +93,7 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
                 cartSubtotal,
                 cartDiscount,
                 couponDiscount,
-                guestCartCookie: guestCart ? JSON.parse(guestCart as string) : null,
+                guestCartStorage: guestCart,
                 guestCouponCookie: guestCoupon ? JSON.parse(guestCoupon as string) : null,
                 guestLoyaltyCookie: guestLoyalty ? JSON.parse(guestLoyalty as string) : null,
                 cartItemsCount: cartItems?.length || 0,
@@ -100,23 +113,28 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
     }, [status, cartItems, itemCount, cartTotal, cartSubtotal, cartDiscount, couponDiscount]);
 
     const handleCheckout = async () => {
-        // Get all cart-related cookies
-        const guestCartCookie = getCookie('guest_cart');
+        // Get guest cart from localStorage (with fallback to cookie for backward compatibility)
+        let parsedGuestCart: CartItem[] | null = getGuestCart<CartItem[]>();
+        
+        // Fallback to cookie for backward compatibility
+        if (!parsedGuestCart) {
+            const guestCartCookie = getCookie('guest_cart');
+            try {
+                if (guestCartCookie) {
+                    parsedGuestCart = JSON.parse(guestCartCookie as string) as CartItem[];
+                }
+            } catch (e) {
+                console.error('Error parsing guest_cart cookie:', e);
+            }
+        }
+        
+        // Get coupon and loyalty from cookies (these remain in cookies)
         const couponCookie = getCookie('couponDiscount');
         const loyaltyCookie = getCookie('loyalty_redemption');
         
         // Parse cookie data
-        let parsedGuestCart: CartItem[] | null = null;
         let parsedCoupon: unknown = null;
         let parsedLoyalty: unknown = null;
-        
-        try {
-            if (guestCartCookie) {
-                parsedGuestCart = JSON.parse(guestCartCookie as string) as CartItem[];
-            }
-        } catch (e) {
-            console.error('Error parsing guest_cart cookie:', e);
-        }
         
         try {
             if (couponCookie) {
@@ -134,10 +152,10 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
             console.error('Error parsing loyalty_redemption cookie:', e);
         }
         
-        // Console log cart details stored in cookies
-        console.log('🍪 [COOKIES] Cart Details Stored in Cookies:', {
+        // Console log cart details stored in storage
+        console.log('💾 [STORAGE] Cart Details Stored:', {
             'guest_cart': {
-                raw: guestCartCookie,
+                source: parsedGuestCart ? 'localStorage' : 'none',
                 parsed: parsedGuestCart,
                 itemCount: parsedGuestCart?.length || 0,
                 items: parsedGuestCart?.map((item: CartItem) => ({
@@ -174,9 +192,21 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
         const isValid = await checkoutStockValidation();
         if(isValid) {
             // For unauthenticated users, skip API call and redirect directly
-            // Cart data is already stored in cookies and will be used on checkout page
+            // Cart data is already stored in localStorage and will be used on checkout page
             if(status !== 'authenticated') {
-                const guestCart = getCookie('guest_cart');
+                // Get from localStorage (with fallback to cookie for backward compatibility)
+                let guestCart = getGuestCart<CartItem[]>();
+                if (!guestCart) {
+                    const guestCartCookie = getCookie('guest_cart');
+                    try {
+                        if (guestCartCookie) {
+                            guestCart = JSON.parse(guestCartCookie as string);
+                        }
+                    } catch {
+                        // Ignore parse errors
+                    }
+                }
+                
                 const guestCoupon = getCookie('couponDiscount');
                 const guestLoyalty = getCookie('loyalty_redemption');
                 
@@ -188,7 +218,7 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
                     cartSubtotal,
                     cartDiscount,
                     couponDiscount,
-                    guestCartCookie: guestCart ? JSON.parse(guestCart as string) : null,
+                    guestCartStorage: guestCart,
                     guestCouponCookie: guestCoupon ? JSON.parse(guestCoupon as string) : null,
                     guestLoyaltyCookie: guestLoyalty ? JSON.parse(guestLoyalty as string) : null,
                     cartItemsCount: cartItems?.length || 0,

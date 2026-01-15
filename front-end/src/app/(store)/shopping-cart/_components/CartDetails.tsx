@@ -318,10 +318,10 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
                     <p className='text-skin-neutral-500 !font-oswald'>Number of Items</p>
                     <p className='text-skin-neutral-300'>{itemCount}</p>
                 </div>
-                <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
+                {/* <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
                     <p className='text-skin-neutral-500 !font-oswald'>Shipping Cost</p>
                     <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL} {safeShippingCost.toFixed(2)}</p>
-                </div>
+                </div> */}
                 <div className='flex items-center justify-between text-content-2 md:text-title-2 font-semibold'>
                     <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
                     <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL} {cartTotal.toFixed(2)}</p>

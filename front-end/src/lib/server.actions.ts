@@ -384,18 +384,30 @@ export const guestCheckoutAndOrder = async (payload: GUEST_CHECKOUT_AND_ORDER_PA
 
 // apply coupon
 export const applyCoupon = async (payload: APPLY_COUPON_PAYLOAD): Promise<ServerActionResponse<CouponResponse>> => {
+  // Remove shippingMethodId from payload if it's 0, null, or undefined - don't pass the field to API
+  const { shippingMethodId, ...restPayload } = payload;
+  const filteredPayload = (shippingMethodId === 0 || shippingMethodId === null || shippingMethodId === undefined)
+    ? restPayload
+    : payload;
+  
   return await handleRequest<CouponResponse, unknown>({
     endpoint: API_ROUTES.APPLY_COUPON,
-    payload,
+    payload: filteredPayload,
     method: 'POST',
   });
 };
 
 // apply guest coupon
 export const applyGuestCoupon = async (payload: APPLY_GUEST_COUPON_PAYLOAD): Promise<ServerActionResponse<CouponResponse>> => {
+  // Remove shippingMethodId from payload if it's 0, null, or undefined - don't pass the field to API
+  const { shippingMethodId, ...restPayload } = payload;
+  const filteredPayload = (shippingMethodId === 0 || shippingMethodId === null || shippingMethodId === undefined)
+    ? restPayload
+    : payload;
+  
   return await handleRequest<CouponResponse, unknown>({
     endpoint: API_ROUTES.APPLY_GUEST_COUPON,
-    payload,
+    payload: filteredPayload,
     method: 'POST',
   });
 };

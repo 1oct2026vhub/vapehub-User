@@ -38,7 +38,7 @@ interface CouponFormProps {
     shippingMethodId?: number;
 }
 
-const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', isGuest = false, shippingMethodId = 0}) => {
+const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', isGuest = false}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isApplied, setIsApplied] = useState(!!initialCouponCode);
     // const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -84,9 +84,9 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             const payload: APPLY_GUEST_COUPON_PAYLOAD = {
                 couponCode: data.couponCode,
                 cartItems: cartItemsForApi,
-                shippingMethodId: shippingMethodId || 0,
+                // shippingMethodId: shippingMethodId || 0, // Commented out - not needed for API payload
                 loyalty: false
-            };
+            } as APPLY_GUEST_COUPON_PAYLOAD;
 
             const response = await applyGuestCoupon(payload);
             if(response.status === 'SUCCESS') {
@@ -154,8 +154,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             // For authenticated users, use the existing flow
             const payload: APPLY_COUPON_PAYLOAD = {
                 ...data,
-                shippingMethodId: shippingMethodId || 0
-            };
+                // shippingMethodId: shippingMethodId || 0, // Commented out - not needed for API payload
+            } as APPLY_COUPON_PAYLOAD;
             const response = await applyCoupon(payload);
             if(response.status === 'SUCCESS') {
                 toast.success('Coupon Applied Successfully');

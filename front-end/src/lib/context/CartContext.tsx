@@ -6,6 +6,7 @@ import { APPLY_GUEST_COUPON_PAYLOAD } from '../config/checkout.config';
 import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, applyGuestCoupon, getLoyaltyPointsRedemption, calculateGuestDeals } from '../server.actions';
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '../config/app.config';
+import { getGuestCart, setGuestCart, removeGuestCart } from '../utils/storage';
 import { useSession } from 'next-auth/react';
 import { Product, ProductImage, ProductVariant } from '../config/product.config';
 import { toast } from 'sonner';
@@ -203,32 +204,30 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           }
         }
              } else {
-         // Load from cookie for guest users
-         const cookieCart = getCookie(CART_COOKIE_NAME);
-         if (cookieCart) {
-           const parsedCart = JSON.parse(cookieCart as string);
-           setCartItems(parsedCart);
+         // Load from localStorage for guest users
+         const guestCart = getGuestCart<CartItem[]>();
+         if (guestCart) {
+           setCartItems(guestCart);
            // For guest users, immediately calculate deals using API to prevent flicker
-           await calculateGuestDealsAndTotals(parsedCart);
+           await calculateGuestDealsAndTotals(guestCart);
          }
        }
          } catch (error) {
        console.error('Error loading cart:', error);
-       // Load from cookie as fallback
-       const cookieCart = getCookie(CART_COOKIE_NAME);
-       if (cookieCart) {
-         const parsedCart = JSON.parse(cookieCart as string);
-         setCartItems(parsedCart);
+       // Load from localStorage as fallback
+       const guestCart = getGuestCart<CartItem[]>();
+       if (guestCart) {
+         setCartItems(guestCart);
          // For guest users, try API first, fallback to local calculation
          if (!isAuthenticated) {
            try {
-             await calculateGuestDealsAndTotals(parsedCart);
+             await calculateGuestDealsAndTotals(guestCart);
            } catch (apiError) {
              console.error('API failed, using local calculation:', apiError);
-             calculateTotals(parsedCart);
+             calculateTotals(guestCart);
            }
          } else {
-           calculateTotals(parsedCart);
+           calculateTotals(guestCart);
          }
        }
      } finally {
@@ -447,7 +446,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
         const updatedCart = [...cartItems, newItem];
         setCartItems(updatedCart);
-        setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+        setGuestCart(updatedCart);
         // Immediately calculate deals using API to prevent flicker
         await calculateGuestDealsAndTotals(updatedCart);
         toast.success(`${productName} added to cart successfully`);
@@ -460,7 +459,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
       const updatedCart = [...cartItems, newItem];
       setCartItems(updatedCart);
-      setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+      setGuestCart(updatedCart);
       // Try API first, fallback to local calculation if API fails
       try {
         await calculateGuestDealsAndTotals(updatedCart);
@@ -520,7 +519,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           return item;
         });
          setCartItems(updatedCart);
-         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+         setGuestCart(updatedCart);
          await calculateGuestDealsAndTotals(updatedCart);
          // Revalidate coupon if applied for guest users
          if (couponDiscount.isApplied && couponDiscount.code) {
@@ -548,7 +547,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         return item;
       });
       setCartItems(updatedCart);
-      setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+      setGuestCart(updatedCart);
       calculateTotals(updatedCart);
     } finally {
       setIsLoading(false);
@@ -585,7 +584,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
          // Handle as guest cart
          const updatedCart = cartItems.filter(item => item.id !== cartId);
          setCartItems(updatedCart);
-         setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+         setGuestCart(updatedCart);
          // For guest users, recalculate deals using API if cart is not empty
          if (updatedCart.length > 0) {
            await calculateGuestDealsAndTotals(updatedCart);
@@ -610,7 +609,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
              // Handle as guest cart as fallback
        const updatedCart = cartItems.filter(item => item.id !== cartId);
        setCartItems(updatedCart);
-       setCookie(CART_COOKIE_NAME, JSON.stringify(updatedCart));
+       setGuestCart(updatedCart);
        // For guest users, try API first, fallback to local calculation
        if (!isAuthenticated && updatedCart.length > 0) {
          try {
@@ -641,10 +640,28 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (!isAuthenticated) return; // Only sync if user is authenticated
 
-    const cookieCart = getCookie(CART_COOKIE_NAME);
-    if (cookieCart) {
-      const items: CartItem[] = JSON.parse(cookieCart as string);
-      const cartItems = items.map(item => ({
+    // Try to load from localStorage first (new approach)
+    let guestCart = getGuestCart<CartItem[]>();
+    
+    // Fallback to cookie for backward compatibility (migrate old cookie data)
+    if (!guestCart) {
+      const cookieCart = getCookie(CART_COOKIE_NAME);
+      if (cookieCart) {
+        try {
+          guestCart = JSON.parse(cookieCart as string);
+          // Migrate to localStorage
+          if (guestCart) {
+            setGuestCart(guestCart);
+            setCookie(CART_COOKIE_NAME, ''); // Clear old cookie
+          }
+        } catch (e) {
+          console.error('Error parsing cookie cart:', e);
+        }
+      }
+    }
+
+    if (guestCart && guestCart.length > 0) {
+      const cartItems = guestCart.map(item => ({
         product_id: item.product_id,
         variant_id: item.variant_id,
         quantity: item.quantity
@@ -653,7 +670,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const response = await bulkAddToCart(cartItems);
 
         if (response.status === ServerActionStatus.SUCCESS) {
-          setCookie(CART_COOKIE_NAME, ''); // Clear cookie cart after sync
+          removeGuestCart(); // Clear localStorage cart after sync
           await loadCartItems();
         } else {
           toast.error(response.message);
@@ -716,11 +733,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const handleAuthChange = async () => {
       if (isAuthenticated && !hasAttemptedSync) {
         setHasAttemptedSync(true);
+        const guestCart = getGuestCart<CartItem[]>();
+        // Also check cookie for backward compatibility
         const cookieCart = getCookie(CART_COOKIE_NAME);
-        if (cookieCart) {
-          const items: CART_GET_PAYLOAD[] = JSON.parse(cookieCart as string);
-          if (items.length > 0) {
-            await syncCookieCart();
+        if (guestCart && guestCart.length > 0) {
+          await syncCookieCart();
+        } else if (cookieCart) {
+          try {
+            const items: CART_GET_PAYLOAD[] = JSON.parse(cookieCart as string);
+            if (items.length > 0) {
+              await syncCookieCart();
+            }
+          } catch (e) {
+            console.error('Error parsing cookie cart:', e);
           }
         }
       }

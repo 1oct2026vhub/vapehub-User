@@ -6,6 +6,7 @@ import { APPLY_COUPON_FORM_SCHEMA, APPLY_COUPON_FORM_TYPE, APPLY_COUPON_PAYLOAD,
 import { applyCoupon, applyGuestCoupon } from '@/lib/server.actions'
 import { getCookie } from 'cookies-next'
 import { CartItem } from '@/lib/config/cart.config'
+import { getGuestCart } from '@/lib/utils/storage'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
 import { toast } from 'sonner'
 import { useEffect, useState, useCallback } from 'react'
@@ -38,7 +39,7 @@ interface CouponFormProps {
     shippingMethodId?: number;
 }
 
-const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', isGuest = false, shippingMethodId = 0}) => {
+const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponCode = '', isGuest = false}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isApplied, setIsApplied] = useState(!!initialCouponCode);
     // const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -54,16 +55,22 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
 
     const handleApplyCoupon = async (data: APPLY_COUPON_FORM_TYPE) => {
         if (isGuest) {
-            // For guest users, get cart items from cookie
-            const guestCartCookie = getCookie('guest_cart');
-            let guestCartItems: CartItem[] = [];
+            // For guest users, get cart items from localStorage (with fallback to cookie for backward compatibility)
+            let guestCartItems: CartItem[] | null = getGuestCart<CartItem[]>();
             
-            try {
-                if (guestCartCookie) {
-                    guestCartItems = JSON.parse(guestCartCookie as string);
+            // Fallback to cookie for backward compatibility
+            if (!guestCartItems) {
+                const guestCartCookie = getCookie('guest_cart');
+                try {
+                    if (guestCartCookie) {
+                        guestCartItems = JSON.parse(guestCartCookie as string);
+                    }
+                } catch (e) {
+                    console.error('Error parsing guest cart cookie:', e);
                 }
-            } catch (e) {
-                console.error('Error parsing guest cart cookie:', e);
+            }
+            
+            if (!guestCartItems) {
                 toast.error('Error loading cart items. Please try again.');
                 return;
             }
@@ -84,9 +91,9 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             const payload: APPLY_GUEST_COUPON_PAYLOAD = {
                 couponCode: data.couponCode,
                 cartItems: cartItemsForApi,
-                shippingMethodId: shippingMethodId || 0,
+                // shippingMethodId: shippingMethodId || 0, // Commented out - not needed for API payload
                 loyalty: false
-            };
+            } as APPLY_GUEST_COUPON_PAYLOAD;
 
             const response = await applyGuestCoupon(payload);
             if(response.status === 'SUCCESS') {
@@ -154,8 +161,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             // For authenticated users, use the existing flow
             const payload: APPLY_COUPON_PAYLOAD = {
                 ...data,
-                shippingMethodId: shippingMethodId || 0
-            };
+                // shippingMethodId: shippingMethodId || 0, // Commented out - not needed for API payload
+            } as APPLY_COUPON_PAYLOAD;
             const response = await applyCoupon(payload);
             if(response.status === 'SUCCESS') {
                 toast.success('Coupon Applied Successfully');

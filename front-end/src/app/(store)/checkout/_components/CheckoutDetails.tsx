@@ -381,35 +381,63 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     useEffect(() => {
         if (originalShippingMethods.length === 0) return;
 
-        // Use cartTotal (amount after deals are applied) for free shipping threshold calculation
-        // cartTotal represents the subtotal after discounts/deals, not including shipping
-        const amountAfterDeals = cartTotal;
+        // Calculate safeTotal using the same logic as CartTotal.tsx (without shipping cost)
+        // This matches the total calculation in CartTotal component for consistency
+        const displaySubTotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0;
+        
+        // Calculate mail subscription discount if available
+        const mailSubscriptionDiscount = (couponDiscount.mailSubscriptionDiscount !== undefined && Number.isFinite(couponDiscount.mailSubscriptionDiscount))
+            ? couponDiscount.mailSubscriptionDiscount
+            : 0;
+        
+        // Calculate total using same logic as CartTotal.tsx (lines 149-162)
+        // Note: Shipping cost is excluded as we're checking eligibility for free shipping
+        let orderTotal: number;
+        if (couponDiscount.isApplied && couponDiscount.value !== undefined && Number.isFinite(couponDiscount.value)) {
+            const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
+            const loyaltyValue = loyaltyRedemption.isRedeemed && Number.isFinite(loyaltyRedemption.discountValue) ? loyaltyRedemption.discountValue : 0;
+            // Formula: (cartTotal with deals) - coupon discount - mail subscription discount - loyalty (no shipping)
+            orderTotal = displaySubTotal - couponValue - mailSubscriptionDiscount - loyaltyValue;
+        } else {
+            const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
+            const loyaltyValue = loyaltyRedemption.isRedeemed && Number.isFinite(loyaltyRedemption.discountValue) ? loyaltyRedemption.discountValue : 0;
+            // Formula: cartTotal - coupon - mail subscription discount - loyalty (no shipping)
+            orderTotal = displaySubTotal - couponValue - mailSubscriptionDiscount - loyaltyValue;
+        }
+        
+        // Ensure no NaN values with final safety check (same as safeTotal in CartTotal.tsx line 166)
+        const safeTotal = Number.isFinite(orderTotal) ? orderTotal : 0;
         
         // Filter shipping methods based on the condition:
-        // (is_enabled && !is_free_shipping && !free_shipping_threshold) || (is_enabled && is_free_shipping && (total >= free_shipping_threshold))
+        // 1. Show enabled non-free shipping methods (regardless of threshold)
+        // 2. Show enabled free shipping methods ONLY if safeTotal meets the threshold
         const filteredMethods = originalShippingMethods.filter((method) => {
             const isEnabled = method.is_enabled ?? false;
             const isFreeShipping = method.is_free_shipping ?? false;
             const freeShippingThreshold = method.free_shipping_threshold;
-            
             
             // Must be enabled
             if (!isEnabled) {
                 return false; // Don't show disabled methods
             }
             
-            // Condition 1: (is_enabled && !is_free_shipping && !free_shipping_threshold)
-            // Show enabled non-free shipping methods that don't have a free_shipping_threshold
-            if (!isFreeShipping && !freeShippingThreshold) {
-                return true;
+            // Condition 1: Show enabled non-free shipping methods
+            if (!isFreeShipping) {
+                return true; // Always show non-free shipping methods if enabled
             }
             
-            // Condition 2: (is_enabled && is_free_shipping && (total >= free_shipping_threshold))
-            // Show enabled free shipping methods only if threshold is met
-            if (isFreeShipping && freeShippingThreshold) {
+            // Condition 2: For free shipping methods, check if threshold is met using safeTotal
+            // Only show free shipping if safeTotal >= free_shipping_threshold
+            if (isFreeShipping) {
+                // If no threshold is set, show the free shipping method (always available)
+                if (!freeShippingThreshold) {
+                    return true;
+                }
+                
+                // If threshold is set, check if safeTotal meets the requirement
                 const threshold = parseFloat(freeShippingThreshold);
                 if (Number.isFinite(threshold) && threshold > 0) {
-                    return amountAfterDeals >= threshold;
+                    return safeTotal >= threshold;
                 }
             }
             
@@ -456,7 +484,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         setSelectedCarrier(nextMethod);
         setSelectedShippingMethod(nextMethod);
         form.setValue('shippingMethodId', nextMethod.id);
-    }, [cartTotal, originalShippingMethods, form, setSelectedShippingMethod]);
+    }, [cartTotal, couponDiscount, loyaltyRedemption, originalShippingMethods, form, setSelectedShippingMethod]);
 
     useEffect(() => {
         if (addresses.length > 0) {

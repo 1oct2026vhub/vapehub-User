@@ -4,9 +4,12 @@ import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.co
 import { useCart } from '@/lib/context/CartContext'
 import { useCheckout } from '@/lib/context/CheckoutContext'
 import { Divider, Checkbox } from '@nextui-org/react'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
 import CouponForm from '@/components/CouponForm'
-import { applyCoupon } from '@/lib/server.actions'
+import { applyCoupon, applyGuestCoupon } from '@/lib/server.actions'
+import { getGuestCart } from '@/lib/utils/storage'
+import { CartItem } from '@/lib/config/cart.config'
+import { APPLY_GUEST_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
 import { toast } from 'sonner'
 import { APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
 import { useSession } from 'next-auth/react'
@@ -18,12 +21,14 @@ interface CartTotalProps {
 }
 
 const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {  
-    const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption } = useCart();
+    const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption, setShippingMethodIdForCoupon } = useCart();
     const { selectedShippingMethod } = useCheckout();
     const [isApplyingLoyalty, setIsApplyingLoyalty] = useState(false);
     const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage } = loyaltyRedemption;
     const { status } = useSession();
     const isAuthenticated = status === 'authenticated';
+    const isRevalidatingRef = useRef(false);
+    const lastRevalidatedRef = useRef<{ cartTotal: number; itemCount: number; shippingMethodId: number } | null>(null);
 
     useEffect(() => {
         if (couponDiscount.isApplied && couponDiscount.code) {
@@ -41,6 +46,135 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             }));
         }
     }, [itemCount, setLoyaltyRedemption]);
+    
+    // Update shipping method ID in CartContext when selectedShippingMethod changes
+    // This ensures coupon revalidation uses the correct shipping method ID when quantity updates
+    useEffect(() => {
+        const shippingMethodId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0;
+        setShippingMethodIdForCoupon(shippingMethodId);
+    }, [selectedShippingMethod, setShippingMethodIdForCoupon]);
+    
+    // Revalidate coupon when component mounts or when cart/shipping method changes
+    // This ensures coupon discount updates when user returns to checkout page after adding products
+    useEffect(() => {
+        const revalidateCoupon = async () => {
+            // Only revalidate if:
+            // 1. Coupon is already applied
+            // 2. Coupon code exists
+            // 3. Shipping method is available (on checkout page)
+            // 4. Not already revalidating
+            if (!couponDiscount.isApplied || !couponDiscount.code || !selectedShippingMethod || isRevalidatingRef.current) {
+                return;
+            }
+            
+            const shippingMethodId = selectedShippingMethod.id ? Number(selectedShippingMethod.id) : 0;
+            
+            // Check if we already revalidated for this cart state and shipping method
+            const lastRevalidated = lastRevalidatedRef.current;
+            if (lastRevalidated && 
+                lastRevalidated.cartTotal === cartTotal && 
+                lastRevalidated.itemCount === itemCount && 
+                lastRevalidated.shippingMethodId === shippingMethodId) {
+                return; // Already revalidated for this state
+            }
+            
+            isRevalidatingRef.current = true;
+            
+            try {
+                let response;
+                
+                if (isAuthenticated) {
+                    // For authenticated users
+                    response = await applyCoupon({
+                        couponCode: couponDiscount.code,
+                        shippingMethodId: shippingMethodId,
+                    });
+                } else {
+                    // For guest users
+                    const guestCartItems: CartItem[] | null = getGuestCart<CartItem[]>();
+                    if (!guestCartItems || guestCartItems.length === 0) {
+                        isRevalidatingRef.current = false;
+                        return;
+                    }
+                    
+                    const cartItemsForApi = guestCartItems.map(item => ({
+                        product_id: item.product_id,
+                        variant_id: item.variant_id,
+                        quantity: item.quantity
+                    }));
+                    
+                    const payload: APPLY_GUEST_COUPON_PAYLOAD = {
+                        couponCode: couponDiscount.code,
+                        cartItems: cartItemsForApi,
+                        shippingMethodId: shippingMethodId,
+                        loyalty: false
+                    };
+                    
+                    response = await applyGuestCoupon(payload);
+                }
+                
+                if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.total != null && response.data.coupon) {
+                    const couponData = response.data;
+                    // Parse values - handle both number and string types from API
+                    const apiSubTotalValue = couponData.subTotal as number | string;
+                    const apiSubTotal = typeof apiSubTotalValue === 'string'
+                        ? parseFloat(apiSubTotalValue.replace(/[^\d.-]/g, '')) || 0
+                        : (Number.isFinite(apiSubTotalValue) ? apiSubTotalValue : 0);
+                    const apiTotalValue = couponData.total as number | string;
+                    const apiTotal = typeof apiTotalValue === 'string'
+                        ? parseFloat(apiTotalValue.replace(/[^\d.-]/g, '')) || 0
+                        : (Number.isFinite(apiTotalValue) ? apiTotalValue : 0);
+                    const apiShippingCostValue = couponData.shippingCost as number | string;
+                    const apiShippingCost = typeof apiShippingCostValue === 'string'
+                        ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
+                        : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
+                    
+                    const discountAmount = couponData.discount_amount ?? (apiSubTotal - apiTotal);
+                    const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
+                        ? couponData.mail_subscription_discount
+                        : undefined;
+                    
+                    setCouponDiscount({
+                        value: Number.isFinite(discountAmount) ? discountAmount : 0,
+                        isApplied: true,
+                        code: couponDiscount.code,
+                        message: couponData.coupon.discount_type === "percentage" ? `Extra ${couponData.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${couponData.coupon.discount_value} off`,
+                        discountValue: Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00',
+                        discount_amount: Number.isFinite(couponData.discount_amount) ? couponData.discount_amount : undefined,
+                        shippingCost: apiShippingCost,
+                        subTotal: apiSubTotal,
+                        total: apiTotal,
+                        mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData,
+                        mailSubscriptionDiscount: mailSubscriptionDiscountValue,
+                    });
+                    
+                    // Update last revalidated state
+                    lastRevalidatedRef.current = {
+                        cartTotal,
+                        itemCount,
+                        shippingMethodId
+                    };
+                } else if (response.status === ServerActionStatus.ERROR) {
+                    // Coupon is no longer valid, remove it
+                    setCouponDiscount({
+                        value: 0,
+                        isApplied: false,
+                        code: couponDiscount.code,
+                        message: null,
+                        discountValue: '',
+                        mailSubscriptionData: couponDiscount.mailSubscriptionData,
+                    });
+                }
+            } catch (error) {
+                console.error('Error revalidating coupon:', error);
+            } finally {
+                isRevalidatingRef.current = false;
+            }
+        };
+        
+        // Revalidate when component mounts or when cart/shipping method changes
+        revalidateCoupon();
+    }, [isAuthenticated, couponDiscount.code, couponDiscount.isApplied, selectedShippingMethod?.id, cartTotal, itemCount, setCouponDiscount]);
     const handleRedeemToggle = async (checked: boolean) => {
         setIsApplyingLoyalty(true);
         const payload: APPLY_COUPON_PAYLOAD = {
@@ -248,7 +382,11 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 <Divider className='border-2' />
                 {hasEnabledFreeShipping && (
                     <>
-                        <ShippingProgress totalAmount={safeSubTotal} freeShippingThreshold={freeShippingThreshold} />
+                        <ShippingProgress 
+                            totalAmount={safeTotal} 
+                            freeShippingThreshold={freeShippingThreshold} 
+                            shippingCost={safeShippingCost}
+                        />
                         <Divider className='border-2' />
                     </>
                 )}

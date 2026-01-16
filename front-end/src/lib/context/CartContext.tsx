@@ -63,6 +63,7 @@ interface CartContextType {
   unAvailableItems: UnAvailableItem[];
   loyaltyRedemption: LoyaltyRedemption;
   setLoyaltyRedemption: React.Dispatch<React.SetStateAction<LoyaltyRedemption>>;
+  setShippingMethodIdForCoupon: (shippingMethodId: number) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -80,6 +81,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [stockValidationErrors, setStockValidationErrors] = useState<Array<{ itemId: number; message: string; isOutOfStock: boolean }>>([]);
   const isAuthenticated = status === 'authenticated';
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
+  // Store shipping method ID for coupon revalidation (set by CartTotal on checkout page)
+  const [shippingMethodIdForCoupon, setShippingMethodIdForCoupon] = useState<number>(0);
   const [cartTotal, setCartTotal] = useState<number>(0);
   const [cartSubtotal, setCartSubtotal] = useState<number>(0);
   const [cartDiscount, setCartDiscount] = useState<number>(0);
@@ -523,7 +526,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
          await calculateGuestDealsAndTotals(updatedCart);
          // Revalidate coupon if applied for guest users
          if (couponDiscount.isApplied && couponDiscount.code) {
-           await revalidateGuestCoupon(updatedCart, 0); // Use 0 as default shippingMethodId, can be updated later
+           await revalidateGuestCoupon(updatedCart, shippingMethodIdForCoupon); // Use shippingMethodIdForCoupon (set by CartTotal on checkout page)
          }
          // toast.success('Cart updated successfully');
       }
@@ -945,9 +948,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
+      // Use shippingMethodIdForCoupon (set by CartTotal on checkout page)
+      // On checkout page: uses selectedShippingMethod ID
+      // On shopping cart page: defaults to 0
       const response = await applyCoupon({
         couponCode: couponDiscount.code,
-        shippingMethodId: 0, // Adjust if you use shipping method
+        shippingMethodId: shippingMethodIdForCoupon,
       });
       
       // console.log('🔄 [CartContext] Response data:', response.data);
@@ -1093,6 +1099,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     unAvailableItems,
     loyaltyRedemption,
     setLoyaltyRedemption,
+    setShippingMethodIdForCoupon,
   };
 
   return (

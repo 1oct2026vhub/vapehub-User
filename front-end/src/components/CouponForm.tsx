@@ -159,11 +159,15 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
             }
         } else {
             // For authenticated users, use the existing flow
+            // Always use the shippingMethodId prop from CartTotal (selectedShippingMethod) instead of form data
+            // This ensures we use the currently selected shipping method, not the form's default value of 0
             const payload: APPLY_COUPON_PAYLOAD = {
-                ...data,
-                shippingMethodId: shippingMethodId || 0, // Commented out - not needed for API payload
+                couponCode: data.couponCode,
+                shippingMethodId: shippingMethodId !== undefined && shippingMethodId !== null ? Number(shippingMethodId) : 0, // Use prop value from CartTotal
             } as APPLY_COUPON_PAYLOAD;
+            // console.log('applyCoupon - Payload:', JSON.stringify(payload, null, 2));
             const response = await applyCoupon(payload);
+            // console.log('applyCoupon - Response:', JSON.stringify(response, null, 2));
             if(response.status === 'SUCCESS') {
                 toast.success('Coupon Applied Successfully');
             }

@@ -109,9 +109,18 @@ function mergeStaticPagesWithSitemap(apiSitemap: string, baseUrl: string): strin
   const normalizedApiSitemap = normalizeSitemapUrls(apiSitemap, baseUrl);
   
   const staticPagesXml = STATIC_PAGES.map(path => {
-    const cleanPath = path === '/' ? '' : (path.startsWith('/') ? path : `/${path}`);
+    // Home page should not have trailing slash, all other static pages should have trailing slash
+    if (path === '/') {
+      return `  <url>
+    <loc>${cleanBaseUrl}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    }
+    // Add trailing slash for all other static pages
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
     return `  <url>
-    <loc>${cleanBaseUrl}${cleanPath}</loc>
+    <loc>${cleanBaseUrl}${cleanPath}/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`;

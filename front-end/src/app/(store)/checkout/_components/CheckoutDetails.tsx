@@ -876,10 +876,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                             </Button>
                             <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-semibold'>We Respect Your Privacy & Information</p>
                             <div className='flex items-center gap-5 flex-wrap justify-center'>
-                                <a href="https://vapehub-live.devateam.com/delivery-information/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Delivery Policy</a>
-                                <a href="https://vapehub-live.devateam.com/returns-policy/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Returns Policy</a>
-                                <a href="https://vapehub-live.devateam.com/privacy-policy/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Privacy Policy</a>
-                                <a href="https://vapehub-live.devateam.com/terms-conditions/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Terms of Service</a>
+                                <a href="https://www.vapehub.co.uk/delivery-information/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Delivery Policy</a>
+                                <a href="https://www.vapehub.co.uk/returns-policy/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Returns Policy</a>
+                                <a href="https://www.vapehub.co.uk/privacy-policy/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Privacy Policy</a>
+                                <a href="https://www.vapehub.co.uk/terms-conditions/" className='primary-gradient-100 text-content-3 md:text-title-2 font-semibold'>Terms of Service</a>
                             </div>
                         </div>
                     </div>

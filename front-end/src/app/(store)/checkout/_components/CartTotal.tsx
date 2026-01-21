@@ -187,7 +187,19 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             // Use API response values for accurate calculation
             const apiSubTotal = response.data.subTotal || cartTotal;
             const apiTotal = response.data.total || cartTotal;
-            const discountAmount = checked ? (apiSubTotal - apiTotal) : 0;
+            // Loyalty discount: use loyalty-only discount from API when available.
+            // NOTE: (subTotal - total) includes deals + loyalty + other discounts, so it is NOT loyalty-only.
+            const loyaltyDiscountRaw = checked
+                ? (response.data as unknown as { loyalty_discount?: number | string }).loyalty_discount
+                : 0;
+            const loyaltyDiscountParsed =
+                typeof loyaltyDiscountRaw === 'string'
+                    ? (parseFloat(loyaltyDiscountRaw.replace(/[^\d.-]/g, '')) || 0)
+                    : (typeof loyaltyDiscountRaw === 'number' && Number.isFinite(loyaltyDiscountRaw) ? loyaltyDiscountRaw : 0);
+            // Fallback to legacy behavior only if API doesn't provide loyalty_discount
+            const discountAmount = checked
+                ? (loyaltyDiscountParsed > 0 ? loyaltyDiscountParsed : (apiSubTotal - apiTotal))
+                : 0;
             setLoyaltyRedemption(prev => ({
                 ...prev,
                 isRedeemed: checked,

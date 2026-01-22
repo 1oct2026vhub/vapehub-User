@@ -187,7 +187,19 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             // Use API response values for accurate calculation
             const apiSubTotal = response.data.subTotal || cartTotal;
             const apiTotal = response.data.total || cartTotal;
-            const discountAmount = checked ? (apiSubTotal - apiTotal) : 0;
+            // Loyalty discount: use loyalty-only discount from API when available.
+            // NOTE: (subTotal - total) includes deals + loyalty + other discounts, so it is NOT loyalty-only.
+            const loyaltyDiscountRaw = checked
+                ? (response.data as unknown as { loyalty_discount?: number | string }).loyalty_discount
+                : 0;
+            const loyaltyDiscountParsed =
+                typeof loyaltyDiscountRaw === 'string'
+                    ? (parseFloat(loyaltyDiscountRaw.replace(/[^\d.-]/g, '')) || 0)
+                    : (typeof loyaltyDiscountRaw === 'number' && Number.isFinite(loyaltyDiscountRaw) ? loyaltyDiscountRaw : 0);
+            // Fallback to legacy behavior only if API doesn't provide loyalty_discount
+            const discountAmount = checked
+                ? (loyaltyDiscountParsed > 0 ? loyaltyDiscountParsed : (apiSubTotal - apiTotal))
+                : 0;
             setLoyaltyRedemption(prev => ({
                 ...prev,
                 isRedeemed: checked,
@@ -202,6 +214,47 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         }
         setIsApplyingLoyalty(false);
     };
+
+    // Keep loyalty discount amount in sync with cart total when loyalty is applied.
+    // This updates the green "Loyalty points applied" amount (and total calculation) after quantity/add-to-cart changes,
+    // without re-calling applyCoupon. Coupon flow is unchanged and remains mutually exclusive with loyalty.
+    useEffect(() => {
+        if (!isRedeemed) return;
+        if (!loyaltyPoints) return;
+        if (couponDiscount.isApplied || couponDiscount.code) return;
+
+        const redemptionAmountNum = typeof loyaltyPoints.redemption_amount === 'string'
+            ? parseFloat(loyaltyPoints.redemption_amount.replace(/[^\d.-]/g, '')) || 0
+            : (Number.isFinite(Number(loyaltyPoints.redemption_amount)) ? Number(loyaltyPoints.redemption_amount) : 0);
+
+        const baseAmount = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0;
+
+        const rawDiscount = loyaltyPoints.redemption_type === 'percentage'
+            ? (redemptionAmountNum / 100) * baseAmount
+            : redemptionAmountNum;
+
+        const nextDiscount = Number.isFinite(rawDiscount)
+            ? Math.max(0, Math.round(rawDiscount * 100) / 100)
+            : 0;
+
+        // Avoid unnecessary state updates / render loops
+        if (Math.abs((loyaltyDiscountValue || 0) - nextDiscount) < 0.01) return;
+
+        setLoyaltyRedemption(prev => ({
+            ...prev,
+            isRedeemed: true,
+            discountValue: nextDiscount,
+            message: prev.message ?? 'Loyalty points applied',
+        }));
+    }, [
+        isRedeemed,
+        loyaltyPoints,
+        cartTotal,
+        couponDiscount.isApplied,
+        couponDiscount.code,
+        loyaltyDiscountValue,
+        setLoyaltyRedemption,
+    ]);
 
     const getRedemptionLabel = () => {
         if (!loyaltyPoints) return "";

@@ -172,6 +172,17 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                         </div>
                     </DrawerHeader>
                     <DrawerBody className='py-4 px-4'>
+                        {/* Static NEW IN menu item */}
+                        <Button 
+                            as={Link} 
+                            href={ROUTES.NEW_PRODUCTS} 
+                            variant='light' 
+                            className='w-full justify-start text-title-2 font-bold uppercase font-oswald p-3 mb-2'
+                            onPress={handleMenuClose}
+                        >
+                            NEW IN
+                        </Button>
+                        
                         {/* Accordion Filters */}
                         {hasMenuContent && (
                             <Accordion variant="splitted" className="!p-0" itemClasses={itemClasses} selectionMode='multiple'>

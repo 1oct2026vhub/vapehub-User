@@ -352,8 +352,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 {/* Title section mobile */}
-                <div className='space-y-2 lg:hidden'>
-                    <h1 className='text-h4 text-skin-neutral-500 font-semibold'>{productName}</h1>
+                <div className='space-y-2 lg:hidden order-1'>
                     <div className='block text-content-1 text-skin-neutral-500 w-fit'>
                         Brand:
                         {product?.product_brands?.map((brand, index) => (
@@ -379,7 +378,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 </div>
                 {/* Title section mobile ends */}
 
-                <div className='space-y-4 w-full lg:w-fit'>
+                <div className='space-y-4 w-full lg:w-fit order-1 lg:order-1'>
                     <div className='bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
                         <CustomImageMagnifier
                             src={mainImage?.url || ''}
@@ -436,10 +435,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                     </Slider>
 
                 </div>
-                <div className='flex flex-col gap-4.5 lg:gap-5 w-full'>
+                <div className='flex flex-col gap-4.5 lg:gap-5 w-full order-0 lg:order-2'>
+                    {/* Single h1 tag - appears first on mobile (order-0), in desktop section on desktop */}
+                    <h1 className='text-h4 lg:text-h2 text-skin-neutral-500 font-semibold mb-2 lg:mb-0 lg:mr-8'>{productName}</h1>
                     <div className='space-y-3.5 hidden lg:block'>
-
-                        <h1 className='text-h2 text-skin-neutral-500 font-semibold mr-8'>{productName}</h1>
                         <div className='block text-content-1 text-skin-neutral-500 w-fit'>
                             Brand:
                             {product?.product_brands?.map((brand, index) => (

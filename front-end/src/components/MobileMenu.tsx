@@ -231,7 +231,12 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             </Accordion>
                         )}
                         {defaultNavLinks.map(({ name, slug }) => (
-                            <Button as={Link} href={slug} key={name} variant='light' className='w-full justify-start text-title-2 font-bold p-3'
+                            <Button
+                                as={Link}
+                                href={slug}
+                                key={name}
+                                variant='light'
+                                className='w-full justify-start text-title-2 font-bold uppercase font-oswald p-3 mb-2'
                                 onPress={handleMenuClose}>
                                 {name}
                             </Button>

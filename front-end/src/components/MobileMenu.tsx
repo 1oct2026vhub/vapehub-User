@@ -177,7 +177,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             as={Link} 
                             href={ROUTES.NEW_PRODUCTS} 
                             variant='light' 
-                            className='w-full justify-start text-title-2 font-bold p-3 mb-2'
+                            className='w-full justify-start text-lg uppercase font-bold font-oswald p-3 mb-2'
                             onPress={handleMenuClose}
                         >
                             NEW IN

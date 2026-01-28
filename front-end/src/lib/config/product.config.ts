@@ -116,6 +116,7 @@ export type ProductReview = {
     verified_by: number;
     testimonial: number;
     created_at: string;
+    review_date: string;
     user: {
         id: number;
         first_name: string;

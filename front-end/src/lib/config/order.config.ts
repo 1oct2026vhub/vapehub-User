@@ -516,6 +516,7 @@ export interface REVIEWS {
     is_visible: boolean;
     created_at: string;
     updated_at: string;
+    review_date: string;
     user: {
         id: number;
         first_name: string;

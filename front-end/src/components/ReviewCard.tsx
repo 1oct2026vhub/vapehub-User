@@ -78,7 +78,7 @@ const ReviewCard: React.FC<{ review: REVIEWS }> = ({ review }) => {
                             )
                         ))}
                     </div>
-                    <p className='text-skin-blue-500 font-medium text-content-1'>{formatDate(review?.created_at)}</p>
+                    <p className='text-skin-blue-500 font-medium text-content-1'>{formatDate(review?.review_date)}</p>
                 </div>
             </div>
             <div className='flex items-center gap-3'>

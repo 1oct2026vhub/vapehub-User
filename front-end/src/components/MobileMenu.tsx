@@ -177,7 +177,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             as={Link} 
                             href={ROUTES.NEW_PRODUCTS} 
                             variant='light' 
-                            className='w-full justify-start text-title-2 font-bold uppercase font-oswald p-3 mb-2'
+                            className='w-full justify-start text-title-2 font-bold uppercase font-oswald rounded-lg shadow-input border border-skin-neutral-100 p-4 py-5.5'
                             onPress={handleMenuClose}
                         >
                             NEW IN
@@ -231,7 +231,12 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             </Accordion>
                         )}
                         {defaultNavLinks.map(({ name, slug }) => (
-                            <Button as={Link} href={slug} key={name} variant='light' className='w-full justify-start text-title-2 font-bold p-3'
+                            <Button
+                                as={Link}
+                                href={slug}
+                                key={name}
+                                variant='light'
+                                className='w-full justify-start text-title-2 font-bold uppercase font-oswald rounded-lg shadow-input border border-skin-neutral-100 p-4 py-5.5'
                                 onPress={handleMenuClose}>
                                 {name}
                             </Button>

@@ -60,7 +60,7 @@ const Page = async ({ params, searchParams }: {
   }
   
 
-  const defaultParams = { sort_by: 'id', order: 'ASC', limit: 12, offset: 0 } as const;
+  const defaultParams = { sort_by: 'id', order: 'DESC', limit: 12, offset: 0 } as const;
   
   // Process search parameters with proper attribute filter handling
   const variantParams = Object.entries(searchParamsData)

@@ -2,6 +2,18 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
+/** Key used to skip scroll restore when user explicitly changed page/filter/sort (e.g. pagination). */
+export const SCROLL_TO_TOP_NEXT_KEY = 'scrollToTopNext';
+
+/** Call before navigating (e.g. pagination, filter, sort) so the next page load scrolls to top instead of restoring position. */
+export function setScrollToTopOnNextNavigation(): void {
+  try {
+    sessionStorage.setItem(SCROLL_TO_TOP_NEXT_KEY, '1');
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 function HistoryProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -74,6 +86,17 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
     
     const restoreScroll = () => {
       try {
+        // When user explicitly changed page/filter/sort (pagination etc.), scroll to top and skip restore
+        const scrollToTopNext = sessionStorage.getItem(SCROLL_TO_TOP_NEXT_KEY);
+        if (scrollToTopNext) {
+          sessionStorage.removeItem(SCROLL_TO_TOP_NEXT_KEY);
+          // Clear saved position for this pageKey so delayed restore timers don't restore it later
+          sessionStorage.removeItem(`scrollPos_${pageKey}`);
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          isRestoringRef.current = false;
+          return;
+        }
+
         // Check if we're navigating to landing page from logo click
         const skipRestore = sessionStorage.getItem('skipScrollRestore_/');
         if (skipRestore && pathname === '/') {

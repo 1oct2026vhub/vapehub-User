@@ -51,12 +51,14 @@ export const signInAction = async (
   
   export const signUpAction = async ({
     email,
+    phone,
     password,
     mail_subscription,
     referralCode
   }: SignUpFormSchema & { referralCode: string }): Promise<ServerActionResponse<{message: string}>> => {
     const payload = {
       email,
+      phone,
       password,
       mail_subscription
     };

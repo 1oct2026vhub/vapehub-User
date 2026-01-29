@@ -29,7 +29,7 @@ export default function ReferralForm({ referralCode }: ReferralFormProps) {
     const [copied, setCopied] = useState(false);
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
     const shareUrl = `${baseUrl}?referral_code=${referralCode}`;
-    const shareMessage = encodeURIComponent(`Check out this awesome store! Use my referral code ${referralCode} for a discount on your first purchase.`);
+    const shareMessage = encodeURIComponent(`Check out this awesome store! Sign up using my referral link to receive a discount on your first purchase.`);
     const {status} = useSession();
     const router = useRouter();
     const form = useForm<EmailFormData>({

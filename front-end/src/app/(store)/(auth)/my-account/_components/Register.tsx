@@ -22,6 +22,7 @@ const Register: FunctionComponent = (): ReactElement => {
         resolver: zodResolver(SIGN_UP_SCHEMA),
         defaultValues: {
             email: "", 
+            phone: "",
             password:"", 
             confirmPassword:"",
             mail_subscription: false
@@ -37,6 +38,7 @@ const Register: FunctionComponent = (): ReactElement => {
         if (response.status === ServerActionStatus.SUCCESS) {
             signUpFormConfig.reset({ 
                 email: "", 
+                phone: "",
                 password:"", 
                 confirmPassword:"",
                 mail_subscription: false
@@ -61,6 +63,16 @@ const Register: FunctionComponent = (): ReactElement => {
                             name="email"
                             type={SIGN_UP_FORM_CONFIG.EMAIL.TYPE}
                             label={SIGN_UP_FORM_CONFIG.EMAIL.LABEL}
+                            className="w-full"
+                        />
+                    </div>
+                    <div className="flex w-full justify-center items-center">
+                        <InputField
+                            control={signUpFormConfig.control}
+                            isRequired
+                            name="phone"
+                            type={SIGN_UP_FORM_CONFIG.PHONE.TYPE}
+                            label={SIGN_UP_FORM_CONFIG.PHONE.LABEL}
                             className="w-full"
                         />
                     </div>

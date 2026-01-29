@@ -35,6 +35,7 @@ export enum ValidationMessage {
   EMAIL = 'Email is required',
   PASSWORD = 'Password is required',
   CONFIRM_PASSWORD = 'Confirm Password is required',
+  PHONE = 'Phone is required',
 }
 
 // * Helper methods

@@ -20,8 +20,8 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FunctionComponent, ReactElement, useState, useEffect } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
-import { useScrollToTopOnSearchParamsChange } from "@/lib/hooks/useScrollToTopOnSearchParamsChange";
 import { setScrollToTopOnNextNavigation } from "@/components/HistoryProvider";
+import { PRODUCT_LISTING_START_ID } from "@/lib/utils/scrollToTop";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 // import { getAllDeals } from "@/lib/server.actions";
@@ -60,8 +60,6 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
   const searchParams = useSearchParams();
   const { getFilterParams, getAppliedFilters, removeFilter, updateFilters, clearAllFilters } = useProductFilters();
 
-  useScrollToTopOnSearchParamsChange();
-
   // Set default sort_by=popularity in URL if not present
   useEffect(() => {
     const sortBy = searchParams.get("sort_by");
@@ -80,7 +78,6 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
   const appliedFilters = getAppliedFilters(productAttributeTerms);
   const handleRemoveFilter = (attributeId: number, type: string) => {
     setScrollToTopOnNextNavigation();
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     setIsLoading(true);
     removeFilter(attributeId, productAttributeTerms, type);
     setTimeout(() => {
@@ -90,7 +87,6 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
 
   const onFilterChange = (attributeId: string, value: string, isSelect: boolean) => {
     setScrollToTopOnNextNavigation();
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     setIsLoading(true);
     const currentFilters = getFilterParams();
     if (!currentFilters.variants) {
@@ -221,10 +217,9 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
 
   
   // const pageLimit = data?.pagination?.limit ?? 0;
-  // on pagination change
+  // on pagination change – scroll to first product section (by id) then navigate
   const handlePagination = (page: number) => {
     setScrollToTopOnNextNavigation();
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     const params = new URLSearchParams(searchParams);    
     params.set("offset", ((page - 1) * 12).toString());
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
@@ -266,7 +261,6 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
 
   const handleSortChange = (sort: string) => {
     setScrollToTopOnNextNavigation();
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     const params = new URLSearchParams(searchParams);
     
     if (!sort || sort === "") {
@@ -312,14 +306,13 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
           filterOptions={filterOptions} 
           onClearAllFilters={() => {
             setScrollToTopOnNextNavigation();
-            window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
             clearAllFilters();
           }}
           />
 
         }
 
-        <div className="flex flex-col gap-7.5 md:gap-9 w-full">
+        <div id={PRODUCT_LISTING_START_ID} className="flex flex-col gap-7.5 md:gap-9 w-full">
           <ProductListingActionsWeb
             onSortChange={handleSortChange}
             initialValue={getSortValueFromParams()}
@@ -333,11 +326,10 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
             appliedFilters={appliedFilters}
             onRemoveFilter={handleRemoveFilter}
             filterOptions={filterOptions}
-            onClearAllFilters={() => {
-              setScrollToTopOnNextNavigation();
-              window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-              clearAllFilters();
-            }}
+          onClearAllFilters={() => {
+            setScrollToTopOnNextNavigation();
+            clearAllFilters();
+          }}
           />
           {products.length === 0 ? (
             <EmptyPlaceholder title='Uh, oh!' description='No products found.' />

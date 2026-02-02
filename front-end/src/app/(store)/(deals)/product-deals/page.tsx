@@ -10,7 +10,6 @@ import { getAllDeals } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import SuspenseLoader from '@/components/ui/SuspenseLoader';
-import { useScrollToTopOnSearchParamsChange } from '@/lib/hooks/useScrollToTopOnSearchParamsChange';
 import { setScrollToTopOnNextNavigation } from '@/components/HistoryProvider';
 
 // Disable static generation for this page since it uses dynamic search params
@@ -27,8 +26,6 @@ const AllDealsContent: React.FC = () => {
 
     // Get current page from URL, default to 1
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
-
-    useScrollToTopOnSearchParamsChange();
 
     useEffect(() => {
         const fetchDeals = async () => {
@@ -47,7 +44,6 @@ const AllDealsContent: React.FC = () => {
     // Handle page change - update URL with page parameter
     const handlePageChange = (page: number) => {
         setScrollToTopOnNextNavigation();
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         const params = new URLSearchParams(searchParams.toString());
         if (page === 1) {
             params.delete('page'); // Remove page param for page 1 to keep URL clean

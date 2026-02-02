@@ -19,7 +19,7 @@ const BrandPage: NextPage<Props> = async ({
   params,
   searchParams }): AsyncReactElement => {
   const slug = (await params).slug as string;
-  const defaultParams = { sort_by: "id", order: "DESC", limit: 10, offset: 0 } as const;
+  const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
   
   // Fetch dynamic page slug data
@@ -122,7 +122,7 @@ export async function generateMetadata({ params, searchParams }: {
   searchParams: Promise<Record<string, string>>
 }) {
   const slug = (await params).slug as string;
-  const defaultParams = { sort_by: "id", order: "ASC", limit: 10, offset: 0 } as const;
+  const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 } as const;
   const combinedParams = { ...defaultParams, ...await searchParams };
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
   

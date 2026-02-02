@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface NoImageProps {
@@ -21,6 +21,11 @@ const NoImage: React.FC<NoImageProps> = ({
   priority = false,
 }) => {
   const [hasError, setHasError] = useState(false);
+
+  // Reset error state when src changes so a new image URL gets a fresh attempt
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
   
   const isValidImageUrl = src && src.startsWith('http');
 

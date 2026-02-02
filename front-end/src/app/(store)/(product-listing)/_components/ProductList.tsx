@@ -336,7 +336,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
           ) :
             <>
               <div className={`grid grid-cols-2  ${isFilterVisible ? 'md:grid-cols-3 xl:grid-cols-4' : 'md:grid-cols-4 xl:grid-cols-5'} transition-all duration-600 ease-in-out gap-4.5 md:gap-5 xl:gap-10 products-slider`}>
-                {products.map((product, index) => {
+                {products.map((product) => {
                   const review = reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews.find(review => review.product_id === product.id));
                   const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
                   const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
@@ -344,7 +344,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
                   const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
                   return (
                     <ProductCard
-                      key={index}
+                      key={product.id}
                       title={product.name}
                       imageSrc={primaryImage?.image_url || ''}
                       altText={primaryImage?.alt_text ?? product.name}

@@ -20,6 +20,8 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FunctionComponent, ReactElement, useState, useEffect } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
+import { setScrollToTopOnNextNavigation } from "@/components/HistoryProvider";
+import { PRODUCT_LISTING_START_ID } from "@/lib/utils/scrollToTop";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 // import { getAllDeals } from "@/lib/server.actions";
@@ -75,6 +77,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
     .filter(attr => attr.attribute?.is_visible === true);
   const appliedFilters = getAppliedFilters(productAttributeTerms);
   const handleRemoveFilter = (attributeId: number, type: string) => {
+    setScrollToTopOnNextNavigation();
     setIsLoading(true);
     removeFilter(attributeId, productAttributeTerms, type);
     setTimeout(() => {
@@ -83,6 +86,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
   };
 
   const onFilterChange = (attributeId: string, value: string, isSelect: boolean) => {
+    setScrollToTopOnNextNavigation();
     setIsLoading(true);
     const currentFilters = getFilterParams();
     if (!currentFilters.variants) {
@@ -213,9 +217,9 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
 
   
   // const pageLimit = data?.pagination?.limit ?? 0;
-  // on pagination change
+  // on pagination change – scroll to first product section (by id) then navigate
   const handlePagination = (page: number) => {
-
+    setScrollToTopOnNextNavigation();
     const params = new URLSearchParams(searchParams);    
     params.set("offset", ((page - 1) * 12).toString());
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
@@ -256,6 +260,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
   };
 
   const handleSortChange = (sort: string) => {
+    setScrollToTopOnNextNavigation();
     const params = new URLSearchParams(searchParams);
     
     if (!sort || sort === "") {
@@ -299,12 +304,15 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
           <FilterSidebar appliedFilters={appliedFilters} 
           onRemoveFilter={handleRemoveFilter} 
           filterOptions={filterOptions} 
-          onClearAllFilters={clearAllFilters}
+          onClearAllFilters={() => {
+            setScrollToTopOnNextNavigation();
+            clearAllFilters();
+          }}
           />
 
         }
 
-        <div className="flex flex-col gap-7.5 md:gap-9 w-full">
+        <div id={PRODUCT_LISTING_START_ID} className="flex flex-col gap-7.5 md:gap-9 w-full">
           <ProductListingActionsWeb
             onSortChange={handleSortChange}
             initialValue={getSortValueFromParams()}
@@ -318,14 +326,17 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
             appliedFilters={appliedFilters}
             onRemoveFilter={handleRemoveFilter}
             filterOptions={filterOptions}
-            onClearAllFilters={clearAllFilters}
+          onClearAllFilters={() => {
+            setScrollToTopOnNextNavigation();
+            clearAllFilters();
+          }}
           />
           {products.length === 0 ? (
             <EmptyPlaceholder title='Uh, oh!' description='No products found.' />
           ) :
             <>
               <div className={`grid grid-cols-2  ${isFilterVisible ? 'md:grid-cols-3 xl:grid-cols-4' : 'md:grid-cols-4 xl:grid-cols-5'} transition-all duration-600 ease-in-out gap-4.5 md:gap-5 xl:gap-10 products-slider`}>
-                {products.map((product, index) => {
+                {products.map((product) => {
                   const review = reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews.find(review => review.product_id === product.id));
                   const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
                   const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
@@ -333,7 +344,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
                   const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
                   return (
                     <ProductCard
-                      key={index}
+                      key={product.id}
                       title={product.name}
                       imageSrc={primaryImage?.image_url || ''}
                       altText={primaryImage?.alt_text ?? product.name}

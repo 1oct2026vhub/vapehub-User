@@ -10,6 +10,7 @@ import { getAllDeals } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import SuspenseLoader from '@/components/ui/SuspenseLoader';
+import { setScrollToTopOnNextNavigation } from '@/components/HistoryProvider';
 
 // Disable static generation for this page since it uses dynamic search params
 export const dynamic = 'force-dynamic';
@@ -42,6 +43,7 @@ const AllDealsContent: React.FC = () => {
 
     // Handle page change - update URL with page parameter
     const handlePageChange = (page: number) => {
+        setScrollToTopOnNextNavigation();
         const params = new URLSearchParams(searchParams.toString());
         if (page === 1) {
             params.delete('page'); // Remove page param for page 1 to keep URL clean

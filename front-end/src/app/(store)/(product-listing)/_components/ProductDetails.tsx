@@ -241,12 +241,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             setIsAddingToCart(false);
         }
     };
-    const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    };
 
     // Fetch variant data when attribute selections change
     const fetchVariantData = useCallback(async (selections: Record<number, AttributeSelection>) => {
@@ -301,10 +295,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
         }
     }, [fetchVariantData, productData.product.attribute_terms]);
 
-    useEffect(() => {
-        scrollToTop();
-    }, []);
-    
     useEffect(() => {
         setMainImage(cartEntity?.primary_image ?? product?.primary_image);
     }, [cartEntity, product]);

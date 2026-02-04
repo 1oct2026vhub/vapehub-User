@@ -8,9 +8,6 @@ import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
 import { toast } from 'sonner';
 import { ORDER_RESPONSE_DATA, SHIPPING_METHOD_DATA } from '../config/order.config';
 
-/** SessionStorage key for restoring checkout form when user returns from payment gateway via browser back. */
-export const CHECKOUT_RESTORE_PAYLOAD_KEY = 'checkout_restore_payload';
-
 interface CheckoutContextType {
     selectedShippingMethod: SHIPPING_METHOD_DATA | null;
     setSelectedShippingMethod: (method: SHIPPING_METHOD_DATA) => void;
@@ -91,14 +88,6 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
               // Redirect to WorldPay URL from the API response
                 if (orderData && typeof orderData === 'object' && 'worldpay_url' in orderData) {
                     const worldpayOrderData = orderData as { worldpay_url: string };
-                    // Persist form data so when user clicks back from payment gateway, checkout form can be restored
-                    if (typeof window !== 'undefined') {
-                        try {
-                            sessionStorage.setItem(CHECKOUT_RESTORE_PAYLOAD_KEY, JSON.stringify(data));
-                        } catch (e) {
-                            console.warn('Could not save checkout data for restore:', e);
-                        }
-                    }
                     window.location.href = worldpayOrderData.worldpay_url;
                 } else {
                     console.error('Worldpay URL not found in order data:', orderData);

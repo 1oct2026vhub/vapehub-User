@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS } from '@/lib/config/checkout.config';
 // import { ROUTES } from '@/lib/routes';
 import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
@@ -34,7 +34,21 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     const [isProcessing, setIsProcessing] = useState(false);
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
     // const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
-     
+
+    // When user returns to checkout via browser back after redirect to payment gateway, the page
+    // can be restored from bfcache. Then isProcessing is still true (finally never ran), so the
+    // Place Order button stays loading/disabled. Reset isProcessing on pageshow when persisted.
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const onPageShow = (event: PageTransitionEvent) => {
+            if (event.persisted) {
+                setIsProcessing(false);
+            }
+        };
+        window.addEventListener('pageshow', onPageShow);
+        return () => window.removeEventListener('pageshow', onPageShow);
+    }, []);
+
     const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => { 
         try {
             setIsProcessing(true);

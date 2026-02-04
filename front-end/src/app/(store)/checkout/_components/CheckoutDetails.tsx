@@ -537,6 +537,9 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             setShowNewAddressForm(false);
             form.setValue('selectedAddressId', addresses[0].id);
             handleAddressSelect(addresses[0]);
+        } else if (addresses.length === 0) {
+            // Always show the manual address form when there are no saved addresses (guests or empty list)
+            setShowNewAddressForm(true);
         }
     }, [addresses]);
 
@@ -613,7 +616,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
 
                                 </>
                             )}
-                            {showNewAddressForm && (
+                            {(showNewAddressForm || addresses.length === 0) && (
                                 <div className='space-y-4'>
                                     <div className='grid grid-cols-2 gap-2.5 md:gap-4'>
                                         <InputForm

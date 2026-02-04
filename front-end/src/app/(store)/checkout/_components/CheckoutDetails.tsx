@@ -10,7 +10,7 @@ import CustomCheckbox from '@/components/FormCheckbox';
 import { CustomRadio } from '@/components/CustomRadio';
 import { Button, RadioGroup, useDisclosure } from '@nextui-org/react';
 import { Form } from '@/components/ui/Form';
-import { useCheckout, CHECKOUT_RESTORE_PAYLOAD_KEY } from '@/lib/context/CheckoutContext';
+import { useCheckout } from '@/lib/context/CheckoutContext';
 import { useCart } from '@/lib/context/CartContext';
 import { useAddress } from '@/lib/context/AddressContext';
 import AddressList from './AddressList';
@@ -81,7 +81,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
-    const hasRestoredFromPaymentRef = useRef(false);
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
         // Validate cart items before proceeding with order
         const isCartValid = await validateCartItems();
@@ -336,50 +335,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
 
     }, [fetchProfile, form]);
 
-    // Restore checkout form when user returns from payment gateway via browser back (e.g. full reload loses React state)
-    useEffect(() => {
-        if (hasRestoredFromPaymentRef.current || typeof window === 'undefined') return;
-        try {
-            const stored = sessionStorage.getItem(CHECKOUT_RESTORE_PAYLOAD_KEY);
-            if (!stored) return;
-            const data = JSON.parse(stored) as CHECKOUT_PAYLOAD;
-            sessionStorage.removeItem(CHECKOUT_RESTORE_PAYLOAD_KEY);
-            hasRestoredFromPaymentRef.current = true;
-
-            form.setValue('email', data.email ?? '');
-            form.setValue('phone', data.phone ?? '');
-            form.setValue('marketingConsent', data.receive_promotions ?? false);
-            form.setValue('selectedAddressId', data.shipping_address_id ?? 0);
-            form.setValue('shippingFirstName', data.shipping_address?.first_name ?? '');
-            form.setValue('shippingLastName', data.shipping_address?.last_name ?? '');
-            form.setValue('shippingAddress1', data.shipping_address?.address_line_1 ?? '');
-            form.setValue('shippingAddress2', data.shipping_address?.address_line_2 ?? '');
-            form.setValue('shippingAddress3', '');
-            form.setValue('shippingCity', data.shipping_address?.city ?? '');
-            form.setValue('shippingRegion', data.shipping_address?.region ?? '');
-            form.setValue('shippingPostcode', data.shipping_address?.post_code ?? '');
-            form.setValue('shippingCountry', data.shipping_address?.country ?? DEFAULT_COUNTRY);
-            form.setValue('useShippingAsBilling', !data.useShippingAsBilling);
-            form.setValue('billingFirstName', data.billing_address?.first_name ?? '');
-            form.setValue('billingLastName', data.billing_address?.last_name ?? '');
-            form.setValue('billingAddress1', data.billing_address?.address_line_1 ?? '');
-            form.setValue('billingAddress2', data.billing_address?.address_line_2 ?? '');
-            form.setValue('billingAddress3', '');
-            form.setValue('billingCity', data.billing_address?.city ?? '');
-            form.setValue('billingRegion', data.billing_address?.region ?? '');
-            form.setValue('billingPostcode', data.billing_address?.post_code ?? '');
-            form.setValue('billingCountry', data.billing_address?.country ?? DEFAULT_COUNTRY);
-            form.setValue('shippingMethodId', data.shipping_method_id ?? 0);
-            if (data.payment_method?.method) {
-                form.setValue('paymentMethod', data.payment_method.method as CHECKOUT_PAYMENT_METHODS);
-            }
-            setShowNewAddressForm(true);
-        } catch (e) {
-            console.warn('Checkout restore from payment failed:', e);
-            if (typeof window !== 'undefined') sessionStorage.removeItem(CHECKOUT_RESTORE_PAYLOAD_KEY);
-        }
-    }, [form]);
-
     useEffect(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {
             return;
@@ -410,10 +365,9 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         setShippingMethods(sortedMethods);
 
         if (sortedMethods.length > 0) {
-            const currentId = form.getValues('shippingMethodId');
-            const matchedMethod = currentId ? sortedMethods.find((m) => m.id === currentId) : null;
+            // Prioritize free shipping method if available
             const freeShippingMethod = sortedMethods.find((method) => (method.is_free_shipping ?? false));
-            const initialMethod = matchedMethod || freeShippingMethod || sortedMethods[0];
+            const initialMethod = freeShippingMethod || sortedMethods[0];
             setSelectedCarrier(initialMethod);
             setSelectedShippingMethod(initialMethod);
             form.setValue('shippingMethodId', initialMethod.id);
@@ -533,7 +487,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     }, [cartTotal, couponDiscount, loyaltyRedemption, originalShippingMethods, form, setSelectedShippingMethod]);
 
     useEffect(() => {
-        if (addresses.length > 0 && !hasRestoredFromPaymentRef.current) {
+        if (addresses.length > 0) {
             setShowNewAddressForm(false);
             form.setValue('selectedAddressId', addresses[0].id);
             handleAddressSelect(addresses[0]);

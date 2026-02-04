@@ -325,15 +325,17 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         onClose();
     };
 
+    // Refill email/phone when session is ready (fixes return-from-payment on live where session hydrates later)
     useEffect(() => {
+        if (status !== 'authenticated') return;
         const loadProfile = async () => {
             const profile = await fetchProfile();
             form.setValue('email', profile?.email || '');
             form.setValue('phone', profile?.phone || '');
-        }
+            form.trigger();
+        };
         loadProfile();
-
-    }, [fetchProfile, form]);
+    }, [status, fetchProfile, form]);
 
     useEffect(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {

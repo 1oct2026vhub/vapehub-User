@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CHECKOUT_FORM_SCHEMA, CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS, type CHECKOUT_FORM_TYPE } from '@/lib/config/checkout.config';
@@ -264,8 +264,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
 
     };
 
-    const handleAddressSelect = (address: Address) => {
-
+    const handleAddressSelect = useCallback((address: Address) => {
         form.setValue('selectedAddressId', address.id);
         form.setValue('shippingFirstName', address.name);
         form.setValue('shippingLastName', address.last_name);
@@ -279,8 +278,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         if (address.phone) {
             form.setValue('phone', address.phone);
         }
-
-    }
+    }, [form]);
     const handleShowNewAddressForm = () => {
         // reset the shipping address fields
         if (!showNewAddressForm) {
@@ -498,6 +496,21 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             setShowNewAddressForm(true);
         }
     }, [addresses]);
+
+    // When user returns to this page via browser Back (bfcache/pageshow), re-apply selected saved address values.
+    // Without this, RHF values/validation can be stale until the user changes something in Shipping Details.
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const onPageShow = () => {
+            if (addresses.length === 0 || showNewAddressForm) return;
+            const selectedId = form.getValues('selectedAddressId') || addresses[0].id;
+            const selected = addresses.find((a) => a.id === selectedId) || addresses[0];
+            handleAddressSelect(selected);
+            form.trigger();
+        };
+        window.addEventListener('pageshow', onPageShow);
+        return () => window.removeEventListener('pageshow', onPageShow);
+    }, [addresses, showNewAddressForm, form, handleAddressSelect]);
 
     return (
         <div className='bg-skin-white p-3.5 sm:p-5 border border-skin-neutral-50 shadow-checkout rounded-md flex flex-col gap-5 w-full'>

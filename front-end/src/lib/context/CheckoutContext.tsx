@@ -34,7 +34,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     const [isProcessing, setIsProcessing] = useState(false);
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
     // const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
-     
+
     const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => { 
         try {
             setIsProcessing(true);

@@ -1,7 +1,7 @@
 import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { notFound, redirect, RedirectType } from 'next/navigation';
+import { notFound, permanentRedirect, redirect, RedirectType } from 'next/navigation';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
 import { DynamicPageSlugResponse, SeoMetaResponse } from "@/lib/config/global.config";
@@ -31,6 +31,14 @@ const Page = async ({
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
     return notFound();
+  }
+
+  // SEO redirect for deleted/unpublished slugs (middleware emits 301; this is a safe fallback).
+  if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect) {
+    const dest = normalizeRedirectUrl((dynamicPageSlug as unknown as { redirect_url?: string })?.redirect_url);
+    if (dest) {
+      permanentRedirect(dest);
+    }
   }
 
   // Only handle product variants when entity_type is "product" and there are two slugs
@@ -200,6 +208,7 @@ export async function generateStaticParams() {
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
+  console.log("dynamic page slug response", response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -276,6 +285,23 @@ const buildVariantParams = (searchParamsData: Record<string, string>, defaultPar
   return Object.keys(variantParams).length > 1 ? variantParams : defaultParams;
 };
 
+function normalizeRedirectUrl(input?: string): string | null {
+  let dest = (input ?? '').trim();
+  if (!dest) return null;
+
+  // Some API responses come as "/https://example.com/path" – fix that
+  if (dest.startsWith('/http://') || dest.startsWith('/https://')) {
+    dest = dest.slice(1);
+  }
+
+  // If it's relative but missing a leading slash, add it
+  if (!/^https?:\/\//i.test(dest) && !dest.startsWith('/')) {
+    dest = `/${dest}`;
+  }
+
+  return dest;
+}
+
 export async function generateMetadata({ params, searchParams }: {
   params: Promise<PageProps>,
   searchParams: Promise<Record<string, string>>
@@ -290,6 +316,12 @@ export async function generateMetadata({ params, searchParams }: {
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
     return notFound();
+  }
+
+  // If this slug is configured to redirect, avoid generating metadata for the old URL.
+  // (Actual redirect is handled by middleware; Page has a permanentRedirect fallback.)
+  if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect) {
+    return {};
   }
 
   // Only handle product variants when entity_type is "product" and there are two slugs

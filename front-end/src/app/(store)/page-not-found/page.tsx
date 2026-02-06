@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 /**
  * Normal page route used when middleware rewrites invalid slugs here.
  * Avoids calling notFound() so the Router never does segment→not-found and we avoid
- * "Rendered more hooks than during the previous render". Pure server component (plain <a>).
+ * "Rendered more hooks than during the previous render".
  */
 export default function PageNotFound() {
   return (
@@ -35,12 +36,12 @@ export default function PageNotFound() {
           height={354}
           className="mx-auto"
         />
-        <a
+        <Link
           href="/"
           className="btn primary-btn block w-full text-center text-xl md:text-2xl font-semibold uppercase !h-12"
         >
           Go to Home
-        </a>
+        </Link>
       </div>
     </div>
   );

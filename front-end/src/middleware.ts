@@ -20,7 +20,7 @@ const KNOWN_FIRST_SEGMENTS = new Set([
   'loyalty-points', 'privacy-policy', 'returns-policy', 'terms-conditions',
   'shopping-cart', 'social-media', 'payment-failed', 'payment-success',
   'blogs', 'page-not-found', 'vapehub-deals', 'brands', 'order-details',
-  'refer-a-friend', 'my-account',
+  'refer-a-friend', 'my-account','brand','product-deals',
 ])
 
 export async function middleware(request: NextRequest) {

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.vapehub.devateam.com/api';
+const API_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL;
 
 // export async function GET(_: NextRequest) {
 export async function GET() {
   try {
-    const response = await fetch(`${API_URL}/seo/robots.txt`, {
+    const response = await fetch(`${API_URL}/api/seo/robots.txt`, {
       headers: {
         Accept: 'text/plain',
       },

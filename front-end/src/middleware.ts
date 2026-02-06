@@ -14,6 +14,15 @@ const protectedRoutes = [
   ROUTES.MY_ACCOUNT_LOYALTY_POINTS, // Add loyalty points route
 ]
 
+// First path segment = known app route. Never run slug-relation or rewrite these to 404.
+const KNOWN_FIRST_SEGMENTS = new Set([
+  'shop', 'new-products', 'checkout', 'contact', 'delivery-information', 'faq',
+  'loyalty-points', 'privacy-policy', 'returns-policy', 'terms-conditions',
+  'shopping-cart', 'social-media', 'payment-failed', 'payment-success',
+  'blogs', 'page-not-found', 'vapehub-deals', 'brands', 'order-details',
+  'refer-a-friend', 'my-account','brand','product-deals',
+])
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -41,12 +50,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Handle SEO-friendly 301 redirects for deleted/unpublished product slugs
-  // based on slug-relation API response: { success: true, data: { redirect, redirect_url } }
+  // Slug-relation: 301 when redirect:true; rewrite to /page-not-found when slug missing (avoids notFound() hook error).
+  // Known routes (shop, contact, etc.) are never checked so they never get wrongly 404'd.
   let response: NextResponse
-  const redirectDestination = await resolveRedirectDestination(request)
-  if (redirectDestination) {
-    response = NextResponse.redirect(redirectDestination, 301)
+  const slugResult = await resolveSlugResult(request)
+  if (slugResult.type === 'redirect' && slugResult.url) {
+    response = NextResponse.redirect(slugResult.url, 301)
+  } else if (slugResult.type === 'not-found') {
+    response = NextResponse.rewrite(new URL('/page-not-found', request.url))
   } else {
     response = NextResponse.next()
   }
@@ -68,27 +79,28 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
-async function resolveRedirectDestination(request: NextRequest): Promise<URL | null> {
-  // Only redirect on navigations (GET/HEAD)
-  if (request.method !== 'GET' && request.method !== 'HEAD') return null
+type SlugResult = { type: 'next' } | { type: 'redirect'; url: URL } | { type: 'not-found' }
+
+async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return { type: 'next' }
 
   const pathname = request.nextUrl.pathname
   const segments = pathname.split('/').filter(Boolean)
   const primarySlug = segments[0]
-  if (!primarySlug) return null
+  if (!primarySlug) return { type: 'next' }
 
-  // Avoid calling slug-relation for account/auth/etc. pages
+  // Never run slug-relation for known app routes – avoids wrong 404s on /shop, /contact, etc.
+  if (KNOWN_FIRST_SEGMENTS.has(primarySlug)) return { type: 'next' }
   if (
     protectedRoutes.some(route => pathname.startsWith(route)) ||
     pathname.startsWith(ROUTES.MY_ACCOUNT) ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/register')
   ) {
-    return null
+    return { type: 'next' }
   }
 
-  // Heuristic: only check "content-like" paths (1-2 segments) to reduce load
-  if (segments.length > 2) return null
+  if (segments.length > 2) return { type: 'next' }
 
   try {
     const endpoint = API_ROUTES.GET_DYNAMIC_PAGE_SLUG(primarySlug)
@@ -97,28 +109,27 @@ async function resolveRedirectDestination(request: NextRequest): Promise<URL | n
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
     })
-    if (!res.ok) return null
 
     const json = (await res.json()) as {
       success?: boolean
+      status?: string
       data?: { redirect?: boolean; redirect_url?: string }
     }
 
-    if (!json?.success || !json.data?.redirect || !json.data.redirect_url) return null
+    const isError = !res.ok || json.status === 'ERROR' || json.success === false
+    if (isError) return { type: 'not-found' }
 
-    const normalized = normalizeRedirectUrl(json.data.redirect_url)
-    if (!normalized) return null
-
-    // Prevent redirect loops
-    if (normalized === pathname) return null
-
-    // Build final URL (absolute or relative)
-    if (/^https?:\/\//i.test(normalized)) {
-      return new URL(normalized)
+    if (json?.data?.redirect && json.data.redirect_url) {
+      const normalized = normalizeRedirectUrl(json.data.redirect_url)
+      if (normalized && normalized !== pathname) {
+        const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)
+        return { type: 'redirect', url }
+      }
     }
-    return new URL(normalized, request.url)
+
+    return { type: 'next' }
   } catch {
-    return null
+    return { type: 'next' }
   }
 }
 

@@ -57,7 +57,6 @@ const PromotionalBanners: React.FC = async () => {
   }
 
   const sortedBanners = [...banners].sort((a, b) => a.display_order - b.display_order);
-  console.log("bannersResponse",bannersResponse);
   
   return (
     <>

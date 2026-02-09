@@ -21,8 +21,8 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
   const isSquare = width === height;
   const aspectClass = isSquare ? 'aspect-square' : 'aspect-video';
 
-  const src = variant === 'mobile' && banner.image_url_mobile
-    ? banner.image_url_mobile
+  const src = variant === 'mobile' && banner.image_url_low
+    ? banner.image_url_low
     : banner.image_url;
   const alt = variant === 'mobile' && banner.alt_text_mobile != null
     ? banner.alt_text_mobile

@@ -496,7 +496,26 @@ input[type="checkbox"] + span {
   font-weight: 500;
 }
 
-/* Product description heading styles - H1 to H6 with responsive sizes */
+/* Product description heading styles - H1 to H6 with responsive sizes and consistent spacing */
+.product-content h1,
+.product-content h2,
+.product-content h3,
+.product-content h4,
+.product-content h5,
+.product-content h6 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.product-content h1:first-child,
+.product-content h2:first-child,
+.product-content h3:first-child,
+.product-content h4:first-child,
+.product-content h5:first-child,
+.product-content h6:first-child {
+  margin-top: 0;
+}
+
 .product-content h1 {
   @apply !font-oswald;
   font-size: 28px !important;
@@ -519,6 +538,12 @@ input[type="checkbox"] + span {
 .product-content h4 {
   @apply !font-oswald;
   font-size: 18px !important;
+  font-weight: 600 !important;
+}
+
+.product-content h5 {
+  @apply !font-oswald;
+  font-size: 16px !important;
   font-weight: 600 !important;
 }
 
@@ -546,6 +571,10 @@ input[type="checkbox"] + span {
     font-size: 20px !important;
   }
 
+  .product-content h5 {
+    font-size: 17px !important;
+  }
+
   .product-content h6 {
     font-size: 15px !important;
   }
@@ -567,6 +596,10 @@ input[type="checkbox"] + span {
 
   .product-content h4 {
     font-size: 22px !important;
+  }
+
+  .product-content h5 {
+    font-size: 18px !important;
   }
 
   .product-content h6 {

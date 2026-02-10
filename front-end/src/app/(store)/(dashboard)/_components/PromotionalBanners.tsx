@@ -12,27 +12,18 @@ interface BannerImageProps {
   height: number;
   priority?: boolean;
   className?: string;
-  /** 'web' uses image_url, 'mobile' uses image_url_mobile (fallback to image_url) */
-  variant?: 'web' | 'mobile';
 }
 
-const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false, className = '', variant = 'web' }) => {
+const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false, className = '' }) => {
   // Determine if this is a square banner based on width and height (for mobile only)
   const isSquare = width === height;
   const aspectClass = isSquare ? 'aspect-square' : 'aspect-video';
-
-  const src = variant === 'mobile' && banner.image_url_low
-    ? banner.image_url_low
-    : banner.image_url;
-  const alt = variant === 'mobile' && banner.alt_text_mobile != null
-    ? banner.alt_text_mobile
-    : (banner.alt_text ?? banner.title);
-
+  
   return (
     <Link href={banner.redirect_url}>
       <NoImage
-        src={src}
-        alt={alt}
+        src={banner.image_url}
+        alt={banner.alt_text ?? banner.title}
         width={width}
         height={height}
         priority={priority}
@@ -57,7 +48,6 @@ const PromotionalBanners: React.FC = async () => {
   }
 
   const sortedBanners = [...banners].sort((a, b) => a.display_order - b.display_order);
-  console.log("bannersResponse",bannersResponse);
   
   return (
     <>
@@ -68,7 +58,6 @@ const PromotionalBanners: React.FC = async () => {
             width={600}
             height={600}
             priority
-            variant="web"
             // className='max-h-[573px]'
           />
         )}
@@ -80,7 +69,6 @@ const PromotionalBanners: React.FC = async () => {
               banner={banner}
               width={662}
               height={274}
-              variant="web"
               className='h-full rounded-md md:rounded-lg max-h-[334px]'
             />
           ))}
@@ -94,7 +82,6 @@ const PromotionalBanners: React.FC = async () => {
             width={361}
             height={361}
             priority
-            variant="mobile"
             className=''
           />
         )}
@@ -104,7 +91,6 @@ const PromotionalBanners: React.FC = async () => {
             banner={banner}
             width={361}
             height={274}
-            variant="mobile"
             className='max-h-[274px] rounded-md md:rounded-lg'
           />
         ))}

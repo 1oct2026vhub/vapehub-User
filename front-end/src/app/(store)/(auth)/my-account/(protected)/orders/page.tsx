@@ -1,6 +1,6 @@
 import { Metadata, NextPage } from "next";
-import React from "react"; 
-import LogoutButton from "../../_components/LogoutButton";
+import React from "react";
+import LogoutButton, { SignOutRedirectToLogin } from "../../_components/LogoutButton";
 import { getOrdersList } from "@/lib/server.actions";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
@@ -18,7 +18,10 @@ const MyAccountOrders: NextPage<{searchParams: Promise<{page: string}>}> = async
     const page = searchParamsData.page ? parseInt(searchParamsData.page) : 1;
     const result = await getOrdersList(page, LIMIT);
     if (result.status === ServerActionStatus.ERROR) {
-        return <p>{result.message}</p>   
+        if (result.message?.includes('Unauthorized') || result.message?.includes('Invalid or missing token')) {
+          return <SignOutRedirectToLogin />;
+        }
+        return <p>{result.message}</p>;
     }
      
     const orders:ORDER_RESPONSE[] = result.data.orders;

@@ -5,8 +5,9 @@ import { AddressFormData } from '@/lib/config/address.config';
 import { addUserAddress, deleteUserAddress, getUserAddresses, updateUserAddress } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { Address, USER_ADDRESS_RESPONSE } from '@/lib/config/user.config';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { DEFAULT_COUNTRY } from '../utils/address.utils';
+import { ROUTES } from '@/lib/routes';
 
 interface AddressContextType {
   addresses: Address[];
@@ -53,6 +54,10 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
         const addressData = response.data as USER_ADDRESS_RESPONSE;
         setAddresses(addressData.UserAddresses || []);
       } else {
+        if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
+          signOut({ callbackUrl: ROUTES.MY_ACCOUNT });
+          return;
+        }
         setError(response.message);
       }
     } catch (err) {
@@ -82,11 +87,15 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
         phone: addressData.phone || '',
       };
       
-      const response = await addUserAddress(payload); 
+      const response = await addUserAddress(payload);
       if (response.status === ServerActionStatus.SUCCESS) {
         // Show success message
         await fetchAddresses();
       } else {
+        if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
+          signOut({ callbackUrl: ROUTES.MY_ACCOUNT });
+          return;
+        }
         setError(response.message);
       }
     } catch (err) {
@@ -122,6 +131,10 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
         // Show success message
         await fetchAddresses();
       } else {
+        if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
+          signOut({ callbackUrl: ROUTES.MY_ACCOUNT });
+          return;
+        }
         setError(response.message);
       }
     } catch (err) {
@@ -142,6 +155,10 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
         // Show success message
         await fetchAddresses();
       } else {
+        if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
+          signOut({ callbackUrl: ROUTES.MY_ACCOUNT });
+          return;
+        }
         setError(response.message);
       }
     } catch (err) {

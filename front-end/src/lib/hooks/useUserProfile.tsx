@@ -3,6 +3,8 @@ import { getUserProfile, updateUserProfile, deleteUserAccount } from '@/lib/serv
 import { UserProfileFormData, UserProfileResponse } from '@/lib/config/user.config'
 import { ServerActionStatus } from '../config/app.config'
 import { toast } from 'sonner'
+import { signOut } from 'next-auth/react'
+import { ROUTES } from '@/lib/routes'
 
 export const useUserProfile = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -13,10 +15,13 @@ export const useUserProfile = () => {
     try {
       const response = await getUserProfile()
       if (response.status === ServerActionStatus.ERROR) {
+        if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
+          signOut({ callbackUrl: ROUTES.MY_ACCOUNT })
+          return null
+        }
         return null
       }
-        
-      return response.data
+        return response.data
     } catch (err) {
       console.log('fetchProfile', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch profile')
@@ -30,7 +35,13 @@ export const useUserProfile = () => {
     setIsLoading(true)
     try {
       const response = await updateUserProfile(data)
-      if (response.status === ServerActionStatus.ERROR) throw new Error(response.message)
+      if (response.status === ServerActionStatus.ERROR) {
+        if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
+          signOut({ callbackUrl: ROUTES.MY_ACCOUNT })
+          return null
+        }
+        throw new Error(response.message)
+      }
       return response
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile')
@@ -45,9 +56,13 @@ export const useUserProfile = () => {
     try {
       const response = await deleteUserAccount()
       if (response.status === ServerActionStatus.ERROR) {
+        if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
+          signOut({ callbackUrl: ROUTES.MY_ACCOUNT })
+          return null
+        }
         toast.error(response.message);
         return null;
-      } else {        
+      } else {
         return response;
       }
     } catch (err) {

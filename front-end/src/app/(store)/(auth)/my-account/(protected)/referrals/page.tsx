@@ -12,6 +12,7 @@ import MyReferrals from "../../_components/MyReferrals";
 import Pagination from "@/components/Pagination";
 import SuspenseLoader from "@/components/ui/SuspenseLoader";
 import { ReferralStatsResponse, RecentReferrals } from "@/lib/config/referral.config";
+import { signOut } from "next-auth/react";
 
 const AccountReferrals: NextPage = (): ReactElement | null => {
   const [page, setPage] = useState(1);
@@ -29,6 +30,9 @@ const AccountReferrals: NextPage = (): ReactElement | null => {
       if (response.status === ServerActionStatus.SUCCESS) {
         setData(response.data);
         setRecentReferrals(response.data.recent_referrals.data);
+      } else if (response.message?.includes('Unauthorized') || response.message?.includes('Invalid or missing token')) {
+        signOut({ callbackUrl: ROUTES.MY_ACCOUNT });
+        return;
       }
       setLoading(false);
     };

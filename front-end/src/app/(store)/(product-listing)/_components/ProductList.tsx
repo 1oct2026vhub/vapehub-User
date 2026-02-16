@@ -18,7 +18,7 @@ import {
   NON_VARIANT_FILTERS 
 } from '@/lib/config/product.config';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FunctionComponent, ReactElement, useState, useEffect } from "react";
+import { FunctionComponent, ReactElement, useState } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
 import { setScrollToTopOnNextNavigation } from "@/components/HistoryProvider";
 import { PRODUCT_LISTING_START_ID } from "@/lib/utils/scrollToTop";
@@ -60,18 +60,9 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
   const searchParams = useSearchParams();
   const { getFilterParams, getAppliedFilters, removeFilter, updateFilters, clearAllFilters } = useProductFilters();
 
-  // Set default sort_by=popularity in URL if not present
-  useEffect(() => {
-    const sortBy = searchParams.get("sort_by");
-    const order = searchParams.get("order");
-    
-    // If no sort_by and no order params, set default to popularity
-    if (!sortBy && !order) {
-      const params = new URLSearchParams(searchParams);
-      params.set("sort_by", "popularity");
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    }
-  }, []); // Run only once on mount
+  // Note: Default sorting by popularity is handled server-side.
+  // We don't modify the URL here to avoid SEO issues.
+  // The URL should only change when the user manually selects a sort option.
 
   const productAttributeTerms: AttributeTerms[] = (data?.attributes || [])
     .filter(attr => attr.attribute?.is_visible === true);
@@ -230,9 +221,12 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
     const sortBy = searchParams.get("sort_by");
     const order = searchParams.get("order");
     
-    // If no params, return "popularity" as default
+    // If no params, return default based on page
+    // New Products page defaults to "Latest" (DESC), others default to "popularity"
     if (!sortBy && !order) {
-      return "popularity";
+      // Check if we're on the new-products page
+      const isNewProductsPage = pathname?.includes('/new-products') ?? false;
+      return isNewProductsPage ? "DESC" : "popularity";
     }
     
     // Handle price sorting

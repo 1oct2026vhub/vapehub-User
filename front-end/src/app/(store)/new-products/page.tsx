@@ -6,7 +6,6 @@ import { Product, ProductReview } from '@/lib/config/product.config';
 import { ROUTES } from '@/lib/routes';
 import { getProductList } from '@/lib/server.actions';
 import { Metadata, NextPage } from 'next';
-import { redirect } from 'next/navigation';
 import ProductList from '../(product-listing)/_components/ProductList';
 
 export const metadata: Metadata = {
@@ -18,17 +17,10 @@ type SearchParams = {
   searchParams: Promise<Record<string, string>>
 }
 const NewProductsPage: NextPage<SearchParams> = async ({ searchParams }): AsyncReactElement => {
+  // Default to "Latest" sorting (order=DESC) when no sort params are provided
+  // This ensures products are sorted by latest without modifying the URL for SEO
   const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0, is_new: true } as const;
   const searchParamsData = await searchParams;
-
-  // Default sort ONLY for New Products page:
-  // If no sort params are present, redirect to "Latest" (order=DESC).
-  // This avoids the client-side default-to-popularity behavior without affecting other pages.
-  if (!searchParamsData.sort_by && !searchParamsData.order) {
-    const params = new URLSearchParams(searchParamsData as never);
-    params.set('order', 'DESC');
-    redirect(`${ROUTES.NEW_PRODUCTS}?${params.toString()}`);
-  }
 
   const variantParams = Object.entries(searchParamsData)
     .reduce((acc: Record<string, unknown>, [key, value]) => {

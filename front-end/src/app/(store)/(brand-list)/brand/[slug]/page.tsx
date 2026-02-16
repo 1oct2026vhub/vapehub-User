@@ -19,7 +19,9 @@ const BrandPage: NextPage<Props> = async ({
   params,
   searchParams }): AsyncReactElement => {
   const slug = (await params).slug as string;
-  const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
+  // Default to popularity sorting when no sort params are provided
+  // This ensures products are sorted by popularity without modifying the URL
+  const defaultParams = { sort_by: "popularity", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
   
   // Fetch dynamic page slug data

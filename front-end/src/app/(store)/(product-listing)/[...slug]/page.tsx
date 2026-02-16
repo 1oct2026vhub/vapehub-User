@@ -24,7 +24,9 @@ const Page = async ({
 }) => {
 
   const slug = (await params).slug;
-  const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
+  // Default to popularity sorting when no sort params are provided
+  // This ensures products are sorted by popularity without modifying the URL
+  const defaultParams = { sort_by: "popularity", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];

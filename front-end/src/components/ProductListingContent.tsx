@@ -41,32 +41,33 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
                     {validBanners.map((banner, index) => {
                         const redirectUrl = banner.url && banner.url.trim() !== '' && banner.url !== '#' ? banner.url : null;
                         
+                        const singleBannerClass = validBanners.length === 1 ? 'flex justify-center w-full md:w-[30%]' : '';
                         return redirectUrl ? (
                             <Link 
                                 href={redirectUrl} 
                                 key={index} 
                                 aria-label={banner.alt || 'Banner'}
-                                className={validBanners.length === 1 ? 'flex justify-center w-[30%]' : ''}
+                                className={singleBannerClass}
                             >
                                 <NoImage
                                     src={banner.image}
                                     alt={banner.alt || ''}
                                     width={437}
                                     height={162}
-                                    className="rounded-lg md:rounded-xl w-full max-h-[118px] md:max-h-40"
+                                    className="rounded-lg md:rounded-xl w-full max-h-40 object-cover object-center"
                                 />
                             </Link>
                         ) : (
                             <div
                                 key={index}
-                                className={validBanners.length === 1 ? 'flex justify-center w-[30%]' : ''}
+                                className={singleBannerClass}
                             >
                                 <NoImage
                                     src={banner.image}
                                     alt={banner.alt || ''}
                                     width={437}
                                     height={162}
-                                    className="rounded-lg md:rounded-xl w-full max-h-[118px] md:max-h-40"
+                                    className="rounded-lg md:rounded-xl w-full max-h-40 object-cover object-center"
                                 />
                             </div>
                         );

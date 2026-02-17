@@ -60,8 +60,9 @@ const Page = async ({ params, searchParams }: {
   }
   
 
-  const defaultParams = { sort_by: 'id', order: 'DESC', limit: 12, offset: 0 } as const;
-  
+  // Default to popularity sorting when no sort params are provided (same as brand/category pages)
+  const defaultParams = { sort_by: 'popularity', limit: 12, offset: 0 } as const;
+
   // Process search parameters with proper attribute filter handling
   const variantParams = Object.entries(searchParamsData)
     .reduce((acc: Record<string, unknown>, [key, value]) => {

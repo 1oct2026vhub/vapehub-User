@@ -40,33 +40,40 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
                 }`}>
                     {validBanners.map((banner, index) => {
                         const redirectUrl = banner.url && banner.url.trim() !== '' && banner.url !== '#' ? banner.url : null;
-                        
+                        // Figma: Mobile 143.92×102.41px radius 7.59px | Web 437.33×162px radius 12px
+                        const singleBannerClass = validBanners.length === 1
+                            ? 'flex justify-center w-[143.92px] h-[102.41px] rounded-[7.59px] overflow-hidden md:w-[437.33px] md:h-[162px] md:rounded-[12px]'
+                            : '';
+                        const imageClass = validBanners.length === 1
+                            ? 'w-full h-full rounded-[7.59px] md:rounded-[12px]'
+                            : 'rounded-[7.59px] md:rounded-[12px] w-full object-cover object-center aspect-[437/162] min-h-[102.41px] md:min-h-[162px]';
+
                         return redirectUrl ? (
                             <Link 
                                 href={redirectUrl} 
                                 key={index} 
                                 aria-label={banner.alt || 'Banner'}
-                                className={validBanners.length === 1 ? 'flex justify-center w-[30%]' : ''}
+                                className={singleBannerClass}
                             >
                                 <NoImage
                                     src={banner.image}
                                     alt={banner.alt || ''}
                                     width={437}
                                     height={162}
-                                    className="rounded-lg md:rounded-xl w-full max-h-[118px] md:max-h-40"
+                                    className={imageClass}
                                 />
                             </Link>
                         ) : (
                             <div
                                 key={index}
-                                className={validBanners.length === 1 ? 'flex justify-center w-[30%]' : ''}
+                                className={singleBannerClass}
                             >
                                 <NoImage
                                     src={banner.image}
                                     alt={banner.alt || ''}
                                     width={437}
                                     height={162}
-                                    className="rounded-lg md:rounded-xl w-full max-h-[118px] md:max-h-40"
+                                    className={imageClass}
                                 />
                             </div>
                         );

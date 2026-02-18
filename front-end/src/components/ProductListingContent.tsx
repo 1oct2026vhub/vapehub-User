@@ -35,17 +35,17 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug})
             {validBanners.length > 0 && (
                 <div className={`grid gap-3.5 ${
                     validBanners.length === 1 
-                        ? 'grid-cols-1 justify-items-center' 
+                        ? 'grid-cols-1 md:grid-cols-1 md:justify-items-center' 
                         : 'grid-cols-1 md:grid-cols-3'
                 }`}>
                     {validBanners.map((banner, index) => {
                         const redirectUrl = banner.url && banner.url.trim() !== '' && banner.url !== '#' ? banner.url : null;
-                        // Figma: Mobile 143.92×102.41px radius 7.59px | Web 437.33×162px radius 12px
+                        // Mobile: same full-width layout as multi-banner so UI is consistent (no overflow). Desktop: Figma 437.33×162px, radius 12px
                         const singleBannerClass = validBanners.length === 1
-                            ? 'flex justify-center w-[143.92px] h-[102.41px] rounded-[7.59px] overflow-hidden md:w-[437.33px] md:h-[162px] md:rounded-[12px]'
+                            ? 'w-full min-w-0 rounded-[7.59px] overflow-hidden md:w-[437.33px] md:h-[162px] md:rounded-[12px]'
                             : '';
                         const imageClass = validBanners.length === 1
-                            ? 'w-full h-full rounded-[7.59px] md:rounded-[12px]'
+                            ? 'w-full h-full rounded-[7.59px] md:rounded-[12px] object-cover object-center aspect-[437/162] min-h-[102.41px] md:min-h-0 md:aspect-auto md:h-full'
                             : 'rounded-[7.59px] md:rounded-[12px] w-full object-cover object-center aspect-[437/162] min-h-[102.41px] md:min-h-[162px]';
 
                         return redirectUrl ? (

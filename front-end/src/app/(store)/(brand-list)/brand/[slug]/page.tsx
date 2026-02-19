@@ -152,18 +152,23 @@ export async function generateMetadata({ params, searchParams }: {
   }
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
+    // Prefer explicit SEO title (non-empty) -> dynamic page name -> brand name -> slug
+    const seoTitleCandidate = dynamicPageSlug?.seo?.title && dynamicPageSlug.seo.title.trim()
+      ? dynamicPageSlug.seo.title.trim()
+      : undefined;
+    const titleBase = seoTitleCandidate || dynamicPageSlug?.name || brandProduct.name || slug;
+
+    const description = dynamicPageSlug?.seo?.description || "";
+    const ogImage = dynamicPageSlug?.seo?.ogImage || brandProduct.logo_url || undefined;
+
     return {
-      title: `${dynamicPageSlug?.seo?.title || brandProduct.name} | VapeHub`,
-      description: dynamicPageSlug?.seo?.description || "",
+      title: `${titleBase} | VapeHub`,
+      description,
       openGraph: {
-        title: `${dynamicPageSlug?.seo?.title || brandProduct.name} | VapeHub`,
-        description: dynamicPageSlug?.seo?.description || "",
-        images: dynamicPageSlug?.seo?.ogImage ? [{
-          url: dynamicPageSlug?.seo?.ogImage,
-          width: 1200,
-          height: 630
-        }] : brandProduct.logo_url ? [{
-          url: brandProduct.logo_url,
+        title: `${titleBase} | VapeHub`,
+        description,
+        images: ogImage ? [{
+          url: ogImage,
           width: 1200,
           height: 630
         }] : undefined

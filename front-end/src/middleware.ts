@@ -89,8 +89,7 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   const primarySlug = segments[0]
   if (!primarySlug) return { type: 'next' }
 
-  // Never run slug-relation for known app routes – avoids wrong 404s on /shop, /contact, etc.
-  if (KNOWN_FIRST_SEGMENTS.has(primarySlug)) return { type: 'next' }
+  // Quick guard for protected routes / auth pages
   if (
     protectedRoutes.some(route => pathname.startsWith(route)) ||
     pathname.startsWith(ROUTES.MY_ACCOUNT) ||
@@ -100,37 +99,53 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
     return { type: 'next' }
   }
 
+  // If the path has more than 2 segments it's out of scope for slug-relation
   if (segments.length > 2) return { type: 'next' }
 
-  try {
-    const endpoint = API_ROUTES.GET_DYNAMIC_PAGE_SLUG(primarySlug)
-    const res = await fetch(endpoint, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-    })
-
-    const json = (await res.json()) as {
-      success?: boolean
-      status?: string
-      data?: { redirect?: boolean; redirect_url?: string }
-    }
-
-    const isError = !res.ok || json.status === 'ERROR' || json.success === false
-    if (isError) return { type: 'not-found' }
-
-    if (json?.data?.redirect && json.data.redirect_url) {
-      const normalized = normalizeRedirectUrl(json.data.redirect_url)
-      if (normalized && normalized !== pathname) {
-        const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)
-        return { type: 'redirect', url }
+  // Helper: call slug-relation API for a given slug and return a SlugResult
+  async function fetchSlugRelation(slugToCheck: string): Promise<SlugResult> {
+    try {
+      const endpoint = API_ROUTES.GET_DYNAMIC_PAGE_SLUG(slugToCheck)
+      const res = await fetch(endpoint, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      })
+      const json = (await res.json()) as {
+        success?: boolean
+        status?: string
+        data?: { redirect?: boolean; redirect_url?: string }
       }
-    }
+      const isError = !res.ok || json.status === 'ERROR' || json.success === false
+      if (isError) return { type: 'not-found' }
 
-    return { type: 'next' }
-  } catch {
-    return { type: 'next' }
+      if (json?.data?.redirect && json.data.redirect_url) {
+        const normalized = normalizeRedirectUrl(json.data.redirect_url)
+        if (normalized && normalized !== pathname) {
+          const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)
+          return { type: 'redirect', url }
+        }
+      }
+      return { type: 'next' }
+    } catch {
+      return { type: 'next' }
+    }
   }
+
+  // Special-case known routes that need to be checked before the KNOWN_FIRST_SEGMENTS guard
+  // (brand and product-deals must run even though 'brand' / 'product-deals' are in KNOWN_FIRST_SEGMENTS)
+  if (pathname.startsWith('/brand/') && segments.length === 2) {
+    return await fetchSlugRelation(segments[1])
+  }
+  if (pathname.startsWith('/product-deals/') && segments.length === 2) {
+    return await fetchSlugRelation(segments[1])
+  }
+
+  // Never run slug-relation for known app routes – avoids wrong 404s on /shop, /contact, etc.
+  if (KNOWN_FIRST_SEGMENTS.has(primarySlug)) return { type: 'next' }
+
+  // Default: check the primary slug (product, category, blog, etc.)
+  return await fetchSlugRelation(primarySlug)
 }
 
 function normalizeRedirectUrl(input: string): string | null {

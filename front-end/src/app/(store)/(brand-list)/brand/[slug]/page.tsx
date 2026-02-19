@@ -3,7 +3,7 @@ import { NextPage } from 'next';
 import React from 'react';
 import BrandProducts from '../_components/BrandProducts';
 import { getProductByBrand, getDynamicPageSlug } from '@/lib/server.actions';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
@@ -24,10 +24,18 @@ const BrandPage: NextPage<Props> = async ({
   const defaultParams = { sort_by: "popularity", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
   
-  // Fetch dynamic page slug data
+  // Fetch dynamic page slug data (slug-relation API)
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
   if (!dynamicPageSlug) {
     return notFound();
+  }
+
+  // SEO redirect for deleted/unpublished brand slugs (middleware emits 301; this is a safe fallback).
+  if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect) {
+    const dest = normalizeRedirectUrl((dynamicPageSlug as unknown as { redirect_url?: string })?.redirect_url);
+    if (dest) {
+      permanentRedirect(dest);
+    }
   }
   // Convert search params to variant structure
   const variantParams = Object.entries(searchParamsData)
@@ -117,6 +125,16 @@ const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
   return response.data;
 };
 
+function normalizeRedirectUrl(input?: string): string | null {
+  let dest = (input ?? '').trim();
+  if (!dest) return null;
+  // Some API responses come as "/https://example.com/path" – fix that
+  if (dest.startsWith('/http://') || dest.startsWith('/https://')) dest = dest.slice(1);
+  // If it's relative but missing a leading slash, add it
+  if (!/^https?:\/\//i.test(dest) && !dest.startsWith('/')) dest = `/${dest}`;
+  return dest;
+}
+
 
 
 export async function generateMetadata({ params, searchParams }: {
@@ -128,6 +146,10 @@ export async function generateMetadata({ params, searchParams }: {
   const combinedParams = { ...defaultParams, ...await searchParams };
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
   
+  // If this slug is configured to redirect, avoid generating metadata for the old URL.
+  if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect) {
+    return {};
+  }
   const brandProduct = await fetchBrandProduct(slug, combinedParams);
   if (brandProduct) {
     return {

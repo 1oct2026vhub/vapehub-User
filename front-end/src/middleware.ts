@@ -116,6 +116,12 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
         status?: string
         data?: { redirect?: boolean; redirect_url?: string }
       }
+      // Log slug-relation responses to help debug 404 -> application error scenarios
+      try {
+        console.log(`slug-relation(${slugToCheck}) ->`, JSON.stringify(json))
+      } catch {
+        console.log(`slug-relation(${slugToCheck}) -> (non-serializable)`, json)
+      }
       const isError = !res.ok || json.status === 'ERROR' || json.success === false
       if (isError) return { type: 'not-found' }
 

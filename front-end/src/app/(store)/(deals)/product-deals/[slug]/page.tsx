@@ -1,6 +1,7 @@
 import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { notFound, permanentRedirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
+import PageNotFound from '@/app/(store)/page-not-found/page';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
 import { Metadata } from "next";
@@ -21,7 +22,7 @@ const Page = async ({ params, searchParams }: {
   // Fetch dynamic page slug data
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
   if (!dynamicPageSlug) {
-    return notFound();
+    return <PageNotFound />;
   }
 
   // SEO redirect for deleted/unpublished deal slugs (middleware emits 301; this is a safe fallback).
@@ -93,7 +94,7 @@ const Page = async ({ params, searchParams }: {
   const combinedParams = { ...defaultParams, ...variantParams };
   const productsResponse = await getProductsByDealSlug(slug, combinedParams);
   if (productsResponse.status === ServerActionStatus.ERROR) {
-    return notFound();
+    return <PageNotFound />;
   }
 
   const products = productsResponse.data?.products || [];
@@ -153,7 +154,7 @@ const Page = async ({ params, searchParams }: {
   // Final check: if we still don't have a deal, return notFound
   // We need the deal object for the component to work properly
   if (!deal) {
-    return notFound();
+    return <PageNotFound />;
   }
 
   const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = products.length > 0 ? await Promise.all(
@@ -162,7 +163,7 @@ const Page = async ({ params, searchParams }: {
   
   const responseData = productsResponse.data;
   if (!responseData) {
-    return notFound();
+    return <PageNotFound />;
   }
   
   return <DealProduct 
@@ -184,7 +185,7 @@ export default Page;
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
-  
+  console.log("Dynamic Page Slug Response:", response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }

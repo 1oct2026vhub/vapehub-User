@@ -1,6 +1,6 @@
 import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { permanentRedirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
@@ -29,7 +29,7 @@ const Page = async ({ params, searchParams }: {
   if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect) {
     const dest = normalizeRedirectUrl((dynamicPageSlug as unknown as { redirect_url?: string })?.redirect_url);
     if (dest) {
-      permanentRedirect(dest);
+      redirect(dest);
     }
   }
 

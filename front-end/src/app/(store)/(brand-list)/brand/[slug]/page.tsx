@@ -3,7 +3,7 @@ import { NextPage } from 'next';
 import React from 'react';
 import BrandProducts from '../_components/BrandProducts';
 import { getProductByBrand, getDynamicPageSlug } from '@/lib/server.actions';
-import { permanentRedirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
@@ -35,7 +35,7 @@ const BrandPage: NextPage<Props> = async ({
   if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect) {
     const dest = normalizeRedirectUrl((dynamicPageSlug as unknown as { redirect_url?: string })?.redirect_url);
     if (dest) {
-      permanentRedirect(dest);
+      redirect(dest);
     }
   }
   // Convert search params to variant structure

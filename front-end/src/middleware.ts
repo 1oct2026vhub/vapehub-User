@@ -55,7 +55,15 @@ export async function middleware(request: NextRequest) {
   let response: NextResponse
   const slugResult = await resolveSlugResult(request)
   if (slugResult.type === 'redirect' && slugResult.url) {
+    // Use 301 as required, but add explicit no-cache headers so browsers and intermediaries
+    // do not cache the redirect mapping permanently. This prevents stale 301 mappings.
     response = NextResponse.redirect(slugResult.url, 301)
+    // Strong cache prevention for clients and proxies
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    // For some CDNs / reverse proxies
+    response.headers.set('Surrogate-Control', 'no-store')
   } else if (slugResult.type === 'not-found') {
     response = NextResponse.rewrite(new URL('/page-not-found', request.url))
   } else {

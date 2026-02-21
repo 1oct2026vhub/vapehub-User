@@ -4,6 +4,23 @@ import { getToken } from 'next-auth/jwt'
 import { ROUTES } from '@/lib/routes'
 import { API_ROUTES } from '@/lib/api-routes'
 
+// Response typing for slug-relation API
+type SlugData = {
+  redirect?: boolean
+  redirect_url?: string
+  updatedAt?: string
+  updated_at?: string
+  seo?: { updatedAt?: string; updated_at?: string } | null
+  [k: string]: unknown
+}
+type SlugResponse = {
+  success?: boolean
+  status?: string
+  data?: SlugData | null
+  message?: string
+  [k: string]: unknown
+}
+
 // Protected routes that require authentication
 const protectedRoutes = [
   ROUTES.MY_ACCOUNT_ORDERS,
@@ -54,8 +71,22 @@ export async function middleware(request: NextRequest) {
   // Known routes (shop, contact, etc.) are never checked so they never get wrongly 404'd.
   let response: NextResponse
   const slugResult = await resolveSlugResult(request)
+  // If a redirect was found, log the target (no suppression — perform redirect normally).
   if (slugResult.type === 'redirect' && slugResult.url) {
-    response = NextResponse.redirect(slugResult.url, 301)
+    try {
+      console.log(`middleware detected redirect target -> ${slugResult.url.toString()}`)
+    } catch {}
+    const isTemp = !!(slugResult as { temporary?: boolean }).temporary
+    const statusCode = isTemp ? 302 : 301
+    response = NextResponse.redirect(slugResult.url, statusCode)
+    // Prevent caching of redirect responses (both temporary and permanent) to avoid stale mappings.
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    response.headers.set('Surrogate-Control', 'no-store')
+    try {
+      console.log(`middleware redirect ${statusCode} -> ${slugResult.url.toString()} (temporary=${isTemp})`)
+    } catch {}
   } else if (slugResult.type === 'not-found') {
     response = NextResponse.rewrite(new URL('/page-not-found', request.url))
   } else {
@@ -79,7 +110,7 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
-type SlugResult = { type: 'next' } | { type: 'redirect'; url: URL } | { type: 'not-found' }
+type SlugResult = { type: 'next' } | { type: 'redirect'; url: URL; temporary?: boolean } | { type: 'not-found' }
 
 async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   if (request.method !== 'GET' && request.method !== 'HEAD') return { type: 'next' }
@@ -89,8 +120,7 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   const primarySlug = segments[0]
   if (!primarySlug) return { type: 'next' }
 
-  // Never run slug-relation for known app routes – avoids wrong 404s on /shop, /contact, etc.
-  if (KNOWN_FIRST_SEGMENTS.has(primarySlug)) return { type: 'next' }
+  // Quick guard for protected routes / auth pages
   if (
     protectedRoutes.some(route => pathname.startsWith(route)) ||
     pathname.startsWith(ROUTES.MY_ACCOUNT) ||
@@ -100,37 +130,66 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
     return { type: 'next' }
   }
 
+  // If the path has more than 2 segments it's out of scope for slug-relation
   if (segments.length > 2) return { type: 'next' }
 
-  try {
-    const endpoint = API_ROUTES.GET_DYNAMIC_PAGE_SLUG(primarySlug)
-    const res = await fetch(endpoint, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-    })
-
-    const json = (await res.json()) as {
-      success?: boolean
-      status?: string
-      data?: { redirect?: boolean; redirect_url?: string }
-    }
-
-    const isError = !res.ok || json.status === 'ERROR' || json.success === false
-    if (isError) return { type: 'not-found' }
-
-    if (json?.data?.redirect && json.data.redirect_url) {
-      const normalized = normalizeRedirectUrl(json.data.redirect_url)
-      if (normalized && normalized !== pathname) {
-        const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)
-        return { type: 'redirect', url }
+  // Helper: call slug-relation API for a given slug and return a SlugResult
+  async function fetchSlugRelation(slugToCheck: string): Promise<SlugResult> {
+    try {
+      const endpoint = API_ROUTES.GET_DYNAMIC_PAGE_SLUG(slugToCheck)
+      const res = await fetch(endpoint, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      })
+      const json = await res.json() as SlugResponse
+      // Log slug-relation responses to help debug 404 -> application error scenarios
+      try {
+        console.log(`slug-relation(${slugToCheck}) ->`, JSON.stringify(json))
+      } catch {
+        console.log(`slug-relation(${slugToCheck}) -> (non-serializable)`, json)
       }
-    }
+      const isError = !res.ok || json.status === 'ERROR' || json.success === false
+      if (isError) return { type: 'not-found' }
 
-    return { type: 'next' }
-  } catch {
-    return { type: 'next' }
+      if (json?.data?.redirect && json.data.redirect_url) {
+        const normalized = normalizeRedirectUrl(json.data.redirect_url)
+        if (normalized && normalized !== pathname) {
+          const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)
+          // Determine whether this redirect was updated recently; if so, treat it as temporary (302)
+          const updatedAt = json.data.updatedAt || json.data.updated_at || json.data.seo?.updatedAt || json.data.seo?.updated_at
+          let temporary = false
+          if (updatedAt) {
+            const ts = Date.parse(updatedAt)
+            if (!isNaN(ts)) {
+              // If updated within last 5 minutes, mark as temporary to avoid issuing a new 301 that clients may cache
+              const FIVE_MIN = 5 * 60 * 1000
+              if ((Date.now() - ts) < FIVE_MIN) temporary = true
+            }
+          }
+          return { type: 'redirect', url, temporary }
+        }
+      }
+      return { type: 'next' }
+    } catch {
+      return { type: 'next' }
+    }
   }
+
+  // Special-case known routes that need to be checked before the KNOWN_FIRST_SEGMENTS guard
+  // (brand and product-deals must run even though 'brand' / 'product-deals' are in KNOWN_FIRST_SEGMENTS)
+  if (pathname.startsWith('/brand/') && segments.length === 2) {
+    return await fetchSlugRelation(segments[1])
+  }
+  if (pathname.startsWith('/product-deals/') && segments.length === 2) {
+    return await fetchSlugRelation(segments[1])
+  }
+
+  // Never run slug-relation for known app routes – avoids wrong 404s on /shop, /contact, etc.
+  if (KNOWN_FIRST_SEGMENTS.has(primarySlug)) return { type: 'next' }
+
+  // Default: check the primary slug (product, category, blog, etc.)
+  return await fetchSlugRelation(primarySlug)
 }
 
 function normalizeRedirectUrl(input: string): string | null {

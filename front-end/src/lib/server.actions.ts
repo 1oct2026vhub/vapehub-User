@@ -356,12 +356,20 @@ export const getFaqs = async (type: string, id: number, canCache: boolean = true
 };
 
 // get dynamic page slug
-export const getDynamicPageSlug = async (slug: string, canCache: boolean = true): Promise<ServerActionResponse<DynamicPageSlugResponse>> => {
-  return await handleRequest<DynamicPageSlugResponse, unknown>({
+export const getDynamicPageSlug = async (slug: string, canCache: boolean = false): Promise<ServerActionResponse<DynamicPageSlugResponse>> => {
+  const response = await handleRequest<DynamicPageSlugResponse, unknown>({
     endpoint: API_ROUTES.GET_DYNAMIC_PAGE_SLUG(slug),
     method: 'GET',
     canCache,
   });
+  // Log response for debugging slug-relation issues (helps trace 404 -> redirect cases)
+  try {
+    // Avoid throwing when response contains circular refs
+    console.log(`getDynamicPageSlug(${slug}) ->`, JSON.stringify(response));
+  } catch {
+    console.log(`getDynamicPageSlug(${slug}) -> (non-serializable response)`, response);
+  }
+  return response;
 };
 
 // checkout

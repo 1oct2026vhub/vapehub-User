@@ -1,7 +1,8 @@
 import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { notFound, permanentRedirect, redirect, RedirectType } from 'next/navigation';
+import { notFound, redirect, RedirectType } from 'next/navigation';
+import PageNotFound from '@/app/(store)/page-not-found/page';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
 import { DynamicPageSlugResponse, SeoMetaResponse } from "@/lib/config/global.config";
@@ -32,14 +33,14 @@ const Page = async ({
   const secondarySlug: string | null = slug[1];
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
-    return notFound();
+    return <PageNotFound />;
   }
 
   // SEO redirect for deleted/unpublished slugs (middleware emits 301; this is a safe fallback).
   if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect) {
     const dest = normalizeRedirectUrl((dynamicPageSlug as unknown as { redirect_url?: string })?.redirect_url);
     if (dest) {
-      permanentRedirect(dest);
+      redirect(dest);
     }
   }
 
@@ -91,12 +92,12 @@ const Page = async ({
       if(newSlug) {
         redirect(`/${data.product.slug}/${newSlug}`, RedirectType.replace);
       } else {
-        return notFound();
+        return <PageNotFound />;
       }
     }
     
     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return notFound();
+      return <PageNotFound />;
     }
 
     return <ProductView data={data} isVariant={true} selectedVariant={variant} />;
@@ -165,8 +166,8 @@ const Page = async ({
     product: async () => {
       const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
 
-      if (!data?.product || !data.product.category) {
-        notFound();
+    if (!data?.product || !data.product.category) {
+        return <PageNotFound />;
       } else {
         return <ProductView data={data} />;
       }
@@ -175,12 +176,12 @@ const Page = async ({
 
   const handler: () => Promise<React.ReactNode> = entityTypeHandlers[dynamicPageSlug?.entity_type ?? ""];
   if (!handler) {
-    notFound();
+    return <PageNotFound />;
   }
 
   const result: React.ReactNode = dynamicPageSlug ? await handler() : null;
   if (!result) {
-    notFound();
+    return <PageNotFound />;
   }
 
   return result;

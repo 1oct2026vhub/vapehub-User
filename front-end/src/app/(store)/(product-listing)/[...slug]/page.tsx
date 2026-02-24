@@ -1,7 +1,7 @@
 import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { notFound, redirect, RedirectType } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
@@ -318,7 +318,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
-    return notFound();
+    return <PageNotFound />;
   }
 
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
@@ -379,7 +379,7 @@ export async function generateMetadata({ params, searchParams }: {
    
     
      if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return notFound();
+      return <PageNotFound />;
     }
      
     return {
@@ -618,7 +618,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const handler = metadataHandlers[dynamicPageSlug?.entity_type ?? ""];
   if (!handler) {
-    notFound();
+    <PageNotFound />;
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;

@@ -4,6 +4,8 @@ import { getToken } from 'next-auth/jwt'
 import { ROUTES } from '@/lib/routes'
 import { API_ROUTES } from '@/lib/api-routes'
 
+export const dynamic = "force-dynamic";
+
 // Response typing for slug-relation API
 type SlugData = {
   redirect?: boolean
@@ -30,8 +32,6 @@ const protectedRoutes = [
   ROUTES.MY_ACCOUNT_SECURITY,
   ROUTES.MY_ACCOUNT_LOYALTY_POINTS, // Add loyalty points route
 ]
-
-// First path segment = known app route. Never run slug-relation or rewrite these to 404.
 const KNOWN_FIRST_SEGMENTS = new Set([
   'shop', 'new-products', 'checkout', 'contact', 'delivery-information', 'faq',
   'loyalty-points', 'privacy-policy', 'returns-policy', 'terms-conditions',

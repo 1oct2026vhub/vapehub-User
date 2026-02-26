@@ -14,7 +14,7 @@ import EmptyPlaceholder from "./ui/EmptyPlaceholder";
 interface FAQProps {
     title?: string;
     viewAllHref?: string;
-    type: "product" | "brand" | "category" | "variant" | "common";
+    type: "product" | "brand" | "category" | "variant" | "common" | "blog";
     id: number;
     showAll?: boolean;
 }

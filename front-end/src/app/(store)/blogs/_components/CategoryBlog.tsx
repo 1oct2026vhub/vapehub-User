@@ -1,8 +1,11 @@
 import BreadCrumbs from "@/components/BreadCrumbs";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
+import FAQSection from "@/components/FAQSection";
 import { BlogByCategoryAndSlugResponse } from "@/lib/config/blog.config";
 import { ROUTES } from "@/lib/routes";
 import Image from "next/image";
+import { Suspense } from "react";
+import SuspenseLoader from "@/components/ui/SuspenseLoader";
 
 interface CategoryBlogsProps {
   data: BlogByCategoryAndSlugResponse;
@@ -54,6 +57,9 @@ const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
       />
       <h1 className='primary-gradient-600 text-h5 md:text-h3 font-semibold w-fit'>{data.title ?? "Blogs"}</h1>
       <div className="w-full blog-details rich-text" dangerouslySetInnerHTML={{ __html: processedContent }} />
+      <Suspense fallback={<SuspenseLoader height="h-40" />}>
+        <FAQSection type="blog" id={data.id} title="Frequently Asked Questions" />
+      </Suspense>
     </main>
   );
 };

@@ -73,15 +73,13 @@ const ProductFeatures: React.FC<ProductFeaturesProps> = ({ productFeatures }) =>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex flex-wrap items-center gap-3 lg:gap-x-5 lg:gap-y-10 justify-center">
 
                 {productFeatures.map((feature, index) => (
-                    features?.[index] && (
                     <FeatureCard
-                        key={index}
-                        imageSrc={feature.attribute.image_url || ""}
+                        key={feature.attribute.id ?? index}
+                        imageSrc={feature.attribute.image_url || features?.[index]?.imageSrc || ""}
                         altText={feature.attribute.name}
                         title={feature.attribute.name}
-                        subtitle={feature.terms?.[0]?.name}
+                        subtitle={feature.terms?.[0]?.name ?? ""}
                     />
-                    )
                 ))}
             </div>) : (
             <EmptyPlaceholder

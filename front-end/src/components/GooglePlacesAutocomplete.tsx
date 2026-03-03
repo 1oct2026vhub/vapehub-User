@@ -37,7 +37,6 @@ const GooglePlacesAutocomplete = <T extends FieldValues>({
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
   const previousLengthRef = useRef(0);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);

@@ -31,6 +31,37 @@ declare namespace google.maps.places {
   interface ComponentRestrictions {
     country: string | string[];
   }
+
+  interface AutocompletePrediction {
+    place_id: string;
+    description: string;
+    structured_formatting?: {
+      main_text: string;
+      secondary_text?: string;
+    };
+  }
+
+  class AutocompleteService {
+    getPlacePredictions(
+      request: { input: string; types?: string[]; componentRestrictions?: ComponentRestrictions },
+      callback: (predictions: AutocompletePrediction[] | null, status: string) => void
+    ): void;
+  }
+
+  class PlacesService {
+    constructor(attrContainer: HTMLDivElement);
+    getDetails(
+      request: { placeId: string; fields?: string[] },
+      callback: (place: PlaceResult | null, status: string) => void
+    ): void;
+  }
+
+  const PlacesServiceStatus: {
+    OK: string;
+    ZERO_RESULTS: string;
+    ERROR: string;
+    [key: string]: string;
+  };
 }
 
 declare namespace google.maps {

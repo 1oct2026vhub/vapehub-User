@@ -21,7 +21,6 @@ interface GooglePlacesAutocompleteProps<T extends FieldValues> extends InputProp
   restrictToCountries?: string[];
 }
 
-
 const GooglePlacesAutocomplete = <T extends FieldValues>({
   onPlaceSelect,
   control,

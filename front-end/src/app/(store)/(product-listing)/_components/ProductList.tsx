@@ -24,6 +24,7 @@ import { setScrollToTopOnNextNavigation } from "@/components/HistoryProvider";
 import { PRODUCT_LISTING_START_ID } from "@/lib/utils/scrollToTop";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+import { cn } from "@/lib/utils";
 // import { getAllDeals } from "@/lib/server.actions";
 // import { li } from "framer-motion/client";
 // import { motion } from "framer-motion";
@@ -207,12 +208,14 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
 
 
   
-  // const pageLimit = data?.pagination?.limit ?? 0;
-  // on pagination change – scroll to first product section (by id) then navigate
   const handlePagination = (page: number) => {
     setScrollToTopOnNextNavigation();
-    const params = new URLSearchParams(searchParams);    
-    params.set("offset", ((page - 1) * 12).toString());
+    const params = new URLSearchParams(searchParams);
+
+    // Use SEO-friendly `page` parameter instead of raw `offset`.
+    params.set("page", page.toString());
+    params.delete("offset");
+
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
@@ -361,7 +364,40 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
               <div className="flex items-center gap-3 justify-between pl-5 flex-wrap">
                 <p className="text-content-1 text-skin-neutral-300 font-bold">Showing {activePage}-{products.length} of {totalCount} results</p>
                 {totalPage > 1 && (
-                  <Pagination total={totalPage} onPageChange={handlePagination} currentPage={activePage} />
+                  <>
+                    <Pagination total={totalPage} onPageChange={handlePagination} currentPage={activePage} />
+                    {/*
+                      SEO-friendly pagination links so crawlers can discover deeper pages.
+                      These links mirror the button-based pagination behaviour.
+                    */}
+                    <nav aria-label="Product pages" className="mt-2">
+                      <ul className="flex flex-wrap gap-2 text-sm">
+                        {Array.from({ length: totalPage }, (_, index) => {
+                          const page = index + 1;
+                          const params = new URLSearchParams(searchParams);
+                          params.set("page", page.toString());
+                          params.delete("offset");
+                          const href = `${pathname}?${params.toString()}`;
+                          const isCurrent = page === activePage;
+
+                          return (
+                            <li key={page}>
+                              <a
+                                href={href}
+                                aria-current={isCurrent ? "page" : undefined}
+                                className={cn(
+                                  "px-2 py-1 rounded border text-skin-neutral-500",
+                                  isCurrent && "bg-primary-gradient-100 text-skin-white border-transparent"
+                                )}
+                              >
+                                {page}
+                              </a>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </nav>
+                  </>
                 )}
               </div>
             </>

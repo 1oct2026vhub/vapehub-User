@@ -168,7 +168,20 @@ const Page = async ({
       return categoryBlogs && <CategoryBlogs data={categoryBlogs} />;
     },
     category: async () => {
-      const combinedParams = buildVariantParams(searchParamsData, defaultParams);
+      // Normalize pagination: use SEO-friendly `page` in the URL, convert to `offset` for the API.
+      const normalizedSearchParams: Record<string, string> = { ...searchParamsData };
+      const pageFromUrl = parseInt(normalizedSearchParams.page ?? "1", 10);
+      const limit = Number(defaultParams.limit) || 12;
+
+      if (!Number.isNaN(pageFromUrl) && pageFromUrl > 1) {
+        normalizedSearchParams.offset = String((pageFromUrl - 1) * limit);
+      } else {
+        // Ensure we always have a deterministic offset value
+        normalizedSearchParams.offset = "0";
+      }
+      delete normalizedSearchParams.page;
+
+      const combinedParams = buildVariantParams(normalizedSearchParams, defaultParams);
       const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
       if (category) {
         // Extract review data from products and format for CategoryProducts
@@ -407,7 +420,6 @@ export async function generateMetadata({ params, searchParams }: {
   const secondarySlug: string | null = slug[1];
   // const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
-
 
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
@@ -715,11 +727,34 @@ export async function generateMetadata({ params, searchParams }: {
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;
-  // if (!metadata) {
-  //   notFound();
-  // }
 
-  return metadata;
+  // Add self-referencing canonical URLs for paginated and filtered pages.
+  // We prefer a stable canonical that includes the current page number when present.
+  const pageParam = searchParamsData.page;
+  const pageNumber = Number.parseInt(pageParam ?? "1", 10);
+  const hasValidPage = !Number.isNaN(pageNumber) && pageNumber > 1;
+
+  const basePath = `/${primarySlug ?? ""}`.replace(/\/+$/, "") || "/";
+  const canonicalPath = hasValidPage ? `${basePath}?page=${pageNumber}` : basePath;
+  const canonicalUrl = toAbsoluteUrl(BASE_URL, canonicalPath);
+
+  if (!metadata) {
+    return {
+      alternates: {
+        canonical: canonicalUrl,
+      },
+    };
+  }
+
+  const typedMetadata = metadata as { alternates?: { canonical?: string } };
+
+  return {
+    ...typedMetadata,
+    alternates: {
+      ...(typedMetadata.alternates ?? {}),
+      canonical: canonicalUrl,
+    },
+  };
 }
 
 

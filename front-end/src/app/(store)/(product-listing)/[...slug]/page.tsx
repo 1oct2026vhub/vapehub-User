@@ -728,21 +728,42 @@ export async function generateMetadata({ params, searchParams }: {
 
   const metadata = dynamicPageSlug ? await handler() : null;
 
+  // URL params that waste crawl budget (listing: sort, pagination, filters); canonical + noindex when present.
+  const CRAWL_WASTE_PARAM_KEYS = [
+    "vahukId",
+    "attribute_pa_flavour",
+    "order",
+    "sort_by",
+    "page",
+    "offset",
+    "price_range",
+    "categories",
+    "brand",
+    "deal_id",
+  ];
+  const hasCrawlWasteParams = Object.keys(searchParamsData ?? {}).some(
+    (k) =>
+      CRAWL_WASTE_PARAM_KEYS.includes(k) ||
+      k.startsWith("attribute_pa_") ||
+      /^attribute_\d+$/.test(k)
+  );
+
   // Add self-referencing canonical URLs for paginated and filtered pages.
   // We prefer a stable canonical that includes the current page number when present.
-  const pageParam = searchParamsData.page;
+  const pageParam = searchParamsData?.page;
   const pageNumber = Number.parseInt(pageParam ?? "1", 10);
   const hasValidPage = !Number.isNaN(pageNumber) && pageNumber > 1;
 
-  const basePath = `/${primarySlug ?? ""}`.replace(/\/+$/, "") || "/";
-  const canonicalPath = hasValidPage ? `${basePath}?page=${pageNumber}` : basePath;
+  const basePath = `/${slug.filter(Boolean).join("/")}`.replace(/\/+$/, "") || "/";
+  // When URL has crawl-waste params, canonical must point to the clean URL (no query).
+  const canonicalPath =
+    hasCrawlWasteParams ? basePath : hasValidPage ? `${basePath}?page=${pageNumber}` : basePath;
   const canonicalUrl = toAbsoluteUrl(BASE_URL, canonicalPath);
 
   if (!metadata) {
     return {
-      alternates: {
-        canonical: canonicalUrl,
-      },
+      alternates: { canonical: canonicalUrl },
+      ...(hasCrawlWasteParams && { robots: { index: false, follow: true } }),
     };
   }
 
@@ -754,6 +775,7 @@ export async function generateMetadata({ params, searchParams }: {
       ...(typedMetadata.alternates ?? {}),
       canonical: canonicalUrl,
     },
+    ...(hasCrawlWasteParams && { robots: { index: false, follow: true } }),
   };
 }
 

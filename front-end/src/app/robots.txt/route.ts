@@ -19,35 +19,7 @@ export async function GET() {
       throw new Error(`Failed to fetch robots.txt: ${response.statusText}`);
     }
 
-    let robotsContent = await response.text();
-
-    // Append rules to block parameter URLs and preserve crawl budget (see GSC parameter handling).
-    // Product listing: sort, pagination, filters (price_range, categories, brand, deal_id, attribute_*).
-    const parameterRules = `
-
-# Block parameter URLs to preserve crawl budget (product listing + tracking)
-Disallow: /*?vahukId=
-Disallow: /*?attribute_pa_flavour=
-Disallow: /*?order=
-Disallow: /*?sort_by=
-Disallow: /*?page=
-Disallow: /*?offset=
-Disallow: /*?price_range=
-Disallow: /*?categories=
-Disallow: /*?brand=
-Disallow: /*?deal_id=
-Disallow: /*?attribute_pa_
-Disallow: /*?attribute_1=
-Disallow: /*?attribute_2=
-Disallow: /*?attribute_3=
-Disallow: /*?attribute_4=
-Disallow: /*?attribute_5=
-Disallow: /*?attribute_6=
-Disallow: /*?attribute_7=
-Disallow: /*?attribute_8=
-Disallow: /*?attribute_9=
-`;
-    robotsContent = robotsContent.trimEnd() + parameterRules;
+    const robotsContent = await response.text();
 
     return new NextResponse(robotsContent, {
       status: 200,

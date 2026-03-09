@@ -9,10 +9,7 @@ export async function GET() {
       headers: {
         Accept: 'text/plain',
       },
-      next: {
-        // Revalidate every 24 hours
-        revalidate: 86400,
-      },
+      cache: 'no-store',
     });
 
     if (!response.ok) {

@@ -17,7 +17,6 @@ import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, getRatingFro
 type PageProps = {
   slug: string[];
 };
-
 const BASE_URL = (process.env.NEXTAUTH_URL || "https://www.vapehub.co.uk").replace(/\/$/, "");
 
 const Page = async ({

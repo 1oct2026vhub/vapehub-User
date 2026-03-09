@@ -207,12 +207,14 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
 
 
   
-  // const pageLimit = data?.pagination?.limit ?? 0;
-  // on pagination change – scroll to first product section (by id) then navigate
   const handlePagination = (page: number) => {
     setScrollToTopOnNextNavigation();
-    const params = new URLSearchParams(searchParams);    
-    params.set("offset", ((page - 1) * 12).toString());
+    const params = new URLSearchParams(searchParams);
+
+    // Use SEO-friendly `page` parameter instead of raw `offset`.
+    params.set("page", page.toString());
+    params.delete("offset");
+
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 

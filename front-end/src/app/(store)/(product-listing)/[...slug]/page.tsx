@@ -1,4 +1,4 @@
-import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug } from "@/lib/server.actions";
+import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug, getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { redirect, RedirectType } from 'next/navigation';
@@ -11,10 +11,13 @@ import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/
 import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+import JsonLd from "@/components/JsonLd";
+import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, getRatingFromReviewResponse, toAbsoluteUrl, SCHEMA_CONTEXT } from "@/lib/seo-schema";
 
 type PageProps = {
   slug: string[];
 };
+const BASE_URL = (process.env.NEXTAUTH_URL || "https://www.vapehub.co.uk").replace(/\/$/, "");
 
 const Page = async ({
   params,
@@ -84,23 +87,68 @@ const Page = async ({
       });
     }
 
-    const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
-     
-    if(data && !data.variants.length) {
+    // Parallel fetch: Product (required), FAQ, Rating (optional)
+    const entityId = dynamicPageSlug?.entity_id ?? 0;
+    const [productRes, faqRes, ratingRes] = await Promise.allSettled([
+      fetchProduct(entityId, payload),
+      getFaqs("product", entityId, false),
+      getReviewOrderByProductId(entityId, 1, 1),
+    ]);
+
+    const data = productRes.status === "fulfilled" ? productRes.value : null;
+    if (data && !data.variants.length) {
       const lastPayload = payload[payload.length - 1];
       const newSlug = data?.filtered_attribute_terms.find(term => term.attribute.id === lastPayload.attribute_id)?.terms.find(t => t.id === lastPayload.term_id)?.slug;
-      if(newSlug) {
+      if (newSlug) {
         redirect(`/${data.product.slug}/${newSlug}`, RedirectType.replace);
       } else {
         return <PageNotFound />;
       }
     }
-    
+
     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
       return <PageNotFound />;
     }
 
-    return <ProductView data={data} isVariant={true} selectedVariant={variant} />;
+    const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}/${secondarySlug}`);
+    const faqs = faqRes.status === "fulfilled" && faqRes.value?.status === ServerActionStatus.SUCCESS ? faqRes.value.data : [];
+    const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
+      ? getRatingFromReviewResponse(ratingRes.value.data)
+      : null;
+
+    const productSchema = buildProductSchema({
+      productResponse: data,
+      productUrl,
+      baseUrl: BASE_URL,
+      ratingData,
+      currency: "GBP",
+    });
+    const breadcrumbSchema = buildBreadcrumbSchema({
+      baseUrl: BASE_URL,
+      categoryName: data.product.category?.name ?? "Category",
+      categorySlug: data.product.category?.slug ?? "",
+      productName: data.product.name,
+      productUrl,
+      shopLabel: "Shop",
+      shopPath: "/shop",
+    });
+    const faqSchema = buildFaqSchema(faqs ?? []);
+    const graph: Record<string, unknown>[] = [
+      productSchema,
+      breadcrumbSchema,
+      ...(faqSchema ? [faqSchema] : []),
+    ];
+    const jsonLdData = {
+      "@context": SCHEMA_CONTEXT,
+      "@graph": graph,
+    };
+
+    return (
+      <>
+        <JsonLd data={jsonLdData} />
+        <ProductView data={data} isVariant={true} selectedVariant={variant} />
+      </>
+    );
   }
 
 
@@ -119,7 +167,20 @@ const Page = async ({
       return categoryBlogs && <CategoryBlogs data={categoryBlogs} />;
     },
     category: async () => {
-      const combinedParams = buildVariantParams(searchParamsData, defaultParams);
+      // Normalize pagination: use SEO-friendly `page` in the URL, convert to `offset` for the API.
+      const normalizedSearchParams: Record<string, string> = { ...searchParamsData };
+      const pageFromUrl = parseInt(normalizedSearchParams.page ?? "1", 10);
+      const limit = Number(defaultParams.limit) || 12;
+
+      if (!Number.isNaN(pageFromUrl) && pageFromUrl > 1) {
+        normalizedSearchParams.offset = String((pageFromUrl - 1) * limit);
+      } else {
+        // Ensure we always have a deterministic offset value
+        normalizedSearchParams.offset = "0";
+      }
+      delete normalizedSearchParams.page;
+
+      const combinedParams = buildVariantParams(normalizedSearchParams, defaultParams);
       const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
       if (category) {
         // Extract review data from products and format for CategoryProducts
@@ -164,13 +225,57 @@ const Page = async ({
       return null;
     },
     product: async () => {
-      const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
+      const entityId = dynamicPageSlug?.entity_id ?? 0;
+      const [productRes, faqRes, ratingRes] = await Promise.allSettled([
+        fetchProduct(entityId, []),
+        getFaqs("product", entityId, false),
+        getReviewOrderByProductId(entityId, 1, 1),
+      ]);
 
-    if (!data?.product || !data.product.category) {
+      const data = productRes.status === "fulfilled" ? productRes.value : null;
+      if (!data?.product || !data.product.category) {
         return <PageNotFound />;
-      } else {
-        return <ProductView data={data} />;
       }
+
+      const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}`);
+      const faqs = faqRes.status === "fulfilled" && faqRes.value?.status === ServerActionStatus.SUCCESS ? faqRes.value.data : [];
+      const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
+        ? getRatingFromReviewResponse(ratingRes.value.data)
+        : null;
+
+      const productSchema = buildProductSchema({
+        productResponse: data,
+        productUrl,
+        baseUrl: BASE_URL,
+        ratingData,
+        currency: "GBP",
+      });
+      const breadcrumbSchema = buildBreadcrumbSchema({
+        baseUrl: BASE_URL,
+        categoryName: data.product.category?.name ?? "Category",
+        categorySlug: data.product.category?.slug ?? "",
+        productName: data.product.name,
+        productUrl,
+        shopLabel: "Shop",
+        shopPath: "/shop",
+      });
+      const faqSchema = buildFaqSchema(faqs ?? []);
+      const graph: Record<string, unknown>[] = [
+        productSchema,
+        breadcrumbSchema,
+        ...(faqSchema ? [faqSchema] : []),
+      ];
+      const jsonLdData = {
+        "@context": SCHEMA_CONTEXT,
+        "@graph": graph,
+      };
+
+      return (
+        <>
+          <JsonLd data={jsonLdData} />
+          <ProductView data={data} />
+        </>
+      );
     }
   };
 
@@ -314,7 +419,6 @@ export async function generateMetadata({ params, searchParams }: {
   const secondarySlug: string | null = slug[1];
   // const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
-
 
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
@@ -622,11 +726,34 @@ export async function generateMetadata({ params, searchParams }: {
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;
-  // if (!metadata) {
-  //   notFound();
-  // }
 
-  return metadata;
+  // Add self-referencing canonical URLs for paginated and filtered pages.
+  // We prefer a stable canonical that includes the current page number when present.
+  const pageParam = searchParamsData.page;
+  const pageNumber = Number.parseInt(pageParam ?? "1", 10);
+  const hasValidPage = !Number.isNaN(pageNumber) && pageNumber > 1;
+
+  const basePath = `/${primarySlug ?? ""}`.replace(/\/+$/, "") || "/";
+  const canonicalPath = hasValidPage ? `${basePath}?page=${pageNumber}` : basePath;
+  const canonicalUrl = toAbsoluteUrl(BASE_URL, canonicalPath);
+
+  if (!metadata) {
+    return {
+      alternates: {
+        canonical: canonicalUrl,
+      },
+    };
+  }
+
+  const typedMetadata = metadata as { alternates?: { canonical?: string } };
+
+  return {
+    ...typedMetadata,
+    alternates: {
+      ...(typedMetadata.alternates ?? {}),
+      canonical: canonicalUrl,
+    },
+  };
 }
 
 

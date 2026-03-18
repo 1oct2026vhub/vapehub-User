@@ -340,7 +340,7 @@ input[type='search'] {
 }
 
 .quantity {
-  @apply w-fit h-4 md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-start items-center p-1 pr-2 md:px-2;
+  @apply w-fit md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-start items-center p-1 pr-2 md:px-2;
   flex-shrink: 0;
   border-radius: 10px 10px 10px 0px;
   background: #61B278;

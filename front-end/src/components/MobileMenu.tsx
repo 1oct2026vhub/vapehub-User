@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@nextui-org/button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Accordion, AccordionItem, Badge, Divider } from '@nextui-org/react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, useDisclosure, Badge, Divider } from '@nextui-org/react';
 import { CloseIcon, DownArrowFilledIcon, MenuCartIcon, MenuIcon, MenuUserIcon } from '@/components/Icons';
 import Link from 'next/link';
 import ShoppingCartCardDrawer from './ShoppingCartCardDrawer';
@@ -45,36 +45,15 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
     const discountAmount = subscriptionSettings ? Math.round(parseFloat(subscriptionSettings.discount_amount)).toString() : '10';
     const discountType = subscriptionSettings ? (subscriptionSettings.discount_type === 'fixed' ? 'fixed' : 'percentage') : 'percentage';
     
-    const itemClasses = {
-        base: "w-full rounded-lg shadow-input border border-skin-neutral-100",
-        title: "text-title-2 font-bold uppercase",
-        trigger: '!py-2.5',
-        indicator: "text-medium text-skin-neutral-50 data-[open=true]:rotate-180",
-        content: "py-4 border-t border-skin-neutral-200",
-    };
-
     // Use megaMenuData if available, otherwise fall back to categories
     const menuData = megaMenuData.length > 0 ? megaMenuData : [];
 
     // Ensure the footer is visible when closing the drawer
     const handleMenuClose = () => {
-        setFooterVisible(true); // Reset footer visibility
-        setOpenItems([]); // Clear open accordion items
+        setFooterVisible(true);
+        setOpenItems([]);
         onMenuClose();
     };
-
-    // Check if there are any menu items with children or images
-    const hasMenuContent = menuData.some(menuItem => 
-        (menuItem.children && menuItem.children.length > 0) || 
-        (menuItem.show_image && menuItem.entity_data)
-    );
-
-    const filterOptions = menuData.length > 0 ? menuData.map((menuItem) => ({
-        title: menuItem.label,
-        content: <MobileSubMenu menuItems={menuItem.children || []} parentMenu={menuItem} onItemSelect={handleMenuClose} />,
-        link: menuItem.original || '#',
-        isLink: false,
-    })) : [];
 
     // Format discount display based on type
     const formatDiscount = () => {
@@ -183,53 +162,62 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             NEW IN
                         </Button>
                         
-                        {/* Accordion Filters */}
-                        {hasMenuContent && (
-                            <Accordion variant="splitted" className="!p-0" itemClasses={itemClasses} selectionMode='multiple'>
-                                {filterOptions.map(({ title, content, link }, index) => {
-                                    // Check if this specific menu item has children or images
-                                    const menuItem = menuData[index];
-                                    const hasSubContent = menuItem && (
-                                        (menuItem.children && menuItem.children.length > 0) || 
-                                        (menuItem.show_image && menuItem.entity_data)
-                                    );
-                                    
-                                    return (
-                                        <AccordionItem
-                                            key={title}
-                                            aria-label={title}
-                                            title={
-                                                menuItem && (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') ? (
-                                                    <button
-                                                        className="w-full text-left"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            // Extract slug from original URL or entity_data
-                                                            let slug = '';
-                                                            if (menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal') {
-                                                                slug = menuItem.entity_data?.slug || menuItem.original?.split('/').pop() || '';
-                                                            }
-                                                            handleMenuClick(menuItem.original, menuItem.entity_type, slug);
-                                                        }}
-                                                    >
-                                                        {title}
-                                                    </button>
-                                                ) : (
-                                                    <Link href={link} key={title} scroll={true}>
-                                                        {title}
-                                                    </Link>
-                                                )
+                        {/* Menu items — custom accordion so title click and arrow click are fully independent */}
+                        {menuData.map((menuItem, index) => {
+                            const hasSubContent =
+                                (menuItem.children && menuItem.children.length > 0) ||
+                                (menuItem.show_image && menuItem.entity_data);
+
+                            const isOpen = openItems.includes(index);
+
+                            const isBrandOrDeal =
+                                menuItem.entity_type === 'brand' || menuItem.entity_type === 'deal';
+                            const slug = isBrandOrDeal
+                                ? menuItem.entity_data?.slug || menuItem.original?.split('/').pop() || ''
+                                : '';
+
+                            return (
+                                <div
+                                    key={menuItem.id}
+                                    className="w-full rounded-lg shadow-input border border-skin-neutral-100"
+                                >
+                                    {/* Header row */}
+                                    <div className="flex items-center justify-between px-4 py-[11px]">
+                                        {/* Title — navigates to URL */}
+                                        <button
+                                            className="flex-1 text-left text-title-2 font-bold uppercase font-oswald"
+                                            onClick={() =>
+                                                handleMenuClick(menuItem.original, menuItem.entity_type, slug)
                                             }
-                                            indicator={hasSubContent ? <DownArrowFilledIcon color='black' /> : null}
-                                            onPress={hasSubContent ? () => handleAccordionItemClick(index) : undefined}
                                         >
-                                            {hasSubContent ? content : null}
-                                        </AccordionItem>
-                                    );
-                                })}
-                            </Accordion>
-                        )}
+                                            {menuItem.label}
+                                        </button>
+
+                                        {/* Arrow — toggles accordion, only shown when item has submenu */}
+                                        {hasSubContent && (
+                                            <button
+                                                className={`flex items-center justify-center transition-transform duration-200 ml-2 ${isOpen ? 'rotate-180' : ''}`}
+                                                onClick={() => handleAccordionItemClick(index)}
+                                                aria-label={isOpen ? 'Collapse' : 'Expand'}
+                                            >
+                                                <DownArrowFilledIcon color='black' />
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {/* Collapsible content */}
+                                    {hasSubContent && isOpen && (
+                                        <div className="border-t border-skin-neutral-200 py-4 px-4">
+                                            <MobileSubMenu
+                                                menuItems={menuItem.children || []}
+                                                parentMenu={menuItem}
+                                                onItemSelect={handleMenuClose}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                         {defaultNavLinks.map(({ name, slug }) => (
                             <Button
                                 as={Link}

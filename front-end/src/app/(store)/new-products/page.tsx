@@ -22,7 +22,20 @@ const NewProductsPage: NextPage<SearchParams> = async ({ searchParams }): AsyncR
   const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0, is_new: true } as const;
   const searchParamsData = await searchParams;
 
-  const variantParams = Object.entries(searchParamsData)
+  // Normalize pagination: accept SEO-friendly `page` in the URL and convert to `offset` for the API.
+  const normalizedSearchParams: Record<string, string> = { ...searchParamsData };
+  const pageFromUrl = parseInt(normalizedSearchParams.page ?? "1", 10);
+  const limit = Number(defaultParams.limit) || 12;
+
+  if (!Number.isNaN(pageFromUrl) && pageFromUrl > 1) {
+    normalizedSearchParams.offset = String((pageFromUrl - 1) * limit);
+  } else {
+    // Ensure we always have a deterministic offset value
+    normalizedSearchParams.offset = "0";
+  }
+  delete normalizedSearchParams.page;
+
+  const variantParams = Object.entries(normalizedSearchParams)
     .reduce((acc: Record<string, unknown>, [key, value]) => {
       if (key.startsWith('attribute_')) {
         const attributeId = key.replace('attribute_', '');

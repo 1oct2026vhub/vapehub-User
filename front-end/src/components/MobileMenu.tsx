@@ -98,10 +98,8 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
         });
     };
 
-    // Handle menu item click navigation
-    const handleMenuClick = (original: string | null, entityType?: string, slug?: string) => {
+    const handleMenuItemNavigate = (original: string | null, entityType?: string, slug?: string) => {
         if (original && original !== '#') {
-            // Handle different entity types with custom navigation
             if (entityType === 'brand' && slug) {
                 router.push(`/brand/${slug}`);
             } else if (entityType === 'deal' && slug) {
@@ -109,7 +107,6 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
             } else {
                 router.push(original);
             }
-
             handleMenuClose();
         }
     };
@@ -162,7 +159,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             NEW IN
                         </Button>
                         
-                        {/* Menu items — custom accordion so title click and arrow click are fully independent */}
+                        {/* Menu items */}
                         {menuData.map((menuItem, index) => {
                             const hasSubContent =
                                 (menuItem.children && menuItem.children.length > 0) ||
@@ -176,37 +173,41 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                                 ? menuItem.entity_data?.slug || menuItem.original?.split('/').pop() || ''
                                 : '';
 
+                            if (!hasSubContent) {
+                                // No submenu — plain link, no accordion
+                                return (
+                                    <Button
+                                        key={menuItem.id}
+                                        as={isBrandOrDeal ? 'button' as any : Link}
+                                        href={!isBrandOrDeal ? (menuItem.original || '#') : undefined}
+                                        onClick={isBrandOrDeal ? () => handleMenuItemNavigate(menuItem.original, menuItem.entity_type, slug) : handleMenuClose}
+                                        variant='light'
+                                        className='w-full justify-start text-title-2 font-bold uppercase font-oswald rounded-lg shadow-input border border-skin-neutral-100 p-4 py-5.5'
+                                    >
+                                        {menuItem.label}
+                                    </Button>
+                                );
+                            }
+
+                            // Has submenu — accordion (whole row toggles open/close)
                             return (
                                 <div
                                     key={menuItem.id}
                                     className="w-full rounded-lg shadow-input border border-skin-neutral-100"
                                 >
-                                    {/* Header row */}
-                                    <div className="flex items-center justify-between px-4 py-[11px]">
-                                        {/* Title — navigates to URL */}
-                                        <button
-                                            className="flex-1 text-left text-title-2 font-bold uppercase font-oswald"
-                                            onClick={() =>
-                                                handleMenuClick(menuItem.original, menuItem.entity_type, slug)
-                                            }
-                                        >
+                                    <button
+                                        className="w-full flex items-center justify-between px-4 py-[11px]"
+                                        onClick={() => handleAccordionItemClick(index)}
+                                    >
+                                        <span className="text-title-2 font-bold uppercase font-oswald">
                                             {menuItem.label}
-                                        </button>
+                                        </span>
+                                        <span className={`flex items-center transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                                            <DownArrowFilledIcon color='black' />
+                                        </span>
+                                    </button>
 
-                                        {/* Arrow — toggles accordion, only shown when item has submenu */}
-                                        {hasSubContent && (
-                                            <button
-                                                className={`flex items-center justify-center transition-transform duration-200 ml-2 ${isOpen ? 'rotate-180' : ''}`}
-                                                onClick={() => handleAccordionItemClick(index)}
-                                                aria-label={isOpen ? 'Collapse' : 'Expand'}
-                                            >
-                                                <DownArrowFilledIcon color='black' />
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    {/* Collapsible content */}
-                                    {hasSubContent && isOpen && (
+                                    {isOpen && (
                                         <div className="border-t border-skin-neutral-200 py-4 px-4">
                                             <MobileSubMenu
                                                 menuItems={menuItem.children || []}

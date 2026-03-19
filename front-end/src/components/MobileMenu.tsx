@@ -175,12 +175,23 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
 
                             if (!hasSubContent) {
                                 // No submenu — plain link, no accordion
+                                if (isBrandOrDeal) {
+                                    return (
+                                        <button
+                                            key={menuItem.id}
+                                            onClick={() => handleMenuItemNavigate(menuItem.original, menuItem.entity_type, slug)}
+                                            className='w-full text-left text-title-2 font-bold uppercase font-oswald rounded-lg shadow-input border border-skin-neutral-100 p-4 py-[11px]'
+                                        >
+                                            {menuItem.label}
+                                        </button>
+                                    );
+                                }
                                 return (
                                     <Button
                                         key={menuItem.id}
-                                        as={isBrandOrDeal ? 'button' as any : Link}
-                                        href={!isBrandOrDeal ? (menuItem.original || '#') : undefined}
-                                        onClick={isBrandOrDeal ? () => handleMenuItemNavigate(menuItem.original, menuItem.entity_type, slug) : handleMenuClose}
+                                        as={Link}
+                                        href={menuItem.original || '#'}
+                                        onClick={handleMenuClose}
                                         variant='light'
                                         className='w-full justify-start text-title-2 font-bold uppercase font-oswald rounded-lg shadow-input border border-skin-neutral-100 p-4 py-5.5'
                                     >

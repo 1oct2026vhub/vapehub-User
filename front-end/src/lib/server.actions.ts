@@ -149,13 +149,13 @@ export const getHomeProductList = async (
 export const getProductByCategory = async (
   slug: string,
   params: PRODUCT_PAYLOAD,
-  canCache: boolean = true
+  // canCache: boolean = true
 ): Promise<ServerActionResponse<CategoryResponseData>> => {
   
   return await handleRequest<CategoryResponseData, unknown>({
     endpoint: API_ROUTES.GET_CATEGORY_PRODUCTS_BY_SLUG(slug, params),
     method: 'GET',
-    canCache,
+    // canCache,
   });
 };
 

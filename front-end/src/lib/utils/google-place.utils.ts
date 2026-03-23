@@ -17,23 +17,12 @@ export const extractAddressComponents = (place: google.maps.places.PlaceResult) 
     return useShortName ? component.short_name : component.long_name;
   };
 
-  const routeShort = getComponent('route', true);
-  const routeLong = getComponent('route');
-  const localityShort = getComponent('locality', true);
-  const localityLong = getComponent('locality');
-  const postalTownShort = getComponent('postal_town', true);
-  const postalTownLong = getComponent('postal_town');
-  const countryLong = getComponent('country');
-  const countryShort = getComponent('country', true);
-
   return {
-    // Address Line 1 should only be the street.
-    // `route` is what Google considers the street name/number.
-    street: routeShort || routeLong || place.name || '',
-    city: localityLong || getComponent('postal_town'),
+    street: place.name || getComponent('route', true) || getComponent('route') || '',
+    city: getComponent('locality') || getComponent('postal_town'),
     state: getComponent('administrative_area_level_1'),
     postcode: getComponent('postal_code'),
-    country: countryLong,
+    country: getComponent('country'),
     region: getComponent('administrative_area_level_2'),
   };
 };

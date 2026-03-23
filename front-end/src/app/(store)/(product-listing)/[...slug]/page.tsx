@@ -220,7 +220,11 @@ const Page = async ({
             total_reviews: product.review_stats?.total_reviews || 0
           }
         })) : [];
-        return <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />;
+        return (
+          <>
+            <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
+          </>
+        );
       }
       return null;
     },
@@ -726,6 +730,11 @@ export async function generateMetadata({ params, searchParams }: {
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;
+  const paginationLinks = await getCategoryPaginationLinks({
+    dynamicPageSlug,
+    primarySlug,
+    searchParamsData,
+  });
 
   // Add self-referencing canonical URLs for paginated and filtered pages.
   // We prefer a stable canonical that includes the current page number when present.
@@ -745,7 +754,14 @@ export async function generateMetadata({ params, searchParams }: {
     };
   }
 
-  const typedMetadata = metadata as { alternates?: { canonical?: string } };
+  const typedMetadata = metadata as {
+    alternates?: { canonical?: string };
+    icons?: { other?: Array<{ rel?: string; url?: string }> };
+  };
+  const paginationIconLinks = [
+    ...(paginationLinks.prev ? [{ rel: "prev", url: paginationLinks.prev }] : []),
+    ...(paginationLinks.next ? [{ rel: "next", url: paginationLinks.next }] : []),
+  ];
 
   return {
     ...typedMetadata,
@@ -753,6 +769,47 @@ export async function generateMetadata({ params, searchParams }: {
       ...(typedMetadata.alternates ?? {}),
       canonical: canonicalUrl,
     },
+    icons: paginationIconLinks.length
+      ? {
+          ...(typedMetadata.icons ?? {}),
+          other: [...(typedMetadata.icons?.other ?? []), ...paginationIconLinks],
+        }
+      : typedMetadata.icons,
+  };
+}
+
+async function getCategoryPaginationLinks({
+  dynamicPageSlug,
+  primarySlug,
+  searchParamsData,
+}: {
+  dynamicPageSlug: DynamicPageSlugResponse | null;
+  primarySlug: string | null;
+  searchParamsData: Record<string, string>;
+}) {
+  if (!primarySlug || dynamicPageSlug?.entity_type !== "category") {
+    return {};
+  }
+
+  const defaultParams = { sort_by: "popularity", limit: 12, offset: 0 } as const;
+  const normalizedSearchParams: Record<string, string> = { ...searchParamsData };
+  const parsedPage = Number.parseInt(normalizedSearchParams.page ?? "1", 10);
+  const pageNumber = !Number.isNaN(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const limit = Number(defaultParams.limit) || 12;
+
+  normalizedSearchParams.offset = pageNumber > 1 ? String((pageNumber - 1) * limit) : "0";
+  delete normalizedSearchParams.page;
+
+  const combinedParams = buildVariantParams(normalizedSearchParams, defaultParams);
+  const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
+  const totalPages = Math.max(1, category?.pagination?.total_pages ?? 1);
+  const prevPage = pageNumber > 1 ? pageNumber - 1 : undefined;
+  const nextPage = pageNumber < totalPages ? pageNumber + 1 : undefined;
+  const basePath = `/${primarySlug}`.replace(/\/+$/, "") || "/";
+
+  return {
+    prev: prevPage ? toAbsoluteUrl(BASE_URL, prevPage === 1 ? basePath : `${basePath}?page=${prevPage}`) : undefined,
+    next: nextPage ? toAbsoluteUrl(BASE_URL, `${basePath}?page=${nextPage}`) : undefined,
   };
 }
 

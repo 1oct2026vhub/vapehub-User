@@ -295,24 +295,24 @@ const Page = async ({
 export default Page;
 
 // Enable ISR with revalidation every 60 seconds
-export const revalidate = 60;
+// export const revalidate = 60;
 
-// Allow dynamic params for paths not in generateStaticParams
-export const dynamicParams = true;
+// // Allow dynamic params for paths not in generateStaticParams
+// export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  // Static product slugs for ISR - no API calls needed
-  const productSlugs = [
-    'ivg-intense-salts-e-liquid',
-    'crystal-prime-nic-salts',
-    'vnsn-quake-10000-pods',
-    'vnsn-quake-10000-prefilled-pod-kit'
-  ];
+// export async function generateStaticParams() {
+//   // Static product slugs for ISR - no API calls needed
+//   const productSlugs = [
+//     'ivg-intense-salts-e-liquid',
+//     'crystal-prime-nic-salts',
+//     'vnsn-quake-10000-pods',
+//     'vnsn-quake-10000-prefilled-pod-kit'
+//   ];
 
-  return productSlugs.map((slug) => ({
-    slug: [slug]
-  }));
-}
+//   return productSlugs.map((slug) => ({
+//     slug: [slug]
+//   }));
+// }
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);

@@ -182,13 +182,12 @@ const GooglePlacesAutocomplete = <T extends FieldValues>({
           if (status !== window.google.maps.places.PlacesServiceStatus.OK || !place) return;
 
           const address = extractAddressComponents(place);
-          const displayAddress = place.formatted_address || prediction.description || '';
 
           onPlaceSelect(address);
-          onChange(displayAddress);
+          onChange(address.street);
           setPredictions([]);
           setShowPredictions(false);
-          onChangeRef.current(displayAddress);
+          onChangeRef.current(address.street);
         }
       );
     },

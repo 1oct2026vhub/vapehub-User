@@ -340,7 +340,7 @@ input[type='search'] {
 }
 
 .quantity {
-  @apply w-fit md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-start items-center p-1 pr-2 md:px-2;
+  @apply h-4 w-fit md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-start items-center p-1 pr-2 md:px-2;
   flex-shrink: 0;
   border-radius: 10px 10px 10px 0px;
   background: #61B278;
@@ -351,11 +351,11 @@ input[type='search'] {
 }
 
 .quantity::before {
-  @apply content-quantity-badge relative block -left-1 -bottom-3.5 md:-left-2 md:-bottom-[13.5px];
+  @apply content-quantity-badge relative block -left-1 -bottom-[10px] md:-left-2 md:-bottom-[13.5px];
 }
 
 .section-slider .quantity::before {
-  @apply -bottom-[10px]  md:-bottom-[13.5px];
+  @apply -bottom-[10px] md:-bottom-[13.5px];
 }
 
 .new-product {

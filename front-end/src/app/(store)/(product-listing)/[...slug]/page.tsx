@@ -11,6 +11,7 @@ import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/
 import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+import { unstable_noStore } from "next/cache";
 import JsonLd from "@/components/JsonLd";
 import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, getRatingFromReviewResponse, toAbsoluteUrl, SCHEMA_CONTEXT } from "@/lib/seo-schema";
 
@@ -327,9 +328,12 @@ const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugRespon
   return response.data;
 };
 
-const fetchCategory = async (slug: string, params: PRODUCT_PAYLOAD): Promise<CategoryResponseData | null> => {
-
-  const response = await getProductByCategory(slug, params);
+const fetchCategory = async (
+  slug: string,
+  params: PRODUCT_PAYLOAD,
+  canCache: boolean = true,
+): Promise<CategoryResponseData | null> => {
+  const response = await getProductByCategory(slug, params, canCache);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -427,6 +431,11 @@ export async function generateMetadata({ params, searchParams }: {
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
     return <PageNotFound />;
+  }
+
+  // Pagination links must reflect the current URL (searchParams). Opt out of static metadata cache for categories.
+  if (dynamicPageSlug.entity_type === "category") {
+    unstable_noStore();
   }
 
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
@@ -735,6 +744,10 @@ export async function generateMetadata({ params, searchParams }: {
     primarySlug,
     searchParamsData,
   });
+  const paginationIconLinks = [
+    ...(paginationLinks.prev ? [{ rel: "prev" as const, url: paginationLinks.prev }] : []),
+    ...(paginationLinks.next ? [{ rel: "next" as const, url: paginationLinks.next }] : []),
+  ];
 
   // Add self-referencing canonical URLs for paginated and filtered pages.
   // We prefer a stable canonical that includes the current page number when present.
@@ -751,6 +764,13 @@ export async function generateMetadata({ params, searchParams }: {
       alternates: {
         canonical: canonicalUrl,
       },
+      ...(paginationIconLinks.length
+        ? {
+            icons: {
+              other: paginationIconLinks,
+            },
+          }
+        : {}),
     };
   }
 
@@ -758,10 +778,6 @@ export async function generateMetadata({ params, searchParams }: {
     alternates?: { canonical?: string };
     icons?: { other?: Array<{ rel?: string; url?: string }> };
   };
-  const paginationIconLinks = [
-    ...(paginationLinks.prev ? [{ rel: "prev", url: paginationLinks.prev }] : []),
-    ...(paginationLinks.next ? [{ rel: "next", url: paginationLinks.next }] : []),
-  ];
 
   return {
     ...typedMetadata,
@@ -801,7 +817,7 @@ async function getCategoryPaginationLinks({
   delete normalizedSearchParams.page;
 
   const combinedParams = buildVariantParams(normalizedSearchParams, defaultParams);
-  const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD);
+  const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD, false);
   const totalPages = Math.max(1, category?.pagination?.total_pages ?? 1);
   const prevPage = pageNumber > 1 ? pageNumber - 1 : undefined;
   const nextPage = pageNumber < totalPages ? pageNumber + 1 : undefined;

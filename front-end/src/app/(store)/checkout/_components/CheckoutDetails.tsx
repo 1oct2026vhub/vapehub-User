@@ -20,8 +20,8 @@ import Flag from '@/components/ui/Flag';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
 import { placeOrder, guestCheckoutAndOrder } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
-import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
+// import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
+// import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
 import { toast } from 'sonner';
 import UnavailableItemsModal from './UnavailableItemsModal';
 import { useSession } from 'next-auth/react';
@@ -301,6 +301,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         setShowNewAddressForm(!showNewAddressForm);
     }
 
+    /*
     const handlePlaceSelect = (place: PlaceAutocompleteAddress) => {
         form.setValue('shippingAddress1', place.street);
         form.setValue('shippingCity', place.city);
@@ -316,6 +317,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         form.setValue('billingCountry', place.country);
         form.setValue('billingRegion', place.region);
     }
+    */
 
     // Custom modal close handler to refresh cart data
     const handleModalClose = () => {
@@ -613,7 +615,8 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                         isRequired
                                         className='w-full'
                                     /> */}
-                                    <GooglePlacesAutocomplete
+                                    {/* Google Places address autofill disabled (type manually) */}
+                                    {/* <GooglePlacesAutocomplete
                                         control={form.control}
                                         name="shippingAddress1"
                                         onPlaceSelect={handlePlaceSelect}
@@ -621,6 +624,14 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                         label="Street Address"
                                         isRequired
                                         inputClassName="w-full"
+                                    /> */}
+                                    <InputForm
+                                        control={form.control}
+                                        name="shippingAddress1"
+                                        type='text'
+                                        label='Street Address'
+                                        isRequired
+                                        className='w-full'
                                     />
                                     <InputForm
                                         control={form.control}
@@ -704,7 +715,8 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                                 className='w-full'
                                             />
                                         </div>
-                                        <GooglePlacesAutocomplete
+                                        {/* Google Places address autofill disabled (type manually) */}
+                                        {/* <GooglePlacesAutocomplete
                                             control={form.control}
                                             name="billingAddress1"
                                             onPlaceSelect={handleBillingPlaceSelect}
@@ -712,6 +724,14 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                             label="Address Line 1"
                                             isRequired
                                             inputClassName="w-full"
+                                        /> */}
+                                        <InputForm
+                                            control={form.control}
+                                            name="billingAddress1"
+                                            type='text'
+                                            label="Address Line 1"
+                                            isRequired
+                                            className='w-full'
                                         />
                                         {/* <InputForm
                                             control={form.control}

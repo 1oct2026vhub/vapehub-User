@@ -268,12 +268,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
 
             const response = await getProductVariantByID(requestPayload);
 
-            const responseData = response.status === ServerActionStatus.SUCCESS ? response.data : undefined;
             // console.log('[VariantFilter] Response:', JSON.stringify({
             //     status: response.status,
-            //     variants: responseData?.variants ?? [],
-            //     available_terms: responseData?.available_terms ?? [],
-            //     filtered_attribute_terms: responseData?.filtered_attribute_terms ?? [],
+            //     variants: response.data?.variants ?? [],
+            //     available_terms: response.data?.available_terms ?? [],
+            //     filtered_attribute_terms: response.data?.filtered_attribute_terms ?? [],
             // }, null, 2));
 
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
@@ -299,12 +298,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
 
                     const fallbackResponse = await getProductVariantByID(fallbackRequestPayload);
 
-                    const fallbackResponseData = fallbackResponse.status === ServerActionStatus.SUCCESS ? fallbackResponse.data : undefined;
                     // console.log('[VariantFilter] Fallback response:', JSON.stringify({
                     //     status: fallbackResponse.status,
-                    //     variants: fallbackResponseData?.variants ?? [],
-                    //     available_terms: fallbackResponseData?.available_terms ?? [],
-                    //     filtered_attribute_terms: fallbackResponseData?.filtered_attribute_terms ?? [],
+                    //     variants: fallbackResponse.data?.variants ?? [],
+                    //     available_terms: fallbackResponse.data?.available_terms ?? [],
+                    //     filtered_attribute_terms: fallbackResponse.data?.filtered_attribute_terms ?? [],
                     // }, null, 2));
 
                     if (fallbackResponse.status === ServerActionStatus.SUCCESS && fallbackResponse.data) {

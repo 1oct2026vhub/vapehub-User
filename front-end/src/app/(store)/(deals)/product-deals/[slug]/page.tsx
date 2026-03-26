@@ -185,7 +185,6 @@ export default Page;
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
-  console.log("Dynamic Page Slug Response:", response);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }

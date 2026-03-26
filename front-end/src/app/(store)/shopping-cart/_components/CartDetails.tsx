@@ -81,34 +81,31 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
                 }
             }
             
-            const guestCoupon = getCookie('couponDiscount');
-            const guestLoyalty = getCookie('loyalty_redemption');
-            
-            console.log('👤 [GUEST USER] Cart Details:', {
-                userType: 'Guest',
-                status,
-                cartItems: cartItems,
-                itemCount,
-                cartTotal,
-                cartSubtotal,
-                cartDiscount,
-                couponDiscount,
-                guestCartStorage: guestCart,
-                guestCouponCookie: guestCoupon ? JSON.parse(guestCoupon as string) : null,
-                guestLoyaltyCookie: guestLoyalty ? JSON.parse(guestLoyalty as string) : null,
-                cartItemsCount: cartItems?.length || 0,
-                cartItemsDetails: cartItems?.map(item => ({
-                    id: item.id,
-                    product_id: item.product_id,
-                    variant_id: item.variant_id,
-                    quantity: item.quantity,
-                    price: item.price,
-                    discount_price: item.discount_price,
-                    name: item.name,
-                    product_slug: item.product_slug,
-                    slug: item.slug
-                }))
-            });
+            // console.log('👤 [GUEST USER] Cart Details:', {
+            //     userType: 'Guest',
+            //     status,
+            //     cartItems: cartItems,
+            //     itemCount,
+            //     cartTotal,
+            //     cartSubtotal,
+            //     cartDiscount,
+            //     couponDiscount,
+            //     guestCartStorage: guestCart,
+            //     guestCouponCookie: getCookie('couponDiscount') ? JSON.parse(getCookie('couponDiscount') as string) : null,
+            //     guestLoyaltyCookie: getCookie('loyalty_redemption') ? JSON.parse(getCookie('loyalty_redemption') as string) : null,
+            //     cartItemsCount: cartItems?.length || 0,
+            //     cartItemsDetails: cartItems?.map(item => ({
+            //         id: item.id,
+            //         product_id: item.product_id,
+            //         variant_id: item.variant_id,
+            //         quantity: item.quantity,
+            //         price: item.price,
+            //         discount_price: item.discount_price,
+            //         name: item.name,
+            //         product_slug: item.product_slug,
+            //         slug: item.slug
+            //     }))
+            // });
         }
     }, [status, cartItems, itemCount, cartTotal, cartSubtotal, cartDiscount, couponDiscount]);
 
@@ -128,66 +125,42 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
             }
         }
         
-        // Get coupon and loyalty from cookies (these remain in cookies)
-        const couponCookie = getCookie('couponDiscount');
-        const loyaltyCookie = getCookie('loyalty_redemption');
-        
-        // Parse cookie data
-        let parsedCoupon: unknown = null;
-        let parsedLoyalty: unknown = null;
-        
-        try {
-            if (couponCookie) {
-                parsedCoupon = JSON.parse(couponCookie as string);
-            }
-        } catch (e) {
-            console.error('Error parsing couponDiscount cookie:', e);
-        }
-        
-        try {
-            if (loyaltyCookie) {
-                parsedLoyalty = JSON.parse(loyaltyCookie as string);
-            }
-        } catch (e) {
-            console.error('Error parsing loyalty_redemption cookie:', e);
-        }
-        
         // Console log cart details stored in storage
-        console.log('💾 [STORAGE] Cart Details Stored:', {
-            'guest_cart': {
-                source: parsedGuestCart ? 'localStorage' : 'none',
-                parsed: parsedGuestCart,
-                itemCount: parsedGuestCart?.length || 0,
-                items: parsedGuestCart?.map((item: CartItem) => ({
-                    id: item.id,
-                    product_id: item.product_id,
-                    variant_id: item.variant_id,
-                    quantity: item.quantity,
-                    price: item.price,
-                    discount_price: item.discount_price,
-                    name: item.name,
-                    product_slug: item.product_slug
-                }))
-            },
-            'couponDiscount': {
-                raw: couponCookie,
-                parsed: parsedCoupon
-            },
-            'loyalty_redemption': {
-                raw: loyaltyCookie,
-                parsed: parsedLoyalty
-            }
-        });
+        // console.log('💾 [STORAGE] Cart Details Stored:', {
+        //     'guest_cart': {
+        //         source: parsedGuestCart ? 'localStorage' : 'none',
+        //         parsed: parsedGuestCart,
+        //         itemCount: parsedGuestCart?.length || 0,
+        //         items: parsedGuestCart?.map((item: CartItem) => ({
+        //             id: item.id,
+        //             product_id: item.product_id,
+        //             variant_id: item.variant_id,
+        //             quantity: item.quantity,
+        //             price: item.price,
+        //             discount_price: item.discount_price,
+        //             name: item.name,
+        //             product_slug: item.product_slug
+        //         }))
+        //     },
+        //     'couponDiscount': {
+        //         raw: couponCookie,
+        //         parsed: couponCookie ? JSON.parse(couponCookie as string) : null
+        //     },
+        //     'loyalty_redemption': {
+        //         raw: loyaltyCookie,
+        //         parsed: loyaltyCookie ? JSON.parse(loyaltyCookie as string) : null
+        //     }
+        // });
         
-        console.log('🛒 [CartDetails] Checkout initiated:', {
-            isAuthenticated: status === 'authenticated',
-            cartItems,
-            itemCount,
-            cartTotal,
-            couponDiscount,
-            cartSubtotal,
-            cartDiscount
-        });
+        // console.log('🛒 [CartDetails] Checkout initiated:', {
+        //     isAuthenticated: status === 'authenticated',
+        //     cartItems,
+        //     itemCount,
+        //     cartTotal,
+        //     couponDiscount,
+        //     cartSubtotal,
+        //     cartDiscount
+        // });
         
         const isValid = await checkoutStockValidation();
         if(isValid) {
@@ -207,57 +180,54 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
                     }
                 }
                 
-                const guestCoupon = getCookie('couponDiscount');
-                const guestLoyalty = getCookie('loyalty_redemption');
+                // console.log('👤 [GUEST USER] Checkout - Cart Details:', {
+                //     userType: 'Guest',
+                //     cartItems: cartItems,
+                //     itemCount,
+                //     cartTotal,
+                //     cartSubtotal,
+                //     cartDiscount,
+                //     couponDiscount,
+                //     guestCartStorage: guestCart,
+                //     guestCouponCookie: getCookie('couponDiscount') ? JSON.parse(getCookie('couponDiscount') as string) : null,
+                //     guestLoyaltyCookie: getCookie('loyalty_redemption') ? JSON.parse(getCookie('loyalty_redemption') as string) : null,
+                //     cartItemsCount: cartItems?.length || 0,
+                //     cartItemsDetails: cartItems?.map(item => ({
+                //         id: item.id,
+                //         product_id: item.product_id,
+                //         variant_id: item.variant_id,
+                //         quantity: item.quantity,
+                //         price: item.price,
+                //         discount_price: item.discount_price,
+                //         name: item.name,
+                //         product_slug: item.product_slug,
+                //         slug: item.slug
+                //     })),
+                //     totalCalculation: {
+                //         subtotal: cartSubtotal,
+                //         discount: cartDiscount,
+                //         couponDiscount: couponDiscount.value,
+                //         finalTotal: cartTotal
+                //     }
+                // });
                 
-                console.log('👤 [GUEST USER] Checkout - Cart Details:', {
-                    userType: 'Guest',
-                    cartItems: cartItems,
-                    itemCount,
-                    cartTotal,
-                    cartSubtotal,
-                    cartDiscount,
-                    couponDiscount,
-                    guestCartStorage: guestCart,
-                    guestCouponCookie: guestCoupon ? JSON.parse(guestCoupon as string) : null,
-                    guestLoyaltyCookie: guestLoyalty ? JSON.parse(guestLoyalty as string) : null,
-                    cartItemsCount: cartItems?.length || 0,
-                    cartItemsDetails: cartItems?.map(item => ({
-                        id: item.id,
-                        product_id: item.product_id,
-                        variant_id: item.variant_id,
-                        quantity: item.quantity,
-                        price: item.price,
-                        discount_price: item.discount_price,
-                        name: item.name,
-                        product_slug: item.product_slug,
-                        slug: item.slug
-                    })),
-                    totalCalculation: {
-                        subtotal: cartSubtotal,
-                        discount: cartDiscount,
-                        couponDiscount: couponDiscount.value,
-                        finalTotal: cartTotal
-                    }
-                });
-                
-                console.log('👤 [GUEST USER] Redirecting to checkout without API call');
+                // console.log('👤 [GUEST USER] Redirecting to checkout without API call');
                 router.push(ROUTES.CHECKOUT);
                 return;
             }
             
             // For authenticated users, call checkout API
-            console.log('🛒 [CartDetails] Authenticated user - calling checkout API');
+            // console.log('🛒 [CartDetails] Authenticated user - calling checkout API');
             const response = await checkout({ couponCode: couponDiscount.code || '' } as unknown as CHECKOUT_PAYLOAD);
             if(response.status === ServerActionStatus.SUCCESS) {
-                console.log('🛒 [CartDetails] Checkout API success - redirecting to checkout');
+                // console.log('🛒 [CartDetails] Checkout API success - redirecting to checkout');
                 router.push(ROUTES.CHECKOUT);
             } else {
                 console.error('🛒 [CartDetails] Checkout API error:', response.message);
                 toast.error(response.message);
             }
         } else {
-            console.log('🛒 [CartDetails] Stock validation failed');
+            // console.log('🛒 [CartDetails] Stock validation failed');
         }
     }
 
@@ -269,14 +239,11 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
         : 0;
     const safeShippingCost = Number.isFinite(shippingCost) ? shippingCost : 0;
     
-    // Get shipping method ID for API calls
-    const shippingMethodId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0;
-    
-    console.log('🛒 [CartDetails] Shipping Info:', {
-        selectedShippingMethod,
-        shippingCost: safeShippingCost,
-        shippingMethodId
-    });
+    // console.log('🛒 [CartDetails] Shipping Info:', {
+    //     selectedShippingMethod,
+    //     shippingCost: safeShippingCost,
+    //     shippingMethodId: selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0
+    // });
 
     return (
         <div className='flex flex-col p-3 md:p-5 gap-3 bg-white border border-skin-neutral-100 rounded-14 w-full lg:w-4/6 xl:w-full xl:max-w-[584px]'>

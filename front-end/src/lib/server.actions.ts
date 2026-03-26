@@ -151,7 +151,6 @@ export const getProductByCategory = async (
   params: PRODUCT_PAYLOAD,
   canCache: boolean = true
 ): Promise<ServerActionResponse<CategoryResponseData>> => {
-  
   return await handleRequest<CategoryResponseData, unknown>({
     endpoint: API_ROUTES.GET_CATEGORY_PRODUCTS_BY_SLUG(slug, params),
     method: 'GET',

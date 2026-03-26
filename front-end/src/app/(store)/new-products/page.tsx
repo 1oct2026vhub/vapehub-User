@@ -5,38 +5,38 @@ import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { Product, ProductReview } from '@/lib/config/product.config';
 import { ROUTES } from '@/lib/routes';
 import { getProductList } from '@/lib/server.actions';
+import { toAbsoluteUrl } from '@/lib/seo-schema';
+import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
+import { unstable_noStore } from 'next/cache';
 import { Metadata, NextPage } from 'next';
 import ProductList from '../(product-listing)/_components/ProductList';
 
-export const metadata: Metadata = {
-  title: "New Products | VapeHub",
-  description: "Discover the latest arrivals at VapeHub.",
-};
+const BASE_URL = (process.env.NEXTAUTH_URL || 'https://www.vapehub.co.uk').replace(/\/$/, '');
 
-type SearchParams = {
-  searchParams: Promise<Record<string, string>>
-}
-const NewProductsPage: NextPage<SearchParams> = async ({ searchParams }): AsyncReactElement => {
-  // Default to "Latest" sorting (order=DESC) when no sort params are provided
-  // This ensures products are sorted by latest without modifying the URL for SEO
-  const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0, is_new: true } as const;
-  const searchParamsData = await searchParams;
+/** Same defaults as the page: latest first, new-only list. */
+const NEW_PRODUCTS_DEFAULT_PARAMS = { sort_by: 'id', order: 'DESC', limit: 12, offset: 0, is_new: true } as const;
 
-  // Normalize pagination: accept SEO-friendly `page` in the URL and convert to `offset` for the API.
+/**
+ * Shared with generateMetadata so canonical / prev / next match the list request.
+ */
+function buildNewProductsListParams(searchParamsData: Record<string, string>): {
+  combinedParams: PRODUCT_PAYLOAD;
+  pageNumber: number;
+} {
   const normalizedSearchParams: Record<string, string> = { ...searchParamsData };
-  const pageFromUrl = parseInt(normalizedSearchParams.page ?? "1", 10);
-  const limit = Number(defaultParams.limit) || 12;
+  const pageFromUrl = parseInt(normalizedSearchParams.page ?? '1', 10);
+  const pageNumber = !Number.isNaN(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1;
+  const limit = Number(NEW_PRODUCTS_DEFAULT_PARAMS.limit) || 12;
 
   if (!Number.isNaN(pageFromUrl) && pageFromUrl > 1) {
     normalizedSearchParams.offset = String((pageFromUrl - 1) * limit);
   } else {
-    // Ensure we always have a deterministic offset value
-    normalizedSearchParams.offset = "0";
+    normalizedSearchParams.offset = '0';
   }
   delete normalizedSearchParams.page;
 
-  const variantParams = Object.entries(normalizedSearchParams)
-    .reduce((acc: Record<string, unknown>, [key, value]) => {
+  const variantParams = Object.entries(normalizedSearchParams).reduce(
+    (acc: Record<string, unknown>, [key, value]) => {
       if (key.startsWith('attribute_')) {
         const attributeId = key.replace('attribute_', '');
         const values = value.split(',').map(Number);
@@ -48,9 +48,67 @@ const NewProductsPage: NextPage<SearchParams> = async ({ searchParams }): AsyncR
         acc[key] = value;
       }
       return acc;
-    }, { ...defaultParams });
+    },
+    { ...NEW_PRODUCTS_DEFAULT_PARAMS },
+  );
 
-  const combinedParams = { ...defaultParams, ...variantParams, is_new: true };
+  const combinedParams = { ...NEW_PRODUCTS_DEFAULT_PARAMS, ...variantParams, is_new: true } as PRODUCT_PAYLOAD;
+  return { combinedParams, pageNumber };
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string>>;
+}): Promise<Metadata> {
+  unstable_noStore();
+  const searchParamsData = await searchParams;
+  const { combinedParams, pageNumber } = buildNewProductsListParams(searchParamsData);
+
+  const response = await getProductList(combinedParams, false);
+  if (response.status !== ServerActionStatus.SUCCESS || !response.data) {
+    return {
+      title: 'New Products | VapeHub',
+      description: 'Discover the latest arrivals at VapeHub.',
+    };
+  }
+
+  const totalPages = Math.max(1, response.data.pagination?.total_pages ?? 1);
+  const root = `${ROUTES.NEW_PRODUCTS}/`;
+  const hasValidPage = pageNumber > 1;
+  const canonicalUrl = hasValidPage
+    ? toAbsoluteUrl(BASE_URL, `${root}?page=${pageNumber}`)
+    : toAbsoluteUrl(BASE_URL, root);
+
+  const prevPage = pageNumber > 1 ? pageNumber - 1 : undefined;
+  const nextPage = pageNumber < totalPages ? pageNumber + 1 : undefined;
+
+  const prevHref = prevPage
+    ? toAbsoluteUrl(BASE_URL, prevPage === 1 ? root : `${root}?page=${prevPage}`)
+    : undefined;
+  const nextHref = nextPage ? toAbsoluteUrl(BASE_URL, `${root}?page=${nextPage}`) : undefined;
+
+  const paginationIconLinks = [
+    ...(prevHref ? [{ rel: 'prev' as const, url: prevHref }] : []),
+    ...(nextHref ? [{ rel: 'next' as const, url: nextHref }] : []),
+  ];
+
+  return {
+    title: 'New Products | VapeHub',
+    description: 'Discover the latest arrivals at VapeHub.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    ...(paginationIconLinks.length ? { icons: { other: paginationIconLinks } } : {}),
+  };
+}
+
+type SearchParams = {
+  searchParams: Promise<Record<string, string>>
+}
+const NewProductsPage: NextPage<SearchParams> = async ({ searchParams }): AsyncReactElement => {
+  const searchParamsData = await searchParams;
+  const { combinedParams } = buildNewProductsListParams(searchParamsData);
 
   const breadcrumbs = [
     { label: "Home", href: "/" },

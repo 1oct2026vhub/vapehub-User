@@ -11,6 +11,7 @@ import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/
 import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
+import { unstable_noStore } from "next/cache";
 import JsonLd from "@/components/JsonLd";
 import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, getRatingFromReviewResponse, toAbsoluteUrl, SCHEMA_CONTEXT } from "@/lib/seo-schema";
 
@@ -220,7 +221,11 @@ const Page = async ({
             total_reviews: product.review_stats?.total_reviews || 0
           }
         })) : [];
-        return <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />;
+        return (
+          <>
+            <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
+          </>
+        );
       }
       return null;
     },
@@ -295,24 +300,24 @@ const Page = async ({
 export default Page;
 
 // Enable ISR with revalidation every 60 seconds
-export const revalidate = 60;
+// export const revalidate = 60;
 
-// Allow dynamic params for paths not in generateStaticParams
-export const dynamicParams = true;
+// // Allow dynamic params for paths not in generateStaticParams
+// export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  // Static product slugs for ISR - no API calls needed
-  const productSlugs = [
-    'ivg-intense-salts-e-liquid',
-    'crystal-prime-nic-salts',
-    'vnsn-quake-10000-pods',
-    'vnsn-quake-10000-prefilled-pod-kit'
-  ];
+// export async function generateStaticParams() {
+//   // Static product slugs for ISR - no API calls needed
+//   const productSlugs = [
+//     'ivg-intense-salts-e-liquid',
+//     'crystal-prime-nic-salts',
+//     'vnsn-quake-10000-pods',
+//     'vnsn-quake-10000-prefilled-pod-kit'
+//   ];
 
-  return productSlugs.map((slug) => ({
-    slug: [slug]
-  }));
-}
+//   return productSlugs.map((slug) => ({
+//     slug: [slug]
+//   }));
+// }
 
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);
@@ -323,9 +328,12 @@ const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugRespon
   return response.data;
 };
 
-const fetchCategory = async (slug: string, params: PRODUCT_PAYLOAD): Promise<CategoryResponseData | null> => {
-
-  const response = await getProductByCategory(slug, params);
+const fetchCategory = async (
+  slug: string,
+  params: PRODUCT_PAYLOAD,
+  canCache: boolean = true,
+): Promise<CategoryResponseData | null> => {
+  const response = await getProductByCategory(slug, params, canCache);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -423,6 +431,11 @@ export async function generateMetadata({ params, searchParams }: {
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
     return <PageNotFound />;
+  }
+
+  // Pagination links must reflect the current URL (searchParams). Opt out of static metadata cache for categories.
+  if (dynamicPageSlug.entity_type === "category") {
+    unstable_noStore();
   }
 
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
@@ -726,6 +739,15 @@ export async function generateMetadata({ params, searchParams }: {
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;
+  const paginationLinks = await getCategoryPaginationLinks({
+    dynamicPageSlug,
+    primarySlug,
+    searchParamsData,
+  });
+  const paginationIconLinks = [
+    ...(paginationLinks.prev ? [{ rel: "prev" as const, url: paginationLinks.prev }] : []),
+    ...(paginationLinks.next ? [{ rel: "next" as const, url: paginationLinks.next }] : []),
+  ];
 
   // Add self-referencing canonical URLs for paginated and filtered pages.
   // We prefer a stable canonical that includes the current page number when present.
@@ -742,10 +764,20 @@ export async function generateMetadata({ params, searchParams }: {
       alternates: {
         canonical: canonicalUrl,
       },
+      ...(paginationIconLinks.length
+        ? {
+            icons: {
+              other: paginationIconLinks,
+            },
+          }
+        : {}),
     };
   }
 
-  const typedMetadata = metadata as { alternates?: { canonical?: string } };
+  const typedMetadata = metadata as {
+    alternates?: { canonical?: string };
+    icons?: { other?: Array<{ rel?: string; url?: string }> };
+  };
 
   return {
     ...typedMetadata,
@@ -753,6 +785,47 @@ export async function generateMetadata({ params, searchParams }: {
       ...(typedMetadata.alternates ?? {}),
       canonical: canonicalUrl,
     },
+    icons: paginationIconLinks.length
+      ? {
+          ...(typedMetadata.icons ?? {}),
+          other: [...(typedMetadata.icons?.other ?? []), ...paginationIconLinks],
+        }
+      : typedMetadata.icons,
+  };
+}
+
+async function getCategoryPaginationLinks({
+  dynamicPageSlug,
+  primarySlug,
+  searchParamsData,
+}: {
+  dynamicPageSlug: DynamicPageSlugResponse | null;
+  primarySlug: string | null;
+  searchParamsData: Record<string, string>;
+}) {
+  if (!primarySlug || dynamicPageSlug?.entity_type !== "category") {
+    return {};
+  }
+
+  const defaultParams = { sort_by: "popularity", limit: 12, offset: 0 } as const;
+  const normalizedSearchParams: Record<string, string> = { ...searchParamsData };
+  const parsedPage = Number.parseInt(normalizedSearchParams.page ?? "1", 10);
+  const pageNumber = !Number.isNaN(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const limit = Number(defaultParams.limit) || 12;
+
+  normalizedSearchParams.offset = pageNumber > 1 ? String((pageNumber - 1) * limit) : "0";
+  delete normalizedSearchParams.page;
+
+  const combinedParams = buildVariantParams(normalizedSearchParams, defaultParams);
+  const category = await fetchCategory(primarySlug, combinedParams as PRODUCT_PAYLOAD, false);
+  const totalPages = Math.max(1, category?.pagination?.total_pages ?? 1);
+  const prevPage = pageNumber > 1 ? pageNumber - 1 : undefined;
+  const nextPage = pageNumber < totalPages ? pageNumber + 1 : undefined;
+  const basePath = `/${primarySlug}`.replace(/\/+$/, "") || "/";
+
+  return {
+    prev: prevPage ? toAbsoluteUrl(BASE_URL, prevPage === 1 ? basePath : `${basePath}?page=${prevPage}`) : undefined,
+    next: nextPage ? toAbsoluteUrl(BASE_URL, `${basePath}?page=${nextPage}`) : undefined,
   };
 }
 

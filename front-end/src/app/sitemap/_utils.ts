@@ -103,6 +103,46 @@ export function buildLoc(baseUrl: string, path: string): string {
 }
 
 // ---------------------------------------------------------------------------
+// Canonical/indexable guard
+// ---------------------------------------------------------------------------
+
+const NON_INDEXABLE_EXACT = new Set([
+  '/my-account',
+  '/login',
+  '/register',
+  '/checkout',
+  '/shopping-cart',
+  '/payment-success',
+  '/payment-failed',
+  '/page-not-found',
+  '/not-found',
+]);
+
+const NON_INDEXABLE_PREFIXES = [
+  '/my-account/',
+  '/orders/',
+  '/order-details/',
+  '/checkout/',
+  '/api/',
+  '/_next/',
+] as const;
+
+/**
+ * Returns true only for canonical, indexable URL paths.
+ * - blocks query/hash variants
+ * - blocks auth/account/cart/checkout/order/system routes
+ */
+export function isIndexableCanonicalPath(path: string): boolean {
+  if (!path) return false;
+  if (path.includes('?') || path.includes('#')) return false;
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  const clean = normalized.replace(/\/+$/, '') || '/';
+  if (NON_INDEXABLE_EXACT.has(clean)) return false;
+  if (NON_INDEXABLE_PREFIXES.some((p) => clean.startsWith(p))) return false;
+  return true;
+}
+
+// ---------------------------------------------------------------------------
 // Entity-slug types (matches backend API response shape)
 // ---------------------------------------------------------------------------
 

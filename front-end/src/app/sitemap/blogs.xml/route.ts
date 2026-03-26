@@ -6,6 +6,7 @@ import {
   urlset,
   buildLoc,
   fetchEntitySlugs,
+  isIndexableCanonicalPath,
 } from '../_utils';
 
 export const dynamic = 'force-dynamic';
@@ -59,6 +60,7 @@ export async function GET(request: NextRequest) {
 
     const blogCategoryEntries = entities
       .filter((e) => e.entity_name === 'blog_category' && e.entity_slug)
+      .filter((e) => isIndexableCanonicalPath(`/${e.entity_slug}`))
       .map((e) =>
         urlEntry(buildLoc(baseUrl, `/${e.entity_slug}`), {
           changefreq: 'weekly',
@@ -97,6 +99,7 @@ export async function GET(request: NextRequest) {
 
     const blogPostEntries = allPosts
       .filter((b) => b.slug)
+      .filter((b) => isIndexableCanonicalPath(`/${b.slug}`))
       .map((b) =>
         urlEntry(buildLoc(baseUrl, `/${b.slug}`), {
           changefreq: 'weekly',

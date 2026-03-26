@@ -6,6 +6,7 @@ import {
   urlset,
   buildLoc,
   fetchSeoLastmodMap,
+  isIndexableCanonicalPath,
 } from '../_utils';
 
 export const dynamic = 'force-dynamic';
@@ -96,6 +97,7 @@ export async function GET(request: NextRequest) {
 
     const entries = allProducts
       .filter((p) => p.slug && !p.deleted_at)
+      .filter((p) => isIndexableCanonicalPath(`/${p.slug}`))
       .map((p) =>
         urlEntry(buildLoc(baseUrl, `/${p.slug}`), {
           // Look up lastmod from the backend SEO sitemap (most accurate source).

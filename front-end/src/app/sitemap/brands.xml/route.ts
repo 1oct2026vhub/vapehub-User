@@ -5,6 +5,7 @@ import {
   urlEntry,
   urlset,
   buildLoc,
+  isIndexableCanonicalPath,
 } from '../_utils';
 
 export const dynamic = 'force-dynamic';
@@ -74,6 +75,7 @@ export async function GET(request: NextRequest) {
 
     const entries = allBrands
       .filter((b) => b.slug)
+      .filter((b) => isIndexableCanonicalPath(`/brand/${b.slug}`))
       .map((b) =>
         urlEntry(buildLoc(baseUrl, `/brand/${b.slug}`), {
           changefreq: 'weekly',

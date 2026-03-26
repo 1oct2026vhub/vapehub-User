@@ -26,11 +26,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "VapeHub - The Ultimate Online Vape Store",
     description: "Vapehub is the one-stop shop for all your vaping needs! Our online store boasts all the popular brands and products at unbeatable prices with amazing deals.",
-    url: "https://www.vapehub.devateam.com/",
+    url: process.env.NEXTAUTH_URL,
+    // url: "https://www.vapehub.devateam.com/",
     siteName: "VapeHub",
   },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{

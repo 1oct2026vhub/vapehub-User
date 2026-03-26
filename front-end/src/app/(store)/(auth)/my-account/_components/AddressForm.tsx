@@ -8,8 +8,9 @@ import InputForm from '@/components/InputForm';
 import { Button } from '@nextui-org/button';
 import { Form } from '@/components/ui/Form';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
-import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
+// Google Places address autofill disabled; keep code commented for future enablement.
+// import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
+// import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
 
 interface AddressFormProps {
   initialData?: AddressFormData;
@@ -52,14 +53,15 @@ const AddressForm: React.FC<AddressFormProps> = ({
     },
   });
 
+  /*
   const handlePlaceSelect = (place: PlaceAutocompleteAddress) => {
     form.setValue('street', place.street);
     form.setValue('town', place.city);
     form.setValue('post_code', place.postcode);
     form.setValue('country', place.country);
     form.setValue('region', place.region);
-   
   };
+  */
 
   return (
     <Form {...form}>
@@ -82,7 +84,8 @@ const AddressForm: React.FC<AddressFormProps> = ({
           className="w-full"
         />
       </div>
-      <GooglePlacesAutocomplete
+      {/* Google Places address autofill disabled (manual typing only) */}
+      {/* <GooglePlacesAutocomplete
         control={form.control}
         name="street"
         onPlaceSelect={handlePlaceSelect}
@@ -90,16 +93,16 @@ const AddressForm: React.FC<AddressFormProps> = ({
         label="Street Address"
         isRequired
         inputClassName="w-full"
-        
-      />
-      {/* <InputForm
+      /> */}
+
+      <InputForm
         control={form.control}
         name="street"
         label="Street Address"
         placeholder="Enter your street address"
         isRequired
         className="w-full"
-      /> */}
+      />
       
       <InputForm
         control={form.control}

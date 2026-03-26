@@ -1,136 +1,145 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL;
-const STATIC_PAGES = ['/', '/shop', '/brands', '/blogs', '/vapehub-deals', '/new-products', '/faq', '/contact', '/delivery-information', '/privacy-policy', '/returns-policy', '/terms-conditions', '/loyalty-points', '/social-media'];
-
-function getBaseUrl(request?: NextRequest): string {
-  if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
-  if (request) {
-    const protocol = request.headers.get('x-forwarded-proto') || 'https';
-    const host = request.headers.get('host') || request.headers.get('x-forwarded-host');
-    if (host) return `${protocol}://${host}`;
-  }
-  throw new Error('Base URL cannot be determined. Please set NEXTAUTH_URL environment variable.');
-}
-
-// Force dynamic rendering to prevent caching
+// Force dynamic rendering — the index itself is cheap (no API calls)
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+/**
+ * Base URL resolution — preserved from original implementation.
+ * Prefers NEXTAUTH_URL env var; falls back to request headers.
+ */
+function getBaseUrl(request?: NextRequest): string {
+  if (process.env.NEXTAUTH_URL) {
+    return process.env.NEXTAUTH_URL.replace(/\/$/, '');
+  }
+  if (request) {
+    const protocol = request.headers.get('x-forwarded-proto') || 'https';
+    const host =
+      request.headers.get('host') || request.headers.get('x-forwarded-host');
+    if (host) return `${protocol}://${host}`;
+  }
+  throw new Error(
+    'Base URL cannot be determined. Please set NEXTAUTH_URL environment variable.',
+  );
+}
+
+function getRequestOrigin(request: NextRequest): string {
+  const protocol = request.headers.get('x-forwarded-proto') || 'http';
+  const host = request.headers.get('host') || request.headers.get('x-forwarded-host');
+  if (!host) throw new Error('Request origin cannot be determined from headers.');
+  return `${protocol}://${host}`;
+}
+
+/**
+ * Child sitemap slugs served under /sitemap/<name>.xml
+ * Each route handles one content type independently, keeping individual
+ * file sizes well under the 50,000-URL / 50 MB sitemap protocol limit.
+ * Add numbered shards (e.g. products-2.xml) here if any type exceeds 50k URLs.
+ */
+const CHILD_SITEMAPS = [
+  'static',     // static marketing pages
+  'categories', // product categories
+  'brands',     // brand pages (includes lastmod from API)
+  'products',   // product detail pages
+  'blogs',      // blog categories + blog posts (includes lastmod from API)
+] as const;
+
+const SITEMAP_URL_LIMIT = 50000;
+
+function extractUrlBlocks(xml: string): string[] {
+  const blocks = xml.match(/<url>[\s\S]*?<\/url>/gi);
+  return blocks ?? [];
+}
+
 export async function GET(request: NextRequest) {
   try {
-    if (!API_URL) throw new Error('NEXT_PUBLIC_VAPE_HUB_API_BASE_URL environment variable is not set');
+    const baseUrl = getBaseUrl(request); // canonical URL for XML <loc> tags
+    const requestOrigin = getRequestOrigin(request); // runtime origin for internal fetches
+    const childUrls = CHILD_SITEMAPS.map((name) => `${requestOrigin}/sitemap/${name}.xml`);
 
-    const apiBaseUrl = API_URL.endsWith('/') ? API_URL : `${API_URL}/`;
-    const sitemapUrl = `${apiBaseUrl}api/seo/sitemap.xml`;
-    
-    // Fetch fresh data without caching
-    const response = await fetch(sitemapUrl, {
-      headers: { Accept: 'application/xml' },
-      cache: 'no-store', // Disable caching to always get fresh data
-    });
+    // Fetch all child sitemaps and count URLs.
+    const childXmlResponses = await Promise.all(
+      childUrls.map(async (url) => {
+        try {
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res.ok) return '';
+          return await res.text();
+        } catch {
+          return '';
+        }
+      }),
+    );
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sitemap: ${response.status} ${response.statusText}`);
+    const allUrlBlocks = childXmlResponses.flatMap(extractUrlBlocks);
+
+    // If child fetches fail and no URLs are collected, return sitemap index as
+    // a safe fallback instead of emitting an empty urlset.
+    if (allUrlBlocks.length === 0) {
+      const sitemapEntries = CHILD_SITEMAPS.map(
+        (name) =>
+          `  <sitemap>\n    <loc>${baseUrl}/sitemap/${name}.xml</loc>\n  </sitemap>`,
+      ).join('\n');
+
+      const xml = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        sitemapEntries,
+        '</sitemapindex>',
+      ].join('\n');
+
+      return new NextResponse(xml, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/xml',
+          'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        },
+      });
     }
 
-    const apiSitemapContent = await response.text();
-    const siteBaseUrl = getBaseUrl(request);
-    const mergedSitemap = mergeStaticPagesWithSitemap(apiSitemapContent, siteBaseUrl);
-    
-    return new NextResponse(mergedSitemap, {
+    // Requirement: separate sitemap files only when total URLs exceed 50,000.
+    // If under/at threshold, serve a single combined sitemap.
+    if (allUrlBlocks.length <= SITEMAP_URL_LIMIT) {
+      const xml = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        ...allUrlBlocks,
+        '</urlset>',
+      ].join('\n');
+
+      return new NextResponse(xml, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/xml',
+          'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        },
+      });
+    }
+
+    const sitemapEntries = CHILD_SITEMAPS.map(
+      (name) =>
+        `  <sitemap>\n    <loc>${baseUrl}/sitemap/${name}.xml</loc>\n  </sitemap>`,
+    ).join('\n');
+
+    const xml = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+      sitemapEntries,
+      '</sitemapindex>',
+    ].join('\n');
+
+    return new NextResponse(xml, {
       status: 200,
-      headers: { 
+      headers: {
         'Content-Type': 'application/xml',
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        // Index is lightweight — allow short-lived public caching
+        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
       },
     });
   } catch (error) {
-    console.error('Sitemap Fetch Error:', error instanceof Error ? error.message : String(error));
-    return new NextResponse('Error generating sitemap.', { status: 500 });
+    console.error(
+      'Sitemap index error:',
+      error instanceof Error ? error.message : String(error),
+    );
+    return new NextResponse('Error generating sitemap index.', { status: 500 });
   }
 }
-
-function normalizeSitemapUrls(sitemapContent: string, baseUrl: string): string {
-  // Clean base URL - remove trailing slash
-  const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-  
-  // Extract the path from any URL and replace with the correct base URL
-  // This regex matches <loc>...</loc> tags (with optional whitespace) and extracts the URL
-  // Using [\s\S]*? to match across newlines if needed
-  return sitemapContent.replace(/<loc>([\s\S]*?)<\/loc>/gi, (match, url) => {
-    const trimmedUrl = url.trim();
-    
-    // If already using the correct base URL, keep it as is
-    if (trimmedUrl.startsWith(cleanBaseUrl)) {
-      return match;
-    }
-    
-    try {
-      // Try to parse as a full URL
-      const urlObj = new URL(trimmedUrl);
-      const path = urlObj.pathname;
-      const search = urlObj.search;
-      const hash = urlObj.hash;
-      // Reconstruct with the correct base URL
-      return `<loc>${cleanBaseUrl}${path}${search}${hash}</loc>`;
-    } catch {
-      // If URL parsing fails, check if it's a relative path
-      if (trimmedUrl.startsWith('/')) {
-        return `<loc>${cleanBaseUrl}${trimmedUrl}</loc>`;
-      }
-      
-      // Try to extract path from any absolute URL pattern (http:// or https://)
-      const absoluteUrlMatch = trimmedUrl.match(/https?:\/\/[^\/\s]+(\/[^\s]*)?/);
-      if (absoluteUrlMatch) {
-        // Extract the path part (everything after the domain)
-        const fullMatch = absoluteUrlMatch[0];
-        const pathMatch = fullMatch.match(/https?:\/\/[^\/]+(\/.*)/);
-        if (pathMatch && pathMatch[1]) {
-          return `<loc>${cleanBaseUrl}${pathMatch[1]}</loc>`;
-        } else {
-          // Just the domain, no path
-          return `<loc>${cleanBaseUrl}/</loc>`;
-        }
-      }
-      
-      // If we can't parse it, return as is (shouldn't happen with valid sitemap)
-      return match;
-    }
-  });
-}
-
-function mergeStaticPagesWithSitemap(apiSitemap: string, baseUrl: string): string {
-  const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-  
-  // Normalize URLs in the API sitemap to use the correct base URL
-  const normalizedApiSitemap = normalizeSitemapUrls(apiSitemap, baseUrl);
-  
-  const staticPagesXml = STATIC_PAGES.map(path => {
-    // Home page should not have trailing slash, all other static pages should have trailing slash
-    if (path === '/') {
-      return `  <url>
-    <loc>${cleanBaseUrl}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`;
-    }
-    // Add trailing slash for all other static pages
-    const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    return `  <url>
-    <loc>${cleanBaseUrl}${cleanPath}/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`;
-  }).join('\n');
-
-  const urlsetTag = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-  const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
-  
-  if (normalizedApiSitemap.includes('</urlset>')) {
-    return normalizedApiSitemap.replace('</urlset>', `${staticPagesXml}\n</urlset>`);
-  }
-  return `${xmlHeader}\n${urlsetTag}\n${staticPagesXml}\n</urlset>`;
-} 

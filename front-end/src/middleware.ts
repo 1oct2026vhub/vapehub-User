@@ -73,9 +73,9 @@ export async function middleware(request: NextRequest) {
   const slugResult = await resolveSlugResult(request)
   // If a redirect was found, log the target (no suppression — perform redirect normally).
   if (slugResult.type === 'redirect' && slugResult.url) {
-    try {
-      console.log(`middleware detected redirect target -> ${slugResult.url.toString()}`)
-    } catch {}
+    // try {
+    //   console.log(`middleware detected redirect target -> ${slugResult.url.toString()}`)
+    // } catch {}
     const isTemp = !!(slugResult as { temporary?: boolean }).temporary
     const statusCode = isTemp ? 302 : 301
     response = NextResponse.redirect(slugResult.url, statusCode)
@@ -84,9 +84,9 @@ export async function middleware(request: NextRequest) {
     response.headers.set('Pragma', 'no-cache')
     response.headers.set('Expires', '0')
     response.headers.set('Surrogate-Control', 'no-store')
-    try {
-      console.log(`middleware redirect ${statusCode} -> ${slugResult.url.toString()} (temporary=${isTemp})`)
-    } catch {}
+    // try {
+    //   console.log(`middleware redirect ${statusCode} -> ${slugResult.url.toString()} (temporary=${isTemp})`)
+    // } catch {}
   } else if (slugResult.type === 'not-found') {
     response = NextResponse.rewrite(new URL('/page-not-found', request.url))
   } else {
@@ -144,11 +144,11 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
       })
       const json = await res.json() as SlugResponse
       // Log slug-relation responses to help debug 404 -> application error scenarios
-      try {
-        console.log(`slug-relation(${slugToCheck}) ->`, JSON.stringify(json))
-      } catch {
-        console.log(`slug-relation(${slugToCheck}) -> (non-serializable)`, json)
-      }
+      // try {
+      //   console.log(`slug-relation(${slugToCheck}) ->`, JSON.stringify(json))
+      // } catch {
+      //   console.log(`slug-relation(${slugToCheck}) -> (non-serializable)`, json)
+      // }
       const isError = !res.ok || json.status === 'ERROR' || json.success === false
       if (isError) return { type: 'not-found' }
 

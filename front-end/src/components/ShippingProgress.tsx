@@ -26,12 +26,12 @@ const ShippingProgress: React.FC<ShippingProgressProps> = ({ totalAmount, freeSh
     const remainingAmount = Math.max(threshold - amountForFreeShipping, 0);
     const progress = Math.min((amountForFreeShipping / threshold) * 100, 100);
     
-    console.log("totalPrice", totalPrice);
-    console.log("shippingCost", shippingCost);
-    console.log("amountForFreeShipping", amountForFreeShipping);
-    console.log("threshold", threshold);
-    console.log("progress", progress);
-    console.log("remainingAmount", remainingAmount);
+    // console.log("totalPrice", totalPrice);
+    // console.log("shippingCost", shippingCost);
+    // console.log("amountForFreeShipping", amountForFreeShipping);
+    // console.log("threshold", threshold);
+    // console.log("progress", progress);
+    // console.log("remainingAmount", remainingAmount);
 
     const getProgressLabel = () => {
         if (amountForFreeShipping >= threshold) {

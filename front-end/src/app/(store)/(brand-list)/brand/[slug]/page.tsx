@@ -38,8 +38,19 @@ const BrandPage: NextPage<Props> = async ({
       redirect(dest);
     }
   }
+  // Normalize pagination: convert SEO-friendly `page` URL param to `offset` for the API.
+  const normalizedSearchParams: Record<string, string> = { ...searchParamsData };
+  const pageFromUrl = parseInt(normalizedSearchParams.page ?? "1", 10);
+  const limit = Number(defaultParams.limit) || 12;
+  if (!Number.isNaN(pageFromUrl) && pageFromUrl > 1) {
+    normalizedSearchParams.offset = String((pageFromUrl - 1) * limit);
+  } else {
+    normalizedSearchParams.offset = "0";
+  }
+  delete normalizedSearchParams.page;
+
   // Convert search params to variant structure
-  const variantParams = Object.entries(searchParamsData)
+  const variantParams = Object.entries(normalizedSearchParams)
     .reduce((acc: Record<string, unknown>, [key, value]) => {
       if (key.startsWith('attribute_')) {
         const attributeId = key.replace('attribute_', '');

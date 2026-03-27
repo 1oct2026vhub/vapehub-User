@@ -141,9 +141,20 @@ export function buildBreadcrumbSchema(input: BreadcrumbSchemaInput): Record<stri
  */
 export function buildFaqSchema(faqs: FaqResponse[]): Record<string, unknown> | null {
   if (!faqs?.length) return null;
+  const seenFaqKeys = new Set<string>();
+  const uniqueFaqs = faqs.filter((faq) => {
+    const normalizedQuestion = (faq.question ?? "").trim().toLowerCase();
+    const normalizedAnswer = htmlToPlainText(faq.answer ?? "", 0).trim().toLowerCase();
+    if (!normalizedQuestion || !normalizedAnswer) return false;
+    const dedupeKey = `${normalizedQuestion}::${normalizedAnswer}`;
+    if (seenFaqKeys.has(dedupeKey)) return false;
+    seenFaqKeys.add(dedupeKey);
+    return true;
+  });
+  if (!uniqueFaqs.length) return null;
   return {
     "@type": "FAQPage",
-    mainEntity: faqs.map((faq) => ({
+    mainEntity: uniqueFaqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
       acceptedAnswer: {
@@ -153,6 +164,27 @@ export function buildFaqSchema(faqs: FaqResponse[]): Record<string, unknown> | n
       },
     })),
   };
+}
+
+/**
+ * Deduplicate top-level schema nodes by serialized payload.
+ * Useful as a final guard when building @graph arrays.
+ */
+export function dedupeSchemaGraphNodes(
+  nodes: Array<Record<string, unknown> | null | undefined>,
+): Record<string, unknown>[] {
+  const seen = new Set<string>();
+  const deduped: Record<string, unknown>[] = [];
+
+  for (const node of nodes) {
+    if (!node) continue;
+    const key = JSON.stringify(node);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(node);
+  }
+
+  return deduped;
 }
 
 /**

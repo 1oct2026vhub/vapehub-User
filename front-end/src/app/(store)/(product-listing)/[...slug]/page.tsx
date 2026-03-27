@@ -13,7 +13,7 @@ import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } f
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 import { unstable_noStore } from "next/cache";
 import JsonLd from "@/components/JsonLd";
-import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, getRatingFromReviewResponse, toAbsoluteUrl, SCHEMA_CONTEXT } from "@/lib/seo-schema";
+import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, dedupeSchemaGraphNodes, getRatingFromReviewResponse, toAbsoluteUrl, SCHEMA_CONTEXT } from "@/lib/seo-schema";
 
 type PageProps = {
   slug: string[];
@@ -35,7 +35,7 @@ const Page = async ({
   const searchParamsData = await searchParams;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
-  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug);
   if (!dynamicPageSlug) {
     return <PageNotFound />;
   }
@@ -134,11 +134,11 @@ const Page = async ({
       shopPath: "/shop",
     });
     const faqSchema = buildFaqSchema(faqs ?? []);
-    const graph: Record<string, unknown>[] = [
+    const graph: Record<string, unknown>[] = dedupeSchemaGraphNodes([
       productSchema,
       breadcrumbSchema,
       ...(faqSchema ? [faqSchema] : []),
-    ];
+    ]);
     const jsonLdData = {
       "@context": SCHEMA_CONTEXT,
       "@graph": graph,
@@ -265,11 +265,11 @@ const Page = async ({
         shopPath: "/shop",
       });
       const faqSchema = buildFaqSchema(faqs ?? []);
-      const graph: Record<string, unknown>[] = [
+      const graph: Record<string, unknown>[] = dedupeSchemaGraphNodes([
         productSchema,
         breadcrumbSchema,
         ...(faqSchema ? [faqSchema] : []),
-      ];
+      ]);
       const jsonLdData = {
         "@context": SCHEMA_CONTEXT,
         "@graph": graph,
@@ -325,6 +325,33 @@ const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugRespon
     return null;
   }
   return response.data;
+};
+
+/**
+ * Keep current single-slug behavior first, then fallback to full path lookup
+ * for legacy URLs like /2022/12/30/elux-legend-3500-review/.
+ */
+const fetchDynamicPageSlugWithFallback = async (slugParts: string[]): Promise<DynamicPageSlugResponse | null> => {
+  const primarySlug = slugParts[0];
+  if (!primarySlug) {
+    return null;
+  }
+
+  const primaryResult = await fetchDynamicPageSlug(primarySlug);
+  if (primaryResult) {
+    return primaryResult;
+  }
+
+  if (slugParts.length <= 1) {
+    return null;
+  }
+
+  const fullPathSlug = slugParts.filter(Boolean).join("/");
+  if (!fullPathSlug || fullPathSlug === primarySlug) {
+    return null;
+  }
+
+  return await fetchDynamicPageSlug(fullPathSlug);
 };
 
 const fetchCategory = async (
@@ -427,7 +454,7 @@ export async function generateMetadata({ params, searchParams }: {
   // const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
 
-  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug);
   if (!dynamicPageSlug) {
     return <PageNotFound />;
   }

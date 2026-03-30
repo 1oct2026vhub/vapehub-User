@@ -67,7 +67,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Slug-relation: 301 when redirect:true; rewrite to /page-not-found when slug missing (avoids notFound() hook error).
+  // Slug-relation: 301 when redirect:true; unresolved slugs continue to route-level handlers.
   // Known routes (shop, contact, etc.) are never checked so they never get wrongly 404'd.
   let response: NextResponse
   const slugResult = await resolveSlugResult(request)
@@ -88,7 +88,16 @@ export async function middleware(request: NextRequest) {
       console.log(`middleware redirect ${statusCode} -> ${slugResult.url.toString()} (temporary=${isTemp})`)
     } catch {}
   } else if (slugResult.type === 'not-found') {
-    response = NextResponse.rewrite(new URL('/page-not-found', request.url))
+    // Rewrite to the existing 404 UI and force a real 404 status.
+    // This avoids calling Next.js `notFound()` in dynamic route handlers (prevents hook mismatch).
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-vapehub-soft404', '1')
+    response = NextResponse.rewrite(new URL('/page-not-found', request.url), {
+      status: 404,
+      request: {
+        headers: requestHeaders,
+      },
+    })
   } else {
     response = NextResponse.next()
   }

@@ -239,7 +239,7 @@ const Page = async ({
 
       const data = productRes.status === "fulfilled" ? productRes.value : null;
       if (!data?.product || !data.product.category) {
-        return <PageNotFound />;
+      return <PageNotFound />;
       }
 
       const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}`);
@@ -457,7 +457,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug);
   if (!dynamicPageSlug) {
-    return <PageNotFound />;
+    return {};
   }
 
   // Pagination links must reflect the current URL (searchParams). Opt out of static metadata cache for categories.
@@ -523,7 +523,7 @@ export async function generateMetadata({ params, searchParams }: {
    
     
      if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return <PageNotFound />;
+      return {};
     }
      
     return {
@@ -762,7 +762,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const handler = metadataHandlers[dynamicPageSlug?.entity_type ?? ""];
   if (!handler) {
-    <PageNotFound />;
+    return {};
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;

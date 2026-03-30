@@ -94,7 +94,6 @@ export async function middleware(request: NextRequest) {
   }
 
   const url = request.nextUrl.clone()
-
   // Check if 'referral_code' is in the query parameters
   if (url.searchParams.has('referral_code')) {
     const referralCode = url.searchParams.get('referral_code')

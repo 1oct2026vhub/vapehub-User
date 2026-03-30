@@ -67,7 +67,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Slug-relation: 301 when redirect:true; unresolved slugs continue to route-level handlers.
+  // Slug-relation: 301 when redirect:true; rewrite to /page-not-found when slug missing (avoids notFound() hook error).
   // Known routes (shop, contact, etc.) are never checked so they never get wrongly 404'd.
   let response: NextResponse
   const slugResult = await resolveSlugResult(request)
@@ -88,16 +88,7 @@ export async function middleware(request: NextRequest) {
     //   console.log(`middleware redirect ${statusCode} -> ${slugResult.url.toString()} (temporary=${isTemp})`)
     // } catch {}
   } else if (slugResult.type === 'not-found') {
-    // Rewrite to the existing 404 UI and force a real 404 status.
-    // This avoids calling Next.js `notFound()` in dynamic route handlers (prevents hook mismatch).
-    const requestHeaders = new Headers(request.headers)
-    requestHeaders.set('x-vapehub-soft404', '1')
-    response = NextResponse.rewrite(new URL('/page-not-found', request.url), {
-      status: 404,
-      request: {
-        headers: requestHeaders,
-      },
-    })
+    response = NextResponse.rewrite(new URL('/page-not-found', request.url))
   } else {
     response = NextResponse.next()
   }
@@ -138,6 +129,9 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   ) {
     return { type: 'next' }
   }
+
+  // If the path has more than 2 segments it's out of scope for slug-relation
+  if (segments.length > 2) return { type: 'next' }
 
   // Helper: call slug-relation API for a given slug and return a SlugResult
   async function fetchSlugRelation(slugToCheck: string): Promise<SlugResult> {
@@ -194,22 +188,8 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   // Never run slug-relation for known app routes – avoids wrong 404s on /shop, /contact, etc.
   if (KNOWN_FIRST_SEGMENTS.has(primarySlug)) return { type: 'next' }
 
-  // Default: check the primary slug first (existing behavior).
-  const primaryResult = await fetchSlugRelation(primarySlug)
-  if (primaryResult.type !== 'not-found') {
-    return primaryResult
-  }
-
-  // Fallback for legacy multi-segment URLs:
-  // if primary slug doesn't resolve, retry with full path as a single slug key.
-  if (segments.length > 1) {
-    const fullPathSlug = segments.join('/')
-    if (fullPathSlug && fullPathSlug !== primarySlug) {
-      return await fetchSlugRelation(fullPathSlug)
-    }
-  }
-
-  return primaryResult
+  // Default: check the primary slug (product, category, blog, etc.)
+  return await fetchSlugRelation(primarySlug)
 }
 
 function normalizeRedirectUrl(input: string): string | null {

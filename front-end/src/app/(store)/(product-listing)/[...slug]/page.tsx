@@ -13,7 +13,7 @@ import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } f
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 import { unstable_noStore } from "next/cache";
 import JsonLd from "@/components/JsonLd";
-import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, dedupeSchemaGraphNodes, getRatingFromReviewResponse, toAbsoluteUrl, SCHEMA_CONTEXT } from "@/lib/seo-schema";
+import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, getRatingFromReviewResponse, toAbsoluteUrl, SCHEMA_CONTEXT } from "@/lib/seo-schema";
 
 type PageProps = {
   slug: string[];
@@ -35,7 +35,7 @@ const Page = async ({
   const searchParamsData = await searchParams;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
-  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug);
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
     return <PageNotFound />;
   }
@@ -134,11 +134,11 @@ const Page = async ({
       shopPath: "/shop",
     });
     const faqSchema = buildFaqSchema(faqs ?? []);
-    const graph: Record<string, unknown>[] = dedupeSchemaGraphNodes([
+    const graph: Record<string, unknown>[] = [
       productSchema,
       breadcrumbSchema,
       ...(faqSchema ? [faqSchema] : []),
-    ]);
+    ];
     const jsonLdData = {
       "@context": SCHEMA_CONTEXT,
       "@graph": graph,
@@ -239,7 +239,7 @@ const Page = async ({
 
       const data = productRes.status === "fulfilled" ? productRes.value : null;
       if (!data?.product || !data.product.category) {
-      return <PageNotFound />;
+        return <PageNotFound />;
       }
 
       const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}`);
@@ -265,11 +265,11 @@ const Page = async ({
         shopPath: "/shop",
       });
       const faqSchema = buildFaqSchema(faqs ?? []);
-      const graph: Record<string, unknown>[] = dedupeSchemaGraphNodes([
+      const graph: Record<string, unknown>[] = [
         productSchema,
         breadcrumbSchema,
         ...(faqSchema ? [faqSchema] : []),
-      ]);
+      ];
       const jsonLdData = {
         "@context": SCHEMA_CONTEXT,
         "@graph": graph,
@@ -325,33 +325,6 @@ const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugRespon
     return null;
   }
   return response.data;
-};
-
-/**
- * Keep current single-slug behavior first, then fallback to full path lookup
- * for legacy URLs like /2022/12/30/elux-legend-3500-review/.
- */
-const fetchDynamicPageSlugWithFallback = async (slugParts: string[]): Promise<DynamicPageSlugResponse | null> => {
-  const primarySlug = slugParts[0];
-  if (!primarySlug) {
-    return null;
-  }
-
-  const primaryResult = await fetchDynamicPageSlug(primarySlug);
-  if (primaryResult) {
-    return primaryResult;
-  }
-
-  if (slugParts.length <= 1) {
-    return null;
-  }
-
-  const fullPathSlug = slugParts.filter(Boolean).join("/");
-  if (!fullPathSlug || fullPathSlug === primarySlug) {
-    return null;
-  }
-
-  return await fetchDynamicPageSlug(fullPathSlug);
 };
 
 const fetchCategory = async (
@@ -454,9 +427,9 @@ export async function generateMetadata({ params, searchParams }: {
   // const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
 
-  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug);
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
   if (!dynamicPageSlug) {
-    return {};
+    return <PageNotFound />;
   }
 
   // Pagination links must reflect the current URL (searchParams). Opt out of static metadata cache for categories.
@@ -522,7 +495,7 @@ export async function generateMetadata({ params, searchParams }: {
    
     
      if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return {};
+      return <PageNotFound />;
     }
      
     return {
@@ -761,7 +734,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const handler = metadataHandlers[dynamicPageSlug?.entity_type ?? ""];
   if (!handler) {
-    return {};
+    <PageNotFound />;
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;

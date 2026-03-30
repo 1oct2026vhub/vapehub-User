@@ -5,9 +5,6 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: '404 Not Found | VapeHub',
   description: 'The page you are looking for does not exist.',
-  alternates: {
-    canonical: null,
-  },
   openGraph: {
     title: '404 Not Found | VapeHub',
     description: 'The page you are looking for does not exist.',

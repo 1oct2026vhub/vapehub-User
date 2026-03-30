@@ -147,8 +147,7 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
       const isError = !res.ok || json.status === 'ERROR' || json.success === false
       if (isError) return { type: 'not-found' }
 
-      const hasRedirectMessage = typeof json?.message === 'string' && json.message.toLowerCase() === 'redirect'
-      if (hasRedirectMessage && json?.data?.redirect === true && json.data.redirect_url) {
+      if (json?.data?.redirect === true && json.data.redirect_url) {
         const normalized = normalizeRedirectUrl(json.data.redirect_url)
         if (normalized && normalized !== pathname) {
           const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)

@@ -41,9 +41,8 @@ const Page = async ({
   }
 
   // SEO redirect for deleted/unpublished slugs (middleware emits 301; this is a safe fallback).
-  const redirectMeta = dynamicPageSlug as unknown as RedirectMeta;
-  if (shouldHandleRedirect(redirectMeta)) {
-    const dest = normalizeRedirectUrl(redirectMeta.redirect_url);
+  if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect === true) {
+    const dest = normalizeRedirectUrl((dynamicPageSlug as unknown as { redirect_url?: string })?.redirect_url);
     if (dest) {
       redirect(dest);
     }
@@ -446,21 +445,6 @@ function normalizeRedirectUrl(input?: string): string | null {
   return dest;
 }
 
-type RedirectMeta = {
-  message?: string;
-  redirect?: boolean;
-  redirect_url?: string;
-};
-
-function shouldHandleRedirect(payload?: RedirectMeta | null): boolean {
-  return (
-    !!payload &&
-    payload.redirect === true &&
-    typeof payload.message === "string" &&
-    payload.message.toLowerCase() === "redirect"
-  );
-}
-
 export async function generateMetadata({ params, searchParams }: {
   params: Promise<PageProps>,
   searchParams: Promise<Record<string, string>>
@@ -483,7 +467,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
   // (Actual redirect is handled by middleware; Page has a permanentRedirect fallback.)
-  if (shouldHandleRedirect(dynamicPageSlug as unknown as RedirectMeta)) {
+  if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect === true) {
     return {};
   }
 

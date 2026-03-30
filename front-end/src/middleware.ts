@@ -130,6 +130,9 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
     return { type: 'next' }
   }
 
+  // If the path has more than 2 segments it's out of scope for slug-relation
+  if (segments.length > 2) return { type: 'next' }
+
   // Helper: call slug-relation API for a given slug and return a SlugResult
   async function fetchSlugRelation(slugToCheck: string): Promise<SlugResult> {
     try {
@@ -185,22 +188,8 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   // Never run slug-relation for known app routes – avoids wrong 404s on /shop, /contact, etc.
   if (KNOWN_FIRST_SEGMENTS.has(primarySlug)) return { type: 'next' }
 
-  // Default: check the primary slug first (existing behavior).
-  const primaryResult = await fetchSlugRelation(primarySlug)
-  if (primaryResult.type !== 'not-found') {
-    return primaryResult
-  }
-
-  // Fallback for legacy multi-segment URLs:
-  // if primary slug doesn't resolve, retry with full path as a single slug key.
-  if (segments.length > 1) {
-    const fullPathSlug = segments.join('/')
-    if (fullPathSlug && fullPathSlug !== primarySlug) {
-      return await fetchSlugRelation(fullPathSlug)
-    }
-  }
-
-  return primaryResult
+  // Default: check the primary slug (product, category, blog, etc.)
+  return await fetchSlugRelation(primarySlug)
 }
 
 function normalizeRedirectUrl(input: string): string | null {

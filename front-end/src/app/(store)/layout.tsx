@@ -3,21 +3,17 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 // import { PropsWithChildren, ReactElement } from "react"
 import { PropsWithChildren, ReactElement, Suspense } from "react"
-import { headers } from "next/headers";
 import { getCategoryList, getFlashNews, getHeaderMegaMenu } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { FlashNewsItem } from '@/lib/config/global.config';
 import HistoryProvider from "@/components/HistoryProvider";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const isSoft404Request = requestHeaders.get('x-vapehub-soft404') === '1';
-
-  return {
-    metadataBase: new URL(process.env.NEXTAUTH_URL || ''),
-    alternates: isSoft404Request ? { canonical: null } : { canonical: './' },
-  };
-}
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL || ''),
+  alternates: {
+    canonical: './',
+  },
+};
 
 const StoreRootLayout = async ({
   children,

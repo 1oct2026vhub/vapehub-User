@@ -66,7 +66,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
   }
-
   // Slug-relation: 301 when redirect:true; rewrite to /page-not-found when slug missing (avoids notFound() hook error).
   // Known routes (shop, contact, etc.) are never checked so they never get wrongly 404'd.
   let response: NextResponse

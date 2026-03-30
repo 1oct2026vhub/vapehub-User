@@ -1,12 +1,12 @@
 import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { redirect } from 'next/navigation';
+import PageNotFound from '@/app/(store)/page-not-found/page';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
 import { Metadata } from "next";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 import { DynamicPageSlugResponse } from "@/lib/config/global.config";
-import PageNotFound from '@/app/(store)/page-not-found/page';
 
 type PageProps = {
   slug: string;
@@ -218,7 +218,9 @@ export async function generateMetadata({ params, searchParams }: {
   // Fetch dynamic page slug data for metadata
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
   if (!dynamicPageSlug) {
-    return {};
+    return {
+      title: 'Deal not found',
+    };
   }
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
   if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect) {
@@ -277,5 +279,7 @@ export async function generateMetadata({ params, searchParams }: {
       }
     }
   }
-  return {};
-}
+  return {
+    title: 'Deal not found',
+  };
+} 

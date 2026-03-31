@@ -1077,7 +1077,7 @@ export const getFeatureContent = async (payload?: { page?: number, limit?: numbe
     });
 };
 
-export const getDispatchNotice = async (canCache: boolean = true): Promise<ServerActionResponse<{
+export const getDispatchNotice = async (): Promise<ServerActionResponse<{
   dispatch_notice: {
     id: number;
     content: string;
@@ -1097,7 +1097,7 @@ export const getDispatchNotice = async (canCache: boolean = true): Promise<Serve
   }, unknown>({
     endpoint: API_ROUTES.GET_DISPATCH_NOTICE,
     method: 'GET',
-    canCache,
+    // canCache,
   });
 };
 

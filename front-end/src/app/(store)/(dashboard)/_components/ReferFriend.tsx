@@ -1,7 +1,6 @@
 import { RightArrowIcon } from '@/components/Icons'
 import { getServerSessionData } from '@/lib/config/auth.config'
 import { ROUTES } from '@/lib/routes'
-import { Button } from '@nextui-org/button'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -10,7 +9,8 @@ const ReferFriend: React.FC = async () => {
     
     const session = await getServerSessionData();
     const user = session?.user;
-    // The common card content that will be wrapped differently based on auth state
+    const referralHref = user ? ROUTES.REFERRAL : ROUTES.MY_ACCOUNT;
+
     const cardContent = (
         <div className='bg-skin-white border border-skin-neutral-50 max-lg:pt-6 lg:pl-7 xl:pl-11 flex flex-col lg:flex-row items-center justify-between h-fit gap-2 shadow-card rounded-md md:rounded-lg xl:max-h-[309px]'>
             <div className='text-center lg:text-left flex flex-col flex-1 flex-fill lg-w-[50%]'>
@@ -18,17 +18,14 @@ const ReferFriend: React.FC = async () => {
                     <h2 className='primary-gradient-100'>Refer a Friend &</h2>
                     <h2 className='primary-gradient-100'>We will reward you both!</h2>
                 </div>
-                <Button
-                    as={user ? Link : "div"}
-                    href={user ? ROUTES.REFERRAL : undefined}
-                    size="lg"
-                    radius="sm"
-                    color="primary"
-                    className="btn primary-btn shadow-input w-fit !min-w-fit max-lg:mx-auto text-content-2 md:text-h5 !px-1.5 !py-1 md:!px-3 md:!py-1.5 !rounded font-oswald mt-4 xl:mt-8 uppercase !h-fit md:!h-11"
-                    endContent={<RightArrowIcon stroke='#fff' className='w-5.5 h-5.5' />}
+                <Link
+                    href={referralHref}
+                    className="btn primary-btn shadow-input inline-flex items-center gap-2 w-fit !min-w-fit max-lg:mx-auto text-[16px] leading-none !px-3.5 !py-2 !rounded-md font-oswald font-semibold mt-4 xl:mt-8 uppercase !h-10"
+                    aria-label='Go to refer a friend page'
                 >
                     Refer Now
-                </Button>
+                    <RightArrowIcon stroke='#fff' className='w-5 h-5 shrink-0' />
+                </Link>
             </div>
             <Image
                 src='/images/refer-friend.svg'
@@ -43,13 +40,7 @@ const ReferFriend: React.FC = async () => {
 
     return (
         <section>
-            {user ? (
-                cardContent
-            ) : (
-                <Link href={ROUTES.MY_ACCOUNT} className='block'>
-                    {cardContent}
-                </Link>
-            )}
+            {cardContent}
         </section>
     )
 }

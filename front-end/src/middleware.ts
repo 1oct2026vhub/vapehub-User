@@ -66,7 +66,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
   }
-
   // Slug-relation: 301 when redirect:true; rewrite to /page-not-found when slug missing (avoids notFound() hook error).
   // Known routes (shop, contact, etc.) are never checked so they never get wrongly 404'd.
   let response: NextResponse
@@ -94,7 +93,6 @@ export async function middleware(request: NextRequest) {
   }
 
   const url = request.nextUrl.clone()
-
   // Check if 'referral_code' is in the query parameters
   if (url.searchParams.has('referral_code')) {
     const referralCode = url.searchParams.get('referral_code')
@@ -130,9 +128,6 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
     return { type: 'next' }
   }
 
-  // If the path has more than 2 segments it's out of scope for slug-relation
-  if (segments.length > 2) return { type: 'next' }
-
   // Helper: call slug-relation API for a given slug and return a SlugResult
   async function fetchSlugRelation(slugToCheck: string): Promise<SlugResult> {
     try {
@@ -152,7 +147,7 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
       const isError = !res.ok || json.status === 'ERROR' || json.success === false
       if (isError) return { type: 'not-found' }
 
-      if (json?.data?.redirect && json.data.redirect_url) {
+      if (json?.data?.redirect === true && json.data.redirect_url) {
         const normalized = normalizeRedirectUrl(json.data.redirect_url)
         if (normalized && normalized !== pathname) {
           const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)
@@ -188,8 +183,22 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   // Never run slug-relation for known app routes – avoids wrong 404s on /shop, /contact, etc.
   if (KNOWN_FIRST_SEGMENTS.has(primarySlug)) return { type: 'next' }
 
-  // Default: check the primary slug (product, category, blog, etc.)
-  return await fetchSlugRelation(primarySlug)
+  // Default: check the primary slug first (existing behavior).
+  const primaryResult = await fetchSlugRelation(primarySlug)
+  if (primaryResult.type !== 'not-found') {
+    return primaryResult
+  }
+
+  // Fallback for legacy multi-segment URLs:
+  // if primary slug doesn't resolve, retry with full path as a single slug key.
+  if (segments.length > 1) {
+    const fullPathSlug = segments.join('/')
+    if (fullPathSlug && fullPathSlug !== primarySlug) {
+      return await fetchSlugRelation(fullPathSlug)
+    }
+  }
+
+  return primaryResult
 }
 
 function normalizeRedirectUrl(input: string): string | null {

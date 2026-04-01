@@ -66,7 +66,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
   }
-  // Slug-relation: 301 when redirect:true; rewrite to /page-not-found when slug missing (avoids notFound() hook error).
+
+  // Slug-relation: 301 when redirect:true; unresolved slugs continue to route-level handlers.
   // Known routes (shop, contact, etc.) are never checked so they never get wrongly 404'd.
   let response: NextResponse
   const slugResult = await resolveSlugResult(request)
@@ -87,12 +88,22 @@ export async function middleware(request: NextRequest) {
       console.log(`middleware redirect ${statusCode} -> ${slugResult.url.toString()} (temporary=${isTemp})`)
     } catch {}
   } else if (slugResult.type === 'not-found') {
-    response = NextResponse.rewrite(new URL('/page-not-found', request.url))
+    // Rewrite to the existing 404 UI and force a real 404 status.
+    // This avoids calling Next.js `notFound()` in dynamic route handlers (prevents hook mismatch).
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-vapehub-soft404', '1')
+    response = NextResponse.rewrite(new URL('/page-not-found', request.url), {
+      status: 404,
+      request: {
+        headers: requestHeaders,
+      },
+    })
   } else {
     response = NextResponse.next()
   }
 
   const url = request.nextUrl.clone()
+
   // Check if 'referral_code' is in the query parameters
   if (url.searchParams.has('referral_code')) {
     const referralCode = url.searchParams.get('referral_code')
@@ -147,7 +158,7 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
       const isError = !res.ok || json.status === 'ERROR' || json.success === false
       if (isError) return { type: 'not-found' }
 
-      if (json?.data?.redirect === true && json.data.redirect_url) {
+      if (json?.data?.redirect && json.data.redirect_url) {
         const normalized = normalizeRedirectUrl(json.data.redirect_url)
         if (normalized && normalized !== pathname) {
           const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)

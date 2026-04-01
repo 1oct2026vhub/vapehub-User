@@ -78,6 +78,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const { status, data: session } = useSession();
   const prevSessionRef = useRef(session);
   const isApplyingCouponRef = useRef(false); // Track if coupon is being applied to prevent revalidation
+  // Debounce coupon revalidation so rapid cart updates don't spam the coupon validation endpoint.
+  const couponRevalidateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [stockValidationErrors, setStockValidationErrors] = useState<Array<{ itemId: number; message: string; isOutOfStock: boolean }>>([]);
   const isAuthenticated = status === 'authenticated';
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
@@ -239,19 +241,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isAuthenticated]);
   
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchLoyaltyPoints = async () => {
-        
-        // if (isAuthenticated) {
-            // Add 2-second delay to handle database lag for loyalty points data
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            const response = await getLoyaltyPointsRedemption();
-          
-            if (response.status === ServerActionStatus.SUCCESS) {
-                setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));
-            } else {
-            }
-        // }
+      const response = await getLoyaltyPointsRedemption();
+
+      if (response.status === ServerActionStatus.SUCCESS) {
+        setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));
+      }
     };
     fetchLoyaltyPoints();
   }, [isAuthenticated]);
@@ -935,6 +932,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Revalidate coupon when cartTotal or itemCount changes
   useEffect(() => {
+    // Always clear the previous scheduled revalidation on cart changes.
+    if (couponRevalidateTimeoutRef.current) {
+      clearTimeout(couponRevalidateTimeoutRef.current);
+      couponRevalidateTimeoutRef.current = null;
+    }
+
     const revalidate = async () => {
       // Skip revalidation if:
       // 1. Coupon is not applied or no code exists
@@ -1010,13 +1013,21 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    // Only revalidate if not loading and coupon is already applied
-    // This prevents revalidation immediately after coupon application
-    if (!isLoading && couponDiscount.isApplied) {
-      revalidate();
+    // Only revalidate if not loading and coupon is already applied.
+    // Debounced to batch rapid cart changes into a single call.
+    if (!isLoading && couponDiscount.isApplied && couponDiscount.code && isAuthenticated) {
+      couponRevalidateTimeoutRef.current = setTimeout(() => {
+        void revalidate();
+      }, 700);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartTotal, itemCount, isLoading]);
+
+    return () => {
+      if (couponRevalidateTimeoutRef.current) {
+        clearTimeout(couponRevalidateTimeoutRef.current);
+        couponRevalidateTimeoutRef.current = null;
+      }
+    };
+  }, [cartTotal, itemCount, isLoading, couponDiscount.code, couponDiscount.isApplied, isAuthenticated, shippingMethodIdForCoupon]);
 
   // Restore couponDiscount from cookie on mount
   useEffect(() => {

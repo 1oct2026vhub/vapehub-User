@@ -41,7 +41,7 @@ const Page = async ({
   }
 
   // SEO redirect for deleted/unpublished slugs (middleware emits 301; this is a safe fallback).
-  if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect === true) {
+  if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect) {
     const dest = normalizeRedirectUrl((dynamicPageSlug as unknown as { redirect_url?: string })?.redirect_url);
     if (dest) {
       redirect(dest);
@@ -239,7 +239,7 @@ const Page = async ({
 
       const data = productRes.status === "fulfilled" ? productRes.value : null;
       if (!data?.product || !data.product.category) {
-        return <PageNotFound />;
+      return <PageNotFound />;
       }
 
       const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}`);
@@ -456,7 +456,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug);
   if (!dynamicPageSlug) {
-    return <PageNotFound />;
+    return {};
   }
 
   // Pagination links must reflect the current URL (searchParams). Opt out of static metadata cache for categories.
@@ -466,7 +466,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
   // (Actual redirect is handled by middleware; Page has a permanentRedirect fallback.)
-  if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect === true) {
+  if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect) {
     return {};
   }
 
@@ -522,7 +522,7 @@ export async function generateMetadata({ params, searchParams }: {
    
     
      if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return <PageNotFound />;
+      return {};
     }
      
     return {
@@ -761,7 +761,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const handler = metadataHandlers[dynamicPageSlug?.entity_type ?? ""];
   if (!handler) {
-    <PageNotFound />;
+    return {};
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;
@@ -854,3 +854,5 @@ async function getCategoryPaginationLinks({
     next: nextPage ? toAbsoluteUrl(BASE_URL, `${basePath}?page=${nextPage}`) : undefined,
   };
 }
+
+

@@ -1,12 +1,11 @@
 import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Deal } from "@/lib/config/deal.config";
 import DealProduct from "../_components/DealProduct";
 import { Metadata } from "next";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 import { DynamicPageSlugResponse } from "@/lib/config/global.config";
-import PageNotFound from '@/app/(store)/page-not-found/page';
 
 type PageProps = {
   slug: string;
@@ -22,7 +21,7 @@ const Page = async ({ params, searchParams }: {
   // Fetch dynamic page slug data
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
   if (!dynamicPageSlug) {
-    return <PageNotFound />;
+    notFound();
   }
 
   // SEO redirect for deleted/unpublished deal slugs (middleware emits 301; this is a safe fallback).
@@ -94,7 +93,7 @@ const Page = async ({ params, searchParams }: {
   const combinedParams = { ...defaultParams, ...variantParams };
   const productsResponse = await getProductsByDealSlug(slug, combinedParams);
   if (productsResponse.status === ServerActionStatus.ERROR) {
-    return <PageNotFound />;
+    notFound();
   }
 
   const products = productsResponse.data?.products || [];
@@ -154,7 +153,7 @@ const Page = async ({ params, searchParams }: {
   // Final check: if we still don't have a deal, return notFound
   // We need the deal object for the component to work properly
   if (!deal) {
-    return <PageNotFound />;
+    notFound();
   }
 
   const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = products.length > 0 ? await Promise.all(
@@ -163,7 +162,7 @@ const Page = async ({ params, searchParams }: {
   
   const responseData = productsResponse.data;
   if (!responseData) {
-    return <PageNotFound />;
+    notFound();
   }
   
   return <DealProduct 

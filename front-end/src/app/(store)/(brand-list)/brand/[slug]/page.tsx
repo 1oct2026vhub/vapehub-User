@@ -3,14 +3,11 @@ import { NextPage } from 'next';
 import React from 'react';
 import BrandProducts from '../_components/BrandProducts';
 import { getProductByBrand, getDynamicPageSlug } from '@/lib/server.actions';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import { Product, ProductReview } from '@/lib/config/product.config';
-import PageNotFound from '@/app/(store)/page-not-found/page';
-
-
 interface Props {
   params: Promise<RouteParams>; 
   searchParams: Promise<Record<string, string>>
@@ -28,7 +25,7 @@ const BrandPage: NextPage<Props> = async ({
   // Fetch dynamic page slug data (slug-relation API)
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
   if (!dynamicPageSlug) {
-    return <PageNotFound />;
+    notFound();
   }
 
   // SEO redirect for deleted/unpublished brand slugs (middleware emits 301; this is a safe fallback).
@@ -103,7 +100,7 @@ const BrandPage: NextPage<Props> = async ({
       <BrandProducts data={brandProduct} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
     );
   }
-  return <PageNotFound />;
+  notFound();
 
 };
 

@@ -86,7 +86,7 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
         <li>
           <Link 
             href={ROUTES.NEW_PRODUCTS} 
-            className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold font-oswald hover:text-skin-primary-300 transition-all duration-300 ease-in flex items-center gap-2"
+            className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold font-oswald hover:text-skin-primary-300 transition-all duration-300 ease-in flex items-center gap-2 relative after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-green-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left"
           >
             NEW IN
           </Link>
@@ -108,7 +108,7 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
               {item.entity_type === 'brand' || item.entity_type === 'deal' ? (
                 <button
                   onClick={() => handleMenuClick(item.original, item.entity_type, slug)}
-                  className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold hover:text-skin-primary-300 font-oswald transition-all duration-300 ease-in flex items-center gap-2 bg-transparent border-none cursor-pointer`}
+                  className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold hover:text-skin-primary-300 font-oswald transition-all duration-300 ease-in flex items-center gap-2 bg-transparent border-none cursor-pointer relative after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-green-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left`}
                 >
                   {item.label}
                   {item.children && item.children.length > 0 && <DownArrowIcon className="w-3 h-3 text-white" />}
@@ -117,7 +117,7 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
                 <Link 
                   href={item.original || '#'} 
                   passHref 
-                  className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold hover:text-skin-primary-300 font-oswald transition-all duration-300 ease-in flex items-center gap-2`}
+                  className={`px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold hover:text-skin-primary-300 font-oswald transition-all duration-300 ease-in flex items-center gap-2 relative after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-green-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left`}
                 >
                   {item.label}
                   {item.children && item.children.length > 0 && <DownArrowIcon className="w-3 h-3 text-white" />}
@@ -135,7 +135,7 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
           <li key={index}>
             <Link 
               href={item?.slug} 
-              className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-oswald font-bold hover:text-skin-primary-300 transition-all duration-300 ease-in"
+              className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-oswald font-bold hover:text-skin-primary-300 transition-all duration-300 ease-in relative after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-green-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left"
             >
               {item.name}
             </Link>

@@ -200,23 +200,29 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                                 );
                             }
 
-                            // Has submenu — accordion (whole row toggles open/close)
+                            // Has submenu — label navigates, arrow toggles accordion
                             return (
                                 <div
                                     key={menuItem.id}
                                     className="w-full rounded-lg shadow-input border border-skin-neutral-100"
                                 >
-                                    <button
-                                        className="w-full flex items-center justify-between px-4 py-[11px]"
-                                        onClick={() => handleAccordionItemClick(index)}
-                                    >
-                                        <span className="text-title-2 font-bold uppercase font-oswald">
+                                    <div className="flex items-center justify-between">
+                                        {/* Label — navigates to URL */}
+                                        <button
+                                            className="flex-1 text-left text-title-2 font-bold uppercase font-oswald px-4 py-[11px]"
+                                            onClick={() => handleMenuItemNavigate(menuItem.original, menuItem.entity_type, slug)}
+                                        >
                                             {menuItem.label}
-                                        </span>
-                                        <span className={`flex items-center transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                                        </button>
+                                        {/* Arrow — toggles accordion only */}
+                                        <button
+                                            className={`flex items-center justify-center px-4 py-[11px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                                            onClick={() => handleAccordionItemClick(index)}
+                                            aria-label={isOpen ? 'Collapse' : 'Expand'}
+                                        >
                                             <DownArrowFilledIcon color='black' />
-                                        </span>
-                                    </button>
+                                        </button>
+                                    </div>
 
                                     {isOpen && (
                                         <div className="border-t border-skin-neutral-200 py-4 px-4">

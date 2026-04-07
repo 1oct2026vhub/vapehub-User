@@ -1,7 +1,8 @@
 import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug, getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
-import { notFound, redirect, RedirectType } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
+import PageNotFound from '@/app/(store)/page-not-found/page';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
 import { DynamicPageSlugResponse, SeoMetaResponse } from "@/lib/config/global.config";
@@ -36,7 +37,7 @@ const Page = async ({
   const secondarySlug: string | null = slug[1];
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug);
   if (!dynamicPageSlug) {
-    notFound();
+    return <PageNotFound />;
   }
 
   // SEO redirect for deleted/unpublished slugs (middleware emits 301; this is a safe fallback).
@@ -102,12 +103,12 @@ const Page = async ({
       if (newSlug) {
         redirect(`/${data.product.slug}/${newSlug}`, RedirectType.replace);
       } else {
-        notFound();
+        return <PageNotFound />;
       }
     }
 
     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      notFound();
+      return <PageNotFound />;
     }
 
     const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}/${secondarySlug}`);
@@ -238,7 +239,7 @@ const Page = async ({
 
       const data = productRes.status === "fulfilled" ? productRes.value : null;
       if (!data?.product || !data.product.category) {
-        notFound();
+        return <PageNotFound />;
       }
 
       const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}`);
@@ -285,12 +286,12 @@ const Page = async ({
 
   const handler: () => Promise<React.ReactNode> = entityTypeHandlers[dynamicPageSlug?.entity_type ?? ""];
   if (!handler) {
-    notFound();
+    return <PageNotFound />;
   }
 
   const result: React.ReactNode = dynamicPageSlug ? await handler() : null;
   if (!result) {
-    notFound();
+    return <PageNotFound />;
   }
 
   return result;

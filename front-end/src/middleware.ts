@@ -185,10 +185,10 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
 
   // Special-case known routes that need to be checked before the KNOWN_FIRST_SEGMENTS guard
   // (brand and product-deals must run even though 'brand' / 'product-deals' are in KNOWN_FIRST_SEGMENTS)
-  if (pathname.startsWith('/brand/') && segments.length === 2) {
+  if (pathname.startsWith('/brand/') && segments.length >= 2) {
     return await fetchSlugRelation(segments[1])
   }
-  if (pathname.startsWith('/product-deals/') && segments.length === 2) {
+  if (pathname.startsWith('/product-deals/') && segments.length >= 2) {
     return await fetchSlugRelation(segments[1])
   }
 

@@ -31,7 +31,7 @@ const PromotionBanner: React.FC<PromotionBannerProps> = ({ messages }) => {
     >
       <h5 className="text-content-3 sm:text-content-1 lg:text-title-2 font-bold text-white">
         {currentMessage.url ? (
-          <a href={currentMessage.url} target="_blank" rel="noopener noreferrer">
+          <a href={currentMessage.url}>
             {currentMessage.label}
           </a>
         ) : (

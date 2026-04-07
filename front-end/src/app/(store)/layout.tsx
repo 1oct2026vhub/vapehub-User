@@ -8,6 +8,7 @@ import { getCategoryList, getFlashNews, getHeaderMegaMenu } from '@/lib/server.a
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { FlashNewsItem } from '@/lib/config/global.config';
 import HistoryProvider from "@/components/HistoryProvider";
+import NormalizeInternalLinks from "@/components/NormalizeInternalLinks";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
@@ -41,6 +42,7 @@ const StoreRootLayout = async ({
 
   return (
     <div className="flex flex-col min-h-screen">
+      <NormalizeInternalLinks />
       <Header megaMenu={megaMenu} flashNews={flashNews} />
       <Suspense fallback={
         <div className="w-full max-w-[1520px] mx-auto">

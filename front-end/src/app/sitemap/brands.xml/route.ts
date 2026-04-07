@@ -6,6 +6,7 @@ import {
   urlset,
   buildLoc,
   isIndexableCanonicalPath,
+  toLastmod,
 } from '../_utils';
 
 export const dynamic = 'force-dynamic';
@@ -78,6 +79,7 @@ export async function GET(request: NextRequest) {
       .filter((b) => isIndexableCanonicalPath(`/brand/${b.slug}`))
       .map((b) =>
         urlEntry(buildLoc(baseUrl, `/brand/${b.slug}`), {
+          lastmod: toLastmod(b.updatedAt),
           changefreq: 'weekly',
           priority: '0.7',
         }),

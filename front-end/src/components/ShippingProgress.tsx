@@ -3,7 +3,7 @@ import { CartItem } from '@/lib/config/cart.config';
 import { useCart } from '@/lib/context/CartContext';
 import { Progress } from '@nextui-org/react'
 import React from 'react'
-import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils';
+import { FREE_DELIVERY_THRESHOLD, orderMeetsFreeShippingThreshold } from '@/lib/utils';
  
 
 interface ShippingProgressProps {
@@ -21,20 +21,15 @@ const ShippingProgress: React.FC<ShippingProgressProps> = ({ totalAmount, freeSh
     const threshold = freeShippingThreshold ?? FREE_DELIVERY_THRESHOLD;
     
     // Calculate remaining amount based on: threshold - (total amount - shipping cost)
-    // This gives the amount needed to reach free shipping threshold
+    // This gives the amount needed to reach free shipping threshold (pence-safe vs float totals)
     const amountForFreeShipping = totalPrice - shippingCost;
-    const remainingAmount = Math.max(threshold - amountForFreeShipping, 0);
-    const progress = Math.min((amountForFreeShipping / threshold) * 100, 100);
-    
-    // console.log("totalPrice", totalPrice);
-    // console.log("shippingCost", shippingCost);
-    // console.log("amountForFreeShipping", amountForFreeShipping);
-    // console.log("threshold", threshold);
-    // console.log("progress", progress);
-    // console.log("remainingAmount", remainingAmount);
+    const thresholdPence = Math.round(threshold * 100);
+    const amountPence = Math.round(amountForFreeShipping * 100);
+    const remainingAmount = thresholdPence > 0 ? Math.max(0, thresholdPence - amountPence) / 100 : 0;
+    const progress = thresholdPence > 0 ? Math.min((amountPence / thresholdPence) * 100, 100) : 0;
 
     const getProgressLabel = () => {
-        if (amountForFreeShipping >= threshold) {
+        if (orderMeetsFreeShippingThreshold(amountForFreeShipping, threshold)) {
             return "You've qualified for free shipping!";
         }
         return `You're £${remainingAmount.toFixed(2)} away from free shipping!`;

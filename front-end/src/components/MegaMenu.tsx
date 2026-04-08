@@ -174,7 +174,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                         <div className={`border-b border-skin-neutral-200 ${shouldShowImageSection ? 'mb-2 pb-2' : 'mb-1 pb-1'}`}>
                             <div className="flex items-center gap-2">
                                 <h3 
-                                    className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
+                                    className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-green-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left' : ''}`}
                                     onClick={() => {
                                         if (menuItem.original && menuItem.original !== '#') {
                                             handleMenuClick(menuItem.original, menuItem.entity_type);
@@ -208,13 +208,13 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                 ) : (
                     /* If item has no visible children, show as a link */
                     <div 
-                        className={`block ${shouldShowImageSection ? 'py-1' : 'py-0.5'} text-skin-neutral-300 font-normal text-content-1 leading-none hover:underline cursor-pointer`}
+                        className={`block ${shouldShowImageSection ? 'py-1' : 'py-0.5'} text-skin-neutral-300 font-normal text-content-1 leading-none cursor-pointer group`}
                         onClick={() => {
                             handleMenuClick(menuItem.original, menuItem.entity_type);
                         }}
                     >
                         <div className="flex items-center gap-2">
-                            <span>{menuItem.label}</span>
+                            <span className="relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-green-500 after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">{menuItem.label}</span>
                             {/* New tag */}
                             {extendedMenuItem.is_new && (                      
                                 <span className="bg-gradient-to-r from-[#001137] to-[#042A82] text-white text-xs px-2 py-0.5 rounded-md font-medium">

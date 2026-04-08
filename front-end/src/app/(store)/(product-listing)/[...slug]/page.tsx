@@ -41,7 +41,7 @@ const Page = async ({
   }
 
   // SEO redirect for deleted/unpublished slugs (middleware emits 301; this is a safe fallback).
-  if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect === true) {
+  if ((dynamicPageSlug as unknown as { redirect?: boolean; redirect_url?: string })?.redirect) {
     const dest = normalizeRedirectUrl((dynamicPageSlug as unknown as { redirect_url?: string })?.redirect_url);
     if (dest) {
       redirect(dest);
@@ -456,7 +456,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug);
   if (!dynamicPageSlug) {
-    return <PageNotFound />;
+    return {};
   }
 
   // Pagination links must reflect the current URL (searchParams). Opt out of static metadata cache for categories.
@@ -466,7 +466,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
   // (Actual redirect is handled by middleware; Page has a permanentRedirect fallback.)
-  if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect === true) {
+  if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect) {
     return {};
   }
 
@@ -508,29 +508,50 @@ export async function generateMetadata({ params, searchParams }: {
     }
 
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
-    if(data &&!data.variants.length) {
-       return {
-        title: dynamicPageSlug.seo?.title ?? data.product.name,
-        description: dynamicPageSlug.seo?.description ?? data.product.description,
+    if (data && !data.variants.length) {
+      const variantName = variant?.terms.name?.trim();
+      const titleBase = dynamicPageSlug.seo?.title ?? data.product.name;
+      const descriptionBase = dynamicPageSlug.seo?.description ?? data.product.description;
+      const title = variantName ? `${titleBase} - ${variantName}` : titleBase;
+      const description = variantName
+        ? (String(descriptionBase ?? "").trim()
+            ? `${String(descriptionBase).trim()} - ${variantName}`
+            : `${data.product.name} - ${variantName}`)
+        : descriptionBase;
+      return {
+        title,
+        description,
         openGraph: {
-          title: dynamicPageSlug.seo?.title ?? data.product.name,
-          description: dynamicPageSlug.seo?.description ?? data.product.description,
-          
-        }
-       };
+          title,
+          description,
+        },
+      };
     }
-   
-    
-     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return <PageNotFound />;
+
+    if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
+      return {};
     }
-     
+
+    const variantName = variant.terms.name.trim();
+    const seoTitle = dynamicPageSlug.seo?.title?.trim();
+    const title = seoTitle
+      ? `${seoTitle} - ${variantName}`
+      : `${data.product.name} - ${variantName}`;
+    const rawDescription = (dynamicPageSlug.seo?.description ?? data.product.description ?? "").trim();
+    const description = rawDescription
+      ? `${rawDescription} - ${variantName}`
+      : `${data.product.name} - ${variantName}`;
+    const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
+
     return {
-      title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
-      description: dynamicPageSlug.seo?.description ?? data.product.description,
+      title,
+      description,
+      alternates: {
+        canonical: variantCanonicalUrl,
+      },
       openGraph: {
-        title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
-        description: dynamicPageSlug.seo?.description ?? data.product.description,
+        title,
+        description,
         images: data.variants[0].primary_image?.url ? [{
           url: data.variants[0].primary_image?.url,
           width: 1200,
@@ -761,7 +782,7 @@ export async function generateMetadata({ params, searchParams }: {
 
   const handler = metadataHandlers[dynamicPageSlug?.entity_type ?? ""];
   if (!handler) {
-    <PageNotFound />;
+    return {};
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;
@@ -854,3 +875,5 @@ async function getCategoryPaginationLinks({
     next: nextPage ? toAbsoluteUrl(BASE_URL, `${basePath}?page=${nextPage}`) : undefined,
   };
 }
+
+

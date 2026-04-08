@@ -9,8 +9,6 @@ import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import { Product, ProductReview } from '@/lib/config/product.config';
-
-
 interface Props {
   params: Promise<RouteParams>; 
   searchParams: Promise<Record<string, string>>
@@ -157,6 +155,9 @@ export async function generateMetadata({ params, searchParams }: {
   const defaultParams = { sort_by: "id", order: "ASC", limit: 12, offset: 0 } as const;
   const combinedParams = { ...defaultParams, ...await searchParams };
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
+  if (!dynamicPageSlug) {
+    return {};
+  }
   
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
   if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect) {
@@ -187,4 +188,5 @@ export async function generateMetadata({ params, searchParams }: {
       }
     };
   }
+  return {};
 }

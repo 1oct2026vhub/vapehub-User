@@ -217,9 +217,7 @@ export async function generateMetadata({ params, searchParams }: {
   // Fetch dynamic page slug data for metadata
   const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(slug);
   if (!dynamicPageSlug) {
-    return {
-      title: 'Deal not found',
-    };
+    return {};
   }
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
   if ((dynamicPageSlug as unknown as { redirect?: boolean })?.redirect) {
@@ -278,7 +276,5 @@ export async function generateMetadata({ params, searchParams }: {
       }
     }
   }
-  return {
-    title: 'Deal not found',
-  };
-} 
+  return {};
+}

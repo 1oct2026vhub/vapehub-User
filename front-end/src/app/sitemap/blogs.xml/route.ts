@@ -7,6 +7,7 @@ import {
   buildLoc,
   fetchEntitySlugs,
   isIndexableCanonicalPath,
+  toLastmod,
 } from '../_utils';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,8 @@ const API_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL;
 /** Minimal shape needed from each blog post in the list API response. */
 interface BlogPostEntry {
   slug: string;
-  updated_at: string;
+  updated_at?: string;
+  updatedAt?: string;
 }
 
 interface BlogListPage {
@@ -63,6 +65,7 @@ export async function GET(request: NextRequest) {
       .filter((e) => isIndexableCanonicalPath(`/${e.entity_slug}`))
       .map((e) =>
         urlEntry(buildLoc(baseUrl, `/${e.entity_slug}`), {
+          lastmod: toLastmod(e.updated_at ?? null),
           changefreq: 'weekly',
           priority: '0.7',
         }),
@@ -102,6 +105,7 @@ export async function GET(request: NextRequest) {
       .filter((b) => isIndexableCanonicalPath(`/${b.slug}`))
       .map((b) =>
         urlEntry(buildLoc(baseUrl, `/${b.slug}`), {
+          lastmod: toLastmod(b.updated_at ?? b.updatedAt),
           changefreq: 'weekly',
           priority: '0.6',
         }),

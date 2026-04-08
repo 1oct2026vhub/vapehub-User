@@ -7,6 +7,7 @@ import { getCategoryList, getFlashNews, getHeaderMegaMenu } from '@/lib/server.a
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { FlashNewsItem } from '@/lib/config/global.config';
 import HistoryProvider from "@/components/HistoryProvider";
+import NormalizeInternalLinks from "@/components/NormalizeInternalLinks";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL || ''),
@@ -37,6 +38,7 @@ const StoreRootLayout = async ({
 
   return (
     <div className="flex flex-col min-h-screen">
+      <NormalizeInternalLinks />
       <Header megaMenu={megaMenu} flashNews={flashNews} />
       <Suspense fallback={
         <div className="w-full max-w-[1520px] mx-auto">

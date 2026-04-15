@@ -361,13 +361,6 @@ export const getDynamicPageSlug = async (slug: string, canCache: boolean = true)
     method: 'GET',
     canCache,
   });
-  // Log response for debugging slug-relation issues (helps trace 404 -> redirect cases)
-  try {
-    // Avoid throwing when response contains circular refs
-    console.log(`getDynamicPageSlug(${slug}) ->`, JSON.stringify(response));
-  } catch {
-    console.log(`getDynamicPageSlug(${slug}) -> (non-serializable response)`, response);
-  }
   return response;
 };
 

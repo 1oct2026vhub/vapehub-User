@@ -355,19 +355,12 @@ export const getFaqs = async (type: string, id: number, canCache: boolean = true
 };
 
 // get dynamic page slug
-export const getDynamicPageSlug = async (slug: string, canCache: boolean = false): Promise<ServerActionResponse<DynamicPageSlugResponse>> => {
+export const getDynamicPageSlug = async (slug: string, canCache: boolean = true): Promise<ServerActionResponse<DynamicPageSlugResponse>> => {
   const response = await handleRequest<DynamicPageSlugResponse, unknown>({
     endpoint: API_ROUTES.GET_DYNAMIC_PAGE_SLUG(slug),
     method: 'GET',
     canCache,
   });
-  // Log response for debugging slug-relation issues (helps trace 404 -> redirect cases)
-  try {
-    // Avoid throwing when response contains circular refs
-    console.log(`getDynamicPageSlug(${slug}) ->`, JSON.stringify(response));
-  } catch {
-    console.log(`getDynamicPageSlug(${slug}) -> (non-serializable response)`, response);
-  }
   return response;
 };
 
@@ -635,7 +628,9 @@ export const deleteNotification = async (id: number): Promise<ServerActionRespon
 export const getFooterMenu = async (): Promise<FooterMenuResponse> => {
   try {
   
-    const response = await fetch(API_ROUTES.GET_FOOTER_MENU);
+    const response = await fetch(API_ROUTES.GET_FOOTER_MENU, {
+      next: { revalidate: 3600 },
+    });
     const data = await response.json();    
     return data;
   } catch (error) {
@@ -730,11 +725,8 @@ export const worldpayPaymentCancel = async (payload: WORLDPAY_PAYMENT_PAYLOAD): 
 };
 
 export const getLoyaltyPointsRedemption = async (): Promise<ServerActionResponse<LoyaltyPointsRedemptionResponse>> => {
-  const timestamp = Date.now();
-  const endpointWithTimestamp = `${API_ROUTES.GET_LOYALTY_POINTS_REDEMPTION}?t=${timestamp}`;
-  
   return await handleRequest<LoyaltyPointsRedemptionResponse, unknown>({
-    endpoint: endpointWithTimestamp,
+    endpoint: API_ROUTES.GET_LOYALTY_POINTS_REDEMPTION,
     method: 'GET',
   });
 };
@@ -1076,7 +1068,7 @@ export const getFeatureContent = async (payload?: { page?: number, limit?: numbe
     });
 };
 
-export const getDispatchNotice = async (): Promise<ServerActionResponse<{
+export const getDispatchNotice = async (canCache: boolean = true): Promise<ServerActionResponse<{
   dispatch_notice: {
     id: number;
     content: string;
@@ -1096,7 +1088,7 @@ export const getDispatchNotice = async (): Promise<ServerActionResponse<{
   }, unknown>({
     endpoint: API_ROUTES.GET_DISPATCH_NOTICE,
     method: 'GET',
-    // canCache,
+    canCache,
   });
 };
 

@@ -106,7 +106,6 @@ export async function middleware(request: NextRequest) {
 
   return response
 }
-
 type SlugResult = { type: 'next' } | { type: 'redirect'; url: URL; temporary?: boolean } | { type: 'not-found' }
 
 async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {

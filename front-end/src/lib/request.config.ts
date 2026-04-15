@@ -13,11 +13,13 @@ type HandleRequest<G> =
       payload: G;
       method: 'POST' | 'PUT' | 'PATCH';
       canCache?: boolean;
+      cacheStrategy?: 'no-store' | 'force-cache' | { revalidate: number };
     }
   | {
       endpoint: string;
       method: 'GET' | 'DELETE';
       canCache?: boolean;
+      cacheStrategy?: 'no-store' | 'force-cache' | { revalidate: number };
     };
 
     const MAX_RETRIES = 1;
@@ -44,8 +46,22 @@ type HandleRequest<G> =
 export const handleRequest = async <T, G>(
     requestData: HandleRequest<G>
   ): Promise<ServerActionResponse<T>> => {
-    const { endpoint, method, canCache = false } = requestData;
+    const { endpoint, method, canCache = false, cacheStrategy } = requestData;
     const retries = method === 'GET' ? MAX_RETRIES : 0;
+    const resolvedCache = cacheStrategy
+      ? typeof cacheStrategy === 'string'
+        ? cacheStrategy
+        : 'force-cache'
+      : canCache
+        ? 'force-cache'
+        : 'no-store';
+    const resolvedNext = cacheStrategy
+      ? typeof cacheStrategy === 'string'
+        ? undefined
+        : { revalidate: cacheStrategy.revalidate }
+      : canCache
+        ? { revalidate: 60 }
+        : undefined;
     try {
       const headers = await buildHeaders(requestData, canCache);
       
@@ -63,8 +79,8 @@ export const handleRequest = async <T, G>(
         headers,
         body: buildRequestBody(requestData),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-        cache: canCache ? 'force-cache' : 'no-store',
-        next: canCache ? { revalidate: 60 } : undefined,
+        cache: resolvedCache,
+        next: resolvedNext,
       }, retries);
           
       const responseJson = await response.json();

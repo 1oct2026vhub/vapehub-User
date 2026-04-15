@@ -65,15 +65,6 @@ export const handleRequest = async <T, G>(
     try {
       const headers = await buildHeaders(requestData, canCache);
       
-      // Log API call request
-      // const hasPayloadData = ['POST', 'PUT', 'PATCH'].includes(method);
-      // console.log(`[API Request] ${method} ${endpoint}`, {
-      //   method,
-      //   endpoint,
-      //   hasPayload: hasPayloadData,
-      //   canCache,
-      // });
-      
       const response = await fetchWithRetry(endpoint, {
         method,
         headers,
@@ -92,10 +83,17 @@ export const handleRequest = async <T, G>(
           UNAUTHORIZED_RESPONSE_NAME,  
         }
       }
-  
-    //   if (response.status >= 500) {
-    //     throw new Error(INTERNAL_SERVER_ERROR);
-    //   }      
+
+      if (response.status >= 500) {
+        return {
+          status: ServerActionStatus.ERROR,
+          errorData: responseJson?.data ?? undefined,
+          message:
+            responseJson.error?.message ??
+            responseJson.message ??
+            'Oops! Something went wrong. Please try again later.',
+        };
+      }
       
       return responseJson.success
         ? {
@@ -114,14 +112,6 @@ export const handleRequest = async <T, G>(
         if (err instanceof Error) {
             errMessage = err.message; // ✅ Safe access to error message
           }
-      
-      // // Log API call error
-      // console.error(`[API Error] ${method} ${endpoint}`, {
-      //   method,
-      //   endpoint,
-      //   error: errMessage,
-      //   errorObject: err,
-      // });
       
       if (errMessage === UNAUTHORIZED_RESPONSE_NAME) {
         await handleUnauthorizedSession();

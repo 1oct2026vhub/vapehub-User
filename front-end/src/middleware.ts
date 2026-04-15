@@ -146,7 +146,7 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
       const res = await fetch(endpoint, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store',
+        next: { revalidate: 60 },
       })
       const json = await res.json() as SlugResponse
       // Log slug-relation responses to help debug 404 -> application error scenarios

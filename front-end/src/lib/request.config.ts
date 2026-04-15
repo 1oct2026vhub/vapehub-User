@@ -22,6 +22,7 @@ type HandleRequest<G> =
 
     const MAX_RETRIES = 1;
     const RETRY_DELAY = 1000; // in milliseconds
+    const REQUEST_TIMEOUT_MS = 5000;
 
     const fetchWithRetry = async (input: RequestInfo, init?: RequestInit, retries = MAX_RETRIES): Promise<Response> => {
       try {
@@ -61,6 +62,7 @@ export const handleRequest = async <T, G>(
         method,
         headers,
         body: buildRequestBody(requestData),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
         cache: canCache ? 'force-cache' : 'no-store',
         next: canCache ? { revalidate: 60 } : undefined,
       }, retries);

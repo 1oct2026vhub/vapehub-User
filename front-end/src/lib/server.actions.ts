@@ -635,7 +635,9 @@ export const deleteNotification = async (id: number): Promise<ServerActionRespon
 export const getFooterMenu = async (): Promise<FooterMenuResponse> => {
   try {
   
-    const response = await fetch(API_ROUTES.GET_FOOTER_MENU);
+    const response = await fetch(API_ROUTES.GET_FOOTER_MENU, {
+      next: { revalidate: 3600 },
+    });
     const data = await response.json();    
     return data;
   } catch (error) {

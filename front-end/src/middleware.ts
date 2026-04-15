@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import { ROUTES } from '@/lib/routes'
-import { API_ROUTES } from '@/lib/api-routes'
 
 // Response typing for slug-relation API
 type SlugData = {
   redirect?: boolean
   redirect_url?: string
+  redirect_type?: 'temporary' | 'permanent'
+  temporary?: boolean
   updatedAt?: string
   updated_at?: string
   seo?: { updatedAt?: string; updated_at?: string } | null
@@ -30,14 +31,11 @@ const protectedRoutes = [
   ROUTES.MY_ACCOUNT_SECURITY,
   ROUTES.MY_ACCOUNT_LOYALTY_POINTS, // Add loyalty points route
 ]
-const KNOWN_FIRST_SEGMENTS = new Set([
-  'shop', 'new-products', 'checkout', 'contact', 'delivery-information', 'faq',
-  'loyalty-points', 'privacy-policy', 'returns-policy', 'terms-conditions',
-  'shopping-cart', 'social-media', 'payment-failed', 'payment-success',
-  'blogs', 'page-not-found', 'vapehub-deals', 'brands', 'order-details',
-  'refer-a-friend', 'my-account','brand','product-deals',
-])
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL?.replace(/\/$/, '')
+if (!API_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_VAPE_HUB_API_BASE_URL is not configured')
+}
+const KNOWN_FIRST_SEGMENTS = buildKnownFirstSegments()
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -53,10 +51,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const token = await getToken({ req: request })
-
   // Check if the current path is in the protected routes
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
+    const token = await getToken({ req: request })
     if (!token) {
       // Redirect to login page if not authenticated
       const url = new URL(ROUTES.MY_ACCOUNT, request.url)
@@ -69,11 +66,7 @@ export async function middleware(request: NextRequest) {
   // Known routes (shop, contact, etc.) are never checked so they never get wrongly 404'd.
   let response: NextResponse
   const slugResult = await resolveSlugResult(request)
-  // If a redirect was found, log the target (no suppression — perform redirect normally).
   if (slugResult.type === 'redirect' && slugResult.url) {
-    // try {
-    //   console.log(`middleware detected redirect target -> ${slugResult.url.toString()}`)
-    // } catch {}
     const isTemp = !!(slugResult as { temporary?: boolean }).temporary
     const statusCode = isTemp ? 302 : 301
     response = NextResponse.redirect(slugResult.url, statusCode)
@@ -82,9 +75,6 @@ export async function middleware(request: NextRequest) {
     response.headers.set('Pragma', 'no-cache')
     response.headers.set('Expires', '0')
     response.headers.set('Surrogate-Control', 'no-store')
-    // try {
-    //   console.log(`middleware redirect ${statusCode} -> ${slugResult.url.toString()} (temporary=${isTemp})`)
-    // } catch {}
   } else if (slugResult.type === 'not-found') {
     // Rewrite to the existing 404 UI and force a real 404 status.
     // This avoids calling Next.js `notFound()` in dynamic route handlers (prevents hook mismatch).
@@ -137,22 +127,22 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
     return { type: 'next' }
   }
 
+  const slugResultCache = new Map<string, Promise<SlugResult>>()
+
   // Helper: call slug-relation API for a given slug and return a SlugResult
   async function fetchSlugRelation(slugToCheck: string): Promise<SlugResult> {
+    const cached = slugResultCache.get(slugToCheck)
+    if (cached) return cached
+
+    const fetchPromise = (async (): Promise<SlugResult> => {
     try {
-      const endpoint = API_ROUTES.GET_DYNAMIC_PAGE_SLUG(slugToCheck)
+      const endpoint = getDynamicPageSlugEndpoint(slugToCheck)
       const res = await fetch(endpoint, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         next: { revalidate: 60 },
       })
       const json = await res.json() as SlugResponse
-      // Log slug-relation responses to help debug 404 -> application error scenarios
-      // try {
-      //   console.log(`slug-relation(${slugToCheck}) ->`, JSON.stringify(json))
-      // } catch {
-      //   console.log(`slug-relation(${slugToCheck}) -> (non-serializable)`, json)
-      // }
       const isError = !res.ok || json.status === 'ERROR' || json.success === false
       if (isError) return { type: 'not-found' }
 
@@ -160,17 +150,7 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
         const normalized = normalizeRedirectUrl(json.data.redirect_url)
         if (normalized && normalized !== pathname) {
           const url = /^https?:\/\//i.test(normalized) ? new URL(normalized) : new URL(normalized, request.url)
-          // Determine whether this redirect was updated recently; if so, treat it as temporary (302)
-          const updatedAt = json.data.updatedAt || json.data.updated_at || json.data.seo?.updatedAt || json.data.seo?.updated_at
-          let temporary = false
-          if (updatedAt) {
-            const ts = Date.parse(updatedAt)
-            if (!isNaN(ts)) {
-              // If updated within last 5 minutes, mark as temporary to avoid issuing a new 301 that clients may cache
-              const FIVE_MIN = 5 * 60 * 1000
-              if ((Date.now() - ts) < FIVE_MIN) temporary = true
-            }
-          }
+          const temporary = resolveTemporaryRedirect(json.data)
           return { type: 'redirect', url, temporary }
         }
       }
@@ -178,6 +158,10 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
     } catch {
       return { type: 'next' }
     }
+    })()
+
+    slugResultCache.set(slugToCheck, fetchPromise)
+    return fetchPromise
   }
 
   // Special-case known routes that need to be checked before the KNOWN_FIRST_SEGMENTS guard
@@ -229,5 +213,45 @@ function normalizeRedirectUrl(input: string): string | null {
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: '/:path*',
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|api|.*\\..*).*)'],
 } 
+
+function getDynamicPageSlugEndpoint(slug: string): string {
+  return `${API_BASE_URL}/api/home/slug-relation?slugs=${encodeURIComponent(slug)}`
+}
+
+function resolveTemporaryRedirect(data: SlugData): boolean {
+  if (data.redirect_type === 'temporary') return true
+  if (data.redirect_type === 'permanent') return false
+  if (data.temporary === true) return true
+
+  // Backward-compatible fallback for older API responses that only include timestamps.
+  const updatedAt = data.updatedAt || data.updated_at || data.seo?.updatedAt || data.seo?.updated_at
+  if (!updatedAt) return false
+
+  const ts = Date.parse(updatedAt)
+  if (Number.isNaN(ts)) return false
+
+  const FIVE_MIN = 5 * 60 * 1000
+  return (Date.now() - ts) < FIVE_MIN
+}
+
+function buildKnownFirstSegments(): Set<string> {
+  const routeSegments = Object.values(ROUTES)
+    .filter((value): value is string => typeof value === 'string' && value.startsWith('/'))
+    .map((route) => route.split('/').filter(Boolean)[0])
+    .filter((segment): segment is string => Boolean(segment))
+
+  const staticSegments = [
+    'contact',
+    'delivery-information',
+    'privacy-policy',
+    'returns-policy',
+    'terms-conditions',
+    'social-media',
+    'page-not-found',
+    'product-deals',
+  ]
+
+  return new Set([...routeSegments, ...staticSegments])
+}

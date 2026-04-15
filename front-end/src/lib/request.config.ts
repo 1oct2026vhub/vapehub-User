@@ -20,7 +20,7 @@ type HandleRequest<G> =
       canCache?: boolean;
     };
 
-    const MAX_RETRIES = 0;
+    const MAX_RETRIES = 1;
     const RETRY_DELAY = 1000; // in milliseconds
 
     const fetchWithRetry = async (input: RequestInfo, init?: RequestInit, retries = MAX_RETRIES): Promise<Response> => {
@@ -44,6 +44,7 @@ export const handleRequest = async <T, G>(
     requestData: HandleRequest<G>
   ): Promise<ServerActionResponse<T>> => {
     const { endpoint, method, canCache = false } = requestData;
+    const retries = method === 'GET' ? MAX_RETRIES : 0;
     try {
       const headers = await buildHeaders(requestData, canCache);
       
@@ -62,7 +63,7 @@ export const handleRequest = async <T, G>(
         body: buildRequestBody(requestData),
         cache: canCache ? 'force-cache' : 'no-store',
         next: canCache ? { revalidate: 60 } : undefined,
-      }, MAX_RETRIES);
+      }, retries);
           
       const responseJson = await response.json();
 

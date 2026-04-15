@@ -213,46 +213,7 @@ function normalizeRedirectUrl(input: string): string | null {
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|api|.*\\..*).*)'],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|images|.*\\..*).*)',
+  ],
 } 
-
-function getDynamicPageSlugEndpoint(slug: string): string {
-  return `${API_BASE_URL}/api/home/slug-relation?slugs=${encodeURIComponent(slug)}`
-}
-
-function resolveTemporaryRedirect(data: SlugData): boolean {
-  if (data.redirect_type === 'temporary') return true
-  if (data.redirect_type === 'permanent') return false
-  if (data.temporary === true) return true
-
-  // Backward-compatible fallback for older API responses that only include timestamps.
-  const updatedAt = data.updatedAt || data.updated_at || data.seo?.updatedAt || data.seo?.updated_at
-  if (!updatedAt) return false
-
-  const ts = Date.parse(updatedAt)
-  if (Number.isNaN(ts)) return false
-
-  const FIVE_MIN = 5 * 60 * 1000
-  return (Date.now() - ts) < FIVE_MIN
-}
-
-function buildKnownFirstSegments(): Set<string> {
-  const routeSegments = Object.values(ROUTES)
-    .filter((value): value is string => typeof value === 'string' && value.startsWith('/'))
-    .map((route) => route.split('/').filter(Boolean)[0])
-    .filter((segment): segment is string => Boolean(segment))
-
-  const staticSegments = [
-    'contact',
-    'delivery-information',
-    'loyalty-points',
-    'privacy-policy',
-    'returns-policy',
-    'terms-conditions',
-    'social-media',
-    'page-not-found',
-    'product-deals',
-  ]
-
-  return new Set([...routeSegments, ...staticSegments])
-}

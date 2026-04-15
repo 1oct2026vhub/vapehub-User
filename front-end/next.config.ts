@@ -12,14 +12,14 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "vapehub-dev.s3.eu-central-1.amazonaws.com",
-        port: '',
         pathname: '/**',
       },
     ],
-    // Disable image optimization to preserve original quality and formats
-    // This prevents WebP conversion, compression, and filename changes
-    // Images will be served as-is with their original quality and format
-    unoptimized: true,
+    // Re-enable Next.js Image Optimization for smaller payloads and WebP/AVIF delivery.
+    // Note: `remotePatterns` controls which external hosts are allowed for `next/image`.
+    formats: ["image/avif", "image/webp"],
+    // Cache optimized images for at least 1 hour to avoid repeated CPU work.
+    minimumCacheTTL: 60 * 60,
   },
    experimental: {
     scrollRestoration: false,

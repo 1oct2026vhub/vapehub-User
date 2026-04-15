@@ -4,8 +4,6 @@ import { getToken } from 'next-auth/jwt'
 import { ROUTES } from '@/lib/routes'
 import { API_ROUTES } from '@/lib/api-routes'
 
-export const dynamic = "force-dynamic";
-
 // Response typing for slug-relation API
 type SlugData = {
   redirect?: boolean

@@ -56,10 +56,13 @@ export const cachedGetPromotionBanners = unstable_cache(
   { revalidate: DEFAULT_REVALIDATE_SECONDS }
 );
 
-export const cachedGetBlogs = async (group?: string | number) =>
+export const cachedGetBlogs = async (
+  group?: string | number,
+  filters?: { show_home_page?: boolean }
+) =>
   unstable_cache(
-    async () => getBlogList(group ?? ''),
-    ['dashboard-blogs', String(group ?? '')],
+    async () => getBlogList(group ?? '', filters),
+    ['dashboard-blogs', String(group ?? ''), JSON.stringify(filters ?? {})],
     { revalidate: DEFAULT_REVALIDATE_SECONDS }
   )();
 

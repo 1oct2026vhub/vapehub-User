@@ -6,11 +6,11 @@ import { ROUTES } from '@/lib/routes';
 import { Button } from '@nextui-org/button';
 import Link from 'next/link';
 import React from 'react'
-import { getBrandList } from '@/lib/server.actions'
+import { cachedGetBrandList } from '@/lib/cached.server'
 import { ServerActionStatus } from '@/lib/config/app.config'
 
 const HottestCollections: React.FC = async () => {
-    const brandsResponse = await getBrandList({ page: 1, limit: 10 });
+    const brandsResponse = await cachedGetBrandList({ page: 1, limit: 10 });
     if (brandsResponse.status !== ServerActionStatus.SUCCESS) {
         return <EmptyPlaceholder title='Uh, oh!' description='Failed to load brands' />;
     }

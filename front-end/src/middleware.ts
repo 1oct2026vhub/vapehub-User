@@ -245,6 +245,7 @@ function buildKnownFirstSegments(): Set<string> {
   const staticSegments = [
     'contact',
     'delivery-information',
+    'loyalty-points',
     'privacy-policy',
     'returns-policy',
     'terms-conditions',

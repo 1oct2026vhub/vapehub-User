@@ -1,4 +1,3 @@
-'use server';
 import {  
   ServerActionResponse,
   ServerActionStatus,

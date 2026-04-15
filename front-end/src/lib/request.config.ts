@@ -3,7 +3,6 @@ import {
   ServerActionStatus,
   UNAUTHORIZED_RESPONSE_NAME,
 } from '@/lib/config/app.config';
-import { cookies } from 'next/headers';
 import { getServerSessionData } from '@/lib/config/auth.config';
 import { handleUnauthorizedSession } from '@/lib/auth.actions';
 
@@ -129,13 +128,10 @@ const buildHeaders = async <G>(
   
     // Only fetch session and add Authorization header for non-cached (protected) APIs
     if (!canCache) {
-      const hasAuthCookie = await hasAuthSessionCookie();
-      if (hasAuthCookie) {
-        const session = await getServerSessionData();
-         
-        if (session?.user) {
-          headers.append('Authorization', `Bearer ${session.user.accessToken}`);
-        }
+      const session = await getServerSessionData();
+      
+      if (session?.user) {
+        headers.append('Authorization', `Bearer ${session.user.accessToken}`);
       }
     }
   
@@ -169,15 +165,5 @@ const buildHeaders = async <G>(
   
   const isFormData = <G>(payload: G | FormData): payload is FormData => {
     return payload instanceof FormData;
-  };
-
-  const hasAuthSessionCookie = async (): Promise<boolean> => {
-    const cookieStore = await cookies();
-    return Boolean(
-      cookieStore.get('next-auth.session-token') ||
-      cookieStore.get('__Secure-next-auth.session-token') ||
-      cookieStore.get('authjs.session-token') ||
-      cookieStore.get('__Secure-authjs.session-token')
-    );
   };
   

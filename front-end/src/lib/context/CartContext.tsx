@@ -108,7 +108,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
 
   // Calculate cart totals
-  const calculateTotals = (items: CartItem[]) => {
+  const calculateTotals = useCallback((items: CartItem[]) => {
     const total = items.reduce((sum, item) => {
       // Use discount_price if available, otherwise use regular price
       const effectivePrice = item.discount_price && parseFloat(item.discount_price) > 0 
@@ -122,10 +122,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCartSubtotal(normalized);
     setCartDiscount(0);
     setItemCount(items.length);
-  };
+  }, []);
 
   // Calculate guest deals and update cart totals
-  const calculateGuestDealsAndTotals = async (items: CartItem[]) => {
+  const calculateGuestDealsAndTotals = useCallback(async (items: CartItem[]) => {
     if (isAuthenticated || items.length === 0) {
       calculateTotals(items);
       return;
@@ -190,6 +190,23 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       // Fallback to local calculation if API fails
       calculateTotals(items);
     }
+  }, [isAuthenticated, calculateTotals]);
+
+  const isValidGuestCartItem = (item: unknown): item is CartItem => {
+    if (!item || typeof item !== 'object') return false;
+    const value = item as Partial<CartItem>;
+    return (
+      typeof value.product_id === 'number' &&
+      typeof value.variant_id === 'number' &&
+      typeof value.quantity === 'number' &&
+      typeof value.price === 'string' &&
+      typeof value.name === 'string'
+    );
+  };
+
+  const sanitizeGuestCart = (input: unknown): CartItem[] => {
+    if (!Array.isArray(input)) return [];
+    return input.filter(isValidGuestCartItem);
   };
 
   const loadCartItems = useCallback(async () => {
@@ -199,7 +216,32 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const response = await getCartItems();
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartData = response.data;
-          const cartItems: CartItem[] = cartData.items.map(bindCartItem);
+          const cartItems: CartItem[] = cartData.items.map((item) => {
+            const attributesName = item.variant.variantAttributes.map(attr => attr.term.name).join(', ');
+            const variantSlug = item.variant.variantAttributes[0]?.term?.slug ?? '';
+            return {
+              id: item.id,
+              product_id: item.product_id,
+              product_slug: item.product.slug,
+              name: attributesName ? `${item.product.name} - ${attributesName}` : item.product.name,
+              price: item.variant.price || '0',
+              discount_price: item.variant.discount_price || '0',
+              variant_id: item.variant_id,
+              stock: item.variant.stock_status === 'in_stock' ? item.variant.stock : 0,
+              slug: variantSlug,
+              description: item.variant.description,
+              ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
+              quantity: item.quantity,
+              subtotal: item.subtotal,
+              total: item.total,
+              applied_deals: item.applied_deals,
+              show_deal_toast: item.show_deal_toast,
+              deal_required_qty: item.deal_required_qty,
+              deal_qty_needed: item.deal_qty_needed,
+              deals: item.product.deals || [],
+              variantAttributes: item.variant.variantAttributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term.slug }))
+            };
+          });
           setCartItems(cartItems);
           if (cartData.summary) {
             setCartTotal(roundCurrency(cartData.summary.total));
@@ -212,8 +254,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         }
              } else {
          // Load from localStorage for guest users
-         const guestCart = getGuestCart<CartItem[]>();
-         if (guestCart) {
+         const guestCart = sanitizeGuestCart(getGuestCart<unknown>());
+         if (guestCart.length > 0) {
            setCartItems(guestCart);
            // For guest users, immediately calculate deals using API to prevent flicker
            await calculateGuestDealsAndTotals(guestCart);
@@ -222,8 +264,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
          } catch (error) {
        console.error('Error loading cart:', error);
        // Load from localStorage as fallback
-       const guestCart = getGuestCart<CartItem[]>();
-       if (guestCart) {
+      const guestCart = sanitizeGuestCart(getGuestCart<unknown>());
+      if (guestCart.length > 0) {
          setCartItems(guestCart);
          // For guest users, try API first, fallback to local calculation
          if (!isAuthenticated) {
@@ -240,7 +282,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
      } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, calculateGuestDealsAndTotals, calculateTotals]);
   
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -357,7 +399,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   // };
 
   const createGuestCartItem = (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]): CartItem => {
-    const id = Math.random();
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function'
+        ? crypto.getRandomValues(new Uint32Array(1))[0]
+        : Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
     // Use discount_price if available, otherwise use regular price
     const effectivePrice = data.discount_price && parseFloat(data.discount_price) > 0 
       ? parseFloat(data.discount_price) 
@@ -391,6 +436,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const event = ({ action, category, label, value }: { action: string, category: string, label: string, value: string }) => {
+      if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
       window.gtag('event', action, {
         event_category: category,
         event_label: label,
@@ -638,21 +684,21 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const syncCookieCart = async () => {
+  const syncCookieCart = useCallback(async () => {
 
     if (!isAuthenticated) return; // Only sync if user is authenticated
 
     // Try to load from localStorage first (new approach)
-    let guestCart = getGuestCart<CartItem[]>();
+    let guestCart = sanitizeGuestCart(getGuestCart<unknown>());
     
     // Fallback to cookie for backward compatibility (migrate old cookie data)
     if (!guestCart) {
       const cookieCart = getCookie(CART_COOKIE_NAME);
       if (cookieCart) {
         try {
-          guestCart = JSON.parse(cookieCart as string);
+          guestCart = sanitizeGuestCart(JSON.parse(cookieCart as string));
           // Migrate to localStorage
-          if (guestCart) {
+          if (guestCart.length > 0) {
             setGuestCart(guestCart);
             setCookie(CART_COOKIE_NAME, ''); // Clear old cookie
           }
@@ -662,7 +708,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
-    if (guestCart && guestCart.length > 0) {
+    if (guestCart.length > 0) {
       const cartItems = guestCart.map(item => ({
         product_id: item.product_id,
         variant_id: item.variant_id,
@@ -681,7 +727,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Failed to sync cart:', error);
       }
     }
-  };
+  }, [isAuthenticated, loadCartItems]);
 
   const checkoutStockValidation = async () => {
     if (isAuthenticated) {
@@ -735,10 +781,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const handleAuthChange = async () => {
       if (isAuthenticated && !hasAttemptedSync) {
         setHasAttemptedSync(true);
-        const guestCart = getGuestCart<CartItem[]>();
+        const guestCart = sanitizeGuestCart(getGuestCart<unknown>());
         // Also check cookie for backward compatibility
         const cookieCart = getCookie(CART_COOKIE_NAME);
-        if (guestCart && guestCart.length > 0) {
+        if (guestCart.length > 0) {
           await syncCookieCart();
         } else if (cookieCart) {
           try {
@@ -827,6 +873,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       discountValue: 0,
       message: null,
     });
+    removeGuestCart();
+    deleteCookie(CART_COOKIE_NAME);
     deleteCookie('couponDiscount');
     deleteCookie(LOYALTY_COOKIE_NAME);
   }, [loyaltyRedemption.pointsData, couponDiscount.mailSubscriptionData]);
@@ -1029,7 +1077,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         couponRevalidateTimeoutRef.current = null;
       }
     };
-  }, [cartTotal, itemCount, isLoading, couponDiscount.code, couponDiscount.isApplied, isAuthenticated, shippingMethodIdForCoupon]);
+  }, [cartTotal, itemCount, isLoading, couponDiscount.code, couponDiscount.isApplied, couponDiscount.mailSubscriptionData, isAuthenticated, shippingMethodIdForCoupon]);
 
   // Restore couponDiscount from cookie on mount
   useEffect(() => {

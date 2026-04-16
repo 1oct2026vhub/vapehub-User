@@ -31,14 +31,9 @@ const SelectAttributeTerms = ({
 
     return (
         <>
-            <div>
-                <p className='text-content-1 md:text-h5 font-semibold !font-oswald text-black capitalize'>
-                    {attributeTerm?.attribute.name}
-                </p>
-                <p className='primary-gradient-100 text-content-2 md:text-content-1'>
-                    {`${attributeTerm?.terms.length} available`}
-                </p>
-            </div>
+            <p className='text-content-1 md:text-h5 font-semibold !font-oswald text-black capitalize'>
+                {attributeTerm?.attribute.name}
+            </p>
             <select
                 value={selectedTerm || ''}
                 onChange={(e) => {

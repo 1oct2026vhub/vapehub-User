@@ -429,7 +429,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
                         <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
-                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{safeSubTotal.toFixed(2)}</p>
+                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{safeSubTotal}</p>
                     </div>
                 </div>
                 <Divider className='border-2' />

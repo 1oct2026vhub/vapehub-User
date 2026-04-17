@@ -10,7 +10,6 @@ import {
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { DynamicPageSlugResponse, FaqResponse, SeoMetaResponse } from "@/lib/config/global.config";
 import {
-  AttributeTerms,
   CategoryResponseData,
   ProductResponse,
 } from "@/lib/config/product.config";

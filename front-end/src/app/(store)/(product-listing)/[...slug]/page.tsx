@@ -351,16 +351,40 @@ export async function generateMetadata({ params, searchParams }: {
       });
     }
 
+    const buildVariantFirstTitle = (variantLabel: string, baseTitle: string): string => {
+      const normalizedBaseTitle = baseTitle.trim();
+      const normalizedVariant = variantLabel.trim();
+      const baseWithoutVariantPrefix = normalizedBaseTitle.toLowerCase().startsWith(normalizedVariant.toLowerCase())
+        ? normalizedBaseTitle.slice(normalizedVariant.length).trim()
+        : normalizedBaseTitle;
+      return `${normalizedVariant} ${baseWithoutVariantPrefix}`.replace(/\s+/g, " ").trim();
+    };
+
+    const buildVariantFirstDescription = (
+      variantLabel: string,
+      productName: string,
+      descriptionBase?: string,
+    ): string => {
+      const normalizedVariant = variantLabel.trim();
+      const normalizedProductName = productName.trim();
+      const prefix = `Buy ${normalizedVariant} ${normalizedProductName} at VapeHub.`;
+      const normalizedDescription = String(descriptionBase ?? "").trim();
+      if (!normalizedDescription) return prefix;
+      const cleanedDescription = normalizedDescription
+        .replace(/^buy\b[\s:-]*/i, "")
+        .replace(/^at vapehub[\s,.-]*/i, "")
+        .trim();
+      return cleanedDescription ? `${prefix} ${cleanedDescription}` : prefix;
+    };
+
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
     if (data && !data.variants.length) {
       const variantName = variant?.terms.name?.trim();
-      const titleBase = dynamicPageSlug.seo?.title ?? data.product.name;
-      const descriptionBase = dynamicPageSlug.seo?.description ?? data.product.description;
-      const title = variantName ? `${titleBase} - ${variantName}` : titleBase;
+      const titleBase = (dynamicPageSlug.seo?.title ?? data.product.name ?? "").trim();
+      const descriptionBase = dynamicPageSlug.seo?.description ?? data.product.description ?? "";
+      const title = variantName ? buildVariantFirstTitle(variantName, titleBase || data.product.name) : titleBase;
       const description = variantName
-        ? (String(descriptionBase ?? "").trim()
-            ? `${String(descriptionBase).trim()} - ${variantName}`
-            : `${data.product.name} - ${variantName}`)
+        ? buildVariantFirstDescription(variantName, data.product.name, descriptionBase)
         : descriptionBase;
       return {
         title,
@@ -378,13 +402,10 @@ export async function generateMetadata({ params, searchParams }: {
 
     const variantName = variant.terms.name.trim();
     const seoTitle = dynamicPageSlug.seo?.title?.trim();
-    const title = seoTitle
-      ? `${seoTitle} - ${variantName}`
-      : `${data.product.name} - ${variantName}`;
+    const titleBase = seoTitle || data.product.name;
+    const title = buildVariantFirstTitle(variantName, titleBase);
     const rawDescription = (dynamicPageSlug.seo?.description ?? data.product.description ?? "").trim();
-    const description = rawDescription
-      ? `${rawDescription} - ${variantName}`
-      : `${data.product.name} - ${variantName}`;
+    const description = buildVariantFirstDescription(variantName, data.product.name, rawDescription);
     const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
 
     return {

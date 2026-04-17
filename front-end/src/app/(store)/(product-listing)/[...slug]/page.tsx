@@ -160,7 +160,7 @@ const Page = async ({
 
     // Parallel fetch: Product (required), FAQ, Rating (optional)
     const entityId = dynamicPageSlug?.entity_id ?? 0;
-    const [productRes, _faqRes, ratingRes] = await Promise.allSettled([
+    const [productRes, , ratingRes] = await Promise.allSettled([
       fetchProduct(entityId, payload),
       getFaqs("product", entityId),
       getReviewOrderByProductId(entityId, 1, 1),
@@ -288,7 +288,7 @@ const Page = async ({
     },
     product: async () => {
       const entityId = dynamicPageSlug?.entity_id ?? 0;
-      const [productRes, _faqRes, ratingRes] = await Promise.allSettled([
+      const [productRes, , ratingRes] = await Promise.allSettled([
         fetchProduct(entityId, []),
         getFaqs("product", entityId),
         getReviewOrderByProductId(entityId, 1, 1),

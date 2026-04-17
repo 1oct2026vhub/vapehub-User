@@ -166,22 +166,64 @@ export function buildFaqSchema(faqs: FaqResponse[]): Record<string, unknown> | n
   };
 }
 
+function schemaPrimaryTypes(node: Record<string, unknown>): string[] {
+  const t = node["@type"];
+  if (typeof t === "string") return [t];
+  if (Array.isArray(t)) return t.filter((x): x is string => typeof x === "string");
+  return [];
+}
+
+function isFaqPageGraphNode(node: Record<string, unknown>): boolean {
+  return schemaPrimaryTypes(node).includes("FAQPage");
+}
+
+function extractFaqMainEntities(mainEntity: unknown): Record<string, unknown>[] {
+  if (!Array.isArray(mainEntity)) return [];
+  return mainEntity.filter(
+    (e): e is Record<string, unknown> =>
+      e !== null && typeof e === "object" && !Array.isArray(e),
+  );
+}
+
 /**
  * Deduplicate top-level schema nodes by serialized payload.
- * Useful as a final guard when building @graph arrays.
+ * Collapses multiple FAQPage nodes into one (merged mainEntity, question-level dedupe)
+ * so validators only see a single FAQPage instance per @graph.
  */
 export function dedupeSchemaGraphNodes(
   nodes: Array<Record<string, unknown> | null | undefined>,
 ): Record<string, unknown>[] {
   const seen = new Set<string>();
   const deduped: Record<string, unknown>[] = [];
+  const faqQuestionEntities: Record<string, unknown>[] = [];
 
   for (const node of nodes) {
     if (!node) continue;
+    if (isFaqPageGraphNode(node)) {
+      faqQuestionEntities.push(...extractFaqMainEntities(node["mainEntity"]));
+      continue;
+    }
     const key = JSON.stringify(node);
     if (seen.has(key)) continue;
     seen.add(key);
     deduped.push(node);
+  }
+
+  if (faqQuestionEntities.length > 0) {
+    const seenQuestion = new Set<string>();
+    const uniqueQuestions: Record<string, unknown>[] = [];
+    for (const q of faqQuestionEntities) {
+      const qKey = JSON.stringify(q);
+      if (seenQuestion.has(qKey)) continue;
+      seenQuestion.add(qKey);
+      uniqueQuestions.push(q);
+    }
+    if (uniqueQuestions.length > 0) {
+      deduped.push({
+        "@type": "FAQPage",
+        mainEntity: uniqueQuestions,
+      });
+    }
   }
 
   return deduped;

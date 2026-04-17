@@ -1,13 +1,12 @@
-import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug, getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
+import { getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { redirect, RedirectType } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
-import { DynamicPageSlugResponse, FaqResponse, SeoMetaResponse } from "@/lib/config/global.config";
-import { AttributeProductTerms, AttributeTerms, CategoryResponseData, ProductResponse, Product, ProductReview } from "@/lib/config/product.config";
-import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
+import { DynamicPageSlugResponse } from "@/lib/config/global.config";
+import { AttributeProductTerms, AttributeTerms, Product, ProductReview } from "@/lib/config/product.config";
 import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE } from "@/lib/api-routes";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";

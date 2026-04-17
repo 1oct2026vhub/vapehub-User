@@ -2,21 +2,19 @@
 
 import { FunctionComponent, ReactElement, useEffect, Suspense } from 'react';
 import Script from 'next/script';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { GATagPageView } from '@/lib/analytics/gtagHelper';
 
 const AnalyticsContent: FunctionComponent<{
   GA_MEASUREMENT_ID: string;
 }> = ({ GA_MEASUREMENT_ID }) => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
-      const url = pathname + searchParams.toString();
-      GATagPageView(GA_MEASUREMENT_ID, url);
+    if (process.env.NODE_ENV === 'production' && GA_MEASUREMENT_ID && pathname) {
+      GATagPageView(pathname);
     }
-  }, [pathname, searchParams, GA_MEASUREMENT_ID]);
+  }, [pathname, GA_MEASUREMENT_ID]);
 
   // if (process.env.NODE_ENV !== 'production') {
   //   return null;
@@ -36,9 +34,7 @@ const AnalyticsContent: FunctionComponent<{
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());              
                
-              gtag('config', '${GA_MEASUREMENT_ID}', {
-              page_path: window.location.pathname,
-              });
+              gtag('config', '${GA_MEASUREMENT_ID}');
           `}
       </Script>
     </>

@@ -5,19 +5,29 @@ import GlobalProvider from "@/providers/GlobalProvider";
 import { Toaster } from "sonner";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 
+const SITE_URL =
+  process.env.NEXTAUTH_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600", "700"],
+  weight: ["400", "500", "700"],
 });
 
 const openSans = Open_Sans({
   variable: "--font-opensans",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "600", "700"],
 });
 
+const TOASTER_CONFIG = {
+  richColors: true,
+  position: "top-right" as const,
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "VapeHub - The Ultimate Online Vape Store",
   description: "Vapehub is the one-stop shop for all your vaping needs! Our online store boasts all the popular brands and products at unbeatable prices with amazing deals.",
   icons: {
@@ -26,8 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "VapeHub - The Ultimate Online Vape Store",
     description: "Vapehub is the one-stop shop for all your vaping needs! Our online store boasts all the popular brands and products at unbeatable prices with amazing deals.",
-    url: process.env.NEXTAUTH_URL,
-    // url: "https://www.vapehub.devateam.com/",
+    url: SITE_URL,
     siteName: "VapeHub",
   },
 };
@@ -42,7 +51,7 @@ export default function RootLayout({
         <meta charSet='UTF-8' />
         <meta
           name='viewport'
-          content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+          content='width=device-width, initial-scale=1.0'
         />
         <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
         <GoogleAnalytics
@@ -53,10 +62,7 @@ export default function RootLayout({
         className={`m-0 min-h-screen bg-white text-skin-black font-opensans antialiased ${oswald.variable} ${openSans.variable}`}
       >
         <GlobalProvider>
-          <Toaster
-            richColors
-            position='top-right'
-          />
+          <Toaster {...TOASTER_CONFIG} />
           {children}
         </GlobalProvider>
       </body>

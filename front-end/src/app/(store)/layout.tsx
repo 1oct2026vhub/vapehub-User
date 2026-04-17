@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { getCategoryList, getFlashNews, getHeaderMegaMenu } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { FlashNewsItem } from '@/lib/config/global.config';
+import { HeaderMegaMenuResponse } from '@/lib/config/header.config';
 import HistoryProvider from "@/components/HistoryProvider";
 import NormalizeInternalLinks from "@/components/NormalizeInternalLinks";
 
@@ -23,21 +24,30 @@ export async function generateMetadata(): Promise<Metadata> {
 const StoreRootLayout = async ({
   children,
 }: Readonly<PropsWithChildren>): Promise<ReactElement> => {
-  const megaMenuResponse = await getHeaderMegaMenu();
-  if (megaMenuResponse.status !== ServerActionStatus.SUCCESS) {
-    return <div>{megaMenuResponse.message}</div>;
-  }
-  const megaMenu = megaMenuResponse.data;
+  const [megaMenuResult, categoryListResult, flashNewsResult] = await Promise.allSettled([
+    getHeaderMegaMenu(),
+    getCategoryList(),
+    getFlashNews(true),
+  ]);
 
-  const response = await getCategoryList();
-  if (response.status !== ServerActionStatus.SUCCESS) {
-    return <div>{response.message}</div>;
-  }
+  const megaMenu: HeaderMegaMenuResponse =
+    megaMenuResult.status === 'fulfilled' &&
+    megaMenuResult.value.status === ServerActionStatus.SUCCESS
+      ? megaMenuResult.value.data
+      : { data: [] };
 
-  const flashNewsResponse = await getFlashNews(true);
+  // Preserve category list fetch without hard-failing the whole store layout.
+  // Some downstream flows rely on this request path, but UI should degrade gracefully.
+  const categoryListResponse =
+    categoryListResult.status === 'fulfilled' ? categoryListResult.value : null;
+  void categoryListResponse;
+
   let flashNews: FlashNewsItem[] = [];
-  if (flashNewsResponse.status === ServerActionStatus.SUCCESS) {
-    flashNews = flashNewsResponse.data;
+  if (
+    flashNewsResult.status === 'fulfilled' &&
+    flashNewsResult.value.status === ServerActionStatus.SUCCESS
+  ) {
+    flashNews = flashNewsResult.value.data;
   }
 
   return (
@@ -55,7 +65,9 @@ const StoreRootLayout = async ({
           </div>
         </HistoryProvider>
       </Suspense>
-      <Footer />
+      <Suspense fallback={<div className="w-full max-w-[1520px] mx-auto" />}>
+        <Footer />
+      </Suspense>
     </div>
   )
 }

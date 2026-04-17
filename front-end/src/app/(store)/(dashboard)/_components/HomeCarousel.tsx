@@ -2,11 +2,11 @@ import React from 'react';
 import BannerSlider from './BannerSlider';
 import MobileBannerSlider from './MobileBannerSlider';
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
-import { getCarouselList } from '@/lib/server.actions';
+import { cachedGetCarouselList } from '@/lib/cached.server';
 import { ServerActionStatus } from '@/lib/config/app.config';
 
 const HomeCarousel = async () => {
-  const bannersResponse = await getCarouselList();
+  const bannersResponse = await cachedGetCarouselList();
 
   if (bannersResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load banners' />;

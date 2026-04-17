@@ -10,6 +10,7 @@ import RelatedProducts from './_components/RelatedProducts';
 import { ROUTES } from '@/lib/routes';
 import SuspenseLoader from '@/components/ui/SuspenseLoader';
 import { AttributeProductTerms, AttributeTerms, ProductResponse } from '@/lib/config/product.config';
+import { FaqResponse } from '@/lib/config/global.config';
 import { ReviewProvider } from '@/lib/context/ReviewContext';
 import { ProductDataProvider } from '@/lib/context/ProductDataContext';
 
@@ -17,9 +18,10 @@ type ProductViewProps = {
     data: ProductResponse;
     isVariant?: boolean;
     selectedVariant?: AttributeProductTerms;
+    productFaqs?: FaqResponse[];
 }
 
-const ProductView: FunctionComponent<ProductViewProps> = ({ data, selectedVariant }): ReactElement => {
+const ProductView: FunctionComponent<ProductViewProps> = ({ data, selectedVariant, productFaqs = [] }): ReactElement => {
 
     const productFeatures = data?.product?.attribute_terms.filter((attrTerm: AttributeTerms) => (attrTerm.attribute.is_visible_page && !attrTerm.attribute.used_in_variation));
     const breadcrumbs = [
@@ -62,7 +64,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({ data, selectedVarian
                         <ProductContent data={data} />
                     </Suspense>
                     <Suspense fallback={<SuspenseLoader height='h-40' />}>
-                        <FAQSection type="product" id={data.product.id} />
+                        <FAQSection type="product" id={data.product.id} initialFaqs={productFaqs} />
                     </Suspense>
                     <Suspense fallback={<SuspenseLoader height='h-64' />}>
                         <RelatedProducts viewAllHref={viewAllHref} currentProductId={data.product.id} />

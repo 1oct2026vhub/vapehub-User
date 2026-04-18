@@ -5,7 +5,7 @@ import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
 import { Category } from "./config/category.config";
-import { APPLY_COUPON_PAYLOAD, APPLY_GUEST_COUPON_PAYLOAD, CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from "./config/checkout.config";
+import { APPLY_COUPON_PAYLOAD, APPLY_GUEST_COUPON_PAYLOAD, CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD, SHOPPING_CART_CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse, SeoMetaResponse } from "./config/global.config";
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
@@ -364,9 +364,11 @@ export const getDynamicPageSlug = async (slug: string, canCache: boolean = true)
   return response;
 };
 
-// checkout
-export const checkout = async (payload: CHECKOUT_PAYLOAD): Promise<ServerActionResponse<{message: string}>> => {
-  const response = await handleRequest<{message: string}, unknown>({
+// checkout (full payload on checkout flow, or minimal payload from shopping cart)
+export const checkout = async (
+  payload: CHECKOUT_PAYLOAD | SHOPPING_CART_CHECKOUT_PAYLOAD
+): Promise<ServerActionResponse<{ message: string }>> => {
+  const response = await handleRequest<{ message: string }, unknown>({
     endpoint: API_ROUTES.CHECKOUT,
     payload,
     method: 'POST',

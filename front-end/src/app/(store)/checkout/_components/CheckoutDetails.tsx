@@ -29,6 +29,7 @@ import { getCookie } from 'cookies-next';
 import { GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config';
 import { CartItem } from '@/lib/config/cart.config';
 import { getGuestCart } from '@/lib/utils/storage';
+import { orderMeetsFreeShippingThreshold } from '@/lib/utils';
 
 interface CheckoutDetailsProps {
     shippingMethodsData: SHIPPING_METHOD_DATA[];
@@ -406,7 +407,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             // Formula: cartTotal - coupon - mail subscription discount - loyalty (no shipping)
             orderTotal = displaySubTotal - couponValue - mailSubscriptionDiscount - loyaltyValue;
         }
-        
         // Ensure no NaN values with final safety check (same as safeTotal in CartTotal.tsx line 166)
         const safeTotal = Number.isFinite(orderTotal) ? orderTotal : 0;
         
@@ -436,16 +436,15 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                     return true;
                 }
                 
-                // If threshold is set, check if safeTotal meets the requirement
+                // If threshold is set, check if safeTotal meets the requirement (pence-safe vs float sum in cart)
                 const threshold = parseFloat(freeShippingThreshold);
                 if (Number.isFinite(threshold) && threshold > 0) {
-                    return safeTotal >= threshold;
+                    return orderMeetsFreeShippingThreshold(safeTotal, freeShippingThreshold);
                 }
             }
             
             return false;
         });
-
 
         // Sort methods to prioritize free shipping methods that meet the threshold
         const sortedMethods = [...filteredMethods].sort((a, b) => {

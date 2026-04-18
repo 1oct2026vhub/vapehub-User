@@ -3,7 +3,7 @@ import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import { BannerResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 import React, { memo } from 'react';
-import { getPromotionBanner } from '@/lib/server.actions';
+import { cachedGetPromotionBanners } from '@/lib/cached.server';
 import { ServerActionStatus } from '@/lib/config/app.config';
 
 interface BannerImageProps {
@@ -37,7 +37,7 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
 BannerImage.displayName = 'BannerImage';
 
 const PromotionalBanners: React.FC = async () => {
-  const bannersResponse = await getPromotionBanner();
+  const bannersResponse = await cachedGetPromotionBanners();
   if (bannersResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load banners' />;
   }

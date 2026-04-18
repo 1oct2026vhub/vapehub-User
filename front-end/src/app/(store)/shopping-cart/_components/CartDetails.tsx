@@ -26,8 +26,6 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
     const { cartTotal, itemCount, couponDiscount, setCouponDiscount, checkoutStockValidation, stockValidationLoading, setIsRemoveCoupon, cartItems, cartSubtotal, cartDiscount } = useCart();
     const router = useRouter();
     const [selectedShippingMethod, setSelectedShippingMethod] = useState<SHIPPING_METHOD_DATA | null>(null);
-    console.log("shippingMethodsData",shippingMethodsData);
-    
     // Initialize selected shipping method when shipping methods data is available
     useEffect(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {

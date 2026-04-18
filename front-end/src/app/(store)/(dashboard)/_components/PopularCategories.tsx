@@ -3,7 +3,8 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
-import { getProductByCategory, getHomeBlocks } from "@/lib/server.actions";
+import { getHomeBlocks } from "@/lib/server.actions";
+import { cachedGetCategoryProducts } from "@/lib/cached.server";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
@@ -40,7 +41,7 @@ const PopularCategories: FunctionComponent = async (): Promise<ReactElement> => 
       const description = popularCategory.description;
       const viewAllHref = `/${slug}`;
 
-      const catResponse = await getProductByCategory(slug, { order: "DESC", limit: 10, offset: 0, homepage: 1 });
+      const catResponse = await cachedGetCategoryProducts(slug, { order: "DESC", limit: 10, offset: 0, homepage: 1 });
       if (catResponse.status !== ServerActionStatus.SUCCESS) {
         return null;
       }

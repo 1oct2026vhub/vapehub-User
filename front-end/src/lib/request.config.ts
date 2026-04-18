@@ -1,4 +1,3 @@
-'use server';
 import {  
   ServerActionResponse,
   ServerActionStatus,
@@ -14,15 +13,18 @@ type HandleRequest<G> =
       payload: G;
       method: 'POST' | 'PUT' | 'PATCH';
       canCache?: boolean;
+      cacheStrategy?: 'no-store' | 'force-cache' | { revalidate: number };
     }
   | {
       endpoint: string;
       method: 'GET' | 'DELETE';
       canCache?: boolean;
+      cacheStrategy?: 'no-store' | 'force-cache' | { revalidate: number };
     };
 
-    const MAX_RETRIES = 0;
+    const MAX_RETRIES = 1;
     const RETRY_DELAY = 1000; // in milliseconds
+    const REQUEST_TIMEOUT_MS = 5000;
 
     const fetchWithRetry = async (input: RequestInfo, init?: RequestInit, retries = MAX_RETRIES): Promise<Response> => {
       try {
@@ -44,26 +46,33 @@ type HandleRequest<G> =
 export const handleRequest = async <T, G>(
     requestData: HandleRequest<G>
   ): Promise<ServerActionResponse<T>> => {
-    const { endpoint, method, canCache = false } = requestData;
+    const { endpoint, method, canCache = false, cacheStrategy } = requestData;
+    const retries = method === 'GET' ? MAX_RETRIES : 0;
+    const resolvedCache = cacheStrategy
+      ? typeof cacheStrategy === 'string'
+        ? cacheStrategy
+        : 'force-cache'
+      : canCache
+        ? 'force-cache'
+        : 'no-store';
+    const resolvedNext = cacheStrategy
+      ? typeof cacheStrategy === 'string'
+        ? undefined
+        : { revalidate: cacheStrategy.revalidate }
+      : canCache
+        ? { revalidate: 60 }
+        : undefined;
     try {
       const headers = await buildHeaders(requestData, canCache);
-      
-      // Log API call request
-      // const hasPayloadData = ['POST', 'PUT', 'PATCH'].includes(method);
-      // console.log(`[API Request] ${method} ${endpoint}`, {
-      //   method,
-      //   endpoint,
-      //   hasPayload: hasPayloadData,
-      //   canCache,
-      // });
       
       const response = await fetchWithRetry(endpoint, {
         method,
         headers,
         body: buildRequestBody(requestData),
-        cache: canCache ? 'force-cache' : 'no-store',
-        next: canCache ? { revalidate: 60 } : undefined,
-      }, MAX_RETRIES);
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        cache: resolvedCache,
+        next: resolvedNext,
+      }, retries);
           
       const responseJson = await response.json();
 
@@ -74,10 +83,17 @@ export const handleRequest = async <T, G>(
           UNAUTHORIZED_RESPONSE_NAME,  
         }
       }
-  
-    //   if (response.status >= 500) {
-    //     throw new Error(INTERNAL_SERVER_ERROR);
-    //   }      
+
+      if (response.status >= 500) {
+        return {
+          status: ServerActionStatus.ERROR,
+          errorData: responseJson?.data ?? undefined,
+          message:
+            responseJson.error?.message ??
+            responseJson.message ??
+            'Oops! Something went wrong. Please try again later.',
+        };
+      }
       
       return responseJson.success
         ? {
@@ -96,14 +112,6 @@ export const handleRequest = async <T, G>(
         if (err instanceof Error) {
             errMessage = err.message; // ✅ Safe access to error message
           }
-      
-      // // Log API call error
-      // console.error(`[API Error] ${method} ${endpoint}`, {
-      //   method,
-      //   endpoint,
-      //   error: errMessage,
-      //   errorObject: err,
-      // });
       
       if (errMessage === UNAUTHORIZED_RESPONSE_NAME) {
         await handleUnauthorizedSession();
@@ -127,7 +135,7 @@ const buildHeaders = async <G>(
     // Only fetch session and add Authorization header for non-cached (protected) APIs
     if (!canCache) {
       const session = await getServerSessionData();
-       
+      
       if (session?.user) {
         headers.append('Authorization', `Bearer ${session.user.accessToken}`);
       }

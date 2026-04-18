@@ -15,6 +15,7 @@ import { APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
 import { useSession } from 'next-auth/react'
 import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'
+import { calculateOrderGrandTotal } from '@/lib/utils/checkout-order.utils'
 
 interface CartTotalProps {
     shippingMethodsData: SHIPPING_METHOD_DATA[];
@@ -330,25 +331,13 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         ? couponDiscount.mailSubscriptionDiscount
         : 0;
     
-    // Total calculation:
-    // When coupon is applied: cartTotal (with deals) - coupon discount - mail subscription discount + shipping - loyalty
-    // When no coupon: cartTotal + shipping - coupon discount - mail subscription discount - loyalty discount
-    let displayTotal: number;
-    if (couponDiscount.isApplied && couponDiscount.value !== undefined && Number.isFinite(couponDiscount.value)) {
-        // Use cartTotal (includes deals) as base, then apply coupon discount
-        // This ensures deal discounts are preserved in the calculation
-        const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
-        const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
-        // Formula: (cartTotal with deals) - coupon discount - mail subscription discount + shipping - loyalty
-        displayTotal = displaySubTotal - couponValue - mailSubscriptionDiscount + safeShippingCost - loyaltyValue;
-    } else {
-        // Calculate locally: cartTotal + shipping - coupon - mail subscription discount - loyalty
-        const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
-        const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
-        displayTotal = displaySubTotal + safeShippingCost - couponValue - mailSubscriptionDiscount - loyaltyValue;
-    }
-    
-    // Ensure no NaN values with final safety check
+    const displayTotal = calculateOrderGrandTotal(
+        cartTotal,
+        couponDiscount,
+        { isRedeemed, discountValue: loyaltyDiscountValue },
+        safeShippingCost
+    )
+
     const safeSubTotal = Number.isFinite(displaySubTotal) ? displaySubTotal : 0;
     const safeTotal = Number.isFinite(displayTotal) ? displayTotal : 0;
     

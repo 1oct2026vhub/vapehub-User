@@ -1,0 +1,182 @@
+import { z } from 'zod'
+import type { CHECKOUT_FORM_TYPE } from '@/lib/config/checkout.config'
+import type { CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config'
+import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils'
+import { orderMeetsFreeShippingThreshold } from '@/lib/utils'
+import type { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
+
+/** Slice of coupon state used for order totals (matches CartContext / CartTotal shape). */
+export type CheckoutCouponSlice = {
+  isApplied: boolean
+  value?: number
+  mailSubscriptionDiscount?: number
+}
+
+export type CheckoutLoyaltySlice = {
+  isRedeemed: boolean
+  discountValue?: number | null
+}
+
+/**
+ * Net merchandise total before shipping: cart (with deals) − coupon − mail subscription − loyalty.
+ * Used for free-shipping threshold checks (same basis as CartTotal display, excluding shipping).
+ */
+export function calculateOrderTotalBeforeShipping(
+  cartTotal: number,
+  couponDiscount: CheckoutCouponSlice,
+  loyalty: CheckoutLoyaltySlice
+): number {
+  const displaySubTotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0
+  const mailSubscriptionDiscount =
+    couponDiscount.mailSubscriptionDiscount !== undefined &&
+    Number.isFinite(couponDiscount.mailSubscriptionDiscount)
+      ? couponDiscount.mailSubscriptionDiscount
+      : 0
+  const couponValue = Number.isFinite(couponDiscount.value) ? (couponDiscount.value ?? 0) : 0
+  const loyaltyValue =
+    loyalty.isRedeemed && Number.isFinite(loyalty.discountValue) ? (loyalty.discountValue ?? 0) : 0
+  const orderTotal = displaySubTotal - couponValue - mailSubscriptionDiscount - loyaltyValue
+  return Number.isFinite(orderTotal) ? orderTotal : 0
+}
+
+/** Customer-facing grand total including shipping (matches consolidated CartTotal formula). */
+export function calculateOrderGrandTotal(
+  cartTotal: number,
+  couponDiscount: CheckoutCouponSlice,
+  loyalty: CheckoutLoyaltySlice,
+  shippingCost: number
+): number {
+  const safeShipping = Number.isFinite(shippingCost) ? shippingCost : 0
+  const net = calculateOrderTotalBeforeShipping(cartTotal, couponDiscount, loyalty)
+  const total = net + safeShipping
+  return Number.isFinite(total) ? total : 0
+}
+
+/**
+ * Total sent on place-order / guest-checkout payloads (legacy behaviour: cart − coupon − loyalty only).
+ * Backend may reconcile; keep aligned with previous client contract unless API changes.
+ */
+export function calculateCheckoutPayloadTotal(
+  cartTotal: number,
+  couponValue: number | undefined,
+  loyaltyDiscountValue: number | undefined
+): number {
+  const sub = Number.isFinite(cartTotal) ? cartTotal : 0
+  const coupon = Number.isFinite(couponValue) ? (couponValue ?? 0) : 0
+  const loyalty = Number.isFinite(loyaltyDiscountValue) ? (loyaltyDiscountValue ?? 0) : 0
+  const t = sub - coupon - loyalty
+  return Number.isFinite(t) ? t : 0
+}
+
+export function buildAuthShippingAddress(
+  data: CHECKOUT_FORM_TYPE
+): CHECKOUT_PAYLOAD['shipping_address'] {
+  return {
+    first_name: data.shippingFirstName || '',
+    last_name: data.shippingLastName || '',
+    address_line_1: data.shippingAddress1 || '',
+    address_line_2: data.shippingAddress2 || '',
+    city: data.shippingCity || '',
+    region: data.shippingRegion || '',
+    country: data.shippingCountry || DEFAULT_COUNTRY,
+    post_code: data.shippingPostcode || ''
+  }
+}
+
+export function buildGuestShippingAddress(
+  data: CHECKOUT_FORM_TYPE
+): GUEST_CHECKOUT_AND_ORDER_PAYLOAD['shipping_address'] {
+  return {
+    ...buildAuthShippingAddress(data),
+    shipping_address_id: null
+  }
+}
+
+export function buildBillingAddressPayload(
+  data: CHECKOUT_FORM_TYPE
+): CHECKOUT_PAYLOAD['billing_address'] {
+  const different = data.useDifferentBillingAddress
+  return {
+    first_name: !different ? data.shippingFirstName || '' : data.billingFirstName || '',
+    last_name: !different ? data.shippingLastName || '' : data.billingLastName || '',
+    address_line_1: !different ? data.shippingAddress1 || '' : data.billingAddress1 || '',
+    address_line_2: !different ? data.shippingAddress2 || '' : data.billingAddress2 || '',
+    city: !different ? data.shippingCity || '' : data.billingCity || '',
+    region: !different ? data.shippingRegion || '' : data.billingRegion || '',
+    country: !different ? data.shippingCountry || DEFAULT_COUNTRY : data.billingCountry || DEFAULT_COUNTRY,
+    post_code: !different ? data.shippingPostcode || '' : data.billingPostcode || ''
+  }
+}
+
+/** API field: true when billing matches shipping (inverse of “different billing” checkbox). */
+export function toApiUseShippingAsBilling(data: CHECKOUT_FORM_TYPE): boolean {
+  return !data.useDifferentBillingAddress
+}
+
+const worldPayOrderDataSchema = z.object({
+  order_code: z.union([z.string(), z.number()]).transform((v) => String(v)),
+  worldpay_url: z.string().min(1)
+})
+
+export function parseWorldPayPlaceOrderData(data: unknown): { order_code: string; worldpay_url: string } | null {
+  const r = worldPayOrderDataSchema.safeParse(data)
+  return r.success ? r.data : null
+}
+
+type EnabledShippingOptions = {
+  enabledMethods: SHIPPING_METHOD_DATA[]
+  filteredSortedMethods: SHIPPING_METHOD_DATA[]
+  safeTotalForThreshold: number
+}
+
+/**
+ * From raw API shipping list + cart/coupon state, derive enabled methods and threshold-filtered list.
+ */
+export function deriveShippingMethodsForCheckout(
+  shippingMethodsData: SHIPPING_METHOD_DATA[] | undefined,
+  cartTotal: number,
+  couponDiscount: CheckoutCouponSlice,
+  loyalty: CheckoutLoyaltySlice
+): EnabledShippingOptions {
+  if (!shippingMethodsData?.length) {
+    return { enabledMethods: [], filteredSortedMethods: [], safeTotalForThreshold: 0 }
+  }
+
+  const enabledMethods = shippingMethodsData
+    .filter((method) => method.is_enabled && !method.deletedAt)
+    .sort((a, b) => a.method_order - b.method_order)
+
+  const safeTotal = calculateOrderTotalBeforeShipping(cartTotal, couponDiscount, loyalty)
+
+  const filteredMethods = enabledMethods.filter((method) => {
+    const isEnabled = method.is_enabled ?? false
+    const isFreeShipping = method.is_free_shipping ?? false
+    const freeShippingThreshold = method.free_shipping_threshold
+
+    if (!isEnabled) return false
+    if (!isFreeShipping) return true
+
+    if (!freeShippingThreshold) return true
+
+    const threshold = parseFloat(freeShippingThreshold)
+    if (Number.isFinite(threshold) && threshold > 0) {
+      return orderMeetsFreeShippingThreshold(safeTotal, freeShippingThreshold)
+    }
+    return false
+  })
+
+  const sortedMethods = [...filteredMethods].sort((a, b) => {
+    const aIsFree = a.is_free_shipping ?? false
+    const bIsFree = b.is_free_shipping ?? false
+    if (aIsFree && bIsFree) return 0
+    if (aIsFree && !bIsFree) return -1
+    if (!aIsFree && bIsFree) return 1
+    return 0
+  })
+
+  return {
+    enabledMethods,
+    filteredSortedMethods: sortedMethods,
+    safeTotalForThreshold: safeTotal
+  }
+}

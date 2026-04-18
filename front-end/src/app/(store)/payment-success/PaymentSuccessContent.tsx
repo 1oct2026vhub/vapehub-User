@@ -12,6 +12,8 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useCart } from '@/lib/context/CartContext';
 
+const WORLDPAY_LOCK_ATTR = 'data-worldpay-payment-lock'
+
 const PaymentSuccessContent = () => {
     const searchParams = useSearchParams();
     const { status } = useSession();
@@ -26,6 +28,12 @@ const PaymentSuccessContent = () => {
     const [isVerifyingPayment, setIsVerifyingPayment] = useState(true);
     const hasApiBeenCalledRef = useRef(false);
     const isProcessingRef = useRef(false);
+
+    useEffect(() => {
+        return () => {
+            document.documentElement.removeAttribute(WORLDPAY_LOCK_ATTR)
+        }
+    }, [])
 
     useEffect(() => {
         // Prevent multiple executions
@@ -78,7 +86,8 @@ const PaymentSuccessContent = () => {
 
                 // If Worldpay parameters are present, call Worldpay success API
                 if (isWorldpayPayment) {
-                    
+                    document.documentElement.setAttribute(WORLDPAY_LOCK_ATTR, 'true')
+
                     const worldpayPayload = {
                         orderCode,
                         currency,
@@ -95,7 +104,7 @@ const PaymentSuccessContent = () => {
                         ...prev,
                         ...newTransactionDetails
                     }));
-                    
+
                     try {
                         const worldpayResponse = await worldpayPaymentSuccess(worldpayPayload);                        
                         // Check if response is valid and has expected structure
@@ -142,6 +151,8 @@ const PaymentSuccessContent = () => {
                         
                         setIsVerifyingPayment(false);
                         return;
+                    } finally {
+                        document.documentElement.removeAttribute(WORLDPAY_LOCK_ATTR)
                     }
                 }
 

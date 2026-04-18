@@ -30,24 +30,29 @@ const CheckoutPageClient: NextPage<CheckoutPageClientProps> = ({
     initialShippingMethods ?? []
   )
 
-  const productIds = React.useMemo(
-    () => Array.from(new Set(cartItems.map((item) => item.product_id))),
-    [cartItems]
-  )
+  // Stable primitive so the effect does not re-run when only quantity changes (cartItems
+  // gets a new array reference but the set of product_id values is unchanged).
+  const productIdsSignature = React.useMemo(() => {
+    const ids = [...new Set(cartItems.map((item) => item.product_id))].sort((a, b) => a - b)
+    return ids.join(',')
+  }, [cartItems])
 
   React.useEffect(() => {
+    if (!productIdsSignature) {
+      setReviews([])
+      return
+    }
+
+    const ids = productIdsSignature.split(',').map(Number)
+
     const fetchReviews = async () => {
-      const reviewPromises = productIds.map((id) => getReviewOrderByProductId(id, 1, 1))
+      const reviewPromises = ids.map((id) => getReviewOrderByProductId(id, 1, 1))
       const reviewResponses = await Promise.all(reviewPromises)
       setReviews(reviewResponses.filter((r) => r.status === ServerActionStatus.SUCCESS))
     }
 
-    if (productIds.length > 0) {
-      fetchReviews()
-    } else {
-      setReviews([])
-    }
-  }, [productIds])
+    fetchReviews()
+  }, [productIdsSignature])
 
   React.useEffect(() => {
     if (initialShippingMethods && initialShippingMethods.length > 0) return

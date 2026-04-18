@@ -445,6 +445,8 @@ export interface CouponResponse {
     total: number;
     coupon: Coupon;
     discount_amount?: number; // Discount amount from API
+    /** Loyalty-only discount when applying coupon with loyalty flag (shape varies by endpoint). */
+    loyalty_discount?: number | string;
     referral_value: number;
     referral_value_type: "percentage" | "fixed";
     mail_subscription_data?: {

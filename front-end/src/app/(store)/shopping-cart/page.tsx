@@ -12,6 +12,7 @@ import { useFeatureData } from '@/lib/hooks/useFeatureData'
 import { getShippingMethods } from '@/lib/server.actions'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
+import { toast } from 'sonner'
 
 const ShoppingCartPage: NextPage = (): ReactElement => {
     const { cartItems } = useCart();
@@ -23,9 +24,12 @@ const ShoppingCartPage: NextPage = (): ReactElement => {
             const response = await getShippingMethods();
             if (response.status === ServerActionStatus.SUCCESS) {
                 setShippingMethods(response.data || []);
+            } else {
+                setShippingMethods([]);
+                toast.error(response.message || 'Could not load shipping methods.');
             }
         };
-        fetchShipping();
+        void fetchShipping();
     }, []);
     if (cartItems.length === 0) {
         return (
@@ -51,8 +55,11 @@ const ShoppingCartPage: NextPage = (): ReactElement => {
             <section className='flex items-start flex-col-reverse lg:flex-row gap-6 xl:gap-10'>
                 <div className='flex flex-col gap-3.5 md:gap-7.5 w-full'>
                     {
-                        cartItems.map((item, idx) => (
-                            <ShoppingCartCard key={item.id || idx} item={item} />
+                        cartItems.map((item) => (
+                            <ShoppingCartCard
+                                key={item.id != null ? String(item.id) : `${item.product_id}-${item.variant_id}`}
+                                item={item}
+                            />
                         ))
                     }
                     

@@ -184,6 +184,11 @@ export interface CHECKOUT_PAYLOAD {
     loyalty?: boolean;
 }
 
+/** Minimal POST body from the shopping cart before the full checkout form (API uses session + coupon). */
+export interface SHOPPING_CART_CHECKOUT_PAYLOAD {
+    couponCode?: string;
+}
+
 export interface GUEST_CHECKOUT_AND_ORDER_PAYLOAD {
     email: string;
     first_name: string;

@@ -1164,5 +1164,11 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
 }
 /* .table , tr, td { border : 1px solid #000 ! important; } */
 
+/* Payment success (Worldpay): block header/search/mega-menu clicks until verification API finishes */
+html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
+  pointer-events: none;
+  user-select: none;
+}
+
 
 

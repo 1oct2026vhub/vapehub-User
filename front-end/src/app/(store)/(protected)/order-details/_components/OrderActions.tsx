@@ -120,7 +120,6 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
 
     }
     const handleDeleteReview = async (productId: number) => {
-        console.log("productId", productId);
         setIsLoading(true);
         const response = await deleteReviewOrder(currentReviewId)
         if (response.status === ServerActionStatus.SUCCESS) {

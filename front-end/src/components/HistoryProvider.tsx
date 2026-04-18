@@ -65,7 +65,7 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
       try {
         sessionStorage.setItem(`scrollPos_${pageKey}`, window.scrollY.toString());
       } catch (e) {
-        console.log(e);
+        console.error(e);
         // Ignore storage errors (e.g., quota exceeded)
       }
     };
@@ -138,7 +138,7 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
           window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
       isRestoringRef.current = false;
       return;
@@ -180,7 +180,7 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
       isRestoringRef.current = false;
     };

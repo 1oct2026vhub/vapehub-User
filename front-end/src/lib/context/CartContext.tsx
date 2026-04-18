@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { LoyaltyPointsRedemptionResponse } from '../config/loyalty-points.config';
 import { CouponResponse } from '../config/order.config';
 import { roundCurrency } from '../utils';
+import { parseApiMoney } from '../utils/checkout-order.utils';
 
 interface CouponDiscount {
   value: number;
@@ -497,6 +498,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         setGuestCart(updatedCart);
         // Immediately calculate deals using API to prevent flicker
         await calculateGuestDealsAndTotals(updatedCart);
+        if (couponDiscount.isApplied && couponDiscount.code) {
+          await revalidateGuestCoupon(updatedCart, shippingMethodIdForCoupon);
+        }
         toast.success(`${productName} added to cart successfully`);
       }
 
@@ -511,6 +515,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       // Try API first, fallback to local calculation if API fails
       try {
         await calculateGuestDealsAndTotals(updatedCart);
+        if (couponDiscount.isApplied && couponDiscount.code) {
+          await revalidateGuestCoupon(updatedCart, shippingMethodIdForCoupon);
+        }
       } catch (apiError) {
         console.error('API failed, using local calculation:', apiError);
         calculateTotals(updatedCart);
@@ -636,6 +643,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
          // For guest users, recalculate deals using API if cart is not empty
          if (updatedCart.length > 0) {
            await calculateGuestDealsAndTotals(updatedCart);
+           if (couponDiscount.isApplied && couponDiscount.code) {
+             await revalidateGuestCoupon(updatedCart, shippingMethodIdForCoupon);
+           }
          } else {
            calculateTotals(updatedCart);
          }
@@ -662,6 +672,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
        if (!isAuthenticated && updatedCart.length > 0) {
          try {
            await calculateGuestDealsAndTotals(updatedCart);
+           if (couponDiscount.isApplied && couponDiscount.code) {
+             await revalidateGuestCoupon(updatedCart, shippingMethodIdForCoupon);
+           }
          } catch (apiError) {
            console.error('API failed, using local calculation:', apiError);
            calculateTotals(updatedCart);
@@ -931,19 +944,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const couponData: CouponResponse = response.data;
         // Use discount_amount directly from API response
         const discountAmount = couponData.discount_amount || 0;
-        // Parse values - handle both number and string types from API (API sometimes returns strings)
-        const apiSubTotalValue = couponData.subTotal as number | string;
-        const apiSubTotal = typeof apiSubTotalValue === 'string' 
-          ? parseFloat(apiSubTotalValue.replace(/[^\d.-]/g, '')) || 0
-          : (Number.isFinite(apiSubTotalValue) ? apiSubTotalValue : 0);
-        const apiTotalValue = couponData.total as number | string;
-        const apiTotal = typeof apiTotalValue === 'string'
-          ? parseFloat(apiTotalValue.replace(/[^\d.-]/g, '')) || 0
-          : (Number.isFinite(apiTotalValue) ? apiTotalValue : 0);
-        const apiShippingCostValue = couponData.shippingCost as number | string;
-        const apiShippingCost = typeof apiShippingCostValue === 'string'
-          ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
-          : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
+        const apiSubTotal = parseApiMoney(couponData.subTotal);
+        const apiTotal = parseApiMoney(couponData.total);
+        const apiShippingCost = parseApiMoney(couponData.shippingCost);
         
         // Extract mail subscription discount from API response
         const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
@@ -1014,19 +1017,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       // Check for valid response with total and coupon data (not just referral_value)
       if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.total != null && response.data.coupon) {
         const couponData: CouponResponse = response.data;
-        // Parse values - handle both number and string types from API (API sometimes returns strings)
-        const apiSubTotalValue = couponData.subTotal as number | string;
-        const apiSubTotal = typeof apiSubTotalValue === 'string'
-          ? parseFloat(apiSubTotalValue.replace(/[^\d.-]/g, '')) || 0
-          : (Number.isFinite(apiSubTotalValue) ? apiSubTotalValue : 0);
-        const apiTotalValue = couponData.total as number | string;
-        const apiTotal = typeof apiTotalValue === 'string'
-          ? parseFloat(apiTotalValue.replace(/[^\d.-]/g, '')) || 0
-          : (Number.isFinite(apiTotalValue) ? apiTotalValue : 0);
-        const apiShippingCostValue = couponData.shippingCost as number | string;
-        const apiShippingCost = typeof apiShippingCostValue === 'string'
-          ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
-          : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
+        const apiSubTotal = parseApiMoney(couponData.subTotal);
+        const apiTotal = parseApiMoney(couponData.total);
+        const apiShippingCost = parseApiMoney(couponData.shippingCost);
         // Use discount_amount directly from API response if available, otherwise calculate
         const discountAmount = couponData.discount_amount ?? (apiSubTotal - apiTotal);
         

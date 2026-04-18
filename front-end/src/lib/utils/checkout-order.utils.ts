@@ -17,6 +17,17 @@ export type CheckoutLoyaltySlice = {
   discountValue?: number | null
 }
 
+/** Parse API money fields that may be number, numeric string, or formatted currency strings. */
+export function parseApiMoney(value: unknown): number {
+  if (value == null) return 0
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+  if (typeof value === 'string') {
+    const n = parseFloat(value.replace(/[^\d.-]/g, ''))
+    return Number.isFinite(n) ? n : 0
+  }
+  return 0
+}
+
 /**
  * Net merchandise total before shipping: cart (with deals) − coupon − mail subscription − loyalty.
  * Used for free-shipping threshold checks (same basis as CartTotal display, excluding shipping).

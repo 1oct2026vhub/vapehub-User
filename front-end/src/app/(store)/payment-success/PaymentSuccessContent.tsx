@@ -20,8 +20,6 @@ function currencyLabelFromParam(code: string | null): string {
   return `${upper} `
 }
 
-const WORLDPAY_LOCK_ATTR = 'data-worldpay-payment-lock'
-
 const PaymentSuccessContent = () => {
   const searchParams = useSearchParams()
   const queryKey = useMemo(() => searchParams.toString(), [searchParams])
@@ -36,12 +34,6 @@ const PaymentSuccessContent = () => {
     currencyLabel: DEFAULT_CURRENCY_SYMBOL,
   })
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(true)
-
-  useEffect(() => {
-    return () => {
-      document.documentElement.removeAttribute(WORLDPAY_LOCK_ATTR)
-    }
-  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -90,10 +82,6 @@ const PaymentSuccessContent = () => {
             }))
           }
 
-          if (!cancelled) {
-            document.documentElement.setAttribute(WORLDPAY_LOCK_ATTR, 'true')
-          }
-
           try {
             const worldpayResponse = await worldpayPaymentSuccess({
               orderCode,
@@ -133,8 +121,6 @@ const PaymentSuccessContent = () => {
             toast.error('Could not reach the server to confirm payment. Your bank may still have charged you — please contact support.')
             setIsVerifyingPayment(false)
             return
-          } finally {
-            document.documentElement.removeAttribute(WORLDPAY_LOCK_ATTR)
           }
         }
 

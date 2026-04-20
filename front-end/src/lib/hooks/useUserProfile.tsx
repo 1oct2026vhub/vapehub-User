@@ -23,7 +23,7 @@ export const useUserProfile = () => {
       }
         return response.data
     } catch (err) {
-      console.log('fetchProfile', err)
+      console.error('fetchProfile', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch profile')
       return null
     } finally {

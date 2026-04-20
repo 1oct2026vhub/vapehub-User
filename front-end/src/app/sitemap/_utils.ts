@@ -21,8 +21,8 @@ export function getBaseUrl(request?: NextRequest): string {
 // ---------------------------------------------------------------------------
 const XML_HEADERS: HeadersInit = {
   'Content-Type': 'application/xml',
-  // Cache child sitemaps for 1 hour; crawlers re-fetch infrequently
-  'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+  // Always serve the latest sitemap payload.
+  'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
 };
 
 export function xmlResponse(body: string, status = 200): NextResponse {
@@ -116,6 +116,10 @@ const NON_INDEXABLE_EXACT = new Set([
   '/payment-failed',
   '/page-not-found',
   '/not-found',
+  // Explicit SEO exclusions from audit (redirect / noindex URLs)
+  '/70-30-shortfills',
+  '/uncategorized',
+  '/how-long-does-crystal-pro-max-last',
 ]);
 
 const NON_INDEXABLE_PREFIXES = [

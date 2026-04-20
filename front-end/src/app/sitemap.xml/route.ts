@@ -41,6 +41,7 @@ const CHILD_SITEMAPS = [
   'categories', // product categories
   'brands',     // brand pages (includes lastmod from API)
   'products',   // product detail pages
+  'deals',      // deal listing + deal detail pages
   'blogs',      // blog categories + blog posts (includes lastmod from API)
 ] as const;
 
@@ -91,7 +92,7 @@ export async function GET(request: NextRequest) {
         status: 200,
         headers: {
           'Content-Type': 'application/xml',
-          'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
         },
       });
     }
@@ -110,7 +111,7 @@ export async function GET(request: NextRequest) {
         status: 200,
         headers: {
           'Content-Type': 'application/xml',
-          'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
         },
       });
     }
@@ -131,8 +132,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'application/xml',
-        // Index is lightweight — allow short-lived public caching
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
       },
     });
   } catch (error) {

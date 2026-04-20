@@ -19,6 +19,7 @@ const STATIC_PAGES: Array<{
 }> = [
   { path: '/',                      changefreq: 'daily',   priority: '1.0' },
   { path: '/shop',                  changefreq: 'daily',   priority: '0.9' },
+  { path: '/product-deals',         changefreq: 'daily',   priority: '0.9' },
   { path: '/vapehub-deals',         changefreq: 'daily',   priority: '0.9' },
   { path: '/new-products',          changefreq: 'daily',   priority: '0.8' },
   { path: '/brands',                changefreq: 'weekly',  priority: '0.8' },

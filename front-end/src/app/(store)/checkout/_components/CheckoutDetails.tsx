@@ -29,7 +29,6 @@ import { getCookie } from 'cookies-next';
 import { GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config';
 import { CartItem } from '@/lib/config/cart.config';
 import { getGuestCart } from '@/lib/utils/storage';
-import { API_ROUTES } from '@/lib/api-routes';
 import { orderMeetsFreeShippingThreshold } from '@/lib/utils';
 
 interface CheckoutDetailsProps {
@@ -339,12 +338,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         loadProfile();
     }, [status, fetchProfile, form]);
 
-    // Same data as parent receives from getShippingMethods() → GET API_ROUTES.GET_SHIPPING_METHODS
-    useEffect(() => {
-        console.log('[CheckoutDetails] shipping methods API URL (GET, no body)', API_ROUTES.GET_SHIPPING_METHODS);
-        console.log('[CheckoutDetails] shipping methods API response data (prop shippingMethodsData)', shippingMethodsData);
-    }, [shippingMethodsData]);
-
     useEffect(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {
             return;
@@ -451,22 +444,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             }
             
             return false;
-        });
-
-        console.log('[CheckoutDetails] free delivery filter', {
-            apiUrl: API_ROUTES.GET_SHIPPING_METHODS,
-            safeTotal,
-            safeTotalPence: Math.round(safeTotal * 100),
-            mailSubscriptionDiscount,
-            mailSubscriptionDiscountFromCoupon: couponDiscount.mailSubscriptionDiscount,
-            note: 'safeTotal = cart after deals, minus coupon, mail subscription discount, loyalty (shipping excluded). Free method uses pence-safe >= threshold.',
-            methodsShown: filteredMethods.map((m) => ({
-                id: m.id,
-                name: m.shipping_method,
-                is_free_shipping: m.is_free_shipping ?? false,
-                shipping_cost: m.shipping_cost,
-                free_shipping_threshold: m.free_shipping_threshold,
-            })),
         });
 
         // Sort methods to prioritize free shipping methods that meet the threshold

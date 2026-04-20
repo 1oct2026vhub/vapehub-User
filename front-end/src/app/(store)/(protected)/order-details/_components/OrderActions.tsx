@@ -119,8 +119,7 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
         setIsEditReview(true);
 
     }
-    const handleDeleteReview = async (productId: number) => {
-        console.log("productId", productId);
+    const handleDeleteReview = async () => {
         setIsLoading(true);
         const response = await deleteReviewOrder(currentReviewId)
         if (response.status === ServerActionStatus.SUCCESS) {
@@ -248,7 +247,7 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
                                                                     radius='sm'
                                                                     variant='bordered'
                                                                     color='danger'
-                                                                        onPress={() => handleDeleteReview(item.product.id)}
+                                                                        onPress={() => handleDeleteReview()}
                                                                     >Delete Review</Button>
                                                                 </div>
                                                             </div>

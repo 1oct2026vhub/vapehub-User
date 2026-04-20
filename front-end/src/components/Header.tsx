@@ -45,14 +45,14 @@ const Header: React.FC<HeaderProps> = ({ megaMenu, flashNews }) => {
     const visibleCategories = convertToCategories(visibleMenus);
 
     return (
-        <div data-store-site-chrome>
+        <>
             {!isVerificationPage && <PromotionBanner messages={flashNews} />}
             <header className="px-4 lg:px-9 xl:px-12.5 pt-3.5 pb-2.5 lg:py-9.5 border-b border-skin-primary-300 flex flex-col gap-9 bg-header-gradient relative">
                 <HeaderTopBar categories={visibleCategories} megaMenuData={visibleMenus}/>
                 {!isVerificationPage && <NavigationMenu menus={megaMenu.data}/>}
             </header>
             <HeaderFeatures />
-        </div>
+        </>
     )
 }
 

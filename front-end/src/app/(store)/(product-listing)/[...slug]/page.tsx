@@ -424,10 +424,12 @@ export async function generateMetadata({ params, searchParams }: {
     const buildVariantFirstTitle = (variantLabel: string, baseTitle: string): string => {
       const normalizedBaseTitle = baseTitle.trim();
       const normalizedVariant = variantLabel.trim();
-      const baseWithoutVariantPrefix = normalizedBaseTitle.toLowerCase().startsWith(normalizedVariant.toLowerCase())
-        ? normalizedBaseTitle.slice(normalizedVariant.length).trim()
-        : normalizedBaseTitle;
-      return `${normalizedVariant} ${baseWithoutVariantPrefix}`.replace(/\s+/g, " ").trim();
+      const titleWithoutSite = normalizedBaseTitle.replace(/\s*\|\s*vapehub\s*$/i, "").trim();
+      const baseWithoutVariantPrefix = titleWithoutSite.toLowerCase().startsWith(normalizedVariant.toLowerCase())
+        ? titleWithoutSite.slice(normalizedVariant.length).trim()
+        : titleWithoutSite;
+      const variantFirstTitle = `${normalizedVariant} ${baseWithoutVariantPrefix}`.replace(/\s+/g, " ").trim();
+      return `${variantFirstTitle} | VapeHub`;
     };
 
     const buildVariantFirstDescription = (

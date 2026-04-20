@@ -25,6 +25,7 @@ const TOASTER_CONFIG = {
   richColors: true,
   position: "top-right" as const,
 };
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_MEASUREMENT_ID ?? "";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -55,7 +56,7 @@ export default function RootLayout({
         />
         <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
         <GoogleAnalytics
-        GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_MEASUREMENT_ID ?? ''}
+        GA_MEASUREMENT_ID={GA_MEASUREMENT_ID}
       />
       </head>
       <body

@@ -5,7 +5,7 @@ import { redirect, RedirectType } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
-import { DynamicPageSlugResponse } from "@/lib/config/global.config";
+import { DynamicPageSlugResponse, FaqResponse } from "@/lib/config/global.config";
 import { AttributeProductTerms, AttributeTerms, Product, ProductReview } from "@/lib/config/product.config";
 import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE } from "@/lib/api-routes";
@@ -30,6 +30,65 @@ type PageProps = {
   slug: string[];
 };
 const BASE_URL = resolveBaseUrl();
+
+const extractFaqList = (payload: unknown): FaqResponse[] => {
+  if (Array.isArray(payload)) return payload as FaqResponse[];
+  if (!payload || typeof payload !== "object") return [];
+
+  const candidate = payload as { faqs?: unknown; items?: unknown; rows?: unknown; data?: unknown };
+  if (Array.isArray(candidate.faqs)) return candidate.faqs as FaqResponse[];
+  if (Array.isArray(candidate.items)) return candidate.items as FaqResponse[];
+  if (Array.isArray(candidate.rows)) return candidate.rows as FaqResponse[];
+  if (Array.isArray(candidate.data)) return candidate.data as FaqResponse[];
+
+  return [];
+};
+
+const resolveServerFaqs = async ({
+  productId,
+  entityId,
+  variantId,
+  variantTermId,
+  categoryId,
+}: {
+  productId: number;
+  entityId?: number;
+  variantId?: number;
+  variantTermId?: number;
+  categoryId?: number;
+}) => {
+  const requests: Array<Promise<ServerActionResponse<unknown>>> = [
+    getFaqs("product", productId),
+  ];
+
+  if (entityId && entityId !== productId) {
+    requests.push(getFaqs("product", entityId));
+  }
+
+  if (variantId) {
+    requests.push(getFaqs("variant", variantId));
+  }
+
+  if (variantTermId && variantTermId !== variantId) {
+    requests.push(getFaqs("variant", variantTermId));
+  }
+
+  if (categoryId) {
+    requests.push(getFaqs("category", categoryId));
+  }
+
+  const responses = await Promise.all(requests);
+  for (const response of responses) {
+    if (response.status === ServerActionStatus.SUCCESS) {
+      const faqList = extractFaqList(response.data);
+      if (faqList.length > 0) {
+        return faqList;
+      }
+    }
+  }
+
+  return [];
+};
 
 const Page = async ({
   params,
@@ -101,9 +160,9 @@ const Page = async ({
 
     // Parallel fetch: Product (required), FAQ, Rating (optional)
     const entityId = dynamicPageSlug?.entity_id ?? 0;
-    const [productRes, faqRes, ratingRes] = await Promise.allSettled([
+    const [productRes, , ratingRes] = await Promise.allSettled([
       fetchProduct(entityId, payload),
-      getFaqs("product", entityId, false),
+      getFaqs("product", entityId),
       getReviewOrderByProductId(entityId, 1, 1),
     ]);
 
@@ -123,7 +182,13 @@ const Page = async ({
     }
 
     const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}/${secondarySlug}`);
-    const faqs = faqRes.status === "fulfilled" && faqRes.value?.status === ServerActionStatus.SUCCESS ? faqRes.value.data : [];
+    const faqs = await resolveServerFaqs({
+      productId: data.product.id,
+      entityId,
+      variantId: data.variants?.[0]?.id,
+      variantTermId: variant?.terms?.id,
+      categoryId: data.product.category?.id,
+    });
     const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
       ? getRatingFromReviewResponse(ratingRes.value.data)
       : null;
@@ -139,7 +204,7 @@ const Page = async ({
     return (
       <>
         <JsonLd data={jsonLdData} />
-        <ProductView data={data} isVariant={true} selectedVariant={variant} />
+        <ProductView data={data} isVariant={true} selectedVariant={variant} productFaqs={faqs} />
       </>
     );
   }
@@ -223,9 +288,9 @@ const Page = async ({
     },
     product: async () => {
       const entityId = dynamicPageSlug?.entity_id ?? 0;
-      const [productRes, faqRes, ratingRes] = await Promise.allSettled([
+      const [productRes, , ratingRes] = await Promise.allSettled([
         fetchProduct(entityId, []),
-        getFaqs("product", entityId, false),
+        getFaqs("product", entityId),
         getReviewOrderByProductId(entityId, 1, 1),
       ]);
 
@@ -235,7 +300,12 @@ const Page = async ({
       }
 
       const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}`);
-      const faqs = faqRes.status === "fulfilled" && faqRes.value?.status === ServerActionStatus.SUCCESS ? faqRes.value.data : [];
+      const faqs = await resolveServerFaqs({
+        productId: data.product.id,
+        entityId,
+        variantId: data.variants?.[0]?.id,
+        categoryId: data.product.category?.id,
+      });
       const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
         ? getRatingFromReviewResponse(ratingRes.value.data)
         : null;
@@ -251,7 +321,7 @@ const Page = async ({
       return (
         <>
           <JsonLd data={jsonLdData} />
-          <ProductView data={data} />
+          <ProductView data={data} productFaqs={faqs} />
         </>
       );
     }
@@ -351,16 +421,40 @@ export async function generateMetadata({ params, searchParams }: {
       });
     }
 
+    const buildVariantFirstTitle = (variantLabel: string, baseTitle: string): string => {
+      const normalizedBaseTitle = baseTitle.trim();
+      const normalizedVariant = variantLabel.trim();
+      const baseWithoutVariantPrefix = normalizedBaseTitle.toLowerCase().startsWith(normalizedVariant.toLowerCase())
+        ? normalizedBaseTitle.slice(normalizedVariant.length).trim()
+        : normalizedBaseTitle;
+      return `${normalizedVariant} ${baseWithoutVariantPrefix}`.replace(/\s+/g, " ").trim();
+    };
+
+    const buildVariantFirstDescription = (
+      variantLabel: string,
+      productName: string,
+      descriptionBase?: string,
+    ): string => {
+      const normalizedVariant = variantLabel.trim();
+      const normalizedProductName = productName.trim();
+      const prefix = `Buy ${normalizedVariant} ${normalizedProductName} at VapeHub.`;
+      const normalizedDescription = String(descriptionBase ?? "").trim();
+      if (!normalizedDescription) return prefix;
+      const cleanedDescription = normalizedDescription
+        .replace(/^buy\b[\s:-]*/i, "")
+        .replace(/^at vapehub[\s,.-]*/i, "")
+        .trim();
+      return cleanedDescription ? `${prefix} ${cleanedDescription}` : prefix;
+    };
+
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
     if (data && !data.variants.length) {
       const variantName = variant?.terms.name?.trim();
-      const titleBase = dynamicPageSlug.seo?.title ?? data.product.name;
-      const descriptionBase = dynamicPageSlug.seo?.description ?? data.product.description;
-      const title = variantName ? `${titleBase} - ${variantName}` : titleBase;
+      const titleBase = (dynamicPageSlug.seo?.title ?? data.product.name ?? "").trim();
+      const descriptionBase = dynamicPageSlug.seo?.description ?? data.product.description ?? "";
+      const title = variantName ? buildVariantFirstTitle(variantName, titleBase || data.product.name) : titleBase;
       const description = variantName
-        ? (String(descriptionBase ?? "").trim()
-            ? `${String(descriptionBase).trim()} - ${variantName}`
-            : `${data.product.name} - ${variantName}`)
+        ? buildVariantFirstDescription(variantName, data.product.name, descriptionBase)
         : descriptionBase;
       return {
         title,
@@ -378,13 +472,10 @@ export async function generateMetadata({ params, searchParams }: {
 
     const variantName = variant.terms.name.trim();
     const seoTitle = dynamicPageSlug.seo?.title?.trim();
-    const title = seoTitle
-      ? `${seoTitle} - ${variantName}`
-      : `${data.product.name} - ${variantName}`;
+    const titleBase = seoTitle || data.product.name;
+    const title = buildVariantFirstTitle(variantName, titleBase);
     const rawDescription = (dynamicPageSlug.seo?.description ?? data.product.description ?? "").trim();
-    const description = rawDescription
-      ? `${rawDescription} - ${variantName}`
-      : `${data.product.name} - ${variantName}`;
+    const description = buildVariantFirstDescription(variantName, data.product.name, rawDescription);
     const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
 
     return {

@@ -1,17 +1,20 @@
 declare global {
   interface Window {
-    gtag: (command: string, id: string, config?: { page_path: string }) => void;
+    gtag: (...args: unknown[]) => void;
   }
 }
 
 /**
- * Sends a page view event to Google Analytics using the provided measurement ID and URL.
- * @param {string} GA_MEASUREMENT_ID The Google Analytics measurement ID.
- * @param {string} url The URL of the page being tracked.
+ * Sends a route-based page view event to GA4.
+ * Uses only pathname to avoid query-string report fragmentation.
  */
-export const GATagPageView = (GA_MEASUREMENT_ID: string, url: string) => {
-    window.gtag('config', GA_MEASUREMENT_ID, {
-      page_path: url,
-    });
-  };
+export const GATagPageView = (pathname: string) => {
+  if (typeof window === "undefined" || typeof window.gtag !== "function" || !pathname) {
+    return;
+  }
+
+  window.gtag("event", "page_view", {
+    page_path: pathname,
+  });
+};
   

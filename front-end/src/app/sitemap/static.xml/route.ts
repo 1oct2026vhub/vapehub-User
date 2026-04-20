@@ -1,45 +1,38 @@
-import { NextRequest } from 'next/server';
-import { getBaseUrl, xmlResponse, urlEntry, urlset, buildLoc } from '../_utils';
+import { xmlResponse, urlset } from '../_utils';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+const API_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL;
+
 /**
- * Static marketing pages — identical list to the original sitemap.xml/route.ts
- * STATIC_PAGES constant, now with per-page changefreq and priority metadata.
- *
- * Excluded (intentionally not indexed):
- *   /login, /register, /my-account, /checkout, /orders, /shopping-cart
- *   /payment-success, /payment-failed, /page-not-found
+ * Returns the backend sitemap XML directly (no filtering/transformation).
  */
-const STATIC_PAGES: Array<{
-  path: string;
-  changefreq: string;
-  priority: string;
-}> = [
-  { path: '/',                      changefreq: 'daily',   priority: '1.0' },
-  { path: '/shop',                  changefreq: 'daily',   priority: '0.9' },
-  { path: '/product-deals',         changefreq: 'daily',   priority: '0.9' },
-  { path: '/vapehub-deals',         changefreq: 'daily',   priority: '0.9' },
-  { path: '/new-products',          changefreq: 'daily',   priority: '0.8' },
-  { path: '/brands',                changefreq: 'weekly',  priority: '0.8' },
-  { path: '/blogs',                 changefreq: 'weekly',  priority: '0.7' },
-  { path: '/loyalty-points',        changefreq: 'monthly', priority: '0.6' },
-  { path: '/faq',                   changefreq: 'monthly', priority: '0.6' },
-  { path: '/contact',               changefreq: 'monthly', priority: '0.6' },
-  { path: '/social-media',          changefreq: 'monthly', priority: '0.5' },
-  { path: '/delivery-information',  changefreq: 'monthly', priority: '0.5' },
-  { path: '/privacy-policy',        changefreq: 'monthly', priority: '0.4' },
-  { path: '/returns-policy',        changefreq: 'monthly', priority: '0.4' },
-  { path: '/terms-conditions',      changefreq: 'monthly', priority: '0.4' },
-];
+export async function GET() {
+  if (!API_URL) {
+    console.error('Static sitemap proxy error: NEXT_PUBLIC_VAPE_HUB_API_BASE_URL is not set');
+    return xmlResponse(urlset([]));
+  }
 
-export async function GET(request: NextRequest) {
-  const baseUrl = getBaseUrl(request);
+  try {
+    const apiBase = API_URL.replace(/\/$/, '');
+    const res = await fetch(`${apiBase}/api/seo/sitemap.xml`, {
+      headers: { Accept: 'application/xml' },
+      cache: 'no-store',
+    });
 
-  const entries = STATIC_PAGES.map(({ path, changefreq, priority }) =>
-    urlEntry(buildLoc(baseUrl, path), { changefreq, priority }),
-  );
+    if (!res.ok) {
+      console.error(`Static sitemap proxy error: API responded with ${res.status}`);
+      return xmlResponse(urlset([]));
+    }
 
-  return xmlResponse(urlset(entries));
+    const xml = await res.text();
+    return xmlResponse(xml);
+  } catch (error) {
+    console.error(
+      'Static sitemap proxy error:',
+      error instanceof Error ? error.message : String(error),
+    );
+    return xmlResponse(urlset([]));
+  }
 }

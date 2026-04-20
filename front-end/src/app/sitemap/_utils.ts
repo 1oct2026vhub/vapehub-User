@@ -116,10 +116,6 @@ const NON_INDEXABLE_EXACT = new Set([
   '/payment-failed',
   '/page-not-found',
   '/not-found',
-  // Explicit SEO exclusions from audit (redirect / noindex URLs)
-  '/70-30-shortfills',
-  '/uncategorized',
-  '/how-long-does-crystal-pro-max-last',
 ]);
 
 const NON_INDEXABLE_PREFIXES = [
@@ -248,7 +244,34 @@ export async function fetchEntitySlugs(apiBase: string): Promise<EntitySlug[]> {
     // All backend responses are wrapped: { success: boolean, data: <payload> }
     const json = await res.json();
     const payload: EntitySlugsResponse = json?.data ?? json;
-    return Array.isArray(payload?.entities) ? payload.entities : [];
+    const entities = Array.isArray(payload?.entities) ? payload.entities : [];
+
+    // Debug visibility: show exactly what the API returned before any filtering.
+    const byType = entities.reduce<Record<string, number>>((acc, entity) => {
+      const key = entity?.entity_name || 'unknown';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const productSlugs = entities
+      .filter((entity) => entity.entity_name === 'product')
+      .map((entity) => entity.entity_slug);
+    const blogSlugs = entities
+      .filter((entity) => entity.entity_name === 'blog')
+      .map((entity) => entity.entity_slug);
+
+    console.info('[sitemap] entity-slugs raw API payload summary', {
+      totalFound: payload?.total_found ?? null,
+      entitiesLength: entities.length,
+      byType,
+      productCount: productSlugs.length,
+      blogCount: blogSlugs.length,
+      sampleProducts: productSlugs.slice(0, 25),
+      sampleBlogs: blogSlugs.slice(0, 25),
+      first10Entities: entities.slice(0, 10),
+    });
+
+    return entities;
   } catch (err) {
     console.error('fetchEntitySlugs error:', err instanceof Error ? err.message : String(err));
     return [];

@@ -12,6 +12,19 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useCart } from '@/lib/context/CartContext';
 
+const WORLDPAY_LOCK_ATTR = 'data-worldpay-payment-lock';
+
+const isLikelyNetworkFailure = (apiError: unknown): boolean => {
+    const errorMessage = apiError instanceof Error ? apiError.message : String(apiError);
+    return (
+        errorMessage.includes('Failed to fetch') ||
+        errorMessage.includes('NetworkError') ||
+        errorMessage.includes('Network request failed') ||
+        errorMessage.includes('Load failed') ||
+        errorMessage.includes('ECONNREFUSED')
+    );
+};
+
 const PaymentSuccessContent = () => {
     const searchParams = useSearchParams();
     const { status } = useSession();
@@ -28,6 +41,14 @@ const PaymentSuccessContent = () => {
     const isProcessingRef = useRef(false);
 
     useEffect(() => {
+        return () => {
+            document.documentElement.removeAttribute(WORLDPAY_LOCK_ATTR);
+        };
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+
         // Prevent multiple executions
         if (hasApiBeenCalledRef.current || isProcessingRef.current) {
             return;
@@ -95,9 +116,15 @@ const PaymentSuccessContent = () => {
                         ...prev,
                         ...newTransactionDetails
                     }));
-                    
+
+                    if (!cancelled) {
+                        document.documentElement.setAttribute(WORLDPAY_LOCK_ATTR, 'true');
+                    }
                     try {
-                        const worldpayResponse = await worldpayPaymentSuccess(worldpayPayload);                        
+                        const worldpayResponse = await worldpayPaymentSuccess(worldpayPayload);
+                        if (cancelled) {
+                            return;
+                        }
                         // Check if response is valid and has expected structure
                         if (worldpayResponse && typeof worldpayResponse === 'object') {
                             if (worldpayResponse.status === ServerActionStatus.SUCCESS) {
@@ -127,6 +154,14 @@ const PaymentSuccessContent = () => {
                     } catch (apiError) {
                         // Only catch actual network/parsing errors, not API response errors
                         console.error('Worldpay API call failed:', apiError);
+
+                        if (isLikelyNetworkFailure(apiError)) {
+                            toast.error(
+                                'Could not reach the server to confirm payment. Your bank may still have charged you — please contact support.'
+                            );
+                            setIsVerifyingPayment(false);
+                            return;
+                        }
                         
                         // Check if it's a JSON parsing error
                         const errorMessage = apiError instanceof Error ? apiError.message : String(apiError);
@@ -142,6 +177,8 @@ const PaymentSuccessContent = () => {
                         
                         setIsVerifyingPayment(false);
                         return;
+                    } finally {
+                        document.documentElement.removeAttribute(WORLDPAY_LOCK_ATTR);
                     }
                 }
 
@@ -225,6 +262,8 @@ const PaymentSuccessContent = () => {
 
         // Cleanup function to reset the ref when component unmounts
         return () => {
+            cancelled = true;
+            document.documentElement.removeAttribute(WORLDPAY_LOCK_ATTR);
             hasApiBeenCalledRef.current = false;
             isProcessingRef.current = false;
         };

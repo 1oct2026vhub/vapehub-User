@@ -21,8 +21,8 @@ export function getBaseUrl(request?: NextRequest): string {
 // ---------------------------------------------------------------------------
 const XML_HEADERS: HeadersInit = {
   'Content-Type': 'application/xml',
-  // Cache child sitemaps for 1 hour; crawlers re-fetch infrequently
-  'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+  // Always serve the latest sitemap payload.
+  'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
 };
 
 export function xmlResponse(body: string, status = 200): NextResponse {
@@ -244,7 +244,34 @@ export async function fetchEntitySlugs(apiBase: string): Promise<EntitySlug[]> {
     // All backend responses are wrapped: { success: boolean, data: <payload> }
     const json = await res.json();
     const payload: EntitySlugsResponse = json?.data ?? json;
-    return Array.isArray(payload?.entities) ? payload.entities : [];
+    const entities = Array.isArray(payload?.entities) ? payload.entities : [];
+
+    // Debug visibility: show exactly what the API returned before any filtering.
+    const byType = entities.reduce<Record<string, number>>((acc, entity) => {
+      const key = entity?.entity_name || 'unknown';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const productSlugs = entities
+      .filter((entity) => entity.entity_name === 'product')
+      .map((entity) => entity.entity_slug);
+    const blogSlugs = entities
+      .filter((entity) => entity.entity_name === 'blog')
+      .map((entity) => entity.entity_slug);
+
+    console.info('[sitemap] entity-slugs raw API payload summary', {
+      totalFound: payload?.total_found ?? null,
+      entitiesLength: entities.length,
+      byType,
+      productCount: productSlugs.length,
+      blogCount: blogSlugs.length,
+      sampleProducts: productSlugs.slice(0, 25),
+      sampleBlogs: blogSlugs.slice(0, 25),
+      first10Entities: entities.slice(0, 10),
+    });
+
+    return entities;
   } catch (err) {
     console.error('fetchEntitySlugs error:', err instanceof Error ? err.message : String(err));
     return [];

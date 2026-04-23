@@ -177,6 +177,13 @@ function isFaqPageGraphNode(node: Record<string, unknown>): boolean {
   return schemaPrimaryTypes(node).includes("FAQPage");
 }
 
+function graphNodeUsesSingletonType(
+  node: Record<string, unknown>,
+  singletonTypes: ReadonlySet<string>,
+): boolean {
+  return schemaPrimaryTypes(node).some((type) => singletonTypes.has(type));
+}
+
 function extractFaqMainEntities(mainEntity: unknown): Record<string, unknown>[] {
   if (!Array.isArray(mainEntity)) return [];
   return mainEntity.filter(
@@ -194,14 +201,26 @@ export function dedupeSchemaGraphNodes(
   nodes: Array<Record<string, unknown> | null | undefined>,
 ): Record<string, unknown>[] {
   const seen = new Set<string>();
+  const seenSingletonTypes = new Set<string>();
   const deduped: Record<string, unknown>[] = [];
   const faqQuestionEntities: Record<string, unknown>[] = [];
+  /** At most one node per type in the final @graph (validators count each Product node). */
+  const singletonSchemaTypes = new Set<string>(["Product", "BreadcrumbList"]);
 
   for (const node of nodes) {
     if (!node) continue;
     if (isFaqPageGraphNode(node)) {
       faqQuestionEntities.push(...extractFaqMainEntities(node["mainEntity"]));
       continue;
+    }
+    if (graphNodeUsesSingletonType(node, singletonSchemaTypes)) {
+      const typesInNode = schemaPrimaryTypes(node).filter((t) =>
+        singletonSchemaTypes.has(t),
+      );
+      if (typesInNode.some((t) => seenSingletonTypes.has(t))) {
+        continue;
+      }
+      typesInNode.forEach((t) => seenSingletonTypes.add(t));
     }
     const key = JSON.stringify(node);
     if (seen.has(key)) continue;

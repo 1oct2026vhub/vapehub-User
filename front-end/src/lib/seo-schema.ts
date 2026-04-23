@@ -65,6 +65,7 @@ export function buildProductSchema(input: ProductSchemaInput): Record<string, un
   const brandName = product.brand?.name ?? product.product_brands?.[0]?.name ?? "Unknown";
 
   const schema: Record<string, unknown> = {
+    "@id": `${productUrl}#product`,
     "@type": "Product",
     name: product.name,
     description: htmlToPlainText(product.description ?? ""),
@@ -126,6 +127,7 @@ export function buildBreadcrumbSchema(input: BreadcrumbSchemaInput): Record<stri
   const categoryUrl = toAbsoluteUrl(baseUrl, `/${categorySlug}`);
 
   return {
+    "@id": `${productUrl}#breadcrumb`,
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: homeUrl },
@@ -139,7 +141,10 @@ export function buildBreadcrumbSchema(input: BreadcrumbSchemaInput): Record<stri
 /**
  * Build FAQPage JSON-LD only when FAQs exist. Map question/answer to schema.org Question/Answer.
  */
-export function buildFaqSchema(faqs: FaqResponse[]): Record<string, unknown> | null {
+export function buildFaqSchema(
+  faqs: FaqResponse[],
+  pageUrl?: string,
+): Record<string, unknown> | null {
   if (!faqs?.length) return null;
   const seenFaqKeys = new Set<string>();
   const uniqueFaqs = faqs.filter((faq) => {
@@ -153,6 +158,7 @@ export function buildFaqSchema(faqs: FaqResponse[]): Record<string, unknown> | n
   });
   if (!uniqueFaqs.length) return null;
   return {
+    ...(pageUrl ? { "@id": `${pageUrl}#faq` } : {}),
     "@type": "FAQPage",
     mainEntity: uniqueFaqs.map((faq) => ({
       "@type": "Question",

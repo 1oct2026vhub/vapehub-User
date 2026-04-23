@@ -192,7 +192,6 @@ const Page = async ({
     const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
       ? getRatingFromReviewResponse(ratingRes.value.data)
       : null;
-
     const jsonLdData = buildProductJsonLdData({
       baseUrl: BASE_URL,
       data,
@@ -309,7 +308,6 @@ const Page = async ({
       const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
         ? getRatingFromReviewResponse(ratingRes.value.data)
         : null;
-
       const jsonLdData = buildProductJsonLdData({
         baseUrl: BASE_URL,
         data,
@@ -317,7 +315,6 @@ const Page = async ({
         faqs,
         ratingData,
       });
-
       return (
         <>
           <JsonLd data={jsonLdData} />

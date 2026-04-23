@@ -65,6 +65,7 @@ export function buildProductSchema(input: ProductSchemaInput): Record<string, un
   const brandName = product.brand?.name ?? product.product_brands?.[0]?.name ?? "Unknown";
 
   const schema: Record<string, unknown> = {
+    "@id": `${productUrl}#product`,
     "@type": "Product",
     name: product.name,
     description: htmlToPlainText(product.description ?? ""),
@@ -126,6 +127,7 @@ export function buildBreadcrumbSchema(input: BreadcrumbSchemaInput): Record<stri
   const categoryUrl = toAbsoluteUrl(baseUrl, `/${categorySlug}`);
 
   return {
+    "@id": `${productUrl}#breadcrumb`,
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: homeUrl },
@@ -139,7 +141,10 @@ export function buildBreadcrumbSchema(input: BreadcrumbSchemaInput): Record<stri
 /**
  * Build FAQPage JSON-LD only when FAQs exist. Map question/answer to schema.org Question/Answer.
  */
-export function buildFaqSchema(faqs: FaqResponse[]): Record<string, unknown> | null {
+export function buildFaqSchema(
+  faqs: FaqResponse[],
+  pageUrl?: string,
+): Record<string, unknown> | null {
   if (!faqs?.length) return null;
   const seenFaqKeys = new Set<string>();
   const uniqueFaqs = faqs.filter((faq) => {
@@ -153,6 +158,7 @@ export function buildFaqSchema(faqs: FaqResponse[]): Record<string, unknown> | n
   });
   if (!uniqueFaqs.length) return null;
   return {
+    ...(pageUrl ? { "@id": `${pageUrl}#faq` } : {}),
     "@type": "FAQPage",
     mainEntity: uniqueFaqs.map((faq) => ({
       "@type": "Question",
@@ -177,6 +183,13 @@ function isFaqPageGraphNode(node: Record<string, unknown>): boolean {
   return schemaPrimaryTypes(node).includes("FAQPage");
 }
 
+function graphNodeUsesSingletonType(
+  node: Record<string, unknown>,
+  singletonTypes: ReadonlySet<string>,
+): boolean {
+  return schemaPrimaryTypes(node).some((type) => singletonTypes.has(type));
+}
+
 function extractFaqMainEntities(mainEntity: unknown): Record<string, unknown>[] {
   if (!Array.isArray(mainEntity)) return [];
   return mainEntity.filter(
@@ -194,14 +207,31 @@ export function dedupeSchemaGraphNodes(
   nodes: Array<Record<string, unknown> | null | undefined>,
 ): Record<string, unknown>[] {
   const seen = new Set<string>();
+  const seenSingletonTypes = new Set<string>();
   const deduped: Record<string, unknown>[] = [];
   const faqQuestionEntities: Record<string, unknown>[] = [];
+  let faqPageId: string | null = null;
+  /** At most one node per type in the final @graph (validators count each Product node). */
+  const singletonSchemaTypes = new Set<string>(["Product", "BreadcrumbList"]);
 
   for (const node of nodes) {
     if (!node) continue;
     if (isFaqPageGraphNode(node)) {
+      const nodeId = node["@id"];
+      if (!faqPageId && typeof nodeId === "string" && nodeId.trim()) {
+        faqPageId = nodeId.trim();
+      }
       faqQuestionEntities.push(...extractFaqMainEntities(node["mainEntity"]));
       continue;
+    }
+    if (graphNodeUsesSingletonType(node, singletonSchemaTypes)) {
+      const typesInNode = schemaPrimaryTypes(node).filter((t) =>
+        singletonSchemaTypes.has(t),
+      );
+      if (typesInNode.some((t) => seenSingletonTypes.has(t))) {
+        continue;
+      }
+      typesInNode.forEach((t) => seenSingletonTypes.add(t));
     }
     const key = JSON.stringify(node);
     if (seen.has(key)) continue;
@@ -220,6 +250,7 @@ export function dedupeSchemaGraphNodes(
     }
     if (uniqueQuestions.length > 0) {
       deduped.push({
+        ...(faqPageId ? { "@id": faqPageId } : {}),
         "@type": "FAQPage",
         mainEntity: uniqueQuestions,
       });

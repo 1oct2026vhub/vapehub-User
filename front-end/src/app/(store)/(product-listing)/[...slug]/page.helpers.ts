@@ -184,7 +184,7 @@ export const buildProductJsonLdData = ({
     shopLabel: "Shop",
     shopPath: "/shop",
   });
-  const faqSchema = buildFaqSchema(faqs ?? []);
+  const faqSchema = buildFaqSchema(faqs ?? [], productUrl);
   const graph: Record<string, unknown>[] = dedupeSchemaGraphNodes([
     productSchema,
     breadcrumbSchema,

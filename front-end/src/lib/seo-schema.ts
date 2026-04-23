@@ -210,12 +210,17 @@ export function dedupeSchemaGraphNodes(
   const seenSingletonTypes = new Set<string>();
   const deduped: Record<string, unknown>[] = [];
   const faqQuestionEntities: Record<string, unknown>[] = [];
+  let faqPageId: string | null = null;
   /** At most one node per type in the final @graph (validators count each Product node). */
   const singletonSchemaTypes = new Set<string>(["Product", "BreadcrumbList"]);
 
   for (const node of nodes) {
     if (!node) continue;
     if (isFaqPageGraphNode(node)) {
+      const nodeId = node["@id"];
+      if (!faqPageId && typeof nodeId === "string" && nodeId.trim()) {
+        faqPageId = nodeId.trim();
+      }
       faqQuestionEntities.push(...extractFaqMainEntities(node["mainEntity"]));
       continue;
     }
@@ -245,6 +250,7 @@ export function dedupeSchemaGraphNodes(
     }
     if (uniqueQuestions.length > 0) {
       deduped.push({
+        ...(faqPageId ? { "@id": faqPageId } : {}),
         "@type": "FAQPage",
         mainEntity: uniqueQuestions,
       });

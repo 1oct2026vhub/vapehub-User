@@ -1,4 +1,4 @@
-import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug } from "@/lib/server.actions";
+import { getAllDeals, getProductsByDealSlug, getReviewOrderByProductId, getDynamicPageSlug, getSeoMetaBySlug } from "@/lib/server.actions";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { redirect } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
@@ -224,6 +224,35 @@ export async function generateMetadata({ params, searchParams }: {
     return {};
   }
 
+  // Prefer SEO configured in CMS regardless of deal lookup success.
+  // Some API variants may return snake_case keys, so read both safely.
+  const dynamicSeo = dynamicPageSlug.seo as (Record<string, unknown> & {
+    title?: string;
+    description?: string;
+    ogImage?: string;
+    og_image?: string;
+    canonicalUrl?: string;
+    canonical_url?: string;
+    noIndex?: boolean;
+    no_index?: boolean;
+  }) | null;
+  const cmsTitle = typeof dynamicSeo?.title === 'string' ? dynamicSeo.title.trim() : '';
+  const cmsDescription = typeof dynamicSeo?.description === 'string' ? dynamicSeo.description.trim() : '';
+  const cmsOgImageRaw = dynamicSeo?.ogImage ?? dynamicSeo?.og_image;
+  const cmsOgImage = typeof cmsOgImageRaw === 'string' ? cmsOgImageRaw.trim() : '';
+  const cmsCanonicalRaw = dynamicSeo?.canonicalUrl ?? dynamicSeo?.canonical_url;
+  const cmsCanonical = typeof cmsCanonicalRaw === 'string' ? cmsCanonicalRaw.trim() : '';
+  const cmsNoIndexRaw = dynamicSeo?.noIndex ?? dynamicSeo?.no_index;
+  const cmsNoIndex = typeof cmsNoIndexRaw === 'boolean' ? cmsNoIndexRaw : false;
+  const seoMetaResponse = await getSeoMetaBySlug(slug);
+  const seoMeta = seoMetaResponse.status === ServerActionStatus.SUCCESS ? seoMetaResponse.data : null;
+  const seoMetaTitle = typeof seoMeta?.name === 'string' ? seoMeta.name.trim() : '';
+  const seoMetaDescription = typeof seoMeta?.description === 'string' ? seoMeta.description.trim() : '';
+  const seoMetaImage = typeof seoMeta?.logo_url === 'string' ? seoMeta.logo_url.trim() : '';
+  const effectiveSeoTitle = cmsTitle || seoMetaTitle;
+  const effectiveSeoDescription = cmsDescription || seoMetaDescription;
+  const effectiveSeoImage = cmsOgImage || seoMetaImage;
+
   const dealResponse = await getAllDeals();
   
   if (dealResponse.status === ServerActionStatus.SUCCESS) {
@@ -255,14 +284,16 @@ export async function generateMetadata({ params, searchParams }: {
       const productsResponse = await getProductsByDealSlug(slug, combinedParams);
       
       if (productsResponse.status === ServerActionStatus.SUCCESS) {
-        // Use dynamic page slug SEO data if available, otherwise fall back to deal data
-        const seoTitle = dynamicPageSlug.seo?.title || deal.name;
-        const seoDescription = dynamicPageSlug.seo?.description || deal.name;
-        const seoImage = dynamicPageSlug.seo?.ogImage || productsResponse.data.products[0]?.primary_image?.url;
+        // Use dynamic page slug SEO data if available, otherwise fall back to deal/product data
+        const seoTitle = effectiveSeoTitle || deal.name;
+        const seoDescription = effectiveSeoDescription || deal.name;
+        const seoImage = effectiveSeoImage || productsResponse.data.products[0]?.primary_image?.url;
         
         return {
           title: seoTitle,
           description: seoDescription,
+          ...(cmsCanonical ? { alternates: { canonical: cmsCanonical } } : {}),
+          ...(cmsNoIndex ? { robots: { index: false, follow: false } } : {}),
           openGraph: {
             title: seoTitle,
             description: seoDescription,
@@ -275,6 +306,27 @@ export async function generateMetadata({ params, searchParams }: {
         };
       }
     }
+  }
+
+  // If deal lookup/fetch fallback path fails, still honor CMS SEO metadata.
+  if (effectiveSeoTitle || effectiveSeoDescription || effectiveSeoImage || cmsCanonical || cmsNoIndex) {
+    return {
+      ...(effectiveSeoTitle ? { title: effectiveSeoTitle } : {}),
+      ...(effectiveSeoDescription ? { description: effectiveSeoDescription } : {}),
+      ...(cmsCanonical ? { alternates: { canonical: cmsCanonical } } : {}),
+      ...(cmsNoIndex ? { robots: { index: false, follow: false } } : {}),
+      openGraph: {
+        ...(effectiveSeoTitle ? { title: effectiveSeoTitle } : {}),
+        ...(effectiveSeoDescription ? { description: effectiveSeoDescription } : {}),
+        ...(effectiveSeoImage ? {
+          images: [{
+            url: effectiveSeoImage,
+            width: 1200,
+            height: 630
+          }]
+        } : {}),
+      },
+    };
   }
   return {};
 }

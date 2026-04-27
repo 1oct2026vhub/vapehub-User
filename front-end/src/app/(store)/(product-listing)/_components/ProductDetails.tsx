@@ -254,7 +254,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     // Fetch variant data when attribute selections change
     const fetchVariantData = useCallback(async (
         selections: Record<number, AttributeSelection>,
-        lastSelectedAttributeId?: number
+        preservedScrollY?: number
     ) => {
         if (!Object.keys(selections).length) return;
         try {
@@ -321,14 +321,19 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 setVariantSelectionError(null);
                 setProductData(response.data);
                 setContextProductData(response.data);
-                if ((response.data.available_terms?.length ?? 0) > 0) {
-                    setLastKnownAvailableTerms(response.data.available_terms);
+                if (typeof preservedScrollY === 'number') {
+                    const y = preservedScrollY;
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            window.scrollTo({ top: y, left: 0, behavior: 'instant' as ScrollBehavior });
+                        });
+                    });
                 }
             }
         } catch (error) {
             console.error('Error fetching variant data:', error);
         }
-    }, [product.id]);
+    }, [product.id, setContextProductData]);
 
     const handleVariantSelectionChange = useCallback((payload: VariantSelectionPayload) => {
         const selectedAttributeId = payload.attributeTerm.attribute.id;
@@ -343,16 +348,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                     termSlug: payload.selectedTerm.slug
             };
 
-            // When primary attribute changes, dependent selections must reset.
-            const updatedSelections = isPrimarySelection
-                ? { [selectedAttributeId]: nextSelection }
-                : { ...prev, [selectedAttributeId]: nextSelection };
-
-            if (isPrimarySelection) {
-                setVariantSelectionError(null);
-            }
-
-            void fetchVariantData(updatedSelections, isPrimarySelection ? undefined : selectedAttributeId);
+            void fetchVariantData(updatedSelections, payload.preservedScrollY);
             return updatedSelections;
         });
 

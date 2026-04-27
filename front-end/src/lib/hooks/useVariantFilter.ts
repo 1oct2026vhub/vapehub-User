@@ -1,4 +1,4 @@
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { AttributeTerms, AttributeProductTerms } from '@/lib/config/product.config';
 // import { ProductVariant } from '@/lib/config/product.config';
@@ -22,6 +22,7 @@ export const useVariantFilter = (
   // allVariants?: ProductVariant[]
 ) => {
   const pathname = usePathname();
+  const router = useRouter();
   const [isFiltering, setIsFiltering] = useState(false);
 
   const hasActiveFilters = useCallback(() => {
@@ -80,7 +81,7 @@ export const useVariantFilter = (
         setIsFiltering(false);
       }
     },
-    [pathname, currentVariant, onVariantChange, primaryAttributeId]
+    [pathname, currentVariant, onVariantChange, primaryAttributeId, router]
   );
 
   const getDefaultSelectedTerm = useCallback((attributeId: number): string | undefined => {

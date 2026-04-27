@@ -3,7 +3,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import ProductsSlider from "@/components/ProductsSlider";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
-import { getProductByCategory } from "@/lib/server.actions";
+import { cachedGetCategoryProducts } from "@/lib/cached.server";
 import { ServerActionResponse,ServerActionStatus } from "@/lib/config/app.config";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
@@ -21,7 +21,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = async ({
   viewAllHref = "#",
   slug,
 }) => {
-  const catResponse = await getProductByCategory(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0, homepage: 1 });
+  const catResponse = await cachedGetCategoryProducts(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0, homepage: 1 });
   if (catResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
   }
@@ -84,7 +84,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = async ({
   viewAllHref = "#",
   slug,
 }) => {
-  const catResponse = await getProductByCategory(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0, homepage: 1 });
+  const catResponse = await cachedGetCategoryProducts(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0, homepage: 1 });
   if (catResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
   }
@@ -156,8 +156,8 @@ export const MostPopularPods: React.FC<MostPopularPodsProps> = async ({
 }) => {
   // Fetch products from both categories
   const [prefilledResponse, refillableResponse] = await Promise.all([
-    getProductByCategory(prefilledSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0, homepage: 1 }),
-    getProductByCategory(refillableSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0, homepage: 1 })
+    cachedGetCategoryProducts(prefilledSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0, homepage: 1 }),
+    cachedGetCategoryProducts(refillableSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0, homepage: 1 })
   ]);
 
   if (prefilledResponse.status !== ServerActionStatus.SUCCESS && refillableResponse.status !== ServerActionStatus.SUCCESS) {

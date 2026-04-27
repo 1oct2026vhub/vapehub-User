@@ -11,7 +11,8 @@ import { ORDER_RESPONSE_DATA, SHIPPING_METHOD_DATA } from '../config/order.confi
 interface CheckoutContextType {
     selectedShippingMethod: SHIPPING_METHOD_DATA | null;
     setSelectedShippingMethod: (method: SHIPPING_METHOD_DATA) => void;
-    handlePlaceOrder: (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => Promise<void>;
+    /** `true` only when a payment redirect was started (or equivalent); callers should not reset the form on `false`. */
+    handlePlaceOrder: (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => Promise<boolean>;
     isProcessing: boolean;
 }
 
@@ -35,7 +36,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
     // const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
 
-    const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => { 
+    const handlePlaceOrder = async (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA): Promise<boolean> => { 
         try {
             setIsProcessing(true);
            
@@ -43,7 +44,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
             if (!response || !response.data) {
                 console.error('❌ [handlePlaceOrder] Invalid response data:', response);
                 toast.error('Invalid order response. Please try again.');
-                return;
+                return false;
             }
 
             const orderData = response.data;            
@@ -51,11 +52,13 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                 // Initiate Viva Wallet payment
                 if (orderData && typeof orderData === 'object' && 'order_code' in orderData) {
                     await initiateVivaPayment({                        
-                        orderReference: String(orderData.order_code)
+                        orderReference: String((orderData as { order_code: string | number }).order_code)
                     });
+                    return true;
                 } else {
                     console.error('Invalid order data for VivaWallet:', orderData);
                     toast.error('Invalid order data. Please try again.');
+                    return false;
                 }
             } else if(data.payment_method.method === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
                 // // Initiate WorldPay Smart Checkout
@@ -88,11 +91,14 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
               // Redirect to WorldPay URL from the API response
                 if (orderData && typeof orderData === 'object' && 'worldpay_url' in orderData) {
                     const worldpayOrderData = orderData as { worldpay_url: string };
-                    window.location.href = worldpayOrderData.worldpay_url;
-                } else {
-                    console.error('Worldpay URL not found in order data:', orderData);
-                    toast.error('Worldpay payment URL not found. Please try again.');
+                    if (worldpayOrderData.worldpay_url) {
+                        window.location.href = worldpayOrderData.worldpay_url;
+                        return true;
+                    }
                 }
+                console.error('Worldpay URL not found in order data:', orderData);
+                toast.error('Worldpay payment URL not found. Please try again.');
+                return false;
             }
             // clearCart();
                  
@@ -100,9 +106,11 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
             console.error('Place order error:', error);
             toast.error('An error occurred while placing your order. Please try again.');
             // router.push(ROUTES.PAYMENT_FAILED);
+            return false;
         } finally {
             setIsProcessing(false);
         }
+        return false;
     };
     
 

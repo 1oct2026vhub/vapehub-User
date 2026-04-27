@@ -6,15 +6,13 @@ import { useCheckout } from '@/lib/context/CheckoutContext'
 import { Divider, Checkbox } from '@nextui-org/react'
 import React, { useEffect, useMemo, useState, useRef } from 'react'
 import CouponForm from '@/components/CouponForm'
-import { applyCoupon, applyGuestCoupon } from '@/lib/server.actions'
-import { getGuestCart } from '@/lib/utils/storage'
-import { CartItem } from '@/lib/config/cart.config'
-import { APPLY_GUEST_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
+import { applyCoupon } from '@/lib/server.actions'
 import { toast } from 'sonner'
 import { APPLY_COUPON_PAYLOAD } from '@/lib/config/checkout.config'
 import { useSession } from 'next-auth/react'
 import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'
+import { calculateOrderGrandTotal, parseApiMoney } from '@/lib/utils/checkout-order.utils'
 
 interface CartTotalProps {
     shippingMethodsData: SHIPPING_METHOD_DATA[];
@@ -27,8 +25,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage } = loyaltyRedemption;
     const { status } = useSession();
     const isAuthenticated = status === 'authenticated';
-    const isRevalidatingRef = useRef(false);
-    const lastRevalidatedRef = useRef<{ cartTotal: number; itemCount: number; shippingMethodId: number } | null>(null);
+    const loyaltyRefreshDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         if (couponDiscount.isApplied && couponDiscount.code) {
@@ -53,128 +50,66 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         const shippingMethodId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0;
         setShippingMethodIdForCoupon(shippingMethodId);
     }, [selectedShippingMethod, setShippingMethodIdForCoupon]);
-    
-    // Revalidate coupon when component mounts or when cart/shipping method changes
-    // This ensures coupon discount updates when user returns to checkout page after adding products
+
+    // Authenticated loyalty: debounced applyCoupon keeps discount aligned with API when cart/shipping changes.
+    // CartContext owns coupon revalidation; toggling loyalty still calls applyCoupon immediately in handleRedeemToggle (may duplicate once ~400ms after redeem).
     useEffect(() => {
-        const revalidateCoupon = async () => {
-            // Only revalidate if:
-            // 1. Coupon is already applied
-            // 2. Coupon code exists
-            // 3. Shipping method is available (on checkout page)
-            // 4. Not already revalidating
-            if (!couponDiscount.isApplied || !couponDiscount.code || !selectedShippingMethod || isRevalidatingRef.current) {
-                return;
+        if (!isAuthenticated || !isRedeemed || couponDiscount.code || !loyaltyPoints) {
+            if (loyaltyRefreshDebounceRef.current) {
+                clearTimeout(loyaltyRefreshDebounceRef.current);
+                loyaltyRefreshDebounceRef.current = null;
             }
-            
-            const shippingMethodId = selectedShippingMethod.id ? Number(selectedShippingMethod.id) : 0;
-            
-            // Check if we already revalidated for this cart state and shipping method
-            const lastRevalidated = lastRevalidatedRef.current;
-            if (lastRevalidated && 
-                lastRevalidated.cartTotal === cartTotal && 
-                lastRevalidated.itemCount === itemCount && 
-                lastRevalidated.shippingMethodId === shippingMethodId) {
-                return; // Already revalidated for this state
-            }
-            
-            isRevalidatingRef.current = true;
-            
+            return;
+        }
+
+        const shippingMethodId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0;
+
+        if (loyaltyRefreshDebounceRef.current) {
+            clearTimeout(loyaltyRefreshDebounceRef.current);
+        }
+
+        loyaltyRefreshDebounceRef.current = setTimeout(async () => {
+            loyaltyRefreshDebounceRef.current = null;
             try {
-                let response;
-                
-                if (isAuthenticated) {
-                    // For authenticated users
-                    response = await applyCoupon({
-                        couponCode: couponDiscount.code,
-                        shippingMethodId: shippingMethodId,
-                    });
-                } else {
-                    // For guest users
-                    const guestCartItems: CartItem[] | null = getGuestCart<CartItem[]>();
-                    if (!guestCartItems || guestCartItems.length === 0) {
-                        isRevalidatingRef.current = false;
-                        return;
-                    }
-                    
-                    const cartItemsForApi = guestCartItems.map(item => ({
-                        product_id: item.product_id,
-                        variant_id: item.variant_id,
-                        quantity: item.quantity
+                const response = await applyCoupon({
+                    shippingMethodId,
+                    loyalty: true,
+                });
+                if (response.status === ServerActionStatus.SUCCESS && response.data) {
+                    const loyaltyParsed = parseApiMoney(response.data.loyalty_discount);
+                    const apiSub = parseApiMoney(response.data.subTotal);
+                    const apiTot = parseApiMoney(response.data.total);
+                    const discountAmount =
+                        loyaltyParsed > 0 ? loyaltyParsed : Math.max(0, apiSub - apiTot);
+                    setLoyaltyRedemption((prev) => ({
+                        ...prev,
+                        isRedeemed: true,
+                        discountValue: Number.isFinite(discountAmount) ? discountAmount : 0,
+                        message: prev.message ?? 'Loyalty points applied',
                     }));
-                    
-                    const payload: APPLY_GUEST_COUPON_PAYLOAD = {
-                        couponCode: couponDiscount.code,
-                        cartItems: cartItemsForApi,
-                        shippingMethodId: shippingMethodId,
-                        loyalty: false
-                    };
-                    
-                    response = await applyGuestCoupon(payload);
                 }
-                
-                if (response.status === ServerActionStatus.SUCCESS && response.data && response.data.total != null && response.data.coupon) {
-                    const couponData = response.data;
-                    // Parse values - handle both number and string types from API
-                    const apiSubTotalValue = couponData.subTotal as number | string;
-                    const apiSubTotal = typeof apiSubTotalValue === 'string'
-                        ? parseFloat(apiSubTotalValue.replace(/[^\d.-]/g, '')) || 0
-                        : (Number.isFinite(apiSubTotalValue) ? apiSubTotalValue : 0);
-                    const apiTotalValue = couponData.total as number | string;
-                    const apiTotal = typeof apiTotalValue === 'string'
-                        ? parseFloat(apiTotalValue.replace(/[^\d.-]/g, '')) || 0
-                        : (Number.isFinite(apiTotalValue) ? apiTotalValue : 0);
-                    const apiShippingCostValue = couponData.shippingCost as number | string;
-                    const apiShippingCost = typeof apiShippingCostValue === 'string'
-                        ? parseFloat(apiShippingCostValue.replace(/[^\d.-]/g, '')) || 0
-                        : (Number.isFinite(apiShippingCostValue) ? apiShippingCostValue : 0);
-                    
-                    const discountAmount = couponData.discount_amount ?? (apiSubTotal - apiTotal);
-                    const mailSubscriptionDiscountValue = (couponData.mail_subscription_discount !== undefined && Number.isFinite(couponData.mail_subscription_discount))
-                        ? couponData.mail_subscription_discount
-                        : undefined;
-                    
-                    setCouponDiscount({
-                        value: Number.isFinite(discountAmount) ? discountAmount : 0,
-                        isApplied: true,
-                        code: couponDiscount.code,
-                        message: couponData.coupon.discount_type === "percentage" ? `Extra ${couponData.coupon.discount_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${couponData.coupon.discount_value} off`,
-                        discountValue: Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00',
-                        discount_amount: Number.isFinite(couponData.discount_amount) ? couponData.discount_amount : undefined,
-                        shippingCost: apiShippingCost,
-                        subTotal: apiSubTotal,
-                        total: apiTotal,
-                        mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData,
-                        mailSubscriptionDiscount: mailSubscriptionDiscountValue,
-                    });
-                    
-                    // Update last revalidated state
-                    lastRevalidatedRef.current = {
-                        cartTotal,
-                        itemCount,
-                        shippingMethodId
-                    };
-                } else if (response.status === ServerActionStatus.ERROR) {
-                    // Coupon is no longer valid, remove it
-                    setCouponDiscount({
-                        value: 0,
-                        isApplied: false,
-                        code: couponDiscount.code,
-                        message: null,
-                        discountValue: '',
-                        mailSubscriptionData: couponDiscount.mailSubscriptionData,
-                    });
-                }
-            } catch (error) {
-                console.error('Error revalidating coupon:', error);
-            } finally {
-                isRevalidatingRef.current = false;
+            } catch (e) {
+                console.error('Error refreshing loyalty discount:', e);
+            }
+        }, 400);
+
+        return () => {
+            if (loyaltyRefreshDebounceRef.current) {
+                clearTimeout(loyaltyRefreshDebounceRef.current);
+                loyaltyRefreshDebounceRef.current = null;
             }
         };
-        
-        // Revalidate when component mounts or when cart/shipping method changes
-        revalidateCoupon();
-    }, [isAuthenticated, couponDiscount.code, couponDiscount.isApplied, selectedShippingMethod?.id, cartTotal, itemCount, setCouponDiscount]);
+    }, [
+        isAuthenticated,
+        isRedeemed,
+        couponDiscount.code,
+        loyaltyPoints,
+        cartTotal,
+        itemCount,
+        selectedShippingMethod?.id,
+        setLoyaltyRedemption,
+    ]);
+
     const handleRedeemToggle = async (checked: boolean) => {
         setIsApplyingLoyalty(true);
         const payload: APPLY_COUPON_PAYLOAD = {
@@ -184,21 +119,11 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
 
         const response = await applyCoupon(payload);
         if (response.status === ServerActionStatus.SUCCESS && response.data) {
-            // Use API response values for accurate calculation
-            const apiSubTotal = response.data.subTotal || cartTotal;
-            const apiTotal = response.data.total || cartTotal;
-            // Loyalty discount: use loyalty-only discount from API when available.
-            // NOTE: (subTotal - total) includes deals + loyalty + other discounts, so it is NOT loyalty-only.
-            const loyaltyDiscountRaw = checked
-                ? (response.data as unknown as { loyalty_discount?: number | string }).loyalty_discount
-                : 0;
-            const loyaltyDiscountParsed =
-                typeof loyaltyDiscountRaw === 'string'
-                    ? (parseFloat(loyaltyDiscountRaw.replace(/[^\d.-]/g, '')) || 0)
-                    : (typeof loyaltyDiscountRaw === 'number' && Number.isFinite(loyaltyDiscountRaw) ? loyaltyDiscountRaw : 0);
-            // Fallback to legacy behavior only if API doesn't provide loyalty_discount
+            const apiSubTotal = parseApiMoney(response.data.subTotal) || cartTotal;
+            const apiTotal = parseApiMoney(response.data.total) || cartTotal;
+            const loyaltyDiscountParsed = checked ? parseApiMoney(response.data.loyalty_discount) : 0;
             const discountAmount = checked
-                ? (loyaltyDiscountParsed > 0 ? loyaltyDiscountParsed : (apiSubTotal - apiTotal))
+                ? (loyaltyDiscountParsed > 0 ? loyaltyDiscountParsed : Math.max(0, apiSubTotal - apiTotal))
                 : 0;
             setLoyaltyRedemption(prev => ({
                 ...prev,
@@ -215,47 +140,6 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         setIsApplyingLoyalty(false);
     };
 
-    // Keep loyalty discount amount in sync with cart total when loyalty is applied.
-    // This updates the green "Loyalty points applied" amount (and total calculation) after quantity/add-to-cart changes,
-    // without re-calling applyCoupon. Coupon flow is unchanged and remains mutually exclusive with loyalty.
-    useEffect(() => {
-        if (!isRedeemed) return;
-        if (!loyaltyPoints) return;
-        if (couponDiscount.isApplied || couponDiscount.code) return;
-
-        const redemptionAmountNum = typeof loyaltyPoints.redemption_amount === 'string'
-            ? parseFloat(loyaltyPoints.redemption_amount.replace(/[^\d.-]/g, '')) || 0
-            : (Number.isFinite(Number(loyaltyPoints.redemption_amount)) ? Number(loyaltyPoints.redemption_amount) : 0);
-
-        const baseAmount = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0;
-
-        const rawDiscount = loyaltyPoints.redemption_type === 'percentage'
-            ? (redemptionAmountNum / 100) * baseAmount
-            : redemptionAmountNum;
-
-        const nextDiscount = Number.isFinite(rawDiscount)
-            ? Math.max(0, Math.round(rawDiscount * 100) / 100)
-            : 0;
-
-        // Avoid unnecessary state updates / render loops
-        if (Math.abs((loyaltyDiscountValue || 0) - nextDiscount) < 0.01) return;
-
-        setLoyaltyRedemption(prev => ({
-            ...prev,
-            isRedeemed: true,
-            discountValue: nextDiscount,
-            message: prev.message ?? 'Loyalty points applied',
-        }));
-    }, [
-        isRedeemed,
-        loyaltyPoints,
-        cartTotal,
-        couponDiscount.isApplied,
-        couponDiscount.code,
-        loyaltyDiscountValue,
-        setLoyaltyRedemption,
-    ]);
-
     const getRedemptionLabel = () => {
         if (!loyaltyPoints) return "";
 
@@ -268,11 +152,12 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             : cartTotal;
         
         if (redemption_type === 'percentage') {
-            const discountAmount = (Number(redemption_amount) / 100) * baseAmount;
+            const discountAmount = (parseApiMoney(redemption_amount) / 100) * baseAmount;
             return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${Number.isFinite(discountAmount) ? discountAmount.toFixed(2) : '0.00'} discount`;
         }
 
-        return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${Number.isFinite(Number(redemption_amount)) ? Number(redemption_amount).toFixed(2) : '0.00'} discount`;
+        const fixedAmt = parseApiMoney(redemption_amount);
+        return `${pointsPrefix} a ${DEFAULT_CURRENCY_SYMBOL}${Number.isFinite(fixedAmt) ? fixedAmt.toFixed(2) : '0.00'} discount`;
     }
 
     const handleRemoveDiscount = () => {
@@ -330,25 +215,13 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         ? couponDiscount.mailSubscriptionDiscount
         : 0;
     
-    // Total calculation:
-    // When coupon is applied: cartTotal (with deals) - coupon discount - mail subscription discount + shipping - loyalty
-    // When no coupon: cartTotal + shipping - coupon discount - mail subscription discount - loyalty discount
-    let displayTotal: number;
-    if (couponDiscount.isApplied && couponDiscount.value !== undefined && Number.isFinite(couponDiscount.value)) {
-        // Use cartTotal (includes deals) as base, then apply coupon discount
-        // This ensures deal discounts are preserved in the calculation
-        const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
-        const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
-        // Formula: (cartTotal with deals) - coupon discount - mail subscription discount + shipping - loyalty
-        displayTotal = displaySubTotal - couponValue - mailSubscriptionDiscount + safeShippingCost - loyaltyValue;
-    } else {
-        // Calculate locally: cartTotal + shipping - coupon - mail subscription discount - loyalty
-        const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
-        const loyaltyValue = isRedeemed && Number.isFinite(loyaltyDiscountValue) ? loyaltyDiscountValue : 0;
-        displayTotal = displaySubTotal + safeShippingCost - couponValue - mailSubscriptionDiscount - loyaltyValue;
-    }
-    
-    // Ensure no NaN values with final safety check
+    const displayTotal = calculateOrderGrandTotal(
+        cartTotal,
+        couponDiscount,
+        { isRedeemed, discountValue: loyaltyDiscountValue },
+        safeShippingCost
+    )
+
     const safeSubTotal = Number.isFinite(displaySubTotal) ? displaySubTotal : 0;
     const safeTotal = Number.isFinite(displayTotal) ? displayTotal : 0;
     
@@ -429,7 +302,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
                         <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
-                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{safeSubTotal.toFixed(2)}</p>
+                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{safeSubTotal}</p>
                     </div>
                 </div>
                 <Divider className='border-2' />

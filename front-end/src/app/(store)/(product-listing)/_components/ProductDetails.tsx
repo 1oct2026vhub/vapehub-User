@@ -153,7 +153,15 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             .map(attr => attr.term_name)
             .join(', ')}`
         : product?.name;
-    const availableAttributes: AttributeTerms[] = productData.available_terms;
+    // Keep the last non-empty available_terms so secondary dropdowns stay populated
+    // even after a full selection resolves (at which point available_terms becomes empty).
+    const [lastKnownAvailableTerms, setLastKnownAvailableTerms] = useState<AttributeTerms[]>([]);
+
+    const availableAttributes: AttributeTerms[] =
+        (productData.available_terms?.length ?? 0) > 0
+            ? productData.available_terms
+            : lastKnownAvailableTerms;
+
     const minQuantity = 1;
 
     const [mainImage, setMainImage] = useState<productAllImages | null>(null);
@@ -162,6 +170,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [inputValue, setInputValue] = useState(quantity.toString());
     const [error, setError] = useState<string | null>(null);
+    const [variantSelectionError, setVariantSelectionError] = useState<string | null>(null);
     const { reviewData } = useReviews();
     const [linkedProducts, setLinkedProducts] = useState<LinkedProduct[]>([]);
     const [isLoadingLinkedProducts, setIsLoadingLinkedProducts] = useState(false);
@@ -254,13 +263,62 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 term_id: selection.termId
             }));
 
-            const response = await getProductVariantByID({
-                product_id: product.id,
-                attribute_terms: payload
-            });
+            const requestPayload = { product_id: product.id, attribute_terms: payload };
+            // console.log('[VariantFilter] Request payload:', JSON.stringify(requestPayload, null, 2));
 
+            const response = await getProductVariantByID(requestPayload);
+
+            // console.log('[VariantFilter] Response:', JSON.stringify({
+            //     status: response.status,
+            //     variants: response.data?.variants ?? [],
+            //     available_terms: response.data?.available_terms ?? [],
+            //     filtered_attribute_terms: response.data?.filtered_attribute_terms ?? [],
+            // }, null, 2));
 
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
+                const hasAnyFilteredTerms = (response.data.filtered_attribute_terms ?? []).some(
+                    (attributeTerm) => (attributeTerm.terms?.length ?? 0) > 0
+                );
+                const isDeadEndSelection =
+                    response.data.variants.length === 0 &&
+                    response.data.available_terms.length === 0 &&
+                    !hasAnyFilteredTerms;
+
+                if (isDeadEndSelection && payload.length > 1 && lastSelectedAttributeId) {
+                    const fallbackSelections = { ...selections };
+                    delete fallbackSelections[lastSelectedAttributeId];
+
+                    const fallbackPayload: PRODUCT_VARIANT_ATTRIBUTE[] = Object.values(fallbackSelections).map((selection) => ({
+                        attribute_id: selection.attributeId,
+                        term_id: selection.termId
+                    }));
+
+                    const fallbackRequestPayload = { product_id: product.id, attribute_terms: fallbackPayload };
+                    // console.log('[VariantFilter] Dead-end detected — fallback request payload:', JSON.stringify(fallbackRequestPayload, null, 2));
+
+                    const fallbackResponse = await getProductVariantByID(fallbackRequestPayload);
+
+                    // console.log('[VariantFilter] Fallback response:', JSON.stringify({
+                    //     status: fallbackResponse.status,
+                    //     variants: fallbackResponse.data?.variants ?? [],
+                    //     available_terms: fallbackResponse.data?.available_terms ?? [],
+                    //     filtered_attribute_terms: fallbackResponse.data?.filtered_attribute_terms ?? [],
+                    // }, null, 2));
+
+                    if (fallbackResponse.status === ServerActionStatus.SUCCESS && fallbackResponse.data) {
+                        setAttributeSelections(fallbackSelections);
+                        setProductData(fallbackResponse.data);
+                        setContextProductData(fallbackResponse.data);
+                        setVariantSelectionError('This combination is unavailable. Please choose another option.');
+                        if ((fallbackResponse.data.available_terms?.length ?? 0) > 0) {
+                            setLastKnownAvailableTerms(fallbackResponse.data.available_terms);
+                        }
+                    }
+
+                    return;
+                }
+
+                setVariantSelectionError(null);
                 setProductData(response.data);
                 setContextProductData(response.data);
                 if (typeof preservedScrollY === 'number') {
@@ -278,14 +336,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     }, [product.id, setContextProductData]);
 
     const handleVariantSelectionChange = useCallback((payload: VariantSelectionPayload) => {
+        const selectedAttributeId = payload.attributeTerm.attribute.id;
+        const isPrimarySelection = primaryAttributeId
+            ? selectedAttributeId === primaryAttributeId
+            : payload.isPrimaryAttribute;
+
         setAttributeSelections((prev) => {
-            const updatedSelections = {
-                ...prev,
-                [payload.attributeTerm.attribute.id]: {
-                    attributeId: payload.attributeTerm.attribute.id,
+            const nextSelection: AttributeSelection = {
+                attributeId: selectedAttributeId,
                     termId: payload.selectedTerm.id,
                     termSlug: payload.selectedTerm.slug
-                }
             };
 
             void fetchVariantData(updatedSelections, payload.preservedScrollY);
@@ -304,7 +364,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 });
             }
         }
-    }, [fetchVariantData, productData.product.attribute_terms]);
+    }, [fetchVariantData, primaryAttributeId, productData.product.attribute_terms]);
+
+    useEffect(() => {
+        if (!variantSelectionError) return;
+        if (canAddToCart) {
+            setVariantSelectionError(null);
+        }
+    }, [variantSelectionError, canAddToCart]);
 
     useEffect(() => {
         setMainImage(cartEntity?.primary_image ?? product?.primary_image);
@@ -513,6 +580,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                         productSlug={product?.slug}
                         selectedVariant={selectedVariant}
                         availableAttributes={availableAttributes ?? []}
+                        filteredAttributeTerms={productData.filtered_attribute_terms ?? []}
                         allVariants={productData.variants ?? []}
                         onVariantChange={handleVariantSelectionChange}
                         selectedAttributeSlugs={selectedAttributeSlugs}
@@ -585,6 +653,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                             Add to Cart
                         </Button>
                     </div>
+                    {variantSelectionError && <p className='text-skin-red-400 text-sm'>{variantSelectionError}</p>}
                     {error && <p className='text-skin-red-400 text-sm'>{error}</p>}
                 </div>
             </div>

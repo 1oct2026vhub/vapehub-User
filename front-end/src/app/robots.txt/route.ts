@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const API_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL;
+export const dynamic = 'force-dynamic';
 
 // export async function GET(_: NextRequest) {
 export async function GET() {
@@ -9,10 +10,7 @@ export async function GET() {
       headers: {
         Accept: 'text/plain',
       },
-      next: {
-        // Revalidate every 24 hours
-        revalidate: 86400,
-      },
+      cache: 'no-store',
     });
 
     if (!response.ok) {

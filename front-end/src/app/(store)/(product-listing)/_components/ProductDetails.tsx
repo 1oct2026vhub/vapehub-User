@@ -254,7 +254,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     // Fetch variant data when attribute selections change
     const fetchVariantData = useCallback(async (
         selections: Record<number, AttributeSelection>,
-        preservedScrollY?: number
+        preservedScrollY?: number,
+        lastSelectedAttributeId?: number
     ) => {
         if (!Object.keys(selections).length) return;
         try {
@@ -337,24 +338,24 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
 
     const handleVariantSelectionChange = useCallback((payload: VariantSelectionPayload) => {
         const selectedAttributeId = payload.attributeTerm.attribute.id;
-        const isPrimarySelection = primaryAttributeId
-            ? selectedAttributeId === primaryAttributeId
-            : payload.isPrimaryAttribute;
 
         setAttributeSelections((prev) => {
-            const nextSelection: AttributeSelection = {
-                attributeId: selectedAttributeId,
+            const updatedSelections = {
+                ...prev,
+                [selectedAttributeId]: {
+                    attributeId: selectedAttributeId,
                     termId: payload.selectedTerm.id,
                     termSlug: payload.selectedTerm.slug
+                }
             };
 
-            void fetchVariantData(updatedSelections, payload.preservedScrollY);
+            void fetchVariantData(updatedSelections, payload.preservedScrollY, selectedAttributeId);
             return updatedSelections;
         });
 
         if (payload.isPrimaryAttribute) {
             const attributeTerm = product?.attribute_terms?.find(
-                (attr) => attr.attribute.id === payload.attributeTerm.attribute.id
+                (attr) => attr.attribute.id === selectedAttributeId
             );
             const term = attributeTerm?.terms.find((t) => t.id === payload.selectedTerm.id);
             if (attributeTerm && term) {
@@ -364,7 +365,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 });
             }
         }
-    }, [fetchVariantData, primaryAttributeId, productData.product.attribute_terms]);
+    }, [fetchVariantData, product?.attribute_terms]);
 
     useEffect(() => {
         if (!variantSelectionError) return;

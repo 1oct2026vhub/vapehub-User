@@ -243,7 +243,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     };
 
     // Fetch variant data when attribute selections change
-    const fetchVariantData = useCallback(async (selections: Record<number, AttributeSelection>) => {
+    const fetchVariantData = useCallback(async (
+        selections: Record<number, AttributeSelection>,
+        preservedScrollY?: number
+    ) => {
         if (!Object.keys(selections).length) return;
         try {
             const payload: PRODUCT_VARIANT_ATTRIBUTE[] = Object.values(selections).map((selection) => ({
@@ -260,11 +263,19 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             if (response.status === ServerActionStatus.SUCCESS && response.data) {
                 setProductData(response.data);
                 setContextProductData(response.data);
+                if (typeof preservedScrollY === 'number') {
+                    const y = preservedScrollY;
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            window.scrollTo({ top: y, left: 0, behavior: 'instant' as ScrollBehavior });
+                        });
+                    });
+                }
             }
         } catch (error) {
             console.error('Error fetching variant data:', error);
         }
-    }, [product.id]);
+    }, [product.id, setContextProductData]);
 
     const handleVariantSelectionChange = useCallback((payload: VariantSelectionPayload) => {
         setAttributeSelections((prev) => {
@@ -277,7 +288,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 }
             };
 
-            void fetchVariantData(updatedSelections);
+            void fetchVariantData(updatedSelections, payload.preservedScrollY);
             return updatedSelections;
         });
 

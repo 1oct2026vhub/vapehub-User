@@ -8,6 +8,8 @@ export type VariantSelectionPayload = {
   selectedTerm: AttributeTerms['terms'][number];
   isPrimaryAttribute: boolean;
   newUrl: string;
+  /** Viewport Y captured before selection so we can keep the user in place after URL + data update */
+  preservedScrollY: number;
 };
 
 export const useVariantFilter = (
@@ -46,6 +48,7 @@ export const useVariantFilter = (
 
   const handleVariantFilter = useCallback(
     (attributeTerm: AttributeTerms, selectedTerm: AttributeTerms['terms'][number]) => {
+      const preservedScrollY = window.scrollY;
       setIsFiltering(true);
       try {
         const pathSegments = pathname.split('/').filter(Boolean);
@@ -58,7 +61,8 @@ export const useVariantFilter = (
 
         if (isPrimaryAttribute && baseSlug) {
           newUrl = `/${baseSlug}/${selectedTerm.slug}`;
-          window.history.pushState({}, '', newUrl);
+          const withQuery = newUrl + window.location.search + window.location.hash;
+          window.history.pushState({}, '', withQuery);
         }
 
         onVariantChange?.({
@@ -66,6 +70,11 @@ export const useVariantFilter = (
           selectedTerm,
           isPrimaryAttribute: Boolean(isPrimaryAttribute),
           newUrl,
+          preservedScrollY,
+        });
+        // Re-apply in case the browser or a layout pass moved the view before the async fetch finishes
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: preservedScrollY, left: 0, behavior: 'instant' as ScrollBehavior });
         });
       } finally {
         setIsFiltering(false);

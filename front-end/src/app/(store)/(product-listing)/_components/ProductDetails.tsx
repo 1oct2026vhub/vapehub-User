@@ -252,7 +252,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     };
 
     // Fetch variant data when attribute selections change
-    const fetchVariantData = useCallback(async (selections: Record<number, AttributeSelection>) => {
+    const fetchVariantData = useCallback(async (
+        selections: Record<number, AttributeSelection>,
+        lastSelectedAttributeId?: number
+    ) => {
         if (!Object.keys(selections).length) return;
         try {
             const payload: PRODUCT_VARIANT_ATTRIBUTE[] = Object.values(selections).map((selection) => ({
@@ -318,6 +321,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 setVariantSelectionError(null);
                 setProductData(response.data);
                 setContextProductData(response.data);
+                if ((response.data.available_terms?.length ?? 0) > 0) {
+                    setLastKnownAvailableTerms(response.data.available_terms);
+                }
             }
         } catch (error) {
             console.error('Error fetching variant data:', error);
@@ -337,7 +343,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                     termSlug: payload.selectedTerm.slug
             };
 
-            void fetchVariantData(updatedSelections);
+            // When primary attribute changes, dependent selections must reset.
+            const updatedSelections = isPrimarySelection
+                ? { [selectedAttributeId]: nextSelection }
+                : { ...prev, [selectedAttributeId]: nextSelection };
+
+            if (isPrimarySelection) {
+                setVariantSelectionError(null);
+            }
+
+            void fetchVariantData(updatedSelections, isPrimarySelection ? undefined : selectedAttributeId);
             return updatedSelections;
         });
 

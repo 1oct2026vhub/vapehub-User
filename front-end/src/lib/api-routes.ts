@@ -3,6 +3,16 @@ import { CategoriesWithDealsPayload } from "./config/deal.config";
 
 const BASE_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL ?? 'https://api.vapehub.devateam.com/';
 
+const toQueryString = <T extends object>(params?: T): string => {
+    if (!params) return '';
+    const searchParams = new URLSearchParams();
+    Object.entries(params as Record<string, unknown>).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') return;
+        searchParams.append(key, String(value));
+    });
+    return searchParams.toString();
+};
+
 
 export const WEB_ROUTES = {
     AUTH: {
@@ -40,12 +50,12 @@ export const API_ROUTES = {
         SOCIAL_MEDIA: buildRequestUrl('/api/users/contact-social-info'),
     },
     GET_CATEGORY_LIST: buildRequestUrl('/api/category'),
-    GET_BRAND_LIST: (payload?: BrandListPayload) => buildRequestUrl(`/api/brands/list/paginated${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
-    GET_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
-    GET_HOME_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/new${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
-    GET_CATEGORY_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/category/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
-    GET_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
-    GET_PRODUCTS_BY_ID: (id: number, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/fetch/${id}?${new URLSearchParams(payload as never).toString()}`),
+    GET_BRAND_LIST: (payload?: BrandListPayload) => buildRequestUrl(`/api/brands/list/paginated${payload ? `?${toQueryString(payload)}` : ''}`),
+    GET_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product${payload ? `?${toQueryString(payload)}` : ''}`),
+    GET_HOME_PRODUCTS: (payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/new${payload ? `?${toQueryString(payload)}` : ''}`),
+    GET_CATEGORY_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/category/slug/${slug}?${toQueryString(payload)}`),
+    GET_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/slug/${slug}?${toQueryString(payload)}`),
+    GET_PRODUCTS_BY_ID: (id: number, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/product/fetch/${id}?${toQueryString(payload)}`),
     GET_PRODUCT_VARIANT_BY_ID: buildRequestUrl('/api/product/filter-variants'),
     GET_CAROUSEL: buildRequestUrl('/api/home/carousel'),
     GET_TESTIMONIALS: buildRequestUrl('/api/testimonials'),
@@ -62,10 +72,10 @@ export const API_ROUTES = {
         return buildRequestUrl(`/api/blogs${queryString ? `?${queryString}` : ''}`);
     },
     GET_PROMOTION_BANNER: buildRequestUrl('/api/home/banner-images'),
-    GET_BRAND_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/brands/slug/${slug}?${new URLSearchParams(payload as never).toString()}`),
+    GET_BRAND_PRODUCTS_BY_SLUG: (slug: string, payload: PRODUCT_PAYLOAD) => buildRequestUrl(`/api/brands/slug/${slug}?${toQueryString(payload)}`),
     GET_BLOGS_BY_SLUG: (slug: string) => buildRequestUrl(`/api/blogs/category/${slug}?page=1&limit=10`),
     GET_BLOGS_BY_CATEGORY_AND_SLUG: (categorySlug: string) => buildRequestUrl(`/api/blogs/post/${categorySlug}`),
-    GET_BLOGS_POST_LIST: (payload?: BLOG_PAYLOAD) => buildRequestUrl(`/api/blogs/list${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_BLOGS_POST_LIST: (payload?: BLOG_PAYLOAD) => buildRequestUrl(`/api/blogs/list${payload ? `?${toQueryString(payload)}` : ''}`),
     CART: buildRequestUrl('/api/cart'),
     BULK_ADD_TO_CART: buildRequestUrl('/api/cart/bulk-update'),
     UPDATE_CART_ITEM: (id: number) => buildRequestUrl(`/api/cart/${id}`),
@@ -87,10 +97,10 @@ export const API_ROUTES = {
     GET_ORDER_LIST: (page: number, limit: number) => buildRequestUrl(`/api/order?page=${page}&limit=${limit}`),
     ORDERS: buildRequestUrl('/api/order'),
     CANCEL_ORDER: (orderId: number) => buildRequestUrl(`/api/order/cancel/${orderId}`),
-    UPDATE_ORDER_STATUS: (orderReference: string) => `/api/orders/${orderReference}/status`,
-    REVIEWS: (payload: { page?: number, limit?: number, product_id?: number, user_id?: number, is_visible?: boolean, testimonial?: boolean }) => buildRequestUrl(`/api/review?${new URLSearchParams(payload as never).toString()}`),
-    GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string, show_home_page?: boolean }) => buildRequestUrl(`/api/product/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
-    GET_MORE_LIKE_THIS: (payload: { product_id: number; limit?: number; offset?: number }) => buildRequestUrl(`/api/product/more-like-this?${new URLSearchParams(payload as never).toString()}`),
+    UPDATE_ORDER_STATUS: (orderReference: string) => buildRequestUrl(`/api/orders/${orderReference}/status`),
+    REVIEWS: (payload: { page?: number, limit?: number, product_id?: number, user_id?: number, is_visible?: boolean, testimonial?: boolean }) => buildRequestUrl(`/api/review?${toQueryString(payload)}`),
+    GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string, show_home_page?: boolean }) => buildRequestUrl(`/api/product/deals${payload ? `?${toQueryString(payload)}` : ''}`),
+    GET_MORE_LIKE_THIS: (payload: { product_id: number; limit?: number; offset?: number }) => buildRequestUrl(`/api/product/more-like-this?${toQueryString(payload)}`),
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
@@ -116,15 +126,15 @@ export const API_ROUTES = {
     WORLDPAY_PAYMENT_SUCCESS: buildRequestUrl('/api/payment/worldpay/payment-success'),
     WORLDPAY_PAYMENT_CANCEL: buildRequestUrl('/api/payment/worldpay/payment-cancel'),
     GET_LOYALTY_POINTS_REDEMPTION: buildRequestUrl('/api/loyalty-points/redemption'),
-    GET_CATEGORIES_WITH_DEALS: (payload?: CategoriesWithDealsPayload) => buildRequestUrl(`/api/product/categories-with-deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
-    GET_DEALS_BY_CATEGORY: (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }) => buildRequestUrl(`/api/product/category/${categoryId}/deals${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
-    GET_DEAL_PRODUCTS: (dealId: number, params?: { limit?: number; offset?: number; product_id?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
-    GET_PRODUCTS_BY_DEAL_SLUG: (slug: string, params?: Record<string, unknown>) => buildRequestUrl(`/api/deals/slug/${slug}${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
-    GET_LINKED_PRODUCTS: (productId: number, params?: { limit?: number; offset?: number; page?: number }) => buildRequestUrl(`/api/product/${productId}/linked-products${params ? `?${new URLSearchParams(params as never).toString()}` : ''}`),
+    GET_CATEGORIES_WITH_DEALS: (payload?: CategoriesWithDealsPayload) => buildRequestUrl(`/api/product/categories-with-deals${payload ? `?${toQueryString(payload)}` : ''}`),
+    GET_DEALS_BY_CATEGORY: (categoryId: number, payload?: { limit?: number; offset?: number; deal_id?: number }) => buildRequestUrl(`/api/product/category/${categoryId}/deals${payload ? `?${toQueryString(payload)}` : ''}`),
+    GET_DEAL_PRODUCTS: (dealId: number, params?: { limit?: number; offset?: number; product_id?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${params ? `?${toQueryString(params)}` : ''}`),
+    GET_PRODUCTS_BY_DEAL_SLUG: (slug: string, params?: Record<string, unknown>) => buildRequestUrl(`/api/deals/slug/${slug}${params ? `?${toQueryString(params)}` : ''}`),
+    GET_LINKED_PRODUCTS: (productId: number, params?: { limit?: number; offset?: number; page?: number }) => buildRequestUrl(`/api/product/${productId}/linked-products${params ? `?${toQueryString(params)}` : ''}`),
     GET_MAIL_SUBSCRIPTION_SETTINGS: buildRequestUrl('/api/mailSubscription/settings'),
-    GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${toQueryString(payload)}` : ''}`),
     GET_WELCOME_CONTENT: buildRequestUrl('/api/home/welcome-content'),
-    GET_FEATURE_CONTENT: (payload?: { page?: number, limit?: number }) => buildRequestUrl(`/api/home/feature-content${payload ? `?${new URLSearchParams(payload as never).toString()}` : ''}`),
+    GET_FEATURE_CONTENT: (payload?: { page?: number, limit?: number }) => buildRequestUrl(`/api/home/feature-content${payload ? `?${toQueryString(payload)}` : ''}`),
     GET_SHIPSTATION_CARRIERS: buildRequestUrl('/api/admin/shipStation/carriers'),
     GET_ENTITY_SLUGS: buildRequestUrl('/api/home/entity-slugs'),
     GET_SEO_META: (slug: string) => buildRequestUrl(`/api/home/seo-meta?slug=${encodeURIComponent(slug)}`),

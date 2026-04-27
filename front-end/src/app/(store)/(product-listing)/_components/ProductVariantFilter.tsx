@@ -8,6 +8,7 @@ type ProductVariantFilterProps = {
     productSlug: string;
     selectedVariant?: AttributeProductTerms;
     availableAttributes: AttributeTerms[];
+    filteredAttributeTerms: AttributeTerms[];
     allVariants: ProductVariant[];
     onVariantChange?: (payload: VariantSelectionPayload) => void;
     selectedAttributeSlugs?: Record<number, string>;
@@ -116,12 +117,13 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     // productSlug,
     selectedVariant,
     availableAttributes,
+    filteredAttributeTerms,
     // allVariants
     onVariantChange,
     selectedAttributeSlugs,
     primaryAttributeId
 }) => {
-    // Filter out attributes that are not used in variation and not used in
+    // Filter out attributes that are not used in variation
     const attributeTermData = attributeTerms.filter(
         (attributeTerm) => attributeTerm.attribute.used_in_variation
     );
@@ -133,6 +135,49 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
         selectedAttributeSlugs,
         primaryAttributeId ?? undefined
     );
+
+    const hasActiveFilters = Boolean(selectedAttributeSlugs && Object.keys(selectedAttributeSlugs).length > 0);
+
+    const visibleAttributeTermData = attributeTermData.map((attributeTerm) => {
+        if (!hasActiveFilters) {
+            return attributeTerm;
+        }
+
+        // Primary attribute always shows all its terms so the user can freely
+        // change their flavour/first selection without restrictions.
+        if (primaryAttributeId != null && attributeTerm.attribute.id === primaryAttributeId) {
+            return attributeTerm;
+        }
+
+        // Term IDs the API says are still selectable (next-step options).
+        // `availableAttributes` falls back to `lastKnownAvailableTerms` in ProductDetails
+        // so this stays populated even after a full selection resolves.
+        const availableTermIds = new Set(
+            (availableAttributes.find(a => a.attribute.id === attributeTerm.attribute.id)?.terms ?? [])
+                .map(t => t.id)
+        );
+
+        // Term IDs that are part of the current resolved combination (filtered_attribute_terms).
+        const filteredTermIds = new Set(
+            (filteredAttributeTerms.find(a => a.attribute.id === attributeTerm.attribute.id)?.terms ?? [])
+                .map(t => t.id)
+        );
+
+        // Show a term if it is selectable OR is already part of the resolved variant.
+        const visibleIds = new Set([...availableTermIds, ...filteredTermIds]);
+
+        // If nothing was found (e.g. no selection yet for this attribute), show all terms.
+        if (visibleIds.size === 0) {
+            return attributeTerm;
+        }
+
+        const visibleTerms = attributeTerm.terms.filter(term => visibleIds.has(term.id));
+
+        return {
+            ...attributeTerm,
+            terms: visibleTerms,
+        };
+    });
 
     // useEffect(() => {
     //     if (!selectedVariant && attributeTermData.length > 0) {
@@ -150,7 +195,7 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
 
     return (
         <div className='space-y-2 lg:space-y-3.5'>
-            {attributeTermData?.map((attributeTerm) => (
+            {visibleAttributeTermData?.map((attributeTerm) => (
                 attributeTerm.attribute.type === "select" ?
                     <SelectAttributeTerms
                         key={attributeTerm.attribute.id}

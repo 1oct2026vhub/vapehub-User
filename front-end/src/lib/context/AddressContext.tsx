@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { AddressFormData } from '@/lib/config/address.config';
 import { addUserAddress, deleteUserAddress, getUserAddresses, updateUserAddress } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
@@ -42,7 +42,7 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
 
   
 
-  const fetchAddresses = async () => {
+  const fetchAddresses = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -66,7 +66,7 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const addAddress = async (addressData: AddressFormData) => {
     try {
@@ -171,13 +171,13 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchAddresses();
+      void fetchAddresses();
     } else {
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchAddresses]);
 
-  const value = {
+  const value = useMemo(() => ({
     addresses,
     isLoading,
     error,
@@ -185,7 +185,7 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
     updateAddress,
     deleteAddress,
     fetchAddresses,
-  };
+  }), [addresses, isLoading, error, fetchAddresses]);
 
   return <AddressContext.Provider value={value}>{children}</AddressContext.Provider>;
 }; 

@@ -1,5 +1,6 @@
+'use client';
+
 import React, { createContext, useContext, useCallback, useState, useEffect, ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
 import {
   getNotificationList,
   getUnreadNotificationCount,
@@ -27,7 +28,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<NotificationList[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
-  const pathname = usePathname();
   const {status} = useSession();
 
   const fetchNotifications = useCallback(async () => {
@@ -71,7 +71,15 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     if(status === 'authenticated') {
       fetchNotifications();
     }
-  }, [fetchNotifications, pathname, status]);
+  }, [fetchNotifications, status]);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    const interval = setInterval(() => {
+      void fetchNotifications();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications, status]);
 
   return (
     <NotificationContext.Provider value={{

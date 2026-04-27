@@ -17,7 +17,11 @@ interface FAQProps {
     type: "product" | "brand" | "category" | "variant" | "common" | "blog";
     id: number;
     showAll?: boolean;
+    initialFaqs?: FaqResponse[];
 }
+
+const normalizeFaqs = (items: FaqResponse[] = [], showAll: boolean = false): FaqResponse[] =>
+    showAll ? items : items.slice(0, 10);
 
 const FAQSection: React.FC<FAQProps> = ({
     title = "FAQ",
@@ -25,6 +29,7 @@ const FAQSection: React.FC<FAQProps> = ({
     type,
     id,
     showAll = false,
+    initialFaqs = [],
 }) => {
  
     const itemClasses = {
@@ -34,19 +39,24 @@ const FAQSection: React.FC<FAQProps> = ({
         indicator: "text-medium text-skin-neutral-500 -rotate-90 data-[open=true]:rotate-90",
         content: "font-bold text-skin-neutral-300 !text-content-1 !py-0 !pb-4",
     };
-    const [faqs, setFaqs] = useState<FaqResponse[]>([]);
+    const [faqs, setFaqs] = useState<FaqResponse[]>(() => normalizeFaqs(initialFaqs, showAll));
     useEffect(() => {
+        // If FAQs are provided by the server for this view, avoid a duplicate client fetch.
+        if (initialFaqs.length > 0) {
+          setFaqs(normalizeFaqs(initialFaqs, showAll));
+          return;
+        }
         const fetchFaqs = async () => {
           const faqs = await getFaqs(type, id);
           if (faqs.status === ServerActionStatus.SUCCESS) {
-            setFaqs(showAll ? faqs.data : faqs.data.slice(0, 10));
+            setFaqs(normalizeFaqs(faqs.data, showAll));
           } else {
             setFaqs([]);
             toast.error(faqs.message);
           }
         };
         fetchFaqs();
-      }, [type, id, showAll]);
+      }, [type, id, showAll, initialFaqs]);
 
     return (
         <div className="w-full space-y-3 md:space-y-5 xl:space-y-7.5">

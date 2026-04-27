@@ -1,23 +1,94 @@
-import { getBlogByCategoryAndSlug, getBlogBySlug, getDynamicPageSlug, getProductByCategory, getProductVariantByID, getSeoMetaBySlug, getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
+import { getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { redirect, RedirectType } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
 import ProductView from "../ProductView";
 import CategoryBlogs from "../../blogs/_components/CategoryBlog";
-import { DynamicPageSlugResponse, SeoMetaResponse } from "@/lib/config/global.config";
-import { AttributeProductTerms, AttributeTerms, CategoryResponseData, ProductResponse, Product, ProductReview } from "@/lib/config/product.config";
-import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
+import { DynamicPageSlugResponse, FaqResponse } from "@/lib/config/global.config";
+import { AttributeProductTerms, AttributeTerms, Product, ProductReview } from "@/lib/config/product.config";
 import BlogListView from "../../blogs/_components/BlogList";
-import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
+import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE } from "@/lib/api-routes";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 import JsonLd from "@/components/JsonLd";
-import { buildProductSchema, buildBreadcrumbSchema, buildFaqSchema, getRatingFromReviewResponse, toAbsoluteUrl, SCHEMA_CONTEXT } from "@/lib/seo-schema";
+import { getRatingFromReviewResponse, toAbsoluteUrl } from "@/lib/seo-schema";
+import {
+  buildProductJsonLdData,
+  buildVariantParams,
+  fetchBlogByCategoryAndSlug,
+  fetchBlogBySlug,
+  fetchCategory,
+  fetchDynamicPageSlugWithFallback,
+  fetchProduct,
+  fetchSeoMetaBySlug,
+  getCategoryPaginationLinks,
+  normalizeRedirectUrl,
+  resolveBaseUrl,
+} from "./page.helpers";
 
 type PageProps = {
   slug: string[];
 };
-const BASE_URL = (process.env.NEXTAUTH_URL || "https://www.vapehub.co.uk").replace(/\/$/, "");
+const BASE_URL = resolveBaseUrl();
+
+const extractFaqList = (payload: unknown): FaqResponse[] => {
+  if (Array.isArray(payload)) return payload as FaqResponse[];
+  if (!payload || typeof payload !== "object") return [];
+
+  const candidate = payload as { faqs?: unknown; items?: unknown; rows?: unknown; data?: unknown };
+  if (Array.isArray(candidate.faqs)) return candidate.faqs as FaqResponse[];
+  if (Array.isArray(candidate.items)) return candidate.items as FaqResponse[];
+  if (Array.isArray(candidate.rows)) return candidate.rows as FaqResponse[];
+  if (Array.isArray(candidate.data)) return candidate.data as FaqResponse[];
+
+  return [];
+};
+
+const resolveServerFaqs = async ({
+  productId,
+  entityId,
+  variantId,
+  variantTermId,
+  categoryId,
+}: {
+  productId: number;
+  entityId?: number;
+  variantId?: number;
+  variantTermId?: number;
+  categoryId?: number;
+}) => {
+  const requests: Array<Promise<ServerActionResponse<unknown>>> = [
+    getFaqs("product", productId),
+  ];
+
+  if (entityId && entityId !== productId) {
+    requests.push(getFaqs("product", entityId));
+  }
+
+  if (variantId) {
+    requests.push(getFaqs("variant", variantId));
+  }
+
+  if (variantTermId && variantTermId !== variantId) {
+    requests.push(getFaqs("variant", variantTermId));
+  }
+
+  if (categoryId) {
+    requests.push(getFaqs("category", categoryId));
+  }
+
+  const responses = await Promise.all(requests);
+  for (const response of responses) {
+    if (response.status === ServerActionStatus.SUCCESS) {
+      const faqList = extractFaqList(response.data);
+      if (faqList.length > 0) {
+        return faqList;
+      }
+    }
+  }
+
+  return [];
+};
 
 const Page = async ({
   params,
@@ -34,7 +105,7 @@ const Page = async ({
   const searchParamsData = await searchParams;
   const primarySlug: string | null = slug[0];
   const secondarySlug: string | null = slug[1];
-  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug.join("/"));
   if (!dynamicPageSlug) {
     return <PageNotFound />;
   }
@@ -89,9 +160,9 @@ const Page = async ({
 
     // Parallel fetch: Product (required), FAQ, Rating (optional)
     const entityId = dynamicPageSlug?.entity_id ?? 0;
-    const [productRes, faqRes, ratingRes] = await Promise.allSettled([
+    const [productRes, , ratingRes] = await Promise.allSettled([
       fetchProduct(entityId, payload),
-      getFaqs("product", entityId, false),
+      getFaqs("product", entityId),
       getReviewOrderByProductId(entityId, 1, 1),
     ]);
 
@@ -111,42 +182,28 @@ const Page = async ({
     }
 
     const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}/${secondarySlug}`);
-    const faqs = faqRes.status === "fulfilled" && faqRes.value?.status === ServerActionStatus.SUCCESS ? faqRes.value.data : [];
+    const faqs = await resolveServerFaqs({
+      productId: data.product.id,
+      entityId,
+      variantId: data.variants?.[0]?.id,
+      variantTermId: variant?.terms?.id,
+      categoryId: data.product.category?.id,
+    });
     const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
       ? getRatingFromReviewResponse(ratingRes.value.data)
       : null;
-
-    const productSchema = buildProductSchema({
-      productResponse: data,
-      productUrl,
+    const jsonLdData = buildProductJsonLdData({
       baseUrl: BASE_URL,
+      data,
+      productUrl,
+      faqs,
       ratingData,
-      currency: "GBP",
     });
-    const breadcrumbSchema = buildBreadcrumbSchema({
-      baseUrl: BASE_URL,
-      categoryName: data.product.category?.name ?? "Category",
-      categorySlug: data.product.category?.slug ?? "",
-      productName: data.product.name,
-      productUrl,
-      shopLabel: "Shop",
-      shopPath: "/shop",
-    });
-    const faqSchema = buildFaqSchema(faqs ?? []);
-    const graph: Record<string, unknown>[] = [
-      productSchema,
-      breadcrumbSchema,
-      ...(faqSchema ? [faqSchema] : []),
-    ];
-    const jsonLdData = {
-      "@context": SCHEMA_CONTEXT,
-      "@graph": graph,
-    };
 
     return (
       <>
         <JsonLd data={jsonLdData} />
-        <ProductView data={data} isVariant={true} selectedVariant={variant} />
+        <ProductView data={data} isVariant={true} selectedVariant={variant} productFaqs={faqs} />
       </>
     );
   }
@@ -220,15 +277,19 @@ const Page = async ({
             total_reviews: product.review_stats?.total_reviews || 0
           }
         })) : [];
-        return <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />;
+        return (
+          <>
+            <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
+          </>
+        );
       }
       return null;
     },
     product: async () => {
       const entityId = dynamicPageSlug?.entity_id ?? 0;
-      const [productRes, faqRes, ratingRes] = await Promise.allSettled([
+      const [productRes, , ratingRes] = await Promise.allSettled([
         fetchProduct(entityId, []),
-        getFaqs("product", entityId, false),
+        getFaqs("product", entityId),
         getReviewOrderByProductId(entityId, 1, 1),
       ]);
 
@@ -238,42 +299,26 @@ const Page = async ({
       }
 
       const productUrl = toAbsoluteUrl(BASE_URL, `/${data.product.slug}`);
-      const faqs = faqRes.status === "fulfilled" && faqRes.value?.status === ServerActionStatus.SUCCESS ? faqRes.value.data : [];
+      const faqs = await resolveServerFaqs({
+        productId: data.product.id,
+        entityId,
+        variantId: data.variants?.[0]?.id,
+        categoryId: data.product.category?.id,
+      });
       const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
         ? getRatingFromReviewResponse(ratingRes.value.data)
         : null;
-
-      const productSchema = buildProductSchema({
-        productResponse: data,
-        productUrl,
+      const jsonLdData = buildProductJsonLdData({
         baseUrl: BASE_URL,
+        data,
+        productUrl,
+        faqs,
         ratingData,
-        currency: "GBP",
       });
-      const breadcrumbSchema = buildBreadcrumbSchema({
-        baseUrl: BASE_URL,
-        categoryName: data.product.category?.name ?? "Category",
-        categorySlug: data.product.category?.slug ?? "",
-        productName: data.product.name,
-        productUrl,
-        shopLabel: "Shop",
-        shopPath: "/shop",
-      });
-      const faqSchema = buildFaqSchema(faqs ?? []);
-      const graph: Record<string, unknown>[] = [
-        productSchema,
-        breadcrumbSchema,
-        ...(faqSchema ? [faqSchema] : []),
-      ];
-      const jsonLdData = {
-        "@context": SCHEMA_CONTEXT,
-        "@graph": graph,
-      };
-
       return (
         <>
           <JsonLd data={jsonLdData} />
-          <ProductView data={data} />
+          <ProductView data={data} productFaqs={faqs} />
         </>
       );
     }
@@ -300,115 +345,20 @@ export const revalidate = 60;
 // Allow dynamic params for paths not in generateStaticParams
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  // Static product slugs for ISR - no API calls needed
-  const productSlugs = [
-    'ivg-intense-salts-e-liquid',
-    'crystal-prime-nic-salts',
-    'vnsn-quake-10000-pods',
-    'vnsn-quake-10000-prefilled-pod-kit'
-  ];
+// export async function generateStaticParams() {
+//   // Static product slugs for ISR - no API calls needed
+//   const productSlugs = [
+//     'ivg-intense-salts-e-liquid',
+//     'crystal-prime-nic-salts',
+//     'vnsn-quake-10000-pods',
+//     'vnsn-quake-10000-prefilled-pod-kit'
+//   ];
 
-  return productSlugs.map((slug) => ({
-    slug: [slug]
-  }));
-}
+//   return productSlugs.map((slug) => ({
+//     slug: [slug]
+//   }));
+// }
 
-const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
-  const response = await getDynamicPageSlug(slug);
-  console.log("dynamic page slug response", response);
-  if (response.status === ServerActionStatus.ERROR) {
-    return null;
-  }
-  return response.data;
-};
-
-const fetchCategory = async (slug: string, params: PRODUCT_PAYLOAD): Promise<CategoryResponseData | null> => {
-
-  const response = await getProductByCategory(slug, params);
-  if (response.status === ServerActionStatus.ERROR) {
-    return null;
-  }
-  return response.data;
-};
-
-const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Promise<ProductResponse | null> => {
-
-  const payload: PRODUCT_VARIANT_PAYLOAD = {
-    product_id: id,
-    attribute_terms: params
-  }
-
-  const response = await getProductVariantByID(payload);
-
-  if (response.status === ServerActionStatus.ERROR) {
-    return null;
-  }
-  return response.data;
-};
-
-const fetchBlogByCategoryAndSlug = async (categorySlug: string): Promise<BlogByCategoryAndSlugResponse | null> => {
-  const response = await getBlogByCategoryAndSlug(categorySlug);
-  if (response.status === ServerActionStatus.ERROR) {
-    return null;
-  }
-  return response.data;
-};
-
-const fetchBlogBySlug = async (slug: string): Promise<BlogBySlugResponse | null> => {
-  const response = await getBlogBySlug(slug);
-  if (response.status === ServerActionStatus.ERROR) {
-    return null;
-  }
-  return response.data;
-};
-
-const fetchSeoMetaBySlug = async (slug: string): Promise<SeoMetaResponse | null> => {
-  const response = await getSeoMetaBySlug(slug);
-  if (response.status === ServerActionStatus.ERROR) {
-    return null;
-  }
-  return response.data;
-};
-
-const buildVariantParams = (searchParamsData: Record<string, string>, defaultParams: PRODUCT_PAYLOAD) => {
-  const variantParams = Object.entries(searchParamsData)
-    .reduce((acc: Record<string, unknown>, [key, value]) => {
-      if (key.startsWith('attribute_')) {
-        const attributeId = key.replace('attribute_', '');
-        const values = value.split(',').map(Number);
-
-        // Build variant object
-        const variantObj = acc.variant ? JSON.parse(acc.variant as string) : {};
-        variantObj[attributeId] = values;
-
-        // Encode variant object as URL parameter
-        acc.variant = JSON.stringify(variantObj);
-      } else {
-        acc[key] = value;
-      }
-      return acc;
-    }, { ...defaultParams });
-
-  return Object.keys(variantParams).length > 1 ? variantParams : defaultParams;
-};
-
-function normalizeRedirectUrl(input?: string): string | null {
-  let dest = (input ?? '').trim();
-  if (!dest) return null;
-
-  // Some API responses come as "/https://example.com/path" – fix that
-  if (dest.startsWith('/http://') || dest.startsWith('/https://')) {
-    dest = dest.slice(1);
-  }
-
-  // If it's relative but missing a leading slash, add it
-  if (!/^https?:\/\//i.test(dest) && !dest.startsWith('/')) {
-    dest = `/${dest}`;
-  }
-
-  return dest;
-}
 
 export async function generateMetadata({ params, searchParams }: {
   params: Promise<PageProps>,
@@ -420,9 +370,9 @@ export async function generateMetadata({ params, searchParams }: {
   // const defaultParams = { sort_by: "id", order: "DESC", limit: 12, offset: 0 } as const;
   const searchParamsData = await searchParams;
 
-  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlug(primarySlug);
+  const dynamicPageSlug: DynamicPageSlugResponse | null = await fetchDynamicPageSlugWithFallback(slug.join("/"));
   if (!dynamicPageSlug) {
-    return <PageNotFound />;
+    return {};
   }
 
   // If this slug is configured to redirect, avoid generating metadata for the old URL.
@@ -468,30 +418,74 @@ export async function generateMetadata({ params, searchParams }: {
       });
     }
 
+    const buildVariantFirstTitle = (variantLabel: string, baseTitle: string): string => {
+      const normalizedBaseTitle = baseTitle.trim();
+      const normalizedVariant = variantLabel.trim();
+      const titleWithoutSite = normalizedBaseTitle.replace(/\s*\|\s*vapehub\s*$/i, "").trim();
+      const baseWithoutVariantPrefix = titleWithoutSite.toLowerCase().startsWith(normalizedVariant.toLowerCase())
+        ? titleWithoutSite.slice(normalizedVariant.length).trim()
+        : titleWithoutSite;
+      const variantFirstTitle = `${normalizedVariant} ${baseWithoutVariantPrefix}`.replace(/\s+/g, " ").trim();
+      return `${variantFirstTitle} | VapeHub`;
+    };
+
+    const buildVariantFirstDescription = (
+      variantLabel: string,
+      productName: string,
+      descriptionBase?: string,
+    ): string => {
+      const normalizedVariant = variantLabel.trim();
+      const normalizedProductName = productName.trim();
+      const prefix = `Buy ${normalizedVariant} ${normalizedProductName} at VapeHub.`;
+      const normalizedDescription = String(descriptionBase ?? "").trim();
+      if (!normalizedDescription) return prefix;
+      const cleanedDescription = normalizedDescription
+        .replace(/^buy\b[\s:-]*/i, "")
+        .replace(/^at vapehub[\s,.-]*/i, "")
+        .trim();
+      return cleanedDescription ? `${prefix} ${cleanedDescription}` : prefix;
+    };
+
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
-    if(data &&!data.variants.length) {
-       return {
-        title: dynamicPageSlug.seo?.title ?? data.product.name,
-        description: dynamicPageSlug.seo?.description ?? data.product.description,
+    if (data && !data.variants.length) {
+      const variantName = variant?.terms.name?.trim();
+      const titleBase = (dynamicPageSlug.seo?.title ?? data.product.name ?? "").trim();
+      const descriptionBase = dynamicPageSlug.seo?.description ?? data.product.description ?? "";
+      const title = variantName ? buildVariantFirstTitle(variantName, titleBase || data.product.name) : titleBase;
+      const description = variantName
+        ? buildVariantFirstDescription(variantName, data.product.name, descriptionBase)
+        : descriptionBase;
+      return {
+        title,
+        description,
         openGraph: {
-          title: dynamicPageSlug.seo?.title ?? data.product.name,
-          description: dynamicPageSlug.seo?.description ?? data.product.description,
-          
-        }
-       };
+          title,
+          description,
+        },
+      };
     }
-   
-    
-     if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
-      return <PageNotFound />;
+
+    if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
+      return {};
     }
-     
+
+    const variantName = variant.terms.name.trim();
+    const seoTitle = dynamicPageSlug.seo?.title?.trim();
+    const titleBase = seoTitle || data.product.name;
+    const title = buildVariantFirstTitle(variantName, titleBase);
+    const rawDescription = (dynamicPageSlug.seo?.description ?? data.product.description ?? "").trim();
+    const description = buildVariantFirstDescription(variantName, data.product.name, rawDescription);
+    const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
+
     return {
-      title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
-      description: dynamicPageSlug.seo?.description ?? data.product.description,
+      title,
+      description,
+      alternates: {
+        canonical: variantCanonicalUrl,
+      },
       openGraph: {
-        title: dynamicPageSlug.seo?.title ?? (variant ? `${variant.terms.name} - ${data.product.name}` : data.product.name),
-        description: dynamicPageSlug.seo?.description ?? data.product.description,
+        title,
+        description,
         images: data.variants[0].primary_image?.url ? [{
           url: data.variants[0].primary_image?.url,
           width: 1200,
@@ -722,10 +716,20 @@ export async function generateMetadata({ params, searchParams }: {
 
   const handler = metadataHandlers[dynamicPageSlug?.entity_type ?? ""];
   if (!handler) {
-    <PageNotFound />;
+    return {};
   }
 
   const metadata = dynamicPageSlug ? await handler() : null;
+  const paginationLinks = await getCategoryPaginationLinks({
+    baseUrl: BASE_URL,
+    dynamicPageSlug,
+    primarySlug,
+    searchParamsData,
+  });
+  const paginationIconLinks = [
+    ...(paginationLinks.prev ? [{ rel: "prev" as const, url: paginationLinks.prev }] : []),
+    ...(paginationLinks.next ? [{ rel: "next" as const, url: paginationLinks.next }] : []),
+  ];
 
   // Add self-referencing canonical URLs for paginated and filtered pages.
   // We prefer a stable canonical that includes the current page number when present.
@@ -742,10 +746,20 @@ export async function generateMetadata({ params, searchParams }: {
       alternates: {
         canonical: canonicalUrl,
       },
+      ...(paginationIconLinks.length
+        ? {
+            icons: {
+              other: paginationIconLinks,
+            },
+          }
+        : {}),
     };
   }
 
-  const typedMetadata = metadata as { alternates?: { canonical?: string } };
+  const typedMetadata = metadata as {
+    alternates?: { canonical?: string };
+    icons?: { other?: Array<{ rel?: string; url?: string }> };
+  };
 
   return {
     ...typedMetadata,
@@ -753,7 +767,12 @@ export async function generateMetadata({ params, searchParams }: {
       ...(typedMetadata.alternates ?? {}),
       canonical: canonicalUrl,
     },
+    icons: paginationIconLinks.length
+      ? {
+          ...(typedMetadata.icons ?? {}),
+          other: [...(typedMetadata.icons?.other ?? []), ...paginationIconLinks],
+        }
+      : typedMetadata.icons,
   };
 }
-
 

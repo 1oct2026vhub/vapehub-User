@@ -6,8 +6,18 @@ export enum CHECKOUT_PAYMENT_METHODS {
     WORLD_PAY = 'Worldpay'
 }
 
+/** Toggle via `NEXT_PUBLIC_CHECKOUT_PAYMENT_METHOD` (`worldpay` | `vivawallet`, case-insensitive). Defaults to Worldpay. */
+export function getDefaultCheckoutPaymentMethod(): CHECKOUT_PAYMENT_METHODS {
+    const v = process.env.NEXT_PUBLIC_CHECKOUT_PAYMENT_METHOD?.trim().toLowerCase()
+    if (v === 'vivawallet' || v === 'viva_wallet' || v === 'viva') {
+        return CHECKOUT_PAYMENT_METHODS.VIVA_WALLET
+    }
+    return CHECKOUT_PAYMENT_METHODS.WORLD_PAY
+}
 
-export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object({
+
+/** When `separateBillingDetails` is true, billing fields are required (user chose different billing address). */
+export const CHECKOUT_FORM_SCHEMA = (separateBillingDetails: boolean) => z.object({
     email: z.string().email('Please enter a valid email address'),
     phone: z.string()
         .min(1, 'Phone number is required')
@@ -58,21 +68,22 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
     .refine((val) => val.trim().length > 0, {
       message: "Country cannot be only whitespace"
     }),
-    useShippingAsBilling: z.boolean(),
+    /** True = user wants a different billing address than shipping (matches checkbox label). */
+    useDifferentBillingAddress: z.boolean(),
     // Billing Address
-    billingFirstName: !useShippingAsBilling ? z.string().optional() : z.string()
+    billingFirstName: !separateBillingDetails ? z.string().optional() : z.string()
     .min(1, 'First name is required')
     .max(50, 'First name must not exceed 50 characters')
     .refine((val) => val.trim().length > 0, {
       message: "First name cannot be only whitespace"
     }),
-    billingLastName: !useShippingAsBilling ? z.string().optional() : z.string()
+    billingLastName: !separateBillingDetails ? z.string().optional() : z.string()
     .min(1, 'Last name is required')
     .max(50, 'Last name must not exceed 50 characters')
     .refine((val) => val.trim().length > 0, {
       message: "Last name cannot be only whitespace"
     }),
-    billingAddress1: !useShippingAsBilling ? z.string().optional() : z.string()
+    billingAddress1: !separateBillingDetails ? z.string().optional() : z.string()
     .min(1, 'Address line 1 is required')
     .max(255, 'Address line 1 must not exceed 255 characters')
     .refine((val) => val.trim().length > 0, {
@@ -80,20 +91,20 @@ export const CHECKOUT_FORM_SCHEMA = (useShippingAsBilling: boolean) => z.object(
     }),
     billingAddress2: z.string().optional(),
     billingAddress3: z.string().optional(),
-    billingCity: !useShippingAsBilling ? z.string().optional() : z.string()
+    billingCity: !separateBillingDetails ? z.string().optional() : z.string()
     .min(1, 'City is required')
     .max(50, 'City must not exceed 50 characters')
     .refine((val) => val.trim().length > 0, {
       message: "City cannot be only whitespace"
     }),
-    billingPostcode: !useShippingAsBilling ? z.string().optional() : z.string().min(1, "Postcode is required")
+    billingPostcode: !separateBillingDetails ? z.string().optional() : z.string().min(1, "Postcode is required")
     .max(20, "Postcode must not exceed 20 characters")
     .regex(
       /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i,
       "Please enter a valid UK postcode"
     ),
     billingRegion: z.string().optional(),
-    billingCountry: !useShippingAsBilling ? z.string().optional() : z.string()
+    billingCountry: !separateBillingDetails ? z.string().optional() : z.string()
     .min(1, 'Country is required')
     .max(50, 'Country must not exceed 50 characters')
     .refine((val) => val.trim().length > 0, {
@@ -171,6 +182,11 @@ export interface CHECKOUT_PAYLOAD {
     };
     total: number;
     loyalty?: boolean;
+}
+
+/** Minimal POST body from the shopping cart before the full checkout form (API uses session + coupon). */
+export interface SHOPPING_CART_CHECKOUT_PAYLOAD {
+    couponCode?: string;
 }
 
 export interface GUEST_CHECKOUT_AND_ORDER_PAYLOAD {

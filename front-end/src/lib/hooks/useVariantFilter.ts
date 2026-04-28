@@ -1,4 +1,4 @@
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { AttributeTerms, AttributeProductTerms } from '@/lib/config/product.config';
 // import { ProductVariant } from '@/lib/config/product.config';
@@ -8,6 +8,7 @@ export type VariantSelectionPayload = {
   selectedTerm: AttributeTerms['terms'][number];
   isPrimaryAttribute: boolean;
   newUrl: string;
+  preservedScrollY: number;
 };
 
 export const useVariantFilter = (
@@ -20,7 +21,6 @@ export const useVariantFilter = (
   // allVariants?: ProductVariant[]
 ) => {
   const pathname = usePathname();
-  const router = useRouter();
   const [isFiltering, setIsFiltering] = useState(false);
 
   const hasActiveFilters = useCallback(() => {
@@ -47,6 +47,7 @@ export const useVariantFilter = (
 
   const handleVariantFilter = useCallback(
     (attributeTerm: AttributeTerms, selectedTerm: AttributeTerms['terms'][number]) => {
+      const preservedScrollY = window.scrollY;
       setIsFiltering(true);
       try {
         const pathSegments = pathname.split('/').filter(Boolean);
@@ -59,7 +60,8 @@ export const useVariantFilter = (
 
         if (isPrimaryAttribute && baseSlug) {
           newUrl = `/${baseSlug}/${selectedTerm.slug}`;
-          window.history.pushState({}, '', newUrl);
+          const withQuery = `${newUrl}${window.location.search}${window.location.hash}`;
+          window.history.pushState({}, '', withQuery);
         }
 
         onVariantChange?.({
@@ -67,12 +69,16 @@ export const useVariantFilter = (
           selectedTerm,
           isPrimaryAttribute: Boolean(isPrimaryAttribute),
           newUrl,
+          preservedScrollY,
+        });
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: preservedScrollY, left: 0, behavior: 'instant' as ScrollBehavior });
         });
       } finally {
         setIsFiltering(false);
       }
     },
-    [pathname, currentVariant, onVariantChange, primaryAttributeId, router]
+    [pathname, currentVariant, onVariantChange, primaryAttributeId]
   );
 
   const getDefaultSelectedTerm = useCallback((attributeId: number): string | undefined => {

@@ -252,7 +252,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                     {isFooterVisible && openItems.length === 0 && (
                         <DrawerFooter className='py-4 px-4 space-y-2 flex-col border-t border-skin-neutral-200 max-lg:landscape:hidden'>
                             <div className='p-4.5 bg-subscription-banner-mob bg-no-repeat bg-top rounded-lg bg-cover space-y-4 w-full'>
-                                <div className='!font-oswald text-content-2 font-semibold text-skin-white'>Signup Now to get rewarded</div>
+                                <h2 className='text-content-2 font-semibold text-skin-white'>Signup Now to get rewarded</h2>
                                 <Form {...subscribeFromConfig}>
                                     <form className='space-y-1.5 subscription-form'
                                         onSubmit={subscribeFromConfig.handleSubmit(handleFormSubmit)}
@@ -278,7 +278,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                                 </Form>
                             </div>
                             <div className='text-center space-y-2'>
-                                <div className='!font-oswald primary-gradient-600 text-title-1 font-bold'>Customer Support Hours</div>
+                                <h2 className='primary-gradient-600 text-title-1 font-bold'>Customer Support Hours</h2>
                                 <div>
                                     <p className='text-content-2 font-semibold text-skin-neutral-400'>10:00am - 4:00pm</p>
                                     <div className='text-content-2 font-semibold text-skin-neutral-400'>
@@ -295,7 +295,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                 <Drawer isOpen={isCartOpen} onOpenChange={onCartClose} className='filter-drawer rounded-l-32 md:!w-[637px] max-w-[90%] md:!max-w-[637px]'>
                     <DrawerContent>
                         <DrawerHeader className="flex flex-col gap-1 border-b border-skin-neutral-100">
-                            <div className='!font-oswald primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</div>
+                            <h1 className='primary-gradient-600 text-title-1 font-bold w-fit'>Shopping Cart</h1>
                         </DrawerHeader>
                         <DrawerBody className='max-sm:px-4'>
                             <div className='space-y-5 my-3'>

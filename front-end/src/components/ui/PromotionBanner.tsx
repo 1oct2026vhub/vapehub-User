@@ -29,7 +29,7 @@ const PromotionBanner: React.FC<PromotionBannerProps> = ({ messages }) => {
       role="alert"
       aria-live="polite"
     >
-      <div className="!font-oswald text-content-3 sm:text-content-1 lg:text-title-2 font-bold text-white">
+      <h5 className="text-content-3 sm:text-content-1 lg:text-title-2 font-bold text-white">
         {currentMessage.url ? (
           <a href={currentMessage.url}>
             {currentMessage.label}
@@ -37,7 +37,7 @@ const PromotionBanner: React.FC<PromotionBannerProps> = ({ messages }) => {
         ) : (
           currentMessage.label
         )}
-      </div>
+      </h5>
     </div>
   );
 };

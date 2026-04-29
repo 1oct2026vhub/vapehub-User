@@ -15,10 +15,6 @@ import { REVIEW_ORDER_RESPONSE, SHIPPING_METHOD_DATA } from '@/lib/config/order.
 import { useFeatureData } from '@/lib/hooks/useFeatureData'
 import GoogleMapsScript from '@/components/GoogleMapsScript'
 
-const CheckoutHeading = () => (
-    <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Checkout</h1>
-)
-
 const CheckoutPage: NextPage = (): ReactElement => {
 
     const { itemCount, cartItems } = useCart();
@@ -48,7 +44,7 @@ const CheckoutPage: NextPage = (): ReactElement => {
     if (itemCount === 0) {
         return (
             <main className='px-4 lg:px-9 xl:px-12.5 pt-5 pb-10 flex flex-col gap-7 lg:gap-10'>
-                <CheckoutHeading />
+                <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Checkout</h1>
                 <div className='text-center py-10'>
                     <EmptyPlaceholder
                         title="No items in cart"
@@ -66,7 +62,7 @@ const CheckoutPage: NextPage = (): ReactElement => {
                 {/* Google Maps API Script - Loaded only on this page */}
                 <GoogleMapsScript />
                 <main className='px-4 lg:px-9 xl:px-12.5 pt-5 pb-10 flex flex-col gap-7 lg:gap-10'>
-                    <CheckoutHeading />
+                    <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>Checkout</h1>
                     <section className='flex items-start flex-col-reverse lg:flex-row gap-5 xl:gap-7.5'>
                         <CheckoutDetails shippingMethodsData={shippingMethods} />
                         <div className='flex flex-col gap-6 md:gap-7 w-full xl:max-w-[584px]'>

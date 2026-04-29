@@ -20,6 +20,8 @@ interface FAQProps {
     initialFaqs?: FaqResponse[];
 }
 
+const EMPTY_FAQS: FaqResponse[] = [];
+
 const normalizeFaqs = (items: FaqResponse[] = [], showAll: boolean = false): FaqResponse[] =>
     showAll ? items : items.slice(0, 10);
 
@@ -29,7 +31,7 @@ const FAQSection: React.FC<FAQProps> = ({
     type,
     id,
     showAll = false,
-    initialFaqs = [],
+    initialFaqs = EMPTY_FAQS,
 }) => {
  
     const itemClasses = {

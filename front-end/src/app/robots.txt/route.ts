@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const API_URL = process.env.NEXT_PUBLIC_VAPE_HUB_API_BASE_URL;
+export const dynamic = 'force-dynamic';
 
 // export async function GET(_: NextRequest) {
 export async function GET() {

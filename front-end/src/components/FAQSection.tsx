@@ -71,11 +71,7 @@ const FAQSection: React.FC<FAQProps> = ({
                
             <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
                 {faqs.map((faq, index) => (
-                    <AccordionItem
-                        key={index}
-                        aria-label={faq.question}
-                        title={<h3 className="text-title-2 font-bold !font-oswald">{faq.question}</h3>}
-                    >
+                    <AccordionItem key={index} aria-label={faq.question} title={faq.question}>
                         <div className='rich-text' dangerouslySetInnerHTML={{ __html: faq.answer }} />
                     </AccordionItem>
                 //     <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">

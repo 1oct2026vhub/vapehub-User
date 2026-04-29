@@ -12,22 +12,22 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, referral}) => {
     return (
         <div className='grid grid-cols-2 space-y-3 justify-between max-md:pb-6 w-full'>
             <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order Total</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order Total</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                     <p>{DEFAULT_CURRENCY_SYMBOL}{data.total}</p>
                 </div>
             </div>
            <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Cost</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Cost</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                     <p>{DEFAULT_CURRENCY_SYMBOL}{data.shippingMethod?.shipping_cost || 0}</p>
                 </div>
             </div>
 
             <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Details</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Details</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
-                    <p className='!font-oswald'>{data.orderShippingAddress?.name || ""} {data.orderShippingAddress?.last_name || ""}</p>
+                    <h5>{data.orderShippingAddress?.name || ""} {data.orderShippingAddress?.last_name || ""}</h5>
                     <p>{data.orderShippingAddress?.street || ""}</p>
                     <p>{data.orderShippingAddress?.post_code || ""}</p>
                     <p>{data.orderShippingAddress?.country || DEFAULT_COUNTRY}</p>
@@ -35,16 +35,16 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, referral}) => {
             </div>
 
             <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Billing Details</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Billing Details</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
-                    <p className='!font-oswald'>{data.orderBillingAddress?.name || ""} {data.orderBillingAddress?.last_name || ""}</p>
+                    <h5>{data.orderBillingAddress?.name || ""} {data.orderBillingAddress?.last_name || ""}</h5>
                     <p>{data.orderBillingAddress?.street || ""}</p>
                     <p>{data.orderBillingAddress?.post_code || ""}</p>
                     <p>{data.orderBillingAddress?.country || DEFAULT_COUNTRY}</p>
                 </div>
             </div>
             <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Payment Method</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Payment Method</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                     <p>{data.paymentMethod?.payment_method || ""}</p>
                     {/* <p className='capitalize'>{data.paymentMethod?.status || ""}</p> */}
@@ -52,7 +52,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, referral}) => {
             </div>
 
             <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Contact Details</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Contact Details</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                     <p>{data.email || ""}</p>
                     <p>{data.phone || ""}</p>
@@ -60,7 +60,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, referral}) => {
             </div>
 
             <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Method</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Shipping Method</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                     <p>{data.shippingMethod?.shipping_method || ""}</p>
                 </div>
@@ -69,7 +69,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, referral}) => {
             {
                     referral && (
                     <div className='space-y-2'>
-                        <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Applied Coupon</div>
+                        <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Applied Coupon</h4>
                         <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                             <p>{referral.coupon_code}</p>
                            <p>{referral.coupon_type === "percentage" ? `Extra ${referral.coupon_value}% off` : `Extra ${DEFAULT_CURRENCY_SYMBOL}${referral.coupon_value} off`}</p>
@@ -80,13 +80,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({data, referral}) => {
             }
 
             <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order ID</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order ID</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                     <p>{data.order_unique_id}</p>
                 </div>
             </div>
             <div className='space-y-2'>
-                <div className='!font-oswald text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order Date</div>
+                <h4 className='text-skin-neutral-400 font-semibold text-content-1 md:text-title-1'>Order Date</h4>
                 <div className='space-y-1 text-content-1 md:text-title-2 text-skin-neutral-300 font-bold'>
                     <p>{new Date(data.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                 </div>

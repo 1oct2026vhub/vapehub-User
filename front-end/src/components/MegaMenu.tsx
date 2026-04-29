@@ -173,7 +173,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                     <>
                         <div className={`border-b border-skin-neutral-200 ${shouldShowImageSection ? 'mb-2 pb-2' : 'mb-1 pb-1'}`}>
                             <div className="flex items-center gap-2">
-                                <div 
+                                <h3 
                                     className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-green-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left' : ''}`}
                                     onClick={() => {
                                         if (menuItem.original && menuItem.original !== '#') {
@@ -182,7 +182,7 @@ export const MegaMenu: React.FC<{ isOpen: boolean; menuItems: HeaderMegaMenu[]; 
                                     }}
                                 >
                                     {menuItem.label}
-                                </div>
+                                </h3>
                                 {/* New tag */}
                                 {extendedMenuItem.is_new && (                      
                                 <span className="bg-gradient-to-r from-[#001137] to-[#042A82] text-white text-xs px-2 py-0.5 rounded-md font-medium">

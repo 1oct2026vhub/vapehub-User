@@ -146,7 +146,7 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral }: {
     }    
     return (
         <div>
-            <div className="!font-oswald text-title-3 md:text-title-2 font-semibold text-skin-neutral-400 mb-2">Referral Rewards</div>
+            <h3 className="text-title-3 md:text-title-2 font-semibold text-skin-neutral-400 mb-2">Referral Rewards</h3>
             {
                 (!coupons || isReferral) ?
 
@@ -163,9 +163,9 @@ const MyReferrals = ({ referralMethods, data, coupons, isReferral }: {
 
                         {!isReferral && data?.referrer?.referral_value !== '0' &&
                         <div className="flex items-center gap-2">
-                            <div className="!font-oswald text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
+                            <h4 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
                                 {coupons}
-                            </div>
+                            </h4>
                             <Button
                                 size="sm"
                                 color='primary'

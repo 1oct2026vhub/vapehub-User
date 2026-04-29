@@ -395,7 +395,7 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 					</div>
 					<div className="space-y-4 w-full max-w-lg">
 						<Link href={productLink}>
-							<div className="!font-oswald font-semibold text-[20px] leading-[100%] tracking-normal text-skin-black mr-10">{name}</div>
+							<h3 className="!font-oswald font-semibold text-[20px] leading-[100%] tracking-normal text-skin-black mr-10">{name}</h3>
 						</Link>
 						{isLoading ? (
 							<div className="space-y-2">
@@ -482,9 +482,9 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 				</Link>
 				<div className="flex flex-col px-2.5 pb-2.5 pt-2 gap-2 h-full justify-between">
 					<Link href={productLink}>
-						<div className="!font-oswald text-content-1 font-semibold text-[12px] md:text-[20px] text-skin-neutral-500 line-clamp-2">
+						<h4 className="text-content-1 font-semibold text-[12px] md:text-[20px] text-skin-neutral-500 line-clamp-2">
 							{name}
-						</div>
+						</h4>
 					</Link>
 					<div className="flex items-center gap-2">
 						{/* Show discount price if it exists and is greater than zero, otherwise show regular price */}

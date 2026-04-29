@@ -42,7 +42,7 @@ const UnavailableItemsModal: React.FC<UnavailableItemsModalProps> = ({
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              <div className="!font-oswald text-skin-neutral-500 font-bold">Unavailable Items in Cart</div>
+              <h3 className="text-skin-neutral-500 font-bold">Unavailable Items in Cart</h3>
             </ModalHeader>
             <ModalBody>
               <p className="text-skin-neutral-400 mb-4">
@@ -63,9 +63,9 @@ const UnavailableItemsModal: React.FC<UnavailableItemsModalProps> = ({
                           </div>
                         
                         <div>
-                          <div className="!font-oswald text-content-2 font-semibold text-skin-neutral-500">
+                          <h4 className="text-content-2 font-semibold text-skin-neutral-500">
                             {item?.name || 'Product'}
-                          </div>
+                          </h4>
                           <p className="text-skin-red-400 text-sm">{item.errorMessage}</p>
                         </div>
                         {/* {

@@ -428,13 +428,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
         };
         fetchLinkedProducts();
     }, [product.id]);  
-
+    
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 {/* Title section mobile */}
                 <div className='space-y-2 lg:hidden'>
-                    <div className='!font-oswald text-h4 text-skin-neutral-500 font-semibold'>{productName}</div>
+                    <h2 className='text-h4 text-skin-neutral-500 font-semibold'>{productName}</h2>
                     <div className='block text-content-1 text-skin-neutral-500 w-fit'>
                         Brand:
                         {product?.product_brands?.map((brand, index) => (
@@ -673,7 +673,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             <Divider />
             {linkedProducts.length > 0 && (
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
-                    <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>Frequently Bought Together</h2>
+                    <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>Pair It Up</h2>
                     <div className={`grid ${linkedProducts.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3 md:flex md:flex-col md:gap-5.5`}>
                         {linkedProducts?.map((linkedProduct, index) => {
                             // Convert LinkedProduct to ProductInDeal format for BundleProductCard

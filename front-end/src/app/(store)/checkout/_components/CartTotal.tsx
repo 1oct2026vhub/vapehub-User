@@ -354,7 +354,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     
     return (
         <div className='flex flex-col p-3 md:p-5 gap-4 md:gap-6 bg-white border border-skin-neutral-100 rounded w-full shadow-checkout'>
-            <h3 className='primary-gradient-600 text-title-2 md:text-2xl font-semibold w-fit'>Cart Total</h3>
+            <div className='!font-oswald primary-gradient-600 text-title-2 md:text-2xl font-semibold w-fit'>Cart Total</div>
             <div className='flex flex-col gap-3'>
                 {!isRedeemed && (
                     <CouponForm

@@ -82,7 +82,7 @@ const ReviewCard: React.FC<{ review: REVIEWS }> = ({ review }) => {
                 </div>
             </div>
             <div className='flex items-center gap-3'>
-                <h4 className='text-22 text-skin-blue-500 font-semibold capitalize'>{getDisplayName()}</h4>
+                <div className='!font-oswald text-22 text-skin-blue-500 font-semibold capitalize'>{getDisplayName()}</div>
                 {review.verified_by && (
                     <span className="text-sm font-medium text-[#02643E]">(Verified Owner)</span>
                 )}

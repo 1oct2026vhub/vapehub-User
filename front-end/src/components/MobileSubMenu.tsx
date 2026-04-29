@@ -208,7 +208,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems, parentMenu, on
                     <>
                         <div className={`${level > 0 ? 'border-b border-skin-neutral-200' : ''} mb-2 pb-2`}>
                             <div className="flex items-center gap-2">
-                                <h3 
+                                <div 
                                     className={`text-title-2 font-bold text-skin-neutral-500 ${menuItem.original && menuItem.original !== '#' ? 'cursor-pointer hover:underline' : ''}`}
                                     onClick={() => {
                                         if (menuItem.original && menuItem.original !== '#') {
@@ -222,7 +222,7 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems, parentMenu, on
                                     }}
                                 >
                                     {menuItem.label}
-                                </h3>
+                                </div>
                                 {/* New tag */}
                                 {extendedMenuItem.is_new && (                      
                                     <span className="bg-gradient-to-r from-[#001137] to-[#042A82] text-white text-xs px-2 py-0.5 rounded-md font-medium">
@@ -342,9 +342,9 @@ const MobileSubMenu: React.FC<MobileSubMenuProps> = ({ menuItems, parentMenu, on
                                         className="w-full h-32 object-contain transition-transform hover:scale-105 rounded-10"
                                     />
                                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                                        <h4 className="text-white text-xs font-semibold truncate">
+                                        <div className="text-white text-xs font-semibold truncate">
                                             {item.label}
-                                        </h4>
+                                        </div>
                                         {item.price && (
                                             <p className="text-white/90 text-xs">
                                                 £{item.price}

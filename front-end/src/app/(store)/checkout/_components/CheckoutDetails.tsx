@@ -1,9 +1,16 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CHECKOUT_FORM_SCHEMA, CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS, type CHECKOUT_FORM_TYPE } from '@/lib/config/checkout.config';
+import {
+    CHECKOUT_FORM_SCHEMA,
+    CHECKOUT_PAYLOAD,
+    CHECKOUT_PAYMENT_METHODS,
+    type CHECKOUT_FORM_TYPE,
+    GUEST_CHECKOUT_AND_ORDER_PAYLOAD,
+    getDefaultCheckoutPaymentMethod,
+} from '@/lib/config/checkout.config';
 import { SHIPPING_METHOD_DATA, ORDER_RESPONSE_DATA, GuestCheckoutResponseData } from '@/lib/config/order.config';
 import InputForm from '@/components/InputForm';
 import CustomCheckbox from '@/components/FormCheckbox';
@@ -20,16 +27,21 @@ import Flag from '@/components/ui/Flag';
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils';
 import { placeOrder, guestCheckoutAndOrder } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
-// import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
-// import { PlaceAutocompleteAddress } from '@/lib/utils/google-place.utils';
 import { toast } from 'sonner';
 import UnavailableItemsModal from './UnavailableItemsModal';
 import { useSession } from 'next-auth/react';
 import { getCookie } from 'cookies-next';
-import { GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config';
 import { CartItem } from '@/lib/config/cart.config';
 import { getGuestCart } from '@/lib/utils/storage';
-import { orderMeetsFreeShippingThreshold } from '@/lib/utils';
+import {
+    buildAuthShippingAddress,
+    buildBillingAddressPayload,
+    buildGuestShippingAddress,
+    calculateCheckoutPayloadTotal,
+    deriveShippingMethodsForCheckout,
+    parseWorldPayPlaceOrderData,
+    toApiUseShippingAsBilling,
+} from '@/lib/utils/checkout-order.utils';
 
 interface CheckoutDetailsProps {
     shippingMethodsData: SHIPPING_METHOD_DATA[];
@@ -39,23 +51,21 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     const { status } = useSession();
     const isAuthenticated = status === 'authenticated';
     const { fetchProfile } = useUserProfile();
-    const [shippingAsBilling, setShippingAsBilling] = useState(true);
     const [shippingMethods, setShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
-    const [originalShippingMethods, setOriginalShippingMethods] = useState<SHIPPING_METHOD_DATA[]>([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const form = useForm<CHECKOUT_FORM_TYPE>({
-        resolver: zodResolver(CHECKOUT_FORM_SCHEMA(shippingAsBilling)),
+        resolver: ((values, context, options) =>
+            zodResolver(CHECKOUT_FORM_SCHEMA(Boolean(values.useDifferentBillingAddress)))(values, context, options)) as Resolver<CHECKOUT_FORM_TYPE>,
         mode: 'all',
         defaultValues: {
             email: '',
             phone: '',
             ageConfirmation: false,
-            useShippingAsBilling: false,
+            useDifferentBillingAddress: false,
             termsAgreement: false,
             shippingMethodId: 0,
             marketingConsent: false,
-            // paymentMethod: CHECKOUT_PAYMENT_METHODS.VIVA_WALLET,
-            paymentMethod: CHECKOUT_PAYMENT_METHODS.WORLD_PAY,
+            paymentMethod: getDefaultCheckoutPaymentMethod(),
             selectedAddressId: undefined,
             shippingFirstName: '',
             shippingLastName: '',
@@ -76,6 +86,11 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             billingRegion: '',
             billingCountry: DEFAULT_COUNTRY
         }
+    });
+    const useDifferentBillingAddressWatched = useWatch({
+        control: form.control,
+        name: 'useDifferentBillingAddress',
+        defaultValue: false,
     });
     const { handlePlaceOrder, isProcessing, setSelectedShippingMethod } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
@@ -132,32 +147,17 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 cartItems: cartItemsForApi,
                 couponCode: couponDiscount.code || undefined,
                 shipping_method_id: Number(selectedCarrier?.id) || 0,
-                shipping_address: {
-                    first_name: data.shippingFirstName || '',
-                    last_name: data.shippingLastName || '',
-                    address_line_1: data.shippingAddress1 || '',
-                    address_line_2: data.shippingAddress2 || '',
-                    city: data.shippingCity || '',
-                    region: data.shippingRegion || '',
-                    post_code: data.shippingPostcode || '',
-                    country: data.shippingCountry || DEFAULT_COUNTRY,
-                    shipping_address_id: null
-                },
-                billing_address: {
-                    first_name: !data.useShippingAsBilling ? data.shippingFirstName || '' : data.billingFirstName || '',
-                    last_name: !data.useShippingAsBilling ? data.shippingLastName || '' : data.billingLastName || '',
-                    address_line_1: !data.useShippingAsBilling ? data.shippingAddress1 || '' : data.billingAddress1 || '',
-                    address_line_2: !data.useShippingAsBilling ? data.shippingAddress2 || '' : data.billingAddress2 || '',
-                    city: !data.useShippingAsBilling ? data.shippingCity || '' : data.billingCity || '',
-                    region: !data.useShippingAsBilling ? data.shippingRegion || '' : data.billingRegion || '',
-                    post_code: !data.useShippingAsBilling ? data.shippingPostcode || '' : data.billingPostcode || '',
-                    country: !data.useShippingAsBilling ? data.shippingCountry || DEFAULT_COUNTRY : data.billingCountry || DEFAULT_COUNTRY
-                },
-                useShippingAsBilling: !data.useShippingAsBilling,
+                shipping_address: buildGuestShippingAddress(data),
+                billing_address: buildBillingAddressPayload(data),
+                useShippingAsBilling: toApiUseShippingAsBilling(data),
                 payment_method: {
                     method: data.paymentMethod
                 },
-                total: (cartTotal + 0) - couponDiscount.value - (loyaltyRedemption.discountValue || 0),
+                total: calculateCheckoutPayloadTotal(
+                    cartTotal,
+                    couponDiscount.value,
+                    loyaltyRedemption.discountValue ?? undefined
+                ),
                 loyalty: loyaltyRedemption.isRedeemed,
                 receive_promotions: data.marketingConsent || false
             };
@@ -170,40 +170,47 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 // The guest API returns: { data: { order: { order_code, worldpay_url, ... } } }
                 // But handlePlaceOrder expects: { data: { order_code, worldpay_url } }
                 const guestResponseData = response.data as unknown as GuestCheckoutResponseData;
+                const order = guestResponseData.order;
+                const wpData = order
+                    ? parseWorldPayPlaceOrderData({
+                          order_code: order.order_code,
+                          worldpay_url: order.worldpay_url,
+                      })
+                    : null;
+                if (!wpData) {
+                    toast.error('Invalid order response. Please try again or contact support.');
+                    return;
+                }
                 const transformedResponse: ORDER_RESPONSE_DATA = {
                     message: 'Order placed successfully',
-                    data: guestResponseData.order ? {
-                        order_code: guestResponseData.order.order_code,
-                        worldpay_url: guestResponseData.order.worldpay_url
-                    } : {
-                        order_code: '',
-                        worldpay_url: ''
-                    }
+                    data: wpData,
                 };
-                
-                
-                
-                await handlePlaceOrder({
+
+                const checkoutPayload: CHECKOUT_PAYLOAD = {
                     email: data.email,
                     phone: data.phone,
                     receive_promotions: data.marketingConsent || false,
                     shipping_address_id: 0,
-                    shipping_address: guestOrderPayload.shipping_address,
-                    billing_address: guestOrderPayload.billing_address,
+                    shipping_address: buildAuthShippingAddress(data),
+                    billing_address: buildBillingAddressPayload(data),
                     useShippingAsBilling: guestOrderPayload.useShippingAsBilling,
                     couponCode: guestOrderPayload.couponCode,
                     shipping_method_id: guestOrderPayload.shipping_method_id,
                     payment_method: guestOrderPayload.payment_method,
                     total: guestOrderPayload.total,
-                    loyalty: guestOrderPayload.loyalty
-                } as CHECKOUT_PAYLOAD, transformedResponse);
-                form.reset();
-                if (shippingMethods.length > 0) {
-                    setSelectedCarrier(shippingMethods[0]);
-                    setSelectedShippingMethod(shippingMethods[0]);
-                    form.setValue('shippingMethodId', shippingMethods[0].id);
+                    loyalty: guestOrderPayload.loyalty,
+                };
+
+                const redirectStarted = await handlePlaceOrder(checkoutPayload, transformedResponse);
+                if (redirectStarted) {
+                    form.reset();
+                    if (shippingMethods.length > 0) {
+                        setSelectedCarrier(shippingMethods[0]);
+                        setSelectedShippingMethod(shippingMethods[0]);
+                        form.setValue('shippingMethodId', shippingMethods[0].id);
+                    }
+                    setShowNewAddressForm(false);
                 }
-                setShowNewAddressForm(false);
             } else {
                 toast.error(response.message);
             }
@@ -216,48 +223,50 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             phone: data.phone,
             receive_promotions: data.marketingConsent || false,
             shipping_address_id: data.selectedAddressId || 0,
-            shipping_address: {
-                first_name: data.shippingFirstName || '',
-                last_name: data.shippingLastName || '',
-                address_line_1: data.shippingAddress1 || '',
-                address_line_2: data.shippingAddress2 || '',
-                city: data.shippingCity || '',
-                region: data.shippingRegion || '',
-                country: data.shippingCountry || DEFAULT_COUNTRY,
-                post_code: data.shippingPostcode || ''
-            },
-            billing_address: {
-                first_name: !data.useShippingAsBilling ? data.shippingFirstName || '' : data.billingFirstName || '',
-                last_name: !data.useShippingAsBilling ? data.shippingLastName || '' : data.billingLastName || '',
-                address_line_1: !data.useShippingAsBilling ? data.shippingAddress1 || '' : data.billingAddress1 || '',
-                address_line_2: !data.useShippingAsBilling ? data.shippingAddress2 || '' : data.billingAddress2 || '',
-                city: !data.useShippingAsBilling ? data.shippingCity || '' : data.billingCity || '',
-                region: !data.useShippingAsBilling ? data.shippingRegion || '' : data.billingRegion || '',
-                country: !data.useShippingAsBilling ? data.shippingCountry || DEFAULT_COUNTRY : data.billingCountry || DEFAULT_COUNTRY,
-                post_code: !data.useShippingAsBilling ? data.shippingPostcode || '' : data.billingPostcode || ''
-            },
-            useShippingAsBilling: !data.useShippingAsBilling,
+            shipping_address: buildAuthShippingAddress(data),
+            billing_address: buildBillingAddressPayload(data),
+            useShippingAsBilling: toApiUseShippingAsBilling(data),
             couponCode: couponDiscount.code || undefined,
             loyalty: loyaltyRedemption.isRedeemed,
             shipping_method_id: Number(selectedCarrier?.id) || 0,
             payment_method: {
                 method: data.paymentMethod
             },
-            total: (cartTotal + 0) - couponDiscount.value - (loyaltyRedemption.discountValue || 0)
-
-        };;
-
+            total: calculateCheckoutPayloadTotal(
+                cartTotal,
+                couponDiscount.value,
+                loyaltyRedemption.discountValue ?? undefined
+            ),
+        };
 
         const response = await placeOrder(orderPayload);
         if (response.status == ServerActionStatus.SUCCESS) {
-            await handlePlaceOrder(orderPayload, response.data);
-            form.reset();
-            if (shippingMethods.length > 0) {
-                setSelectedCarrier(shippingMethods[0]);
-                setSelectedShippingMethod(shippingMethods[0]);
-                form.setValue('shippingMethodId', shippingMethods[0].id);
+            const full = response.data;
+            let orderResponse: ORDER_RESPONSE_DATA;
+            if (data.paymentMethod === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
+                const wp = parseWorldPayPlaceOrderData(full.data);
+                if (!wp) {
+                    toast.error('Invalid order response. Please try again or contact support.');
+                    return;
+                }
+                orderResponse = {
+                    message: full.message || 'Order placed successfully',
+                    data: wp,
+                };
+            } else {
+                orderResponse = full;
             }
-            setShowNewAddressForm(false);
+
+            const redirectStarted = await handlePlaceOrder(orderPayload, orderResponse);
+            if (redirectStarted) {
+                form.reset();
+                if (shippingMethods.length > 0) {
+                    setSelectedCarrier(shippingMethods[0]);
+                    setSelectedShippingMethod(shippingMethods[0]);
+                    form.setValue('shippingMethodId', shippingMethods[0].id);
+                }
+                setShowNewAddressForm(false);
+            }
         } else {
            toast.error(response.message);
         }
@@ -302,24 +311,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         setShowNewAddressForm(!showNewAddressForm);
     }
 
-    /*
-    const handlePlaceSelect = (place: PlaceAutocompleteAddress) => {
-        form.setValue('shippingAddress1', place.street);
-        form.setValue('shippingCity', place.city);
-        form.setValue('shippingPostcode', place.postcode);
-        form.setValue('shippingCountry', place.country);
-        form.setValue('shippingRegion', place.region);
-    }
-
-    const handleBillingPlaceSelect = (place: PlaceAutocompleteAddress) => {
-        form.setValue('billingAddress1', place.street);
-        form.setValue('billingCity', place.city);
-        form.setValue('billingPostcode', place.postcode);
-        form.setValue('billingCountry', place.country);
-        form.setValue('billingRegion', place.region);
-    }
-    */
-
     // Custom modal close handler to refresh cart data
     const handleModalClose = () => {
         fetchCartItems(); // Refresh cart data after potential changes in the modal
@@ -340,152 +331,46 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
 
     useEffect(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {
+            setShippingMethods([]);
+            setSelectedCarrier(null);
+            form.setValue('shippingMethodId', 0);
             return;
         }
 
-        const enabledMethods = shippingMethodsData
-            .filter(method => method.is_enabled && !method.deletedAt)
-            .sort((a, b) => a.method_order - b.method_order);
+        const { filteredSortedMethods } = deriveShippingMethodsForCheckout(
+            shippingMethodsData,
+            cartTotal,
+            couponDiscount,
+            {
+                isRedeemed: loyaltyRedemption.isRedeemed,
+                discountValue: loyaltyRedemption.discountValue,
+            }
+        );
 
-        setOriginalShippingMethods(enabledMethods);
-        
-        // Sort to prioritize free shipping methods initially
-        const sortedMethods = [...enabledMethods].sort((a, b) => {
-            const aIsFree = a.is_free_shipping ?? false;
-            const bIsFree = b.is_free_shipping ?? false;
-            
-            if (aIsFree && bIsFree) {
-                return 0;
-            }
-            if (aIsFree && !bIsFree) {
-                return -1;
-            }
-            if (!aIsFree && bIsFree) {
-                return 1;
-            }
-            return 0;
-        });
-        setShippingMethods(sortedMethods);
+        setShippingMethods(filteredSortedMethods);
 
-        if (sortedMethods.length > 0) {
-            // Prioritize free shipping method if available
-            const freeShippingMethod = sortedMethods.find((method) => (method.is_free_shipping ?? false));
-            const initialMethod = freeShippingMethod || sortedMethods[0];
-            setSelectedCarrier(initialMethod);
-            setSelectedShippingMethod(initialMethod);
-            form.setValue('shippingMethodId', initialMethod.id);
-        }
-    }, [shippingMethodsData, form, setSelectedShippingMethod]);
-
-    useEffect(() => {
-        setShippingAsBilling(form.watch('useShippingAsBilling'));
-    }, [form.watch('useShippingAsBilling')]);
-
-    useEffect(() => {
-        if (originalShippingMethods.length === 0) return;
-
-        // Calculate safeTotal using the same logic as CartTotal.tsx (without shipping cost)
-        // This matches the total calculation in CartTotal component for consistency
-        const displaySubTotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0;
-        
-        // Calculate mail subscription discount if available
-        const mailSubscriptionDiscount = (couponDiscount.mailSubscriptionDiscount !== undefined && Number.isFinite(couponDiscount.mailSubscriptionDiscount))
-            ? couponDiscount.mailSubscriptionDiscount
-            : 0;
-        
-        // Calculate total using same logic as CartTotal.tsx (lines 149-162)
-        // Note: Shipping cost is excluded as we're checking eligibility for free shipping
-        let orderTotal: number;
-        if (couponDiscount.isApplied && couponDiscount.value !== undefined && Number.isFinite(couponDiscount.value)) {
-            const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
-            const loyaltyValue = loyaltyRedemption.isRedeemed && Number.isFinite(loyaltyRedemption.discountValue) ? loyaltyRedemption.discountValue : 0;
-            // Formula: (cartTotal with deals) - coupon discount - mail subscription discount - loyalty (no shipping)
-            orderTotal = displaySubTotal - couponValue - mailSubscriptionDiscount - loyaltyValue;
-        } else {
-            const couponValue = Number.isFinite(couponDiscount.value) ? couponDiscount.value : 0;
-            const loyaltyValue = loyaltyRedemption.isRedeemed && Number.isFinite(loyaltyRedemption.discountValue) ? loyaltyRedemption.discountValue : 0;
-            // Formula: cartTotal - coupon - mail subscription discount - loyalty (no shipping)
-            orderTotal = displaySubTotal - couponValue - mailSubscriptionDiscount - loyaltyValue;
-        }
-        // Ensure no NaN values with final safety check (same as safeTotal in CartTotal.tsx line 166)
-        const safeTotal = Number.isFinite(orderTotal) ? orderTotal : 0;
-        
-        // Filter shipping methods based on the condition:
-        // 1. Show enabled non-free shipping methods (regardless of threshold)
-        // 2. Show enabled free shipping methods ONLY if safeTotal meets the threshold
-        const filteredMethods = originalShippingMethods.filter((method) => {
-            const isEnabled = method.is_enabled ?? false;
-            const isFreeShipping = method.is_free_shipping ?? false;
-            const freeShippingThreshold = method.free_shipping_threshold;
-            
-            // Must be enabled
-            if (!isEnabled) {
-                return false; // Don't show disabled methods
-            }
-            
-            // Condition 1: Show enabled non-free shipping methods
-            if (!isFreeShipping) {
-                return true; // Always show non-free shipping methods if enabled
-            }
-            
-            // Condition 2: For free shipping methods, check if threshold is met using safeTotal
-            // Only show free shipping if safeTotal >= free_shipping_threshold
-            if (isFreeShipping) {
-                // If no threshold is set, show the free shipping method (always available)
-                if (!freeShippingThreshold) {
-                    return true;
-                }
-                
-                // If threshold is set, check if safeTotal meets the requirement (pence-safe vs float sum in cart)
-                const threshold = parseFloat(freeShippingThreshold);
-                if (Number.isFinite(threshold) && threshold > 0) {
-                    return orderMeetsFreeShippingThreshold(safeTotal, freeShippingThreshold);
-                }
-            }
-            
-            return false;
-        });
-
-        // Sort methods to prioritize free shipping methods that meet the threshold
-        const sortedMethods = [...filteredMethods].sort((a, b) => {
-            const aIsFree = a.is_free_shipping ?? false;
-            const bIsFree = b.is_free_shipping ?? false;
-            
-            // If both are free shipping, maintain original order
-            if (aIsFree && bIsFree) {
-                return 0;
-            }
-            
-            // If only one is free shipping, prioritize it
-            if (aIsFree && !bIsFree) {
-                return -1; // a comes first
-            }
-            if (!aIsFree && bIsFree) {
-                return 1; // b comes first
-            }
-            
-            // If neither is free shipping, maintain original order
-            return 0;
-        });
-
-        setShippingMethods(sortedMethods);
-
-        if (sortedMethods.length === 0) {
+        if (filteredSortedMethods.length === 0) {
             setSelectedCarrier(null);
             form.setValue('shippingMethodId', 0);
             return;
         }
 
         const currentMethodId = form.getValues('shippingMethodId');
-        const matchedMethod = sortedMethods.find((method) => method.id === currentMethodId);
-        
-        // Prioritize free shipping method if available, otherwise use matched or first method
-        const freeShippingMethod = sortedMethods.find((method) => (method.is_free_shipping ?? false));
-        const nextMethod = freeShippingMethod || matchedMethod || sortedMethods[0];
+        const matchedMethod = filteredSortedMethods.find((method) => method.id === currentMethodId);
+        const freeShippingMethod = filteredSortedMethods.find((method) => (method.is_free_shipping ?? false));
+        const nextMethod = freeShippingMethod || matchedMethod || filteredSortedMethods[0];
         setSelectedCarrier(nextMethod);
         setSelectedShippingMethod(nextMethod);
         form.setValue('shippingMethodId', nextMethod.id);
-    }, [cartTotal, couponDiscount, loyaltyRedemption, originalShippingMethods, form, setSelectedShippingMethod]);
+    }, [
+        shippingMethodsData,
+        cartTotal,
+        couponDiscount,
+        loyaltyRedemption.isRedeemed,
+        loyaltyRedemption.discountValue,
+        form,
+        setSelectedShippingMethod,
+    ]);
 
     useEffect(() => {
         if (addresses.length > 0) {
@@ -606,24 +491,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                             className='w-full'
                                         />
                                     </div>
-                                    {/* <InputForm
-                                        control={form.control}
-                                        name="shippingAddress1"
-                                        type='text'
-                                        label='Start typing the first line of your address'
-                                        isRequired
-                                        className='w-full'
-                                    /> */}
-                                    {/* Google Places address autofill disabled (type manually) */}
-                                    {/* <GooglePlacesAutocomplete
-                                        control={form.control}
-                                        name="shippingAddress1"
-                                        onPlaceSelect={handlePlaceSelect}
-                                        placeholder="Start typing your address here..."
-                                        label="Street Address"
-                                        isRequired
-                                        inputClassName="w-full"
-                                    /> */}
                                     <InputForm
                                         control={form.control}
                                         name="shippingAddress1"
@@ -691,10 +558,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                             <div className='flex flex-col space-y-5 w-full'>
                                 <CustomCheckbox
                                     control={form.control}
-                                    name="useShippingAsBilling"
+                                    name="useDifferentBillingAddress"
                                     label='Use different billing details'
                                 />
-                                {form.watch('useShippingAsBilling') && (
+                                {useDifferentBillingAddressWatched && (
                                     <div className='space-y-4'>
                                         <div className='grid grid-cols-2 gap-2.5 md:gap-4'>
                                             <InputForm
@@ -714,16 +581,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                                 className='w-full'
                                             />
                                         </div>
-                                        {/* Google Places address autofill disabled (type manually) */}
-                                        {/* <GooglePlacesAutocomplete
-                                            control={form.control}
-                                            name="billingAddress1"
-                                            onPlaceSelect={handleBillingPlaceSelect}
-                                            placeholder="Start typing your address here..."
-                                            label="Address Line 1"
-                                            isRequired
-                                            inputClassName="w-full"
-                                        /> */}
                                         <InputForm
                                             control={form.control}
                                             name="billingAddress1"
@@ -732,14 +589,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                             isRequired
                                             className='w-full'
                                         />
-                                        {/* <InputForm
-                                            control={form.control}
-                                            name="billingAddress1"
-                                            type='text'
-                                            label='Address Line 1'
-                                            isRequired
-                                            className='w-full'
-                                        /> */}
                                         <InputForm
                                             control={form.control}
                                             name="billingAddress2"
@@ -800,8 +649,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                 <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Shipping Methods</h3>
                                 <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-semibold'>Important: Order by 3pm for same day dispatch</p>
                             </div>
-                            {/* value={form.watch('paymentMethod')}
-                            onChange={(e) => form.setValue('paymentMethod', e.target.value as CHECKOUT_PAYMENT_METHODS) */}
                             <RadioGroup
                                 value={form.watch('shippingMethodId').toString()}
 
@@ -857,19 +704,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                 <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-semibold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</p>
                             </div>
                             <RadioGroup
-                                defaultValue={CHECKOUT_PAYMENT_METHODS.WORLD_PAY}
-                                // defaultValue={CHECKOUT_PAYMENT_METHODS.VIVA_WALLET}
+                                defaultValue={getDefaultCheckoutPaymentMethod()}
                                 value={form.watch('paymentMethod')}
                                 onChange={(e) => form.setValue('paymentMethod', e.target.value as CHECKOUT_PAYMENT_METHODS)}
                             >
-                                {/* <CustomRadio value={CHECKOUT_PAYMENT_METHODS.VIVA_WALLET}>
-                                    <div className='space-y-4'>
-                                        <div className='flex items-center justify-between gap-4'>
-                                            <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Pay by Card - Viva Wallet</h4>
-                                        </div>
-
-                                    </div>
-                                </CustomRadio> */}
                                 <CustomRadio value={CHECKOUT_PAYMENT_METHODS.WORLD_PAY}>
                                     <div className='space-y-2'>
                                         <div className='flex items-center justify-between gap-4'>

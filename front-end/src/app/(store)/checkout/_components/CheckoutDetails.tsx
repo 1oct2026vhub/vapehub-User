@@ -447,7 +447,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                         {/* shipping details */}
                         <div className='space-y-4 lg:space-y-6'>
                             <div className='flex items-center justify-between'>
-                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Shipping Details</h3>
+                                <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Shipping Details</h2>
                                 {addresses.length > 0 &&
                                     <Button
                                         type="button"
@@ -554,7 +554,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
 
                         {/* billing details */}
                         <div className='space-y-4 lg:space-y-6'>
-                            <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Billing Details</h3>
+                            <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Billing Details</h2>
                             <div className='flex flex-col space-y-5 w-full'>
                                 <CustomCheckbox
                                     control={form.control}
@@ -646,7 +646,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                         {/* shipping methods */}
                         <div className='space-y-4'>
                             <div className='space-y-2'>
-                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Shipping Methods</h3>
+                                <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Shipping Methods</h2>
                                 <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-semibold'>Important: Order by 3pm for same day dispatch</p>
                             </div>
                             <RadioGroup
@@ -665,9 +665,9 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                     <CustomRadio key={method.id} value={method.id.toString()}>
                                         <div className='space-y-2'>
                                             <div className='flex items-start justify-between gap-4'>
-                                                <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>
+                                                <div className='!font-oswald text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>
                                                     {method.shipping_method}
-                                                </h4>
+                                                </div>
                                                 <p className='primary-gradient-100 text-content-2 md:text-lg font-semibold'>
                                                     £{method.shipping_cost}
                                                 </p>
@@ -687,7 +687,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
 
                         {/* never miss out */}
                         <div className='space-y-4'>
-                            <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Never Miss Out</h3>
+                            <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Never Miss Out</h2>
                             <div className='flex flex-col w-full'>
                                 <CustomCheckbox
                                     control={form.control}
@@ -700,7 +700,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                         {/* payment information */}
                         <div className='space-y-4 pt-2'>
                             <div className='space-y-2'>
-                                <h3 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Payment Information</h3>
+                                <h2 className='text-title-2 lg:text-h5 text-skin-neutral-500 font-semibold'>Payment Information</h2>
                                 <p className='text-skin-neutral-300 text-content-2 md:text-title-2 font-semibold'>All transactions are secure and encrypted. Credit card information is never stored on our servers.</p>
                             </div>
                             <RadioGroup
@@ -711,7 +711,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                 <CustomRadio value={CHECKOUT_PAYMENT_METHODS.WORLD_PAY}>
                                     <div className='space-y-2'>
                                         <div className='flex items-center justify-between gap-4'>
-                                            <h4 className='text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Pay by Card - World pay</h4>
+                                            <div className='!font-oswald text-content-2 md:text-title-2 font-semibold text-skin-neutral-400'>Pay by Card - World pay</div>
                                         </div>
                                     </div>
                                 </CustomRadio>

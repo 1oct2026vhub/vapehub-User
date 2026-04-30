@@ -10,7 +10,7 @@ import { Product, ProductReview } from '@/lib/config/product.config';
 
 export const metadata: Metadata = {
   title: "Shop | VapeHub",
-  description: "",
+  description: "Browse VapeHub's full range of vape kits, e-liquids, disposables, pods, and accessories from top brands at competitive prices.",
 };
 type SearchParams = {
   searchParams: Promise<Record<string, string>>

@@ -29,7 +29,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ imageSrc, altText, title, sub
             )}
         </div>
         <div className="text-center space-y-1">
-            <h3 className="font-semibold md:text-nowrap text-title-2 md:text-xl text-skin-neutral-500">{title}</h3>
+            <div className="!font-oswald font-semibold md:text-nowrap text-title-2 md:text-xl text-skin-neutral-500">{title}</div>
             <p className="font-semibold text-content-2 md:text-content-1 text-skin-primary-400">{subtitle}</p>
         </div>
     </div>

@@ -191,7 +191,7 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
                                 <div className='w-[86px] h-[5px] bg-[#9CA0A7] mx-auto rounded-10' />
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <h4 className="primary-gradient-600 rounded-14 text-h5 font-bold w-fit p-1">Filter by</h4>
+                                        <p className="!font-oswald primary-gradient-600 rounded-14 text-h5 font-bold w-fit p-1">Filter by</p>
                                         {appliedFilters.length > 0 && (
                                             <Button onPress={onClearAllFilters} color="default" variant="bordered" className="text-skin-neutral-500 text-content-2 font-bold">Clear All</Button>
                                         )}

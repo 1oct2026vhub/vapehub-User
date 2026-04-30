@@ -1,6 +1,6 @@
 
 import BreadCrumbs from '@/components/BreadCrumbs';
-import React, { FunctionComponent, ReactElement, Suspense } from 'react';
+import React, { FunctionComponent, ReactElement } from 'react';
 import OrderCard from '@/components/OrderCard'
 import ProductContent from '@/components/ProductContent'
 import FAQSection from '@/components/FAQSection'
@@ -8,7 +8,6 @@ import ProductDetails from './_components/ProductDetails';
 import ProductFeatures from './_components/ProductFeatures';
 import RelatedProducts from './_components/RelatedProducts';
 import { ROUTES } from '@/lib/routes';
-import SuspenseLoader from '@/components/ui/SuspenseLoader';
 import { AttributeProductTerms, AttributeTerms, ProductResponse } from '@/lib/config/product.config';
 import { FaqResponse } from '@/lib/config/global.config';
 import { ReviewProvider } from '@/lib/context/ReviewContext';
@@ -47,28 +46,16 @@ const ProductView: FunctionComponent<ProductViewProps> = ({ data, selectedVarian
             <ProductDataProvider initialData={data}>
                 <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
                     <BreadCrumbs items={breadcrumbs} />
-                    <Suspense fallback={<SuspenseLoader />}>
                     <ProductDetails data={data} selectedVariant={selectedVariant} />
-                    </Suspense>
-                    <Suspense fallback={<SuspenseLoader />}>
-                        <OrderCard />
-                    </Suspense>
+                    <OrderCard />
                     {
                         productFeatures.length > 0 && (
-                            <Suspense fallback={<SuspenseLoader />}>
-                                <ProductFeatures productFeatures={productFeatures} />
-                            </Suspense>
+                            <ProductFeatures productFeatures={productFeatures} />
                         )
                     }
-                    <Suspense fallback={<SuspenseLoader />}>
-                        <ProductContent data={data} />
-                    </Suspense>
-                    <Suspense fallback={<SuspenseLoader height='h-40' />}>
-                        <FAQSection type="product" id={data.product.id} initialFaqs={productFaqs} />
-                    </Suspense>
-                    <Suspense fallback={<SuspenseLoader height='h-64' />}>
-                        <RelatedProducts viewAllHref={viewAllHref} currentProductId={data.product.id} />
-                    </Suspense>
+                    <ProductContent data={data} />
+                    <FAQSection type="product" id={data.product.id} initialFaqs={productFaqs} />
+                    <RelatedProducts viewAllHref={viewAllHref} currentProductId={data.product.id} />
 
                 </main>
             </ProductDataProvider>

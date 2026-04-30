@@ -33,6 +33,7 @@ const ShopByCategory: FunctionComponent = async (): Promise<ReactElement> => {
         <h1 className="text-h5 md:text-h3 w-fit font-semibold primary-gradient-100">{CategoryDetails.title}</h1>
         {/* <ViewAllLink href={CategoryDetails.viewAllHref} /> */}
       </div>
+      <h2 className="sr-only">{`${CategoryDetails.title} Items`}</h2>
       <div className="slider-container section-slider">
         <CategorySlider categories={categories.slice(0, 8)}/>
       </div>

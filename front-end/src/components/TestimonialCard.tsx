@@ -102,9 +102,9 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
                 </div>
             </div>
             <div className="flex items-center gap-2">
-                <h5 className="text-title-2 md:text-2xl text-skin-neutral-500 font-semibold">
+                <div className="!font-oswald text-title-2 md:text-2xl text-skin-neutral-500 font-semibold">
                     {name}
-                </h5>
+                </div>
                 {verified && (
                     <div className="flex items-center gap-1 bg-green-100 text-green-600 px-2 py-0.5 rounded-full" title="Verified">
                         <VerifiedIcon className="w-3 h-3 md:w-4 md:h-4 text-green-600" />

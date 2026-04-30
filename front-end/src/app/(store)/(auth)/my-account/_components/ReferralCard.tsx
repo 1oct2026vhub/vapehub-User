@@ -24,9 +24,9 @@ const ReferralCard: React.FC<ReferralCardProps> = ({ referral }) => {
     return (
         <div className="bg-skin-white p-4 flex items-start justify-between gap-5 shadow-card rounded-md md:rounded-lg">
             <div className="space-y-1">
-                <h3 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold capitalize">
+                <div className="!font-oswald text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold capitalize">
                     {referred_user?.name === "null null" ? "Anonymous" : referred_user?.name}
-                </h3>
+                </div>
                 <p className="text-content-2 md:text-content-1 font-bold primary-gradient-100">
                     {referred_user?.email}
                 </p>
@@ -37,9 +37,9 @@ const ReferralCard: React.FC<ReferralCardProps> = ({ referral }) => {
                 </p>
             ) : (
                 <div className="space-y-2.5 text-right">
-                    <h4 className="text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
+                    <div className="!font-oswald text-title-2 md:text-title-1 text-skin-neutral-400 font-semibold">
                     {referral.referral_coupon_code}
-                </h4>
+                </div>
                 <Button 
                     size="sm" 
                     color='primary' 

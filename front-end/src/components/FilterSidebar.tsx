@@ -32,7 +32,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     return (
         <div className="hidden md:flex flex-col gap-6 xl:min-w-[310px] max-w-[310px] bg-skin-white p-4 xl:p-9 border border-skin-neutral-50 rounded-14">
             <div className="flex items-center justify-between">
-                <h2 className="primary-gradient-600 text-h5 font-bold w-fit">Filter by</h2>
+                <div className="!font-oswald primary-gradient-600 text-h5 font-bold w-fit">Filter by</div>
                 {appliedFilters.length > 0 && (
                     <Button onPress={onClearAllFilters} color="default" variant="bordered" className="text-skin-neutral-500 text-content-2 font-bold">Clear All</Button>
                 )}

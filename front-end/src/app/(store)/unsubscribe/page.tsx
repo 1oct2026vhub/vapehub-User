@@ -2,6 +2,7 @@ import { ServerActionStatus } from '@/lib/config/app.config'
 import { unsubscribeMail } from '@/lib/server.actions'
 
 import UnsubscribeSuccessContent from './UnsubscribeSuccessContent'
+import UnsubscribeForm from './UnsubscribeForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +15,7 @@ const UnsubscribeSuccessPage = async ({ searchParams }: UnsubscribeSuccessPagePr
   const normalizedEmail = email?.trim()
 
   if (!normalizedEmail) {
-    return <UnsubscribeSuccessContent isSuccess={false} message="Invalid unsubscribe link. Email is missing." />
+    return <UnsubscribeForm />
   }
 
   const unsubscribeResponse = await unsubscribeMail(normalizedEmail)

@@ -1580,3 +1580,20 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   }
 }
 
+.blogs-list-ui-host {
+  display: none;
+}
+
+.blogs-list-static-fallback {
+  display: block;
+}
+
+@media (scripting: enabled) {
+  .blogs-list-static-fallback {
+    display: none !important;
+  }
+  .blogs-list-ui-host {
+    display: block;
+  }
+}
+

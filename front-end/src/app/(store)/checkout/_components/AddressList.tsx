@@ -48,9 +48,9 @@ const AddressList: FunctionComponent<AddressListProps> = ({ selectedAddressId, o
             <CustomRadio key={address.id} value={address.id.toString()}>
               <div className='bg-skin-white p-3.5 flex items-start justify-between gap-2 border border-skin-neutral-200 rounded-md shadow-base w-full'>
                 <div className='space-y-1.5'>
-                  <h3 className='text-content-1 md:text-title-2 font-bold text-skin-neutral-500 capitalize'>
+                  <div className='!font-oswald text-content-1 md:text-title-2 font-bold text-skin-neutral-500 capitalize'>
                     {address.name} {address.last_name}
-                  </h3>
+                  </div>
                   <p className='text-content-2 md:text-content-1 text-skin-neutral-300 font-bold'>
                     {address.street}{address.apartment ? `, ${address.apartment}` : ''}
                   </p>
@@ -112,9 +112,9 @@ const AddressList: FunctionComponent<AddressListProps> = ({ selectedAddressId, o
           >
             <div className='bg-skin-white p-3.5 border border-skin-neutral-200 rounded-10 shadow-base'>
               <div className='flex items-center justify-between mb-4'>
-                <h2 className='text-content-1 md:text-title-2 font-bold text-skin-neutral-500 capitalize'>
+                <div className='!font-oswald text-content-1 md:text-title-2 font-bold text-skin-neutral-500 capitalize'>
                   Edit Address
-                </h2>
+                </div>
                 <Button
                   size="md"
                   isIconOnly

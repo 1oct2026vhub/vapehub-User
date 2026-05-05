@@ -212,7 +212,16 @@ const Page = async ({
   const entityTypeHandlers: Record<string, () => Promise<React.ReactNode>> = {
     blog_category: async () => {
       const blogs = await fetchBlogBySlug(primarySlug);
-      return blogs && <BlogListView selectedId={blogs.id.toString()} />;
+      const pageFromQuery = Number.parseInt(searchParamsData.page ?? "1", 10);
+      const page = Number.isNaN(pageFromQuery) || pageFromQuery < 1 ? 1 : pageFromQuery;
+      return blogs && (
+        <BlogListView
+          selectedId={blogs.id.toString()}
+          page={page}
+          pathnameBase={`/${primarySlug}`}
+          lockCategory
+        />
+      );
     },
     blog: async () => {
       // For blog posts with two slugs (category/blog), use the secondary slug (blog post slug)

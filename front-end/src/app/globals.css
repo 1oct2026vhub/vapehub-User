@@ -253,7 +253,16 @@ input[type='search'] {
 
 .mobile-banner-carousel .slick-prev,
 .mobile-banner-carousel .slick-next {
-  display: none !important;
+  display: flex !important;
+  width: 2rem;
+  height: 2rem;
+  border-width: 2px;
+}
+.mobile-banner-carousel .slick-prev {
+  left: 6px;
+}
+.mobile-banner-carousel .slick-next {
+  right: 6px;
 }
 
 .mobile-banner-carousel .slick-dots li {
@@ -1138,6 +1147,33 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
   font-size: 72px !important;
 }
 
+/* Blog listing cards: keep CMS HTML compact to avoid grid overlap */
+.blog-card-excerpt.rich-text {
+  line-height: 1.45;
+}
+.blog-card-excerpt.rich-text p,
+.blog-card-excerpt.rich-text ul,
+.blog-card-excerpt.rich-text ol,
+.blog-card-excerpt.rich-text h1,
+.blog-card-excerpt.rich-text h2,
+.blog-card-excerpt.rich-text h3,
+.blog-card-excerpt.rich-text h4 {
+  margin: 0 0 0.35em;
+  font-size: inherit;
+  font-weight: inherit;
+}
+.blog-card-excerpt.rich-text > *:first-child {
+  margin-top: 0;
+}
+.blog-card-excerpt.rich-text img,
+.blog-card-excerpt.rich-text figure {
+  max-height: 2.5rem;
+  max-width: 100%;
+  width: auto;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
 /* //Loader */
 .loader {
   border-top-color: var(--primary-500) !important;
@@ -1170,5 +1206,377 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 }
 /* .table , tr, td { border : 1px solid #000 ! important; } */
 
+/*
+ * Product carousels (react-slick) need JavaScript to lay out slides. When scripting is disabled,
+ * show a plain CSS grid instead. Browsers that do not support `scripting` show both layers; the
+ * static grid remains usable. Optional `maxNoJsProducts` limits grid size; arrows match Slick (decorative).
+ */
+.products-slider-static-shell {
+  position: relative;
+  /* Keep grid clear of decorative arrows */
+  padding-inline: clamp(0.35rem, 2vw, 2.75rem);
+}
+.products-slider-static-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  box-sizing: border-box;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 2px solid var(--neutral-200);
+  background: var(--neutral-50);
+}
+@media (min-width: 768px) {
+  .products-slider-static-arrow {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 3px;
+  }
+}
+.products-slider-static-prev {
+  left: 0;
+}
+.products-slider-static-next {
+  right: 0;
+}
+@media (min-width: 1024px) {
+  .products-slider-static-prev {
+    left: -12px;
+  }
+  .products-slider-static-next {
+    right: -12px;
+  }
+}
+.products-slider-static-prev::before,
+.products-slider-static-next::before {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+@media (min-width: 768px) {
+  .products-slider-static-prev::before,
+  .products-slider-static-next::before {
+    width: 18px;
+    height: 18px;
+  }
+}
+.products-slider-static-prev::before {
+  background-image: url("/images/mob-left-arrow.svg");
+}
+.products-slider-static-next::before {
+  background-image: url("/images/mob-arrow-right.svg");
+}
+@media (min-width: 768px) {
+  .products-slider-static-prev::before {
+    background-image: url("/images/arrow-left.svg");
+  }
+  .products-slider-static-next::before {
+    background-image: url("/images/arrow-right.svg");
+  }
+}
+.products-slider-static-fallback {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .products-slider-static-fallback {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .products-slider-static-fallback {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+.products-slider-slick-host {
+  display: none;
+}
+@media (scripting: enabled) {
+  .products-slider-static-shell {
+    display: none !important;
+  }
+  .products-slider-slick-host {
+    display: block;
+  }
+}
 
+/* Trustpilot / testimonial carousel: no-JS fallback with Slick-style arrows */
+.testimonial-slider-static-shell {
+  position: relative;
+  padding-inline: clamp(0.35rem, 2vw, 2.75rem);
+}
+.testimonial-slider-static-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  box-sizing: border-box;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 2px solid var(--neutral-200);
+  background: var(--neutral-50);
+}
+@media (min-width: 768px) {
+  .testimonial-slider-static-arrow {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 3px;
+  }
+}
+.testimonial-slider-static-prev {
+  left: 0;
+}
+.testimonial-slider-static-next {
+  right: 0;
+}
+@media (min-width: 1024px) {
+  .testimonial-slider-static-prev {
+    left: -12px;
+  }
+  .testimonial-slider-static-next {
+    right: -12px;
+  }
+}
+.testimonial-slider-static-prev::before,
+.testimonial-slider-static-next::before {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+@media (min-width: 768px) {
+  .testimonial-slider-static-prev::before,
+  .testimonial-slider-static-next::before {
+    width: 18px;
+    height: 18px;
+  }
+}
+.testimonial-slider-static-prev::before {
+  background-image: url("/images/mob-left-arrow.svg");
+}
+.testimonial-slider-static-next::before {
+  background-image: url("/images/mob-arrow-right.svg");
+}
+@media (min-width: 768px) {
+  .testimonial-slider-static-prev::before {
+    background-image: url("/images/arrow-left.svg");
+  }
+  .testimonial-slider-static-next::before {
+    background-image: url("/images/arrow-right.svg");
+  }
+}
+.testimonial-slider-static-fallback {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .testimonial-slider-static-fallback {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .testimonial-slider-static-fallback {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.testimonial-slider-slick-host {
+  display: none;
+}
+@media (scripting: enabled) {
+  .testimonial-slider-static-shell {
+    display: none !important;
+  }
+  .testimonial-slider-slick-host {
+    display: block;
+  }
+}
+
+/* Blog cards (“New to Vaping”): static grid when JS is off */
+.blogs-slider-static-fallback {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.blogs-slider-static-fallback.blogs-slider-two-only {
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (min-width: 768px) {
+  .blogs-slider-static-fallback:not(.blogs-slider-two-only) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .blogs-slider-static-fallback:not(.blogs-slider-two-only) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.blogs-slider-slick-host {
+  display: none;
+}
+@media (scripting: enabled) {
+  .blogs-slider-static-fallback {
+    display: none !important;
+  }
+  .blogs-slider-slick-host {
+    display: block;
+  }
+}
+
+/* Homepage hero: no-JS = first slide + Slick-style arrows; JS = Slick */
+.hero-banner-static-fallback {
+  display: block;
+}
+.hero-banner-static-shell {
+  position: relative;
+}
+.hero-banner-static-slick-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  box-sizing: border-box;
+  width: 2.5rem;
+  height: 2.5rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border-style: solid;
+  border-width: 2px;
+}
+@media (min-width: 768px) {
+  .hero-banner-static-slick-arrow {
+    border-width: 3px;
+  }
+}
+.banner-carousel .hero-banner-static-slick-arrow {
+  border-color: var(--neutral-200);
+  background: var(--neutral-50);
+}
+.banner-carousel .hero-banner-static-prev {
+  left: -18px;
+}
+.banner-carousel .hero-banner-static-next {
+  right: -18px;
+}
+.mobile-banner-carousel .hero-banner-static-slick-arrow {
+  border-color: var(--neutral-200);
+  background: var(--neutral-50);
+  width: 2rem;
+  height: 2rem;
+}
+.hero-banner-static-shell--mobile .hero-banner-static-prev {
+  left: 6px;
+}
+.hero-banner-static-shell--mobile .hero-banner-static-next {
+  right: 6px;
+}
+.hero-banner-static-prev::before,
+.hero-banner-static-next::before {
+  content: "";
+  display: block;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 1;
+}
+.banner-carousel .hero-banner-static-prev::before {
+  width: 22px;
+  height: 22px;
+  background-image: url("/images/mob-left-arrow.svg");
+}
+.banner-carousel .hero-banner-static-next::before {
+  width: 22px;
+  height: 22px;
+  background-image: url("/images/mob-arrow-right.svg");
+}
+@media (min-width: 768px) {
+  .banner-carousel .hero-banner-static-prev::before {
+    width: 24px;
+    height: 24px;
+    background-image: url("/images/arrow-left.svg");
+  }
+  .banner-carousel .hero-banner-static-next::before {
+    width: 24px;
+    height: 24px;
+    background-image: url("/images/arrow-right.svg");
+  }
+}
+.mobile-banner-carousel .hero-banner-static-prev::before,
+.mobile-banner-carousel .hero-banner-static-next::before {
+  width: 16px;
+  height: 16px;
+}
+.mobile-banner-carousel .hero-banner-static-prev::before {
+  background-image: url("/images/mob-left-arrow.svg");
+}
+.mobile-banner-carousel .hero-banner-static-next::before {
+  background-image: url("/images/mob-arrow-right.svg");
+}
+.hero-banner-static-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: fill;
+  background: var(--neutral-50);
+  border-radius: 10px;
+}
+.hero-banner-static-image--mobile {
+  border-radius: 0.375rem;
+}
+.hero-banner-slick-host {
+  display: none;
+}
+@media (scripting: enabled) {
+  .hero-banner-static-fallback {
+    display: none !important;
+  }
+  .hero-banner-slick-host {
+    display: block;
+  }
+}
+
+/* Brands listing: NextUI pagination vs plain links — only one visible */
+.brands-pagination-ui-host {
+  display: none;
+}
+.brands-pagination-nav-fallback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+@media (scripting: enabled) {
+  .brands-pagination-nav-fallback {
+    display: none !important;
+  }
+  .brands-pagination-ui-host {
+    display: flex;
+    justify-content: center;
+  }
+}
 

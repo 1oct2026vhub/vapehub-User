@@ -121,7 +121,7 @@ const PopularCategories: FunctionComponent = async (): Promise<ReactElement> => 
           <div className="slider-container section-slider products-slider">
             {
               section.filtered.length > 0 ? (
-                <ProductsSlider data={section.products} reviews={section.reviews} />
+                <ProductsSlider data={section.products} reviews={section.reviews} maxNoJsProducts={5} />
               ) : (
                 <EmptyPlaceholder title='Uh, oh!' description='No products available' />
               )

@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { resolveMediaImageUrl } from '@/lib/media-image-url';
 
 interface NoImageProps {
   src?: string;
@@ -21,13 +22,14 @@ const NoImage: React.FC<NoImageProps> = ({
   priority = false,
 }) => {
   const [hasError, setHasError] = useState(false);
+  const resolvedSrc = resolveMediaImageUrl(src);
 
   // Reset error state when src changes so a new image URL gets a fresh attempt
   useEffect(() => {
     setHasError(false);
   }, [src]);
   
-  const isValidImageUrl = src && src.startsWith('http');
+  const isValidImageUrl = !!resolvedSrc;
 
   if (!isValidImageUrl || hasError) {
     return (
@@ -46,7 +48,7 @@ const NoImage: React.FC<NoImageProps> = ({
 
   return (
     <Image
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       width={width}
       height={height}

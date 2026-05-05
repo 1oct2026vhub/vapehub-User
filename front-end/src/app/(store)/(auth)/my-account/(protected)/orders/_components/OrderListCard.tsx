@@ -42,9 +42,9 @@ const OrderListCard: React.FC<OrderListCardProps> = ({data}) => {
                 )}
 
                 {/* Order Title */}
-                <h3 className="text-content-2 md:text-xl text-skin-neutral-400 line-clamp-2 font-semibold">
+                <div className="!font-oswald text-content-2 md:text-xl text-skin-neutral-400 line-clamp-2 font-semibold">
                     {data.orderItems?.[0]?.product?.name}
-                </h3>
+                </div>
                 {data.orderItems.length > 1 && <p className="primary-gradient-100 font-semibold text-sm ml-1 ">(+ {data.orderItems.length - 1} more)</p>}
 
                 {/* Order ID */}

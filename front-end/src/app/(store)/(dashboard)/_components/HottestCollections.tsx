@@ -22,7 +22,7 @@ const HottestCollections: React.FC = async () => {
     return (
         <section className='bg-skin-white border border-skin-neutral-100 py-7.5 md:p-12.5 rounded-lg space-y-5 md:space-y-10 text-center'>
             <div className='space-y-2 text-center px-10'>
-                <SectionHeading title='TOP BRANDS' className='!text-h5 md:!text-h3 w-fit mx-auto uppercase' />
+                <SectionHeading title='The HOTTEST COLLECTIONS' className='!text-h5 md:!text-h3 w-fit mx-auto uppercase' />
                 <p className='text-content-2 md:text-title-2 text-skin-neutral-300 font-bold'>The leading brands delivering exceptional products</p>
             </div>
             <div className='flex flex-wrap items-center justify-center gap-6 md:gap-8.5 px-8'>

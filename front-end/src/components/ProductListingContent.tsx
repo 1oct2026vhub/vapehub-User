@@ -9,10 +9,9 @@ import NoImage from './NoImage';
 type CategoryProps = {
     data: Category | BrandConfig;
     dynamicPageSlug?: DynamicPageSlugResponse & { latest_deals?: DynamicPageSlugResponse['deals'] };
-    aboutHeading?: string;
 }
 
-const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug, aboutHeading}) => {
+const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug}) => {
     // Only use banners from API - no fallback to deals
     const banners = dynamicPageSlug?.banners || [];
     
@@ -26,7 +25,6 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug, 
         <div className="space-y-6">
             <div className='space-y-4'>
                 <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name || dynamicPageSlug?.name}</h1>
-                {aboutHeading && <h2 className='sr-only'>{aboutHeading}</h2>}
                 {(dynamicPageSlug?.description || data?.description) && (
                     <div 
                         className="product-content rich-text text-content-1 md:text-content-1 font-normal text-skin-neutral-500 leading-relaxed"

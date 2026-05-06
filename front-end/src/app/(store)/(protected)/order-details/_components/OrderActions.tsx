@@ -218,7 +218,7 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
                                                         <div className='mt-2 p-4 border border-skin-neutral-100 rounded-xl'>
                                                             <div className="flex flex-col items-center justify-center space-y-4">
                                                                 <div className="text-center">
-                                                                    <div className="!font-oswald text-title-2 font-semibold text-skin-neutral-400 mb-2">Thank You!</div>
+                                                                    <h4 className="text-title-2 font-semibold text-skin-neutral-400 mb-2">Thank You!</h4>
                                                                     <p className="text-content-2 text-skin-neutral-300">
                                                                         Your review has been submitted successfully.
                                                                     </p>

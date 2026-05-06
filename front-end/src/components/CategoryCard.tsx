@@ -37,9 +37,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
             <CategoryIcon />
           </div>
         )}
-        <h3 className="text-skin-white text-title-2 sm:text-h5 lg:text-h3 max-sm:text-center font-semibold !font-oswald !capitalize">
+        <span className="text-skin-white text-title-2 sm:text-h5 lg:text-h3 max-sm:text-center font-semibold !font-oswald !capitalize">
           {title}
-        </h3>
+        </span>
       </div>
     </Link>
   );

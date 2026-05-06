@@ -15,8 +15,8 @@ const ReferFriend: React.FC = async () => {
         <div className='bg-skin-white border border-skin-neutral-50 max-lg:pt-6 lg:pl-7 xl:pl-11 flex flex-col lg:flex-row items-center justify-between h-fit gap-2 shadow-card rounded-md md:rounded-lg xl:max-h-[309px]'>
             <div className='text-center lg:text-left flex flex-col flex-1 flex-fill lg-w-[50%]'>
                 <div className='text-h5 md:text-h3 font-semibold'>
-                    <div className='!font-oswald primary-gradient-100'>Refer a Friend &</div>
-                    <div className='!font-oswald primary-gradient-100'>We will reward you both!</div>
+                    <h2 className='primary-gradient-100'>Refer a Friend &</h2>
+                    <h2 className='primary-gradient-100'>We will reward you both!</h2>
                 </div>
                 <Link
                     href={referralHref}

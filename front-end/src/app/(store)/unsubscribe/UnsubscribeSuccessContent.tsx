@@ -6,11 +6,10 @@ import { ROUTES } from '@/lib/routes'
 
 interface UnsubscribeSuccessContentProps {
   isSuccess: boolean
-  email?: string
   message?: string
 }
 
-const UnsubscribeSuccessContent = ({ isSuccess, email, message }: UnsubscribeSuccessContentProps) => {
+const UnsubscribeSuccessContent = ({ isSuccess, message }: UnsubscribeSuccessContentProps) => {
   return (
     <div className="auth-form-container md:!py-[84px]">
       <div className="auth-form-wrapper !space-y-0 !rounded-2xl !max-w-[600px] !p-5 !gap-5">
@@ -27,7 +26,7 @@ const UnsubscribeSuccessContent = ({ isSuccess, email, message }: UnsubscribeSuc
           </h1>
           <p className="text-content-2 md:text-content-1 text-center font-bold text-skin-neutral-300 mx-auto max-w-[460px]">
             {isSuccess
-              ? `You will no longer receive promotional emails${email ? ` at ${email}` : ''}.`
+              ? 'You will no longer receive promotional emails from us.'
               : message || 'We could not process your unsubscribe request. Please try again later.'}
           </p>
         </div>

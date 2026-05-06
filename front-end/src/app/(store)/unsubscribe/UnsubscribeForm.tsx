@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@nextui-org/button'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -11,12 +11,11 @@ import InputField from '@/components/InputField'
 import { Form } from '@/components/ui/Form'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { SUBSCRIBE_FORM_CONFIG, SUBSCRIBE_IN_SCHEMA, SubscribeFormSchema } from '@/lib/config/subscribe.config'
+import { ROUTES } from '@/lib/routes'
 import { unsubscribeMail } from '@/lib/server.actions'
 
-import UnsubscribeSuccessContent from './UnsubscribeSuccessContent'
-
 const UnsubscribeForm = () => {
-  const [unsubscribedEmail, setUnsubscribedEmail] = useState<string | null>(null)
+  const router = useRouter()
 
   const unsubscribeForm = useForm<SubscribeFormSchema>({
     resolver: zodResolver(SUBSCRIBE_IN_SCHEMA),
@@ -25,19 +24,15 @@ const UnsubscribeForm = () => {
 
   const handleFormSubmit = async ({ email }: SubscribeFormSchema) => {
     const normalizedEmail = email.trim()
-    const response = await unsubscribeMail(normalizedEmail)
+    const response = await unsubscribeMail(normalizedEmail, 'app')
 
     if (response.status === ServerActionStatus.ERROR) {
       toast.error(response.message || 'Unable to unsubscribe this email.')
       return
     }
 
-    setUnsubscribedEmail(normalizedEmail)
     toast.success('You have successfully unsubscribed.')
-  }
-
-  if (unsubscribedEmail) {
-    return <UnsubscribeSuccessContent isSuccess email={unsubscribedEmail} />
+    router.push(`${ROUTES.UNSUBSCRIBE_SUCCESS}?success=true`)
   }
 
   return (

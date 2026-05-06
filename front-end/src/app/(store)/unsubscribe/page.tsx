@@ -1,34 +1,18 @@
-import { ServerActionStatus } from '@/lib/config/app.config'
-import { unsubscribeMail } from '@/lib/server.actions'
-
 import UnsubscribeSuccessContent from './UnsubscribeSuccessContent'
 import UnsubscribeForm from './UnsubscribeForm'
 
 export const dynamic = 'force-dynamic'
 
 interface UnsubscribeSuccessPageProps {
-  searchParams: Promise<{ email?: string }>
+  searchParams: Promise<{ success?: string }>
 }
 
 const UnsubscribeSuccessPage = async ({ searchParams }: UnsubscribeSuccessPageProps) => {
-  const { email } = await searchParams
-  const normalizedEmail = email?.trim()
+  const { success } = await searchParams
+  const isSuccess = success === 'true'
 
-  if (!normalizedEmail) {
-    return <UnsubscribeForm />
-  }
-
-  const unsubscribeResponse = await unsubscribeMail(normalizedEmail)
-  const errorMessage =
-    unsubscribeResponse.status === ServerActionStatus.ERROR ? unsubscribeResponse.message : undefined
-
-  return (
-    <UnsubscribeSuccessContent
-      isSuccess={unsubscribeResponse.status === ServerActionStatus.SUCCESS}
-      email={normalizedEmail}
-      message={errorMessage}
-    />
-  )
+  if (isSuccess) return <UnsubscribeSuccessContent isSuccess />
+  return <UnsubscribeForm />
 }
 
 export default UnsubscribeSuccessPage

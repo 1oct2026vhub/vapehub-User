@@ -219,9 +219,12 @@ export const subscribeMail = async (email: string): Promise<ServerActionResponse
 };
 
 // unsubscribe mail subscription api
-export const unsubscribeMail = async (email: string): Promise<ServerActionResponse<mailSubscriptionResponse>> => {
+export const unsubscribeMail = async (
+  email: string,
+  source: string = 'app'
+): Promise<ServerActionResponse<mailSubscriptionResponse>> => {
   return await handleRequest<mailSubscriptionResponse, unknown>({
-    endpoint: API_ROUTES.UNSUBSCRIBE_MAIL(email),
+    endpoint: API_ROUTES.UNSUBSCRIBE_MAIL(email, source),
     method: 'GET',
   });
 };

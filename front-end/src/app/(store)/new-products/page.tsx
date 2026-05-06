@@ -16,7 +16,6 @@ const BASE_URL = resolveSiteUrl();
 
 /** Same defaults as the page: latest first, new-only list. */
 const NEW_PRODUCTS_DEFAULT_PARAMS = { sort_by: 'id', order: 'DESC', limit: 12, offset: 0, is_new: true } as const;
-
 /**
  * Shared with generateMetadata so canonical / prev / next match the list request.
  */

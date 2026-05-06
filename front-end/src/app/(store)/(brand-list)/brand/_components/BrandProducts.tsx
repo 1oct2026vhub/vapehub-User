@@ -16,28 +16,20 @@ type BrandProps = {
 }
 
 const BrandProducts: React.FC<BrandProps> = ({ data, reviews, dynamicPageSlug }): ReactElement => {
-    const brandName = data.name || dynamicPageSlug?.name || "";
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Brands", href: ROUTES.BRANDS },
-        { label: brandName, href: `/${data.slug || dynamicPageSlug?.slug || ""}`, isActive: true },
+        { label: data.name || dynamicPageSlug?.name || "", href: `/${data.slug || dynamicPageSlug?.slug || ""}`, isActive: true },
     ];
     return (
         <div>
             <section className="product-listing-container flex-col">
                 <BreadCrumbs items={breadcrumbs} />
-                <ProductListingContent
-                    data={data}
-                    dynamicPageSlug={dynamicPageSlug}
-                    aboutHeading={`About ${brandName} Vapes`}
-                />
+                <ProductListingContent data={data} dynamicPageSlug={dynamicPageSlug} />
             </section>
-            <section aria-label={`Shop ${brandName} products`}>
-                <h2 className="sr-only">{`Shop ${brandName} Products`}</h2>
-                <ProductList data={data} reviews={reviews} />
-            </section>
+            <ProductList data={data} reviews={reviews} />
             <section className="product-listing-container">
-                <FAQSection type="brand" id={data.id} title="FAQs" />
+                <FAQSection type="brand" id={data.id} />
             </section>
         </div>
 

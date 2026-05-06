@@ -28,7 +28,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, isEditReview, current
         return (
             <div className="flex flex-col items-center justify-center space-y-4 py-8">
                 <div className="text-center">
-                    <div className="!font-oswald text-title-2 font-semibold text-skin-neutral-400 mb-2">Thank You!</div>
+                    <h4 className="text-title-2 font-semibold text-skin-neutral-400 mb-2">Thank You!</h4>
                     <p className="text-content-2 text-skin-neutral-300">
                         Your review has been submitted successfully.
                     </p>
@@ -45,7 +45,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, isEditReview, current
     return (
         <form onSubmit={handleSubmit} className="space-y-4 w-full">
             <div className="flex flex-col gap-2">
-                <div className="!font-oswald text-title-2 font-semibold text-skin-neutral-400">Your Rating</div>
+                <h4 className="text-title-2 font-semibold text-skin-neutral-400">Your Rating</h4>
                 <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                         <button
@@ -67,7 +67,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, isEditReview, current
             </div>
 
             <div className="flex flex-col gap-2">
-                <div className="!font-oswald text-title-2 font-semibold text-skin-neutral-400">Your Review</div>
+                <h4 className="text-title-2 font-semibold text-skin-neutral-400">Your Review</h4>
                 <Textarea
                     value={review}
                     onChange={(e) => setReview(e.target.value)}

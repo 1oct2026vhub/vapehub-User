@@ -60,8 +60,6 @@ export const API_ROUTES = {
     GET_CAROUSEL: buildRequestUrl('/api/home/carousel'),
     GET_TESTIMONIALS: buildRequestUrl('/api/testimonials'),
     SUBSCRIBE_MAIL: buildRequestUrl('/api/mailSubscription'),
-    UNSUBSCRIBE_MAIL: (email: string, source: string = 'app') =>
-        buildRequestUrl(`/api/mailSubscription/unsubscribe?email=${encodeURIComponent(email)}&source=${encodeURIComponent(source)}`),
     GET_BLOGS: (group?: string | number, filters?: { show_home_page?: boolean }) => {
         const params = new URLSearchParams();
         if (group !== undefined && group !== '') {

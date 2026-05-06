@@ -217,6 +217,17 @@ export const subscribeMail = async (email: string): Promise<ServerActionResponse
     method: 'POST',
   });
 };
+
+// unsubscribe mail subscription api
+export const unsubscribeMail = async (
+  email: string,
+  source: string = 'app'
+): Promise<ServerActionResponse<mailSubscriptionResponse>> => {
+  return await handleRequest<mailSubscriptionResponse, unknown>({
+    endpoint: API_ROUTES.UNSUBSCRIBE_MAIL(email, source),
+    method: 'GET',
+  });
+};
 // blog list api
 export const getBlogList = async (group?: string | number, filters?: { show_home_page?: boolean }, canCache: boolean = true): Promise<ServerActionResponse<BlogResponse[]>> => {
   return await handleRequest<BlogResponse[], unknown>({

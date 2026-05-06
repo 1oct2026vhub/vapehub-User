@@ -61,7 +61,7 @@ const NewProducts: React.FC<NewProductsProps> = async ({
       </div>
       <div className="slider-container section-slider products-slider">
         {newProducts.length > 0 ? (
-          <ProductsSlider data={products} reviews={reviews} />
+          <ProductsSlider data={products} reviews={reviews} maxNoJsProducts={5} />
         ) : (
           <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         )}

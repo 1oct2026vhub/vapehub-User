@@ -10,12 +10,12 @@ import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { unstable_noStore } from 'next/cache';
 import { Metadata, NextPage } from 'next';
 import ProductList from '../(product-listing)/_components/ProductList';
+import { resolveSiteUrl } from '@/lib/site-url';
 
-const BASE_URL = (process.env.NEXTAUTH_URL || 'https://www.vapehub.co.uk').replace(/\/$/, '');
+const BASE_URL = resolveSiteUrl();
 
 /** Same defaults as the page: latest first, new-only list. */
 const NEW_PRODUCTS_DEFAULT_PARAMS = { sort_by: 'id', order: 'DESC', limit: 12, offset: 0, is_new: true } as const;
-
 /**
  * Shared with generateMetadata so canonical / prev / next match the list request.
  */
@@ -117,7 +117,14 @@ const NewProductsPage: NextPage<SearchParams> = async ({ searchParams }): AsyncR
 
   const response = await getProductList(combinedParams);
   if (response.status === ServerActionStatus.ERROR) {
-    return (<p>{response.message}</p>);
+    return (
+      <div className="product-listing-container py-6">
+        <h1 className="primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit">New In</h1>
+        <p className="mt-2 text-content-1 text-skin-neutral-500">
+          New products are temporarily unavailable. Please try again shortly.
+        </p>
+      </div>
+    );
   }
 
   const reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[] = response.status === ServerActionStatus.SUCCESS && response.data.products ? response.data.products.map((product: Product) => ({

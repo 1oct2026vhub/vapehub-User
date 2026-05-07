@@ -1,36 +1,37 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React from "react";
 import DealCard from "./DealCard";
 import { Deal } from "@/lib/config/deal.config";
-import { getAllDeals } from "@/lib/server.actions";
-import { ServerActionStatus } from "@/lib/config/app.config";
+import EmptyPlaceholder from "./ui/EmptyPlaceholder";
 
-const DealsSlider: React.FC = () => {
-    const [deals, setDeals] = useState<Deal[]>([]);
+type DealsSliderProps = {
+  deals: Deal[];
+};
 
-    useEffect(() => {
-        const fetchDeals = async () => {
-            const response = await getAllDeals({ offset: 0, show_home_page: true });
-            if (response.status === ServerActionStatus.SUCCESS && response.data) {
-                setDeals(response.data.deals);
-            }
-        };
-        fetchDeals();
-    }, []);
-    
+/**
+ * Presentational carousel/grid for deals. Data must be loaded on the server and passed in
+ * so the homepage HTML includes real links and images for crawlers and no-JS users.
+ */
+const DealsSlider: React.FC<DealsSliderProps> = ({ deals }) => {
+  if (!deals.length) {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {deals.map((deal) => (
-                <DealCard
-                    key={deal.id}
-                    title={deal.name}
-                    imageSrc={deal?.image_url ?? "/images/deal-placeholder.jpg"} // Placeholder image
-                    altText={deal.alt_text ?? deal.name}
-                    href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
-                />
-            ))}
-        </div>
+      <EmptyPlaceholder title="Uh, oh!" description="No deals available right now." />
     );
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      {deals.map((deal) => (
+        <DealCard
+          key={deal.id}
+          title={deal.name}
+          imageSrc={deal?.image_url ?? "/images/deal-placeholder.jpg"}
+          altText={deal.alt_text ?? deal.name}
+          href={`/product-deals/${deal.slug.replace(/ /g, "-")}`}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default DealsSlider;

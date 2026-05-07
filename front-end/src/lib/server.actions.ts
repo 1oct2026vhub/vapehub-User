@@ -1366,3 +1366,13 @@ export const getLegalContentByKey = async (
     canCache,
   });
 };
+// unsubscribe mail subscription api
+export const unsubscribeMail = async (
+  email: string,
+  source: string = 'app'
+): Promise<ServerActionResponse<mailSubscriptionResponse>> => {
+  return await handleRequest<mailSubscriptionResponse, unknown>({
+    endpoint: API_ROUTES.UNSUBSCRIBE_MAIL(email, source),
+    method: 'GET',
+  });
+};

@@ -142,6 +142,8 @@ export const API_ROUTES = {
     GET_HOME_BLOCKS: buildRequestUrl('/api/home/blocks'),
     GET_DISPATCH_NOTICE: buildRequestUrl('/api/settings/dispatch-notice'),
     GUEST_CHECKOUT_AND_ORDER: buildRequestUrl('/api/checkout/guest/checkout-and-order'),
+    UNSUBSCRIBE_MAIL: (email: string, source: string = 'app') =>
+        buildRequestUrl(`/api/mailSubscription/unsubscribe?email=${encodeURIComponent(email)}&source=${encodeURIComponent(source)}`)
 };
 
 // * Helper functions

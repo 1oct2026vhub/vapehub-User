@@ -26,6 +26,7 @@ PAYMENT_SUCCESS: '/payment-success',
 PAYMENT_FAILED: '/payment-failed',
 ORDER_DETAILS: '/order-details',
 REFERRAL: '/refer-a-friend',
+UNSUBSCRIBE_SUCCESS: '/unsubscribe'
 }
 
  

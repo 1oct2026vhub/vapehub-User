@@ -169,14 +169,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex flex-col flex-grow">
             <div className='h-[132px] md:h-[155px] relative'>
               <div className="relative h-full">
-                <h4 
+                <div 
                   ref={titleRef}
-                  className="text-title-2 md:text-h5 text-skin-neutral-500 font-semibold line-clamp-4 xl:mr-8 cursor-pointer"
+                  className="!font-oswald text-title-2 md:text-h5 text-skin-neutral-500 font-semibold line-clamp-4 xl:mr-8 cursor-pointer"
                   onMouseEnter={() => isTitleTruncated && setShowTitleTooltip(true)}
                   onMouseLeave={() => setShowTitleTooltip(false)}
                 >
                   {title}
-                </h4>
+                </div>
                 {showTitleTooltip && isTitleTruncated && (
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-white text-sm rounded-lg shadow-lg z-50 max-w-xs break-words" style={{ backgroundColor: '#02643E' }}>
                     <div className="whitespace-normal leading-relaxed">

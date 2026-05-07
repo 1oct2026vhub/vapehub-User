@@ -22,7 +22,7 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
                 />
             </div>
             <div className='flex gap-4 items-start justify-between mb-4 w-full'>
-                <h2 className='text-skin-neutral-500 text-title-2 md:text-title-1 font-semibold line-clamp-2 sm:h-14'>{blog?.title}</h2>
+                <div className='!font-oswald text-skin-neutral-500 text-title-2 md:text-title-1 font-semibold line-clamp-2 sm:h-14'>{blog?.title}</div>
                 <RightArrowIcon stroke='#091410' className='-rotate-45 w-6 h-6 min-w-5 md:min-w-6' />
             </div>
             <div>

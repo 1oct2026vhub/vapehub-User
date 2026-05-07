@@ -35,7 +35,6 @@ const HottestCollections: React.FC = async () => {
                     />
                 ))}
             </div>
-            
             <Button
                 as={Link}
                 href={ROUTES.BRANDS}

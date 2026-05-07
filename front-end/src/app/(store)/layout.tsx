@@ -10,13 +10,15 @@ import { FlashNewsItem } from '@/lib/config/global.config';
 import { HeaderMegaMenuResponse } from '@/lib/config/header.config';
 import HistoryProvider from "@/components/HistoryProvider";
 import NormalizeInternalLinks from "@/components/NormalizeInternalLinks";
+import { resolveSiteUrl } from "@/lib/site-url";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
   const isSoft404Request = requestHeaders.get('x-vapehub-soft404') === '1';
+  const siteUrl = resolveSiteUrl();
 
   return {
-    metadataBase: new URL(process.env.NEXTAUTH_URL || ''),
+    metadataBase: new URL(siteUrl),
     alternates: isSoft404Request ? { canonical: null } : { canonical: './' },
   };
 }

@@ -386,9 +386,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
         }
     }, [variantSelectionError, canAddToCart]);
 
+    const resolvedMainImage = mainImage ?? allImages?.[0] ?? cartEntity?.primary_image ?? product?.primary_image ?? null;
+
     useEffect(() => {
-        setMainImage(cartEntity?.primary_image ?? product?.primary_image);
-    }, [cartEntity, product]);
+        setMainImage(cartEntity?.primary_image ?? product?.primary_image ?? allImages?.[0] ?? null);
+    }, [cartEntity, product, allImages]);
 
     useEffect(() => {
         if (!primaryAttributeId) return;
@@ -463,8 +465,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 <div className='space-y-4 w-full lg:w-fit'>
                     <div className='bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
                         <CustomImageMagnifier
-                            src={mainImage?.url || ''}
-                            alt={mainImage?.alt_text ?? product?.name ?? ''}
+                            src={resolvedMainImage?.url || ''}
+                            alt={resolvedMainImage?.alt_text ?? product?.name ?? ''}
                             width={320}
                             height={396}
                             className='aspect-square  mix-blend-multiply'
@@ -497,7 +499,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                                         <Button
                                             onPress={() => setMainImage(image)}
                                             isIconOnly
-                                            className={`p-0 w-[118px] h-[111px] flex items-center !rounded justify-center bg-transparent ${mainImage?.id === image.id ? 'ring-2 ring-skin-primary2-500' : ''
+                                            className={`p-0 w-[118px] h-[111px] flex items-center !rounded justify-center bg-transparent ${resolvedMainImage?.id === image.id ? 'ring-2 ring-skin-primary2-500' : ''
                                                 }`}
                                         >
                                             <NoImage

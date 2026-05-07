@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import NoImage from './NoImage';
-import { resolveMediaImageUrl } from '@/lib/media-image-url';
 
 interface CustomImageMagnifierProps {
   src: string;
@@ -22,7 +21,6 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [magnifierPosition, setMagnifierPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const resolvedSrc = resolveMediaImageUrl(src);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
@@ -57,7 +55,7 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
     <div className="relative">
       
         <div className="hidden md:block">
-        {resolvedSrc ? (
+        {src ? (
           <div
             ref={containerRef}
             className="relative cursor-crosshair"
@@ -91,7 +89,7 @@ const CustomImageMagnifier: React.FC<CustomImageMagnifierProps> = ({
                   height: '400px',
                   left: '105%',
                   top: '-50px',
-                  backgroundImage: `url(${resolvedSrc})`,
+                  backgroundImage: `url(${src})`,
                   backgroundSize: `${width * zoomLevel}px ${height * zoomLevel}px`,
                   backgroundRepeat: 'no-repeat',
                   zIndex: 1000,

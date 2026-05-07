@@ -4,9 +4,10 @@ import "./globals.css";
 import GlobalProvider from "@/providers/GlobalProvider";
 import { Toaster } from "sonner";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import { resolveSiteUrl } from "@/lib/site-url";
 
-const SITE_URL = resolveSiteUrl();
+const SITE_URL =
+  process.env.NEXTAUTH_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
 const oswald = Oswald({
   variable: "--font-oswald",

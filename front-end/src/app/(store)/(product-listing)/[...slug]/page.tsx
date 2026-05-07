@@ -1,4 +1,4 @@
-import { getBlogList, getBlogPostList, getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
+import { getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { redirect, RedirectType } from 'next/navigation';
@@ -212,44 +212,7 @@ const Page = async ({
   const entityTypeHandlers: Record<string, () => Promise<React.ReactNode>> = {
     blog_category: async () => {
       const blogs = await fetchBlogBySlug(primarySlug);
-      const pageFromQuery = Number.parseInt(searchParamsData.page ?? "1", 10);
-      const page = Number.isNaN(pageFromQuery) || pageFromQuery < 1 ? 1 : pageFromQuery;
-      const selectedCategoryId = blogs?.id?.toString() ?? "0";
-      const [categoriesResponse, blogsResponse] = await Promise.all([
-        getBlogList(),
-        selectedCategoryId === "0"
-          ? getBlogPostList({ limit: 9, page })
-          : getBlogPostList({ categoryId: selectedCategoryId, limit: 9, page }),
-      ]);
-
-      const allTab = {
-        id: 0,
-        name: "All",
-        slug: "all",
-        description: "",
-        image_url: "",
-        blogs: [],
-        blog_count: 0,
-      };
-
-      const initialTabs = categoriesResponse.status === ServerActionStatus.SUCCESS
-        ? [allTab, ...categoriesResponse.data]
-        : [allTab];
-      const initialBlogs = blogsResponse.status === ServerActionStatus.SUCCESS ? blogsResponse.data.blogs : [];
-      const initialTotalPages = blogsResponse.status === ServerActionStatus.SUCCESS ? blogsResponse.data.pagination.totalPages : 1;
-
-      return blogs && (
-        <BlogListView
-          selectedId={selectedCategoryId}
-          page={page}
-          pathnameBase={`/${primarySlug}`}
-          lockCategory
-          initialTabs={initialTabs}
-          initialBlogs={initialBlogs}
-          initialPage={page}
-          initialTotalPages={initialTotalPages}
-        />
-      );
+      return blogs && <BlogListView selectedId={blogs.id.toString()} />;
     },
     blog: async () => {
       // For blog posts with two slugs (category/blog), use the secondary slug (blog post slug)

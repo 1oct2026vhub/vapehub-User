@@ -1,32 +1,105 @@
-import React from 'react';
+'use client'
+
+import React, { useEffect, useState, Suspense } from 'react';
 import { NextPage } from 'next';
+import { Pagination } from '@nextui-org/react';
 import BreadCrumbs from '@/components/BreadCrumbs';
+import DealCard from '@/components/DealCard';
+import { Deal } from '@/lib/config/deal.config';
 import { getAllDeals } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
-import AllDealsContentClient from './_components/AllDealsContentClient';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import SuspenseLoader from '@/components/ui/SuspenseLoader';
+import { setScrollToTopOnNextNavigation } from '@/components/HistoryProvider';
 
 // Disable static generation for this page since it uses dynamic search params
 export const dynamic = 'force-dynamic';
 
-type AllDealsPageProps = {
-    searchParams: Promise<Record<string, string | string[] | undefined>>;
+const AllDealsContent: React.FC = () => {
+    const [deals, setDeals] = useState<Deal[]>([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const limit = 10;
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // Get current page from URL, default to 1
+    const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
+    useEffect(() => {
+        const fetchDeals = async () => {
+            setLoading(true);
+            const offset = (currentPage - 1) * limit;
+            const response = await getAllDeals({ limit, offset, deal_type:'BUY_N_FOR_FIXED' });
+            if (response.status === ServerActionStatus.SUCCESS && response.data) {
+                setDeals(response.data.deals);
+                setTotalPages(response.data.pagination.total_pages);
+            }
+            setLoading(false);
+        };
+        fetchDeals();
+    }, [currentPage]);
+
+    // Handle page change - update URL with page parameter
+    const handlePageChange = (page: number) => {
+        setScrollToTopOnNextNavigation();
+        const params = new URLSearchParams(searchParams.toString());
+        if (page === 1) {
+            params.delete('page'); // Remove page param for page 1 to keep URL clean
+        } else {
+            params.set('page', page.toString());
+        }
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
+    return (
+        <>
+            <section className='border-t border-skin-neutral-200 product-listing-container py-8'>
+                {loading ? (
+                    <div className="flex justify-center items-center min-h-[400px]">
+                        <p className="text-skin-neutral-300 text-lg">Loading deals...</p>
+                    </div>
+                ) : deals.length > 0 ? (
+                    <>
+                        <div className="grid sm:grid-cols-2 w-full gap-6">
+                            {deals.map((deal) => (
+                                <DealCard
+                                    key={deal.id}
+                                    title={deal.name}
+                                    imageSrc={deal.image_url || ""}
+                                    altText={deal.alt_text ?? deal.name}
+                                    href={`/product-deals/${deal.slug.replace(/ /g, '-')}`}
+                                />
+                            ))}
+                        </div>
+                        
+                    </>
+                ) : (
+                    <div className="flex justify-center items-center min-h-[400px]">
+                        <p className="text-skin-neutral-300 text-lg">No deals available</p>
+                    </div>
+                )}
+            </section>
+            {totalPages > 1 && (
+                <div className="flex justify-center mt-8">
+                    <Pagination
+                        total={totalPages}
+                        initialPage={1}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        showControls
+                        classNames={{
+                            cursor: "bg-skin-primary-500 text-white",
+                        }}
+                    />
+                </div>
+            )}
+        </>
+    );
 };
 
-const AllDealsPage: NextPage<AllDealsPageProps> = async ({ searchParams }) => {
-    const params = await searchParams;
-    const rawPage = params.page;
-    const pageParam = typeof rawPage === "string" ? rawPage : Array.isArray(rawPage) ? rawPage[0] : "1";
-    const parsedPage = Number.parseInt(pageParam ?? "1", 10);
-    const currentPage = Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
-    const limit = 10;
-    const offset = (currentPage - 1) * limit;
-
-    const dealsResponse = await getAllDeals({ limit, offset, deal_type: 'BUY_N_FOR_FIXED' });
-    const initialDeals = dealsResponse.status === ServerActionStatus.SUCCESS && dealsResponse.data ? dealsResponse.data.deals : [];
-    const initialTotalPages = dealsResponse.status === ServerActionStatus.SUCCESS && dealsResponse.data
-        ? dealsResponse.data.pagination.total_pages
-        : 1;
-
+const AllDealsPage: NextPage = () => {
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Deals", href: "/deals", isActive: true },
@@ -41,11 +114,9 @@ const AllDealsPage: NextPage<AllDealsPageProps> = async ({ searchParams }) => {
                     <h2 className="text-content-2 md:text-title-1 text-skin-neutral-300 font-semibold">Fantastic deals, all year round!</h2>
                 </div>
             </section>
-            <AllDealsContentClient
-                initialDeals={initialDeals}
-                initialPage={currentPage}
-                initialTotalPages={initialTotalPages}
-            />
+            <Suspense fallback={<SuspenseLoader height="min-h-[400px]" />}>
+                <AllDealsContent />
+            </Suspense>
         </main>
     );
 };

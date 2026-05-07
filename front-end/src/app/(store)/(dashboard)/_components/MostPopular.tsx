@@ -71,7 +71,7 @@ export const MostPopularSalts: React.FC<MostPopularProps> = async ({
       </div>
       <div className="slider-container section-slider products-slider">
         {
-          filtered.length > 0 ? <ProductsSlider data={products} reviews={reviews} maxNoJsProducts={5} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
+          filtered.length > 0 ? <ProductsSlider data={products} reviews={reviews} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         }
       </div>
     </section>
@@ -134,7 +134,7 @@ export const MostPopularVapes: React.FC<MostPopularProps> = async ({
       </div>
       <div className="slider-container section-slider products-slider">
         {
-          filtered.length > 0 ? <ProductsSlider data={products} reviews={reviews} maxNoJsProducts={5} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
+          filtered.length > 0 ? <ProductsSlider data={products} reviews={reviews} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         }
       </div>
     </section>
@@ -228,7 +228,7 @@ export const MostPopularPods: React.FC<MostPopularPodsProps> = async ({
       </div>
       <div className="slider-container section-slider products-slider">
         {
-          filtered.length > 0 ? <ProductsSlider data={products} reviews={reviews} maxNoJsProducts={5} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
+          filtered.length > 0 ? <ProductsSlider data={products} reviews={reviews} /> : <EmptyPlaceholder title='Uh, oh!' description='No products available' />
         }
       </div>
     </section>

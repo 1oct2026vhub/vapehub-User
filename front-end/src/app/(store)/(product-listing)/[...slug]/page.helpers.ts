@@ -24,10 +24,18 @@ import {
   toAbsoluteUrl,
   SCHEMA_CONTEXT,
 } from "@/lib/seo-schema";
-import { resolveSiteUrl } from "@/lib/site-url";
 
 export const resolveBaseUrl = (): string => {
-  return resolveSiteUrl();
+  const configuredUrl = process.env.NEXTAUTH_URL;
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/$/, "");
+  }
+
+  if (process.env.NODE_ENV !== "development") {
+    throw new Error("NEXTAUTH_URL is required in non-development environments");
+  }
+
+  return "http://localhost:3000";
 };
 
 const fetchDynamicPageSlug = cache(async (slug: string): Promise<DynamicPageSlugResponse | null> => {

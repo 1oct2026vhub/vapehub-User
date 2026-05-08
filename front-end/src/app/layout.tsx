@@ -4,10 +4,10 @@ import "./globals.css";
 import GlobalProvider from "@/providers/GlobalProvider";
 import { Toaster } from "sonner";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { resolveSiteUrl } from "@/lib/site-url";
+import { GoogleTagManagerBody, GoogleTagManagerHead } from "@/components/GoogleTagManager";
 
-const SITE_URL =
-  process.env.NEXTAUTH_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+const SITE_URL = resolveSiteUrl();
 
 const oswald = Oswald({
   variable: "--font-oswald",
@@ -55,6 +55,7 @@ export default function RootLayout({
           content='width=device-width, initial-scale=1.0'
         />
         <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+        <GoogleTagManagerHead />
         <GoogleAnalytics
         GA_MEASUREMENT_ID={GA_MEASUREMENT_ID}
       />
@@ -62,6 +63,7 @@ export default function RootLayout({
       <body
         className={`m-0 min-h-screen bg-white text-skin-black font-opensans antialiased ${oswald.variable} ${openSans.variable}`}
       >
+        <GoogleTagManagerBody />
         <GlobalProvider>
           <Toaster {...TOASTER_CONFIG} />
           {children}

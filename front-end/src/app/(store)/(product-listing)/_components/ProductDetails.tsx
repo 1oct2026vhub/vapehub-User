@@ -386,9 +386,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
         }
     }, [variantSelectionError, canAddToCart]);
 
+    const resolvedMainImage = mainImage ?? allImages?.[0] ?? cartEntity?.primary_image ?? product?.primary_image ?? null;
+
     useEffect(() => {
-        setMainImage(cartEntity?.primary_image ?? product?.primary_image);
-    }, [cartEntity, product]);
+        setMainImage(cartEntity?.primary_image ?? product?.primary_image ?? allImages?.[0] ?? null);
+    }, [cartEntity, product, allImages]);
 
     useEffect(() => {
         if (!primaryAttributeId) return;
@@ -428,13 +430,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
         };
         fetchLinkedProducts();
     }, [product.id]);  
-    
+
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
             <div className='flex flex-col lg:flex-row items-start gap-6 xl:gap-11'>
                 {/* Title section mobile */}
                 <div className='space-y-2 lg:hidden'>
-                    <h2 className='text-h4 text-skin-neutral-500 font-semibold'>{productName}</h2>
+                    <div className='!font-oswald text-h4 text-skin-neutral-500 font-semibold'>{productName}</div>
                     <div className='block text-content-1 text-skin-neutral-500 w-fit'>
                         Brand:
                         {product?.product_brands?.map((brand, index) => (
@@ -463,8 +465,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 <div className='space-y-4 w-full lg:w-fit'>
                     <div className='bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
                         <CustomImageMagnifier
-                            src={mainImage?.url || ''}
-                            alt={mainImage?.alt_text ?? product?.name ?? ''}
+                            src={resolvedMainImage?.url || ''}
+                            alt={resolvedMainImage?.alt_text ?? product?.name ?? ''}
                             width={320}
                             height={396}
                             className='aspect-square  mix-blend-multiply'
@@ -497,7 +499,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                                         <Button
                                             onPress={() => setMainImage(image)}
                                             isIconOnly
-                                            className={`p-0 w-[118px] h-[111px] flex items-center !rounded justify-center bg-transparent ${mainImage?.id === image.id ? 'ring-2 ring-skin-primary2-500' : ''
+                                            className={`p-0 w-[118px] h-[111px] flex items-center !rounded justify-center bg-transparent ${resolvedMainImage?.id === image.id ? 'ring-2 ring-skin-primary2-500' : ''
                                                 }`}
                                         >
                                             <NoImage
@@ -673,7 +675,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             <Divider />
             {linkedProducts.length > 0 && (
                 <div className='space-y-3.5 md:space-y-5 lg:space-y-7 md:mt-2'>
-                    <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>Pair It Up</h2>
+                    <h2 className='text-title-1 md:text-h3 font-semibold primary-gradient-600 w-fit'>Frequently Bought Together</h2>
                     <div className={`grid ${linkedProducts.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3 md:flex md:flex-col md:gap-5.5`}>
                         {linkedProducts?.map((linkedProduct, index) => {
                             // Convert LinkedProduct to ProductInDeal format for BundleProductCard

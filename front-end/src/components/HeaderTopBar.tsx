@@ -235,7 +235,7 @@ const HeaderTopBar = ({ megaMenuData = [] }: Props) => {
                     {(onClose) => (
                         <>
                             <DrawerHeader className="flex items-center justify-between gap-1 border-b border-skin-neutral-100 py-3 md:py-6 px-4 md:px-6">
-                                <h1 className='primary-gradient-600 text-xl font-semibold w-fit'>Shopping Cart</h1>
+                                <div className='!font-oswald primary-gradient-600 text-xl font-semibold w-fit'>Shopping Cart</div>
                                 <Button isIconOnly variant='light' onPress={onClose} className="!h-fit !w-fit !min-w-fit">
                                     <CloseIcon />
                                 </Button>

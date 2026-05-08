@@ -48,9 +48,9 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
                     <OrderStatusBadge status={status as ORDER_STATUS} />
 
                     {/* Order Title */}
-                    <h2 className="text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 font-semibold">
+                    <div className="!font-oswald text-content-2 sm:text-content-1 lg:text-title-1 text-skin-neutral-400 font-semibold">
                         {data.product.name}
-                    </h2>
+                    </div>
 
                     {/* Order ID */}
                     <div>

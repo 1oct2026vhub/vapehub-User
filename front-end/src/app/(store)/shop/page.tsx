@@ -10,7 +10,7 @@ import { Product, ProductReview } from '@/lib/config/product.config';
 
 export const metadata: Metadata = {
   title: "Shop | VapeHub",
-  description: "",
+  description: "Browse VapeHub's full range of vape kits, e-liquids, disposables, pods, and accessories from top brands at competitive prices.",
 };
 type SearchParams = {
   searchParams: Promise<Record<string, string>>
@@ -45,7 +45,14 @@ const ShopPage: NextPage<SearchParams> = async ({searchParams}):AsyncReactElemen
     
     const response = await getProductList(combinedParams);
       if(response.status == ServerActionStatus.ERROR) {
-        return (<p>{response.message}</p>);
+        return (
+          <div className="product-listing-container py-6">
+            <h1 className="primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit">Shop</h1>
+            <p className="mt-2 text-content-1 text-skin-neutral-500">
+              Products are temporarily unavailable. Please try again shortly.
+            </p>
+          </div>
+        );
       } 
 
     // Extract review data from products and format for ProductList

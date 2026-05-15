@@ -18,7 +18,7 @@ import { CustomRadio } from '@/components/CustomRadio';
 import { Button, RadioGroup, useDisclosure } from '@nextui-org/react';
 import { Form } from '@/components/ui/Form';
 import { useCheckout } from '@/lib/context/CheckoutContext';
-import { useCart } from '@/lib/context/CartContext';
+import { useCart, type LoyaltyRedemption } from '@/lib/context/CartContext';
 import { useAddress } from '@/lib/context/AddressContext';
 import AddressList from './AddressList';
 import { Address } from '@/lib/config/user.config';
@@ -37,6 +37,7 @@ import {
     buildAuthShippingAddress,
     buildBillingAddressPayload,
     buildGuestShippingAddress,
+    buildOrderLoyaltyFields,
     calculateCheckoutPayloadTotal,
     deriveShippingMethodsForCheckout,
     parseWorldPayPlaceOrderData,
@@ -45,6 +46,40 @@ import {
 
 interface CheckoutDetailsProps {
     shippingMethodsData: SHIPPING_METHOD_DATA[];
+}
+
+function resolveShippingMethodIdForOrder(loyalty: LoyaltyRedemption, selectedCarrierId: number): number {
+    if (!loyalty.isRedeemed) {
+        return selectedCarrierId || 0;
+    }
+    const zeroApplyCouponShipping =
+        loyalty.applyCouponShippingCost !== null &&
+        Number.isFinite(loyalty.applyCouponShippingCost) &&
+        loyalty.applyCouponShippingCost === 0;
+    if (zeroApplyCouponShipping) {
+        return selectedCarrierId || 0;
+    }
+    if (loyalty.applyCouponShippingMethodId != null && loyalty.applyCouponShippingMethodId > 0) {
+        return loyalty.applyCouponShippingMethodId;
+    }
+    return selectedCarrierId || 0;
+}
+
+function resolveMailDiscountForCheckoutPayload(
+    loyalty: LoyaltyRedemption,
+    couponMail: number | undefined
+): number | undefined {
+    if (
+        loyalty.isRedeemed &&
+        loyalty.applyCouponMailSubscriptionDiscount !== null &&
+        Number.isFinite(loyalty.applyCouponMailSubscriptionDiscount)
+    ) {
+        return loyalty.applyCouponMailSubscriptionDiscount;
+    }
+    if (couponMail !== undefined && Number.isFinite(couponMail)) {
+        return couponMail;
+    }
+    return undefined;
 }
 
 const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }) => {
@@ -110,6 +145,16 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         // Handle form submission
         if (!data) return;
 
+        const shippingMethodIdForOrder = resolveShippingMethodIdForOrder(
+            loyaltyRedemption,
+            Number(selectedCarrier?.id) || 0
+        );
+
+        const mailDiscountForCheckoutPayload = resolveMailDiscountForCheckoutPayload(
+            loyaltyRedemption,
+            couponDiscount.mailSubscriptionDiscount
+        );
+
         // For guest users, use the combined checkout and order API
         if (!isAuthenticated) {
             // Get cart items from localStorage (with fallback to cookie for backward compatibility)
@@ -146,7 +191,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 phone: data.phone,
                 cartItems: cartItemsForApi,
                 couponCode: couponDiscount.code || undefined,
-                shipping_method_id: Number(selectedCarrier?.id) || 0,
+                shipping_method_id: shippingMethodIdForOrder,
                 shipping_address: buildGuestShippingAddress(data),
                 billing_address: buildBillingAddressPayload(data),
                 useShippingAsBilling: toApiUseShippingAsBilling(data),
@@ -156,9 +201,14 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 total: calculateCheckoutPayloadTotal(
                     cartTotal,
                     couponDiscount.value,
-                    loyaltyRedemption.discountValue ?? undefined
+                    loyaltyRedemption.discountValue ?? undefined,
+                    mailDiscountForCheckoutPayload
                 ),
-                loyalty: loyaltyRedemption.isRedeemed,
+                ...buildOrderLoyaltyFields(
+                    loyaltyRedemption.isRedeemed,
+                    loyaltyRedemption.pointsToRedeem,
+                    loyaltyRedemption.pointsData
+                ),
                 receive_promotions: data.marketingConsent || false
             };
 
@@ -227,15 +277,20 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             billing_address: buildBillingAddressPayload(data),
             useShippingAsBilling: toApiUseShippingAsBilling(data),
             couponCode: couponDiscount.code || undefined,
-            loyalty: loyaltyRedemption.isRedeemed,
-            shipping_method_id: Number(selectedCarrier?.id) || 0,
+            shipping_method_id: shippingMethodIdForOrder,
             payment_method: {
                 method: data.paymentMethod
             },
             total: calculateCheckoutPayloadTotal(
                 cartTotal,
                 couponDiscount.value,
-                loyaltyRedemption.discountValue ?? undefined
+                loyaltyRedemption.discountValue ?? undefined,
+                mailDiscountForCheckoutPayload
+            ),
+            ...buildOrderLoyaltyFields(
+                loyaltyRedemption.isRedeemed,
+                loyaltyRedemption.pointsToRedeem,
+                loyaltyRedemption.pointsData
             ),
         };
 
@@ -337,6 +392,14 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             return;
         }
 
+        const loyaltyApplyCouponSnapshot = loyaltyRedemption.isRedeemed
+            ? {
+                  isRedeemed: true,
+                  applyCouponShippingCost: loyaltyRedemption.applyCouponShippingCost,
+                  applyCouponShippingMethodId: loyaltyRedemption.applyCouponShippingMethodId,
+              }
+            : undefined;
+
         const { filteredSortedMethods } = deriveShippingMethodsForCheckout(
             shippingMethodsData,
             cartTotal,
@@ -344,7 +407,8 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             {
                 isRedeemed: loyaltyRedemption.isRedeemed,
                 discountValue: loyaltyRedemption.discountValue,
-            }
+            },
+            loyaltyApplyCouponSnapshot
         );
 
         setShippingMethods(filteredSortedMethods);
@@ -368,6 +432,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         couponDiscount,
         loyaltyRedemption.isRedeemed,
         loyaltyRedemption.discountValue,
+        loyaltyRedemption.applyCouponShippingCost,
         form,
         setSelectedShippingMethod,
     ]);

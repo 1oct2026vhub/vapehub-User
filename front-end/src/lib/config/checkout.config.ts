@@ -136,6 +136,8 @@ export interface APPLY_COUPON_PAYLOAD {
     couponCode?: string;
     shippingMethodId: number;
     loyalty?: boolean;
+    /** When set with `loyalty: true`, server redeems this many points (clamped to balance/rules). Omit for maximum allowed. */
+    points_to_redeem?: number;
 }
 
 export interface APPLY_GUEST_COUPON_PAYLOAD {
@@ -147,6 +149,7 @@ export interface APPLY_GUEST_COUPON_PAYLOAD {
     }>;
     shippingMethodId: number;
     loyalty?: boolean;
+    points_to_redeem?: number;
 }
 
 export interface CHECKOUT_PAYLOAD {
@@ -182,6 +185,7 @@ export interface CHECKOUT_PAYLOAD {
     };
     total: number;
     loyalty?: boolean;
+    points_to_redeem?: number;
 }
 
 /** Minimal POST body from the shopping cart before the full checkout form (API uses session + coupon). */
@@ -228,5 +232,6 @@ export interface GUEST_CHECKOUT_AND_ORDER_PAYLOAD {
     };
     total: number;
     loyalty?: boolean;
+    points_to_redeem?: number;
     receive_promotions: boolean;
 }

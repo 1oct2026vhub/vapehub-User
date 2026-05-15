@@ -33,13 +33,21 @@ interface CouponDiscount {
   mailSubscriptionDiscount?: number; // Mail subscription discount amount from API
 }
 
-interface LoyaltyRedemption {
+export interface LoyaltyRedemption {
   isRedeemed: boolean;
   pointsData: LoyaltyPointsRedemptionResponse | null;
   discountValue: number;
   message: string | null;
+  /** When `null`, omit `points_to_redeem` on the API so the server redeems the maximum allowed. */
+  pointsToRedeem: number | null;
+  /** Last apply-coupon `shippingCost` when loyalty is on; `null` = use catalog shipping from selected method. */
+  applyCouponShippingCost: number | null;
+  /** From apply-coupon when loyalty is on; used for place-order when priced shipping is non-zero. If apply-coupon shipping is £0, checkout uses the selected method (catalog free row). */
+  applyCouponShippingMethodId: number | null;
+  /** Last apply-coupon `mail_subscription_discount` when loyalty is on (coupon UI cleared but API still applies mail). */
+  applyCouponMailSubscriptionDiscount: number | null;
 }
-interface CartContextType {
+export interface CartContextType {
   cartItems: CartItem[];
   isLoading: boolean;
   addItemToCart: (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => Promise<void>;
@@ -103,6 +111,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     pointsData: null,
     discountValue: 0,
     message: null,
+    pointsToRedeem: null,
+    applyCouponShippingCost: null,
+    applyCouponShippingMethodId: null,
+    applyCouponMailSubscriptionDiscount: null,
   });
   const [isRemoveCoupon, setIsRemoveCoupon] = useState<boolean>(false);
   const [itemCount, setItemCount] = useState<number>(0);
@@ -632,6 +644,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               pointsData: loyaltyRedemption.pointsData,
               discountValue: 0,
               message: null,
+              pointsToRedeem: null,
+              applyCouponShippingCost: null,
+              applyCouponShippingMethodId: null,
+              applyCouponMailSubscriptionDiscount: null,
             });
           }
         }
@@ -658,6 +674,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
              pointsData: loyaltyRedemption.pointsData,
              discountValue: 0,
              message: null,
+             pointsToRedeem: null,
+             applyCouponShippingCost: null,
+             applyCouponShippingMethodId: null,
+             applyCouponMailSubscriptionDiscount: null,
            });
          }
        }
@@ -690,6 +710,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
            pointsData: loyaltyRedemption.pointsData,
            discountValue: 0,
            message: null,
+           pointsToRedeem: null,
+           applyCouponShippingCost: null,
+           applyCouponShippingMethodId: null,
+           applyCouponMailSubscriptionDiscount: null,
          });
        }
     } finally {
@@ -885,6 +909,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       pointsData: loyaltyRedemption.pointsData, // Preserve points data
       discountValue: 0,
       message: null,
+      pointsToRedeem: null,
+      applyCouponShippingCost: null,
+      applyCouponShippingMethodId: null,
+      applyCouponMailSubscriptionDiscount: null,
     });
     removeGuestCart();
     deleteCookie(CART_COOKIE_NAME);
@@ -1154,7 +1182,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     loyaltyRedemption,
     setLoyaltyRedemption,
     setShippingMethodIdForCoupon,
-  };
+  } satisfies CartContextType;
 
   return (
     <CartContext.Provider value={value}>
@@ -1163,7 +1191,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useCart = () => {
+export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
   if (context === undefined) {
     throw new Error('useCart must be used within a CartProvider');

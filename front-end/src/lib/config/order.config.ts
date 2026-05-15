@@ -90,6 +90,10 @@ export interface PLACE_ORDER_PAYLOAD {
         method: string;
     };
     total: number;
+    loyalty?: boolean;
+    receive_promotions?: boolean;
+    shipping_address_id?: number;
+    points_to_redeem?: number;
 }
 
 export interface SHIPPING_METHOD {
@@ -441,6 +445,12 @@ export interface Coupon {
 export interface CouponResponse {
     totalItems: number;
     shippingCost: number;
+    shipping_cost?: number | string;
+    /** Resolved shipping method id from pricing (e.g. loyalty free-shipping row). May be snake_case from API. */
+    shipping_method_id?: number;
+    shippingMethodId?: number;
+    shippingMethod?: { id: number; shipping_method?: string; shipping_cost?: number | string };
+    shipping_method?: { id: number; shipping_method?: string; shipping_cost?: number | string };
     subTotal: number;
     total: number;
     coupon: Coupon;

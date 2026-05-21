@@ -24,10 +24,13 @@ import { useReviews } from '@/lib/context/ReviewContext'
 import { PRODUCT_VARIANT_ATTRIBUTE } from '@/lib/api-routes'
 import { VariantSelectionPayload } from '@/lib/hooks/useVariantFilter'
 import { useProductData } from '@/lib/context/ProductDataContext'
+import { buildVariantFirstDescription, buildVariantFirstTitle } from '@/lib/seo-schema'
 
 type ProductViewProps = {
     data: ProductResponse;
-    selectedVariant?: AttributeProductTerms
+    selectedVariant?: AttributeProductTerms;
+    parentSeoDescription?: string;
+    parentSeoTitle?: string;
 }
 
 type AttributeSelection = {
@@ -69,6 +72,7 @@ const settings: Settings = {
     ],
 
 };
+
 function mergeVariantsById(existing: ProductVariant[], incoming: ProductVariant[]): ProductVariant[] {
     if (!incoming.length) {
         return existing;
@@ -80,7 +84,12 @@ function mergeVariantsById(existing: ProductVariant[], incoming: ProductVariant[
     return Array.from(byId.values());
 }
 
-const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selectedVariant: initialSelectedVariant }) => {
+const ProductDetails: React.FC<ProductViewProps> = ({
+    data: initialData,
+    selectedVariant: initialSelectedVariant,
+    parentSeoDescription = '',
+    parentSeoTitle = '',
+}) => {
     const [productData, setProductData] = useState<ProductResponse>(initialData);
     /** Full variant list for stock labels; API filter responses only return matching variants. */
     const [allVariantsCatalog, setAllVariantsCatalog] = useState<ProductVariant[]>(initialData.variants ?? []);
@@ -467,7 +476,32 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             }
         };
         fetchLinkedProducts();
-    }, [product.id]);  
+    }, [product.id]);
+
+    useEffect(() => {
+        const variantName = selectedVariant?.terms.name?.trim();
+        if (!variantName || !parentSeoDescription.trim() || variantAttributes.length === 0) return;
+        const title = buildVariantFirstTitle(variantName, parentSeoTitle || product.name);
+        const description = buildVariantFirstDescription(variantName, product.name, parentSeoDescription);
+        document.title = title;
+        const tags: [string, string, string][] = [
+            ["name", "description", description],
+            ["property", "og:title", title],
+            ["property", "og:description", description],
+            ["name", "twitter:title", title],
+            ["name", "twitter:description", description],
+        ];
+        for (const [attr, key, value] of tags) {
+            const nodes = document.querySelectorAll<HTMLMetaElement>(`meta[${attr}="${key}"]`);
+            nodes.forEach((node, i) => (i ? node.remove() : node.setAttribute("content", value)));
+            if (!nodes.length) {
+                const meta = document.createElement("meta");
+                meta.setAttribute(attr, key);
+                meta.setAttribute("content", value);
+                document.head.appendChild(meta);
+            }
+        }
+    }, [selectedVariant?.terms.name, product.name, parentSeoTitle, parentSeoDescription, variantAttributes.length]);
 
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>

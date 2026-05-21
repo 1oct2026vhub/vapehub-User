@@ -11,7 +11,12 @@ import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE } from "@/lib/api-routes";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 import JsonLd from "@/components/JsonLd";
-import { getRatingFromReviewResponse, toAbsoluteUrl } from "@/lib/seo-schema";
+import {
+  buildVariantFirstDescription,
+  buildVariantFirstTitle,
+  getRatingFromReviewResponse,
+  toAbsoluteUrl,
+} from "@/lib/seo-schema";
 import {
   buildProductJsonLdData,
   buildVariantParams,
@@ -192,18 +197,39 @@ const Page = async ({
     const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
       ? getRatingFromReviewResponse(ratingRes.value.data)
       : null;
+
+    const parentPage = primarySlug ? await fetchDynamicPageSlugWithFallback(primarySlug) : null;
+    const parentSeoDescription = parentPage?.seo?.description?.trim() ?? "";
+    const parentSeoTitle = parentPage?.seo?.title?.trim() ?? data.product.name;
+    const variantName = variant.terms.name.trim();
+    const variantDescription = buildVariantFirstDescription(
+      variantName,
+      data.product.name,
+      parentSeoDescription,
+    );
+    const variantTitle = buildVariantFirstTitle(variantName, parentSeoTitle);
+
     const jsonLdData = buildProductJsonLdData({
       baseUrl: BASE_URL,
       data,
       productUrl,
       faqs,
       ratingData,
+      schemaDescription: variantDescription,
+      schemaName: variantTitle.replace(/\s*\|\s*vapehub\s*$/i, "").trim(),
     });
 
     return (
       <>
         <JsonLd data={jsonLdData} />
-        <ProductView data={data} isVariant={true} selectedVariant={variant} productFaqs={faqs} />
+        <ProductView
+          data={data}
+          isVariant={true}
+          selectedVariant={variant}
+          productFaqs={faqs}
+          parentSeoDescription={parentSeoDescription}
+          parentSeoTitle={parentSeoTitle}
+        />
       </>
     );
   }
@@ -345,6 +371,8 @@ const Page = async ({
       const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
         ? getRatingFromReviewResponse(ratingRes.value.data)
         : null;
+      const parentSeoDescription = dynamicPageSlug.seo?.description?.trim() ?? "";
+      const parentSeoTitle = dynamicPageSlug.seo?.title?.trim() ?? data.product.name;
       const jsonLdData = buildProductJsonLdData({
         baseUrl: BASE_URL,
         data,
@@ -355,7 +383,12 @@ const Page = async ({
       return (
         <>
           <JsonLd data={jsonLdData} />
-          <ProductView data={data} productFaqs={faqs} />
+          <ProductView
+            data={data}
+            productFaqs={faqs}
+            parentSeoDescription={parentSeoDescription}
+            parentSeoTitle={parentSeoTitle}
+          />
         </>
       );
     }
@@ -455,43 +488,20 @@ export async function generateMetadata({ params, searchParams }: {
       });
     }
 
-    const buildVariantFirstTitle = (variantLabel: string, baseTitle: string): string => {
-      const normalizedBaseTitle = baseTitle.trim();
-      const normalizedVariant = variantLabel.trim();
-      const titleWithoutSite = normalizedBaseTitle.replace(/\s*\|\s*vapehub\s*$/i, "").trim();
-      const baseWithoutVariantPrefix = titleWithoutSite.toLowerCase().startsWith(normalizedVariant.toLowerCase())
-        ? titleWithoutSite.slice(normalizedVariant.length).trim()
-        : titleWithoutSite;
-      const variantFirstTitle = `${normalizedVariant} ${baseWithoutVariantPrefix}`.replace(/\s+/g, " ").trim();
-      return `${variantFirstTitle} | VapeHub`;
-    };
-
-    const buildVariantFirstDescription = (
-      variantLabel: string,
-      productName: string,
-      descriptionBase?: string,
-    ): string => {
-      const normalizedVariant = variantLabel.trim();
-      const normalizedProductName = productName.trim();
-      const prefix = `Buy ${normalizedVariant} ${normalizedProductName} at VapeHub.`;
-      const normalizedDescription = String(descriptionBase ?? "").trim();
-      if (!normalizedDescription) return prefix;
-      const cleanedDescription = normalizedDescription
-        .replace(/^buy\b[\s:-]*/i, "")
-        .replace(/^at vapehub[\s,.-]*/i, "")
-        .trim();
-      return cleanedDescription ? `${prefix} ${cleanedDescription}` : prefix;
-    };
+    const parentPage = primarySlug ? await fetchDynamicPageSlugWithFallback(primarySlug) : null;
+    const parentSeoDescription = parentPage?.seo?.description?.trim() ?? "";
+    const parentSeoTitle = parentPage?.seo?.title?.trim() ?? "";
+    const productMetaDescription =
+      parentSeoDescription || dynamicPageSlug.seo?.description?.trim() || "";
 
     const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, payload);
     if (data && !data.variants.length) {
       const variantName = variant?.terms.name?.trim();
-      const titleBase = (dynamicPageSlug.seo?.title ?? data.product.name ?? "").trim();
-      const descriptionBase = dynamicPageSlug.seo?.description ?? data.product.description ?? "";
+      const titleBase = (parentSeoTitle || dynamicPageSlug.seo?.title || data.product.name || "").trim();
       const title = variantName ? buildVariantFirstTitle(variantName, titleBase || data.product.name) : titleBase;
       const description = variantName
-        ? buildVariantFirstDescription(variantName, data.product.name, descriptionBase)
-        : descriptionBase;
+        ? buildVariantFirstDescription(variantName, data.product.name, productMetaDescription)
+        : productMetaDescription;
       return {
         title,
         description,
@@ -507,11 +517,9 @@ export async function generateMetadata({ params, searchParams }: {
     }
 
     const variantName = variant.terms.name.trim();
-    const seoTitle = dynamicPageSlug.seo?.title?.trim();
-    const titleBase = seoTitle || data.product.name;
+    const titleBase = parentSeoTitle || dynamicPageSlug.seo?.title?.trim() || data.product.name;
     const title = buildVariantFirstTitle(variantName, titleBase);
-    const rawDescription = (dynamicPageSlug.seo?.description ?? data.product.description ?? "").trim();
-    const description = buildVariantFirstDescription(variantName, data.product.name, rawDescription);
+    const description = buildVariantFirstDescription(variantName, data.product.name, productMetaDescription);
     const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
 
     return {

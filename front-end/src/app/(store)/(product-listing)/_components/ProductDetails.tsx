@@ -69,8 +69,21 @@ const settings: Settings = {
     ],
 
 };
+function mergeVariantsById(existing: ProductVariant[], incoming: ProductVariant[]): ProductVariant[] {
+    if (!incoming.length) {
+        return existing;
+    }
+    const byId = new Map(existing.map((v) => [v.id, v]));
+    for (const variant of incoming) {
+        byId.set(variant.id, variant);
+    }
+    return Array.from(byId.values());
+}
+
 const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selectedVariant: initialSelectedVariant }) => {
     const [productData, setProductData] = useState<ProductResponse>(initialData);
+    /** Full variant list for stock labels; API filter responses only return matching variants. */
+    const [allVariantsCatalog, setAllVariantsCatalog] = useState<ProductVariant[]>(initialData.variants ?? []);
     const { setProductData: setContextProductData } = useProductData();
     const [selectedVariant, setSelectedVariant] = useState<AttributeProductTerms | undefined>(initialSelectedVariant);
     const [attributeSelections, setAttributeSelections] = useState<Record<number, AttributeSelection>>(() => {
@@ -310,6 +323,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                         setAttributeSelections(fallbackSelections);
                         setProductData(fallbackResponse.data);
                         setContextProductData(fallbackResponse.data);
+                        setAllVariantsCatalog((prev) => mergeVariantsById(prev, fallbackResponse.data.variants ?? []));
                         setVariantSelectionError('This combination is unavailable. Please choose another option.');
                         if ((fallbackResponse.data.available_terms?.length ?? 0) > 0) {
                             setLastKnownAvailableTerms(fallbackResponse.data.available_terms);
@@ -322,6 +336,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 setVariantSelectionError(null);
                 setProductData(response.data);
                 setContextProductData(response.data);
+                setAllVariantsCatalog((prev) => mergeVariantsById(prev, response.data.variants ?? []));
                 if ((response.data.available_terms?.length ?? 0) > 0) {
                     setLastKnownAvailableTerms(response.data.available_terms);
                 }
@@ -338,6 +353,29 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             console.error('Error fetching variant data:', error);
         }
     }, [product.id, setContextProductData]);
+
+    // Load unfiltered variants so out-of-stock labels stay correct after a selection.
+    useEffect(() => {
+        let cancelled = false;
+        const productId = initialData.product.id;
+        (async () => {
+            try {
+                const response = await getProductVariantByID({
+                    product_id: productId,
+                    attribute_terms: [],
+                });
+                if (cancelled || response.status !== ServerActionStatus.SUCCESS || !response.data?.variants?.length) {
+                    return;
+                }
+                setAllVariantsCatalog((prev) => mergeVariantsById(prev, response.data.variants));
+            } catch (error) {
+                console.error('Error fetching full variant catalog:', error);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [initialData.product.id]);
 
     const handleVariantSelectionChange = useCallback((payload: VariantSelectionPayload) => {
         const selectedAttributeId = payload.attributeTerm.attribute.id;
@@ -596,7 +634,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                         selectedVariant={selectedVariant}
                         availableAttributes={availableAttributes ?? []}
                         filteredAttributeTerms={productData.filtered_attribute_terms ?? []}
-                        allVariants={productData.variants ?? []}
+                        allVariants={allVariantsCatalog}
                         onVariantChange={handleVariantSelectionChange}
                         selectedAttributeSlugs={selectedAttributeSlugs}
                         primaryAttributeId={primaryAttributeId}

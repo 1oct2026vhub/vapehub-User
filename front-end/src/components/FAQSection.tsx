@@ -16,21 +16,16 @@ interface FAQProps {
     viewAllHref?: string;
     type: "product" | "brand" | "category" | "variant" | "common" | "blog";
     id: number;
-    showAll?: boolean;
     initialFaqs?: FaqResponse[];
 }
 
 const EMPTY_FAQS: FaqResponse[] = [];
-
-const normalizeFaqs = (items: FaqResponse[] = [], showAll: boolean = false): FaqResponse[] =>
-    showAll ? items : items.slice(0, 10);
 
 const FAQSection: React.FC<FAQProps> = ({
     title = "FAQ",
     // viewAllHref = ROUTES.FAQ,
     type,
     id,
-    showAll = false,
     initialFaqs = EMPTY_FAQS,
 }) => {
  
@@ -41,31 +36,31 @@ const FAQSection: React.FC<FAQProps> = ({
         indicator: "text-medium text-skin-neutral-500 -rotate-90 data-[open=true]:rotate-90",
         content: "font-bold text-skin-neutral-300 !text-content-1 !py-0 !pb-4",
     };
-    const [faqs, setFaqs] = useState<FaqResponse[]>(() => normalizeFaqs(initialFaqs, showAll));
+    const [faqs, setFaqs] = useState<FaqResponse[]>(initialFaqs);
     useEffect(() => {
         // If FAQs are provided by the server for this view, avoid a duplicate client fetch.
         if (initialFaqs.length > 0) {
-          setFaqs(normalizeFaqs(initialFaqs, showAll));
+          setFaqs(initialFaqs);
           return;
         }
         const fetchFaqs = async () => {
           const faqs = await getFaqs(type, id);
           if (faqs.status === ServerActionStatus.SUCCESS) {
-            setFaqs(normalizeFaqs(faqs.data, showAll));
+            setFaqs(faqs.data);
           } else {
             setFaqs([]);
             toast.error(faqs.message);
           }
         };
         fetchFaqs();
-      }, [type, id, showAll, initialFaqs]);
+      }, [type, id, initialFaqs]);
 
     return (
         <div className="w-full space-y-3 md:space-y-5 xl:space-y-7.5">
             {/* FAQ Heading & View All */}
             <div className="flex items-center justify-between w-full">
                 <SectionHeading title={title} />
-                {/* {!showAll && <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} />} */}
+                {/* <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} /> */}
             </div>
             {faqs.length > 0 ? (
                
@@ -74,7 +69,8 @@ const FAQSection: React.FC<FAQProps> = ({
                     <AccordionItem
                         key={index}
                         aria-label={faq.question}
-                        title={<h3 className="text-title-2 font-bold !font-oswald">{faq.question}</h3>}
+                        HeadingComponent="h3"
+                        title={faq.question}
                     >
                         <div className='rich-text' dangerouslySetInnerHTML={{ __html: faq.answer }} />
                     </AccordionItem>

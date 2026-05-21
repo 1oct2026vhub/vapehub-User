@@ -44,13 +44,23 @@ export interface ProductSchemaInput {
   baseUrl: string;
   ratingData: { avgRating: number; reviewCount: number } | null;
   currency?: string;
+  descriptionOverride?: string;
+  nameOverride?: string;
 }
 
 /**
  * Build Product JSON-LD from API data. Uses first variant for price/availability when present.
  */
 export function buildProductSchema(input: ProductSchemaInput): Record<string, unknown> {
-  const { productResponse, productUrl, baseUrl, ratingData, currency = "GBP" } = input;
+  const {
+    productResponse,
+    productUrl,
+    baseUrl,
+    ratingData,
+    currency = "GBP",
+    descriptionOverride,
+    nameOverride,
+  } = input;
   const product = productResponse.product;
   const firstVariant = productResponse.variants?.[0];
   const price = firstVariant?.price ?? (product as { price?: string }).price ?? "0";
@@ -67,8 +77,8 @@ export function buildProductSchema(input: ProductSchemaInput): Record<string, un
   const schema: Record<string, unknown> = {
     "@id": `${productUrl}#product`,
     "@type": "Product",
-    name: product.name,
-    description: htmlToPlainText(product.description ?? ""),
+    name: nameOverride?.trim() || product.name,
+    description: descriptionOverride?.trim() || htmlToPlainText(product.description ?? ""),
     image: images.length ? images : [toAbsoluteUrl(baseUrl, "/")],
     sku: (product as { sku?: string }).sku ?? String(product.id),
     brand: {
@@ -269,4 +279,29 @@ export function getRatingFromReviewResponse(data: REVIEW_ORDER_RESPONSE | null):
   if (reviewCount <= 0) return null;
   const avgRating = parseFloat(String(data.average_rating ?? 0)) || 0;
   return { avgRating, reviewCount };
+}
+
+const VARIANT_OFFERS_DESC = /^the\s+(.+?)\s+offers\s+([\s\S]+)$/i;
+
+export function buildVariantFirstTitle(variant: string, baseTitle: string): string {
+  const v = variant.trim();
+  const base = baseTitle.trim().replace(/\s*\|\s*vapehub\s*$/i, "").trim();
+  const core = base.toLowerCase().startsWith(v.toLowerCase()) ? base.slice(v.length).trim() : base;
+  return `${v} ${core}`.replace(/\s+/g, " ").trim() + " | VapeHub";
+}
+
+export function buildVariantFirstDescription(variant: string, productName: string, base?: string): string {
+  const v = variant.trim();
+  let body = String(base ?? "").trim().replace(/^buy\s+.+?\s+at\s+vapehub\.?\s*/i, "").trim();
+  if (!body) return `The ${v} ${productName.trim()} — shop at VapeHub with free same-day shipping on eligible orders.`;
+  body = body.replace(/long lasting performance\s*&\s*flavour/gi, "long lasting flavour");
+  if (new RegExp(`^the\\s+${v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s+`, "i").test(body)) {
+    return body.replace(/\s+/g, " ").trim();
+  }
+  const m = body.match(VARIANT_OFFERS_DESC);
+  if (m) return `The ${v} ${m[1].trim()} offers ${m[2].trim()}`.replace(/\s+/g, " ").trim();
+  const lb = body.toLowerCase();
+  if (lb.includes(v.toLowerCase())) return body.replace(/\s+/g, " ").trim();
+  if (/^the\s+/i.test(body)) return `The ${v} ${body.replace(/^the\s+/i, "").trim()}`.replace(/\s+/g, " ").trim();
+  return `The ${v} ${body}`.replace(/\s+/g, " ").trim();
 }

@@ -235,6 +235,7 @@ export const ProductListingActionsMob: React.FC<ProductListingActionsMobProps> =
                                         <AccordionItem
                                             key={index}
                                             aria-label={title}
+                                            HeadingComponent="div"
                                             title={title}
                                         >
                                             {content}

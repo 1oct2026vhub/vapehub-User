@@ -100,6 +100,7 @@ export default {
         'mob-right-arrow': "url('/images/mob-arrow-right.svg')",
         'quantity-badge': "url('/images/quantity-before.svg')",
         'new-badge': "url('/images/new-before.svg')",
+        'discontinued-badge': "url('/images/discontinued-before.svg')",
       },
       spacing: {
         '4.5': '1.125rem', //18px

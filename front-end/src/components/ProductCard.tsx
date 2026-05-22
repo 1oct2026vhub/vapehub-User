@@ -20,6 +20,7 @@ interface ProductCardProps {
   totalPuffs?: string;
   link: string;
   isNew?: string;
+  isDiscontinued?: boolean;
   averageRating?: number;
   totalReviews?: number;
   outOfStock?: boolean;
@@ -37,6 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   totalPuffs,
   link,
   isNew,
+  isDiscontinued = false,
   averageRating = 0,
   totalReviews = 0,
 }) => {
@@ -142,7 +144,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <Link prefetch={false} href={link} className="block h-full">
       <div className="bg-skin-white rounded-md flex flex-col h-full shadow-mob-product-card md:shadow-product-card hover:shadow-card transition-all duration-300">
-        <div className="relative p-1.5 md:py-6 md:px-3 bg-skin-neutral-50 rounded-t-md">
+        <div className={`relative p-1.5 md:py-6 md:px-3 bg-skin-neutral-50 rounded-t-md${isDiscontinued ? ' has-discontinued-badge' : ''}`}>
           <NoImage
             src={imageSrc}
             alt={altText ?? title}
@@ -150,6 +152,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
             height={275}
             className="w-full aspect-square rounded mix-blend-multiply"
           />
+          {isDiscontinued && (
+            <div className="discontinued-product">
+              <span>Discontinued</span>
+            </div>
+          )}
           {totalPuffs && (
             <div className='quantity'>
               <span>{totalPuffs.replace(/\bpuffs\b/gi, 'Puffs')}</span>

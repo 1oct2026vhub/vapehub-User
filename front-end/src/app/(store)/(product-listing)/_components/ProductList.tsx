@@ -352,6 +352,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
                       link={`/${product.slug}`}
                       totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
                       isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
+                      isDiscontinued={Boolean(product.is_discontinued)}
                       averageRating={averageRating}
                       totalReviews={totalReviews}
                       outOfStock={product.out_of_stock}

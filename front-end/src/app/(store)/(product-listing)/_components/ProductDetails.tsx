@@ -136,6 +136,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     const regularPrice = Number(rawRegularPrice) || 0;
     // When sale price is zero, fall back to regular price for display only
     const effectivePrice = price > 0 ? price : (regularPrice > 0 ? regularPrice : 0);
+    const isDiscontinued = Boolean(product?.is_discontinued || cartEntity?.is_discontinued);
     
     // Create a set of attribute IDs that are used in variation for filtering
     const variationAttributeIds = useMemo(() => {
@@ -459,11 +460,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                         </div>
                         <p className="text-content-2 sm:text-lg text-black font-bold mt-1">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
                     </div>
+                    {isDiscontinued && (
+                        <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
+                            This product has been discontinued
+                        </p>
+                    )}
                 </div>
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit'>
-                    <div className='bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
+                    <div className={`bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit${isDiscontinued ? ' has-discontinued-badge' : ''}`}>
                         <CustomImageMagnifier
                             src={resolvedMainImage?.url || ''}
                             alt={resolvedMainImage?.alt_text ?? product?.name ?? ''}
@@ -472,6 +478,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                             className='aspect-square  mix-blend-multiply'
                             zoomLevel={2}
                         />
+
+                        {isDiscontinued && (
+                            <div className="discontinued-product">
+                                <span>Discontinued</span>
+                            </div>
+                        )}
 
                         {
                             product?.created_at && isLessThanOneMonth(product?.created_at) &&
@@ -545,6 +557,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                             </div>
                             <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
                         </div>
+                        {isDiscontinued && (
+                            <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
+                                This product has been discontinued
+                            </p>
+                        )}
                     </div>
                     <div className='flex items-center justify-between gap-2 text-skin-neutral-500'>
                         <p className='text-xl md:text-h5 !font-oswald font-bold'>{DEFAULT_CURRENCY_SYMBOL}{effectivePrice}</p>

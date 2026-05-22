@@ -480,9 +480,15 @@ const ProductDetails: React.FC<ProductViewProps> = ({
 
     useEffect(() => {
         const variantName = selectedVariant?.terms.name?.trim();
-        if (!variantName || !parentSeoDescription.trim() || variantAttributes.length === 0) return;
+        if (!variantName || variantAttributes.length === 0) return;
         const title = buildVariantFirstTitle(variantName, parentSeoTitle || product.name);
-        const description = buildVariantFirstDescription(variantName, product.name, parentSeoDescription);
+        const description = buildVariantFirstDescription(
+            variantName,
+            product.name,
+            parentSeoDescription,
+            product.description,
+        );
+        if (!description.trim()) return;
         document.title = title;
         const tags: [string, string, string][] = [
             ["name", "description", description],
@@ -501,7 +507,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                 document.head.appendChild(meta);
             }
         }
-    }, [selectedVariant?.terms.name, product.name, parentSeoTitle, parentSeoDescription, variantAttributes.length]);
+    }, [selectedVariant?.terms.name, product.name, product.description, parentSeoTitle, parentSeoDescription, variantAttributes.length]);
 
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>

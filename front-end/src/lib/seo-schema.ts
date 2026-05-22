@@ -290,10 +290,18 @@ export function buildVariantFirstTitle(variant: string, baseTitle: string): stri
   return `${v} ${core}`.replace(/\s+/g, " ").trim() + " | VapeHub";
 }
 
-export function buildVariantFirstDescription(variant: string, productName: string, base?: string): string {
+export function buildVariantFirstDescription(
+  variant: string,
+  _productName: string,
+  seoDescription?: string,
+  productDescription?: string,
+): string {
   const v = variant.trim();
-  let body = String(base ?? "").trim().replace(/^buy\s+.+?\s+at\s+vapehub\.?\s*/i, "").trim();
-  if (!body) return `The ${v} ${productName.trim()} — shop at VapeHub with free same-day shipping on eligible orders.`;
+  let body = String(seoDescription ?? "").trim().replace(/^buy\s+.+?\s+at\s+vapehub\.?\s*/i, "").trim();
+  if (!body) {
+    body = htmlToPlainText(String(productDescription ?? ""), 0).trim();
+  }
+  if (!body) return "";
   body = body.replace(/long lasting performance\s*&\s*flavour/gi, "long lasting flavour");
   if (new RegExp(`^the\\s+${v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s+`, "i").test(body)) {
     return body.replace(/\s+/g, " ").trim();

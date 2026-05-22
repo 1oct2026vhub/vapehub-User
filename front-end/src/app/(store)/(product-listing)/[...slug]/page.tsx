@@ -15,6 +15,7 @@ import {
   buildVariantFirstDescription,
   buildVariantFirstTitle,
   getRatingFromReviewResponse,
+  htmlToPlainText,
   toAbsoluteUrl,
 } from "@/lib/seo-schema";
 import {
@@ -206,6 +207,7 @@ const Page = async ({
       variantName,
       data.product.name,
       parentSeoDescription,
+      data.product.description,
     );
     const variantTitle = buildVariantFirstTitle(variantName, parentSeoTitle);
 
@@ -500,8 +502,13 @@ export async function generateMetadata({ params, searchParams }: {
       const titleBase = (parentSeoTitle || dynamicPageSlug.seo?.title || data.product.name || "").trim();
       const title = variantName ? buildVariantFirstTitle(variantName, titleBase || data.product.name) : titleBase;
       const description = variantName
-        ? buildVariantFirstDescription(variantName, data.product.name, productMetaDescription)
-        : productMetaDescription;
+        ? buildVariantFirstDescription(
+            variantName,
+            data.product.name,
+            productMetaDescription,
+            data.product.description,
+          )
+        : productMetaDescription || htmlToPlainText(data.product.description ?? "");
       return {
         title,
         description,
@@ -519,7 +526,12 @@ export async function generateMetadata({ params, searchParams }: {
     const variantName = variant.terms.name.trim();
     const titleBase = parentSeoTitle || dynamicPageSlug.seo?.title?.trim() || data.product.name;
     const title = buildVariantFirstTitle(variantName, titleBase);
-    const description = buildVariantFirstDescription(variantName, data.product.name, productMetaDescription);
+    const description = buildVariantFirstDescription(
+      variantName,
+      data.product.name,
+      productMetaDescription,
+      data.product.description,
+    );
     const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
 
     return {

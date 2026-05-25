@@ -228,7 +228,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
     };
 
     const handleAddToCart = async () => {
-        if (!canAddToCart || !cartEntity) {
+        if (!canAddToCart || !cartEntity || isDiscontinued) {
             // This is a safeguard; the button should be disabled if this is the case.
             return;
         }
@@ -678,9 +678,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                             radius="md"
                             color="primary"
                             isLoading={isAddingToCart}
-                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || isDiscontinued || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
-                            disabled={isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock}
+                            disabled={isAddingToCart || !canAddToCart || isDiscontinued || quantity <= 0 || quantity > stock}
                         >
                             Add to Cart
                         </Button>

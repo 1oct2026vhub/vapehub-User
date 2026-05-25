@@ -203,11 +203,13 @@ const Page = async ({
     const parentSeoDescription = parentPage?.seo?.description?.trim() ?? "";
     const parentSeoTitle = parentPage?.seo?.title?.trim() ?? data.product.name;
     const variantName = variant.terms.name.trim();
+    const variantRecordDescription = data.variants?.[0]?.description?.trim() ?? "";
     const variantDescription = buildVariantFirstDescription(
       variantName,
       data.product.name,
       parentSeoDescription,
       data.product.description,
+      variantRecordDescription,
     );
     const variantTitle = buildVariantFirstTitle(variantName, parentSeoTitle);
 
@@ -501,12 +503,14 @@ export async function generateMetadata({ params, searchParams }: {
       const variantName = variant?.terms.name?.trim();
       const titleBase = (parentSeoTitle || dynamicPageSlug.seo?.title || data.product.name || "").trim();
       const title = variantName ? buildVariantFirstTitle(variantName, titleBase || data.product.name) : titleBase;
+      const variantRecordDescription = data.variants?.[0]?.description?.trim() ?? "";
       const description = variantName
         ? buildVariantFirstDescription(
             variantName,
             data.product.name,
             productMetaDescription,
             data.product.description,
+            variantRecordDescription,
           )
         : productMetaDescription || htmlToPlainText(data.product.description ?? "");
       return {
@@ -526,11 +530,13 @@ export async function generateMetadata({ params, searchParams }: {
     const variantName = variant.terms.name.trim();
     const titleBase = parentSeoTitle || dynamicPageSlug.seo?.title?.trim() || data.product.name;
     const title = buildVariantFirstTitle(variantName, titleBase);
+    const variantRecordDescription = data.variants?.[0]?.description?.trim() ?? "";
     const description = buildVariantFirstDescription(
       variantName,
       data.product.name,
       productMetaDescription,
       data.product.description,
+      variantRecordDescription,
     );
     const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
 

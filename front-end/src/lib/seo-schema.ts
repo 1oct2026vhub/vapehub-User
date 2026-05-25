@@ -1,4 +1,4 @@
-import type { ProductResponse } from "@/lib/config/product.config";
+import type { ProductResponse, ProductVariant } from "@/lib/config/product.config";
 import type { FaqResponse } from "@/lib/config/global.config";
 import type { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
@@ -290,14 +290,37 @@ export function buildVariantFirstTitle(variant: string, baseTitle: string): stri
   return `${v} ${core}`.replace(/\s+/g, " ").trim() + " | VapeHub";
 }
 
+/** Plain-text variant description from API when all attribute selections match. */
+export function findVariantDescriptionBySelections(
+  variants: ProductVariant[] | undefined,
+  selectedAttributeSlugs: Record<number, string>,
+): string {
+  if (!variants?.length) return "";
+  const active = Object.entries(selectedAttributeSlugs).filter(([, slug]) => slug?.trim());
+  if (!active.length) return "";
+  const match = variants.find((variant) =>
+    active.every(([idStr, slug]) => {
+      const attributeId = Number(idStr);
+      return variant.attributes.some(
+        (a) => a.attribute_id === attributeId && a.term_slug === slug,
+      );
+    }),
+  );
+  return htmlToPlainText(match?.description ?? "", 0).trim();
+}
+
 export function buildVariantFirstDescription(
   variant: string,
   _productName: string,
   seoDescription?: string,
   productDescription?: string,
+  variantDescription?: string,
 ): string {
   const v = variant.trim();
   let body = String(seoDescription ?? "").trim().replace(/^buy\s+.+?\s+at\s+vapehub\.?\s*/i, "").trim();
+  if (!body) {
+    body = htmlToPlainText(String(variantDescription ?? ""), 0).trim();
+  }
   if (!body) {
     body = htmlToPlainText(String(productDescription ?? ""), 0).trim();
   }

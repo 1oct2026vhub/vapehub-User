@@ -24,7 +24,11 @@ import { useReviews } from '@/lib/context/ReviewContext'
 import { PRODUCT_VARIANT_ATTRIBUTE } from '@/lib/api-routes'
 import { VariantSelectionPayload } from '@/lib/hooks/useVariantFilter'
 import { useProductData } from '@/lib/context/ProductDataContext'
-import { buildVariantFirstDescription, buildVariantFirstTitle } from '@/lib/seo-schema'
+import {
+    buildVariantFirstDescription,
+    buildVariantFirstTitle,
+    findVariantDescriptionBySelections,
+} from '@/lib/seo-schema'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -482,11 +486,15 @@ const ProductDetails: React.FC<ProductViewProps> = ({
         const variantName = selectedVariant?.terms.name?.trim();
         if (!variantName || variantAttributes.length === 0) return;
         const title = buildVariantFirstTitle(variantName, parentSeoTitle || product.name);
+        const variantRecordDescription =
+            cartEntity?.description?.trim()
+            || findVariantDescriptionBySelections(allVariantsCatalog, selectedAttributeSlugs);
         const description = buildVariantFirstDescription(
             variantName,
             product.name,
             parentSeoDescription,
             product.description,
+            variantRecordDescription,
         );
         if (!description.trim()) return;
         document.title = title;
@@ -507,7 +515,17 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                 document.head.appendChild(meta);
             }
         }
-    }, [selectedVariant?.terms.name, product.name, product.description, parentSeoTitle, parentSeoDescription, variantAttributes.length]);
+    }, [
+        selectedVariant?.terms.name,
+        product.name,
+        product.description,
+        parentSeoTitle,
+        parentSeoDescription,
+        variantAttributes.length,
+        cartEntity?.description,
+        allVariantsCatalog,
+        selectedAttributeSlugs,
+    ]);
 
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>

@@ -14,17 +14,22 @@ type HandleRequest<G> =
       method: 'POST' | 'PUT' | 'PATCH';
       canCache?: boolean;
       cacheStrategy?: 'no-store' | 'force-cache' | { revalidate: number };
+      timeoutMs?: number;
     }
   | {
       endpoint: string;
       method: 'GET' | 'DELETE';
       canCache?: boolean;
       cacheStrategy?: 'no-store' | 'force-cache' | { revalidate: number };
+      timeoutMs?: number;
     };
 
     const MAX_RETRIES = 1;
     const RETRY_DELAY = 1000; // in milliseconds
     const REQUEST_TIMEOUT_MS = 5000;
+
+/** filter-variants can return large variant sets and exceed the default 5s timeout. */
+export const PRODUCT_VARIANT_FILTER_TIMEOUT_MS = 30_000;
 
     const fetchWithRetry = async (input: RequestInfo, init?: RequestInit, retries = MAX_RETRIES): Promise<Response> => {
       try {
@@ -46,7 +51,7 @@ type HandleRequest<G> =
 export const handleRequest = async <T, G>(
     requestData: HandleRequest<G>
   ): Promise<ServerActionResponse<T>> => {
-    const { endpoint, method, canCache = false, cacheStrategy } = requestData;
+    const { endpoint, method, canCache = false, cacheStrategy, timeoutMs } = requestData;
     const retries = method === 'GET' ? MAX_RETRIES : 0;
     const resolvedCache = cacheStrategy
       ? typeof cacheStrategy === 'string'
@@ -69,7 +74,7 @@ export const handleRequest = async <T, G>(
         method,
         headers,
         body: buildRequestBody(requestData),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        signal: AbortSignal.timeout(timeoutMs ?? REQUEST_TIMEOUT_MS),
         cache: resolvedCache,
         next: resolvedNext,
       }, retries);

@@ -7,6 +7,7 @@ import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
 // import { useWorldPay } from '@/lib/hooks/useWorldpay';
 import { toast } from 'sonner';
 import { ORDER_RESPONSE_DATA, SHIPPING_METHOD_DATA } from '../config/order.config';
+import { resolvePlaceOrderRedirectUrl } from '../utils/checkout-order.utils';
 
 interface CheckoutContextType {
     selectedShippingMethod: SHIPPING_METHOD_DATA | null;
@@ -88,16 +89,14 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
                 //         country: data.shipping_address.country,
                 //     }
                 // });
-              // Redirect to WorldPay URL from the API response
-                if (orderData && typeof orderData === 'object' && 'worldpay_url' in orderData) {
-                    const worldpayOrderData = orderData as { worldpay_url: string };
-                    if (worldpayOrderData.worldpay_url) {
-                        window.location.href = worldpayOrderData.worldpay_url;
-                        return true;
-                    }
+              // WorldPay URL when payment is required; otherwise payment_success_url (e.g. loyalty zero-total).
+                const redirectUrl = resolvePlaceOrderRedirectUrl(orderData);
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                    return true;
                 }
-                console.error('Worldpay URL not found in order data:', orderData);
-                toast.error('Worldpay payment URL not found. Please try again.');
+                console.error('Payment redirect URL not found in order data:', orderData);
+                toast.error('Payment redirect URL not found. Please try again.');
                 return false;
             }
             // clearCart();

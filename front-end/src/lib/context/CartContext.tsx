@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { LoyaltyPointsRedemptionResponse } from '../config/loyalty-points.config';
 import { CouponResponse } from '../config/order.config';
 import { roundCurrency } from '../utils';
-import { parseApiMoney } from '../utils/checkout-order.utils';
+import { parseApiMoney, parseIsPaymentRequiredFromApplyCouponResponse } from '../utils/checkout-order.utils';
 
 interface CouponDiscount {
   value: number;
@@ -31,6 +31,8 @@ interface CouponDiscount {
     isDiscountUsed: boolean;
   };
   mailSubscriptionDiscount?: number; // Mail subscription discount amount from API
+  /** Last apply-coupon `is_payment_required`; `null` = field not returned. */
+  isPaymentRequired?: boolean | null;
 }
 
 export interface LoyaltyRedemption {
@@ -46,6 +48,8 @@ export interface LoyaltyRedemption {
   applyCouponShippingMethodId: number | null;
   /** Last apply-coupon `mail_subscription_discount` when loyalty is on (coupon UI cleared but API still applies mail). */
   applyCouponMailSubscriptionDiscount: number | null;
+  /** Last apply-coupon `is_payment_required` when loyalty is on. */
+  applyCouponIsPaymentRequired: boolean | null;
 }
 export interface CartContextType {
   cartItems: CartItem[];
@@ -115,6 +119,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     applyCouponShippingCost: null,
     applyCouponShippingMethodId: null,
     applyCouponMailSubscriptionDiscount: null,
+    applyCouponIsPaymentRequired: null,
   });
   const [isRemoveCoupon, setIsRemoveCoupon] = useState<boolean>(false);
   const [itemCount, setItemCount] = useState<number>(0);
@@ -648,6 +653,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               applyCouponShippingCost: null,
               applyCouponShippingMethodId: null,
               applyCouponMailSubscriptionDiscount: null,
+              applyCouponIsPaymentRequired: null,
             });
           }
         }
@@ -678,6 +684,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
              applyCouponShippingCost: null,
              applyCouponShippingMethodId: null,
              applyCouponMailSubscriptionDiscount: null,
+             applyCouponIsPaymentRequired: null,
            });
          }
        }
@@ -714,6 +721,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
            applyCouponShippingCost: null,
            applyCouponShippingMethodId: null,
            applyCouponMailSubscriptionDiscount: null,
+           applyCouponIsPaymentRequired: null,
          });
        }
     } finally {
@@ -913,6 +921,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       applyCouponShippingCost: null,
       applyCouponShippingMethodId: null,
       applyCouponMailSubscriptionDiscount: null,
+      applyCouponIsPaymentRequired: null,
     });
     removeGuestCart();
     deleteCookie(CART_COOKIE_NAME);
@@ -992,6 +1001,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           total: apiTotal,
           mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData,
           mailSubscriptionDiscount: mailSubscriptionDiscountValue,
+          isPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(couponData),
         });
       } else {
         if (couponDiscount.isApplied) {
@@ -1003,6 +1013,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             discountValue: '',
             mailSubscriptionData: couponDiscount.mailSubscriptionData,
             mailSubscriptionDiscount: undefined,
+            isPaymentRequired: null,
           });
         }
       }
@@ -1067,6 +1078,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           total: apiTotal,
           mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData, // Use new data or preserve existing
           mailSubscriptionDiscount: mailSubscriptionDiscountValue,
+          isPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(couponData),
         });
       } else {
         // Only update state if the coupon was previously applied to avoid loops
@@ -1079,6 +1091,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             message: null,
             discountValue: '',
             mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
+            isPaymentRequired: null,
           });
         }
       }

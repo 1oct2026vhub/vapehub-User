@@ -17,6 +17,7 @@ import {
     buildApplyCouponWithLoyalty,
     parseShippingMethodIdFromApplyCouponResponse,
     parseShippingCostFromApplyCouponResponse,
+    parseIsPaymentRequiredFromApplyCouponResponse,
     type CheckoutCouponSlice,
 } from '@/lib/utils/checkout-order.utils'
 
@@ -53,6 +54,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 applyCouponShippingCost: null,
                 applyCouponShippingMethodId: null,
                 applyCouponMailSubscriptionDiscount: null,
+                applyCouponIsPaymentRequired: null,
             }));
         }
     }, [couponDiscount, setLoyaltyRedemption]);
@@ -68,6 +70,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 applyCouponShippingCost: null,
                 applyCouponShippingMethodId: null,
                 applyCouponMailSubscriptionDiscount: null,
+                applyCouponIsPaymentRequired: null,
             }));
         }
     }, [itemCount, setLoyaltyRedemption]);
@@ -127,6 +130,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                 ? resolvedShippingMethodId
                                 : null,
                         applyCouponMailSubscriptionDiscount: snapshotMailDiscountFromApplyCoupon(response.data),
+                        applyCouponIsPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(response.data),
                     }));
                 }
             } catch (e) {
@@ -186,6 +190,9 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                         : null,
                 applyCouponMailSubscriptionDiscount: checked
                     ? snapshotMailDiscountFromApplyCoupon(response.data)
+                    : null,
+                applyCouponIsPaymentRequired: checked
+                    ? parseIsPaymentRequiredFromApplyCouponResponse(response.data)
                     : null,
             }));
             if (checked) {
@@ -306,6 +313,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                     applyCouponShippingCost: null,
                                     applyCouponShippingMethodId: null,
                                     applyCouponMailSubscriptionDiscount: null,
+                                    applyCouponIsPaymentRequired: null,
                                 }));
                             }
                         }}

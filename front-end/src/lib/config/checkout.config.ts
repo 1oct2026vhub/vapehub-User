@@ -186,6 +186,7 @@ export interface CHECKOUT_PAYLOAD {
     total: number;
     loyalty?: boolean;
     points_to_redeem?: number;
+    is_payment_required?: boolean;
 }
 
 /** Minimal POST body from the shopping cart before the full checkout form (API uses session + coupon). */
@@ -234,4 +235,5 @@ export interface GUEST_CHECKOUT_AND_ORDER_PAYLOAD {
     loyalty?: boolean;
     points_to_redeem?: number;
     receive_promotions: boolean;
+    is_payment_required?: boolean;
 }

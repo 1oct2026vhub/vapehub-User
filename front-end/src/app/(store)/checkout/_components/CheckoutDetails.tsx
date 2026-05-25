@@ -37,10 +37,12 @@ import {
     buildAuthShippingAddress,
     buildBillingAddressPayload,
     buildGuestShippingAddress,
+    buildOrderIsPaymentRequiredFields,
     buildOrderLoyaltyFields,
     calculateCheckoutPayloadTotal,
     deriveShippingMethodsForCheckout,
-    parseWorldPayPlaceOrderData,
+    parsePlaceOrderResponseData,
+    resolveIsPaymentRequiredForOrder,
     toApiUseShippingAsBilling,
 } from '@/lib/utils/checkout-order.utils';
 
@@ -155,6 +157,12 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             couponDiscount.mailSubscriptionDiscount
         );
 
+        const isPaymentRequiredForOrder = resolveIsPaymentRequiredForOrder(
+            loyaltyRedemption,
+            couponDiscount
+        );
+        const orderIsPaymentRequiredFields = buildOrderIsPaymentRequiredFields(isPaymentRequiredForOrder);
+
         // For guest users, use the combined checkout and order API
         if (!isAuthenticated) {
             // Get cart items from localStorage (with fallback to cookie for backward compatibility)
@@ -209,6 +217,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                     loyaltyRedemption.pointsToRedeem,
                     loyaltyRedemption.pointsData
                 ),
+                ...orderIsPaymentRequiredFields,
                 receive_promotions: data.marketingConsent || false
             };
 
@@ -221,19 +230,14 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 // But handlePlaceOrder expects: { data: { order_code, worldpay_url } }
                 const guestResponseData = response.data as unknown as GuestCheckoutResponseData;
                 const order = guestResponseData.order;
-                const wpData = order
-                    ? parseWorldPayPlaceOrderData({
-                          order_code: order.order_code,
-                          worldpay_url: order.worldpay_url,
-                      })
-                    : null;
-                if (!wpData) {
+                const redirectData = order ? parsePlaceOrderResponseData(order) : null;
+                if (!redirectData) {
                     toast.error('Invalid order response. Please try again or contact support.');
                     return;
                 }
                 const transformedResponse: ORDER_RESPONSE_DATA = {
                     message: 'Order placed successfully',
-                    data: wpData,
+                    data: redirectData,
                 };
 
                 const checkoutPayload: CHECKOUT_PAYLOAD = {
@@ -292,6 +296,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 loyaltyRedemption.pointsToRedeem,
                 loyaltyRedemption.pointsData
             ),
+            ...orderIsPaymentRequiredFields,
         };
 
         const response = await placeOrder(orderPayload);
@@ -299,14 +304,14 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             const full = response.data;
             let orderResponse: ORDER_RESPONSE_DATA;
             if (data.paymentMethod === CHECKOUT_PAYMENT_METHODS.WORLD_PAY) {
-                const wp = parseWorldPayPlaceOrderData(full.data);
-                if (!wp) {
+                const redirectData = parsePlaceOrderResponseData(full.data);
+                if (!redirectData) {
                     toast.error('Invalid order response. Please try again or contact support.');
                     return;
                 }
                 orderResponse = {
                     message: full.message || 'Order placed successfully',
-                    data: wp,
+                    data: redirectData,
                 };
             } else {
                 orderResponse = full;

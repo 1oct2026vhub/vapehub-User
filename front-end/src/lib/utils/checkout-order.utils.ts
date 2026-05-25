@@ -71,6 +71,40 @@ export function parseShippingCostFromApplyCouponResponse(data: unknown): number 
   return parseApiMoney(raw)
 }
 
+/** `is_payment_required` from apply-coupon; `null` when the field is absent. */
+export function parseIsPaymentRequiredFromApplyCouponResponse(data: unknown): boolean | null {
+  if (data == null || typeof data !== 'object') return null
+  const o = data as Record<string, unknown>
+  if ('is_payment_required' in o && typeof o.is_payment_required === 'boolean') {
+    return o.is_payment_required
+  }
+  if ('payment_required' in o && typeof o.payment_required === 'boolean') {
+    return o.payment_required
+  }
+  return null
+}
+
+/** Include `is_payment_required` on place-order only when apply-coupon returned it. */
+export function buildOrderIsPaymentRequiredFields(
+  value: boolean | null | undefined
+): { is_payment_required?: boolean } {
+  if (value === null || value === undefined) return {}
+  return { is_payment_required: value }
+}
+
+export function resolveIsPaymentRequiredForOrder(
+  loyalty: { isRedeemed: boolean; applyCouponIsPaymentRequired: boolean | null },
+  coupon: { isPaymentRequired?: boolean | null }
+): boolean | null {
+  if (loyalty.isRedeemed && loyalty.applyCouponIsPaymentRequired !== null) {
+    return loyalty.applyCouponIsPaymentRequired
+  }
+  if (coupon.isPaymentRequired !== null && coupon.isPaymentRequired !== undefined) {
+    return coupon.isPaymentRequired
+  }
+  return null
+}
+
 /** When loyalty apply-coupon returns £0 shipping, include catalog `is_free_shipping` methods even if basket is below threshold. */
 export type LoyaltyApplyCouponShippingSnapshot = {
   isRedeemed: boolean
@@ -222,6 +256,43 @@ const worldPayOrderDataSchema = z.object({
 export function parseWorldPayPlaceOrderData(data: unknown): { order_code: string; worldpay_url: string } | null {
   const r = worldPayOrderDataSchema.safeParse(data)
   return r.success ? r.data : null
+}
+
+function pickNonEmptyUrl(...values: unknown[]): string | null {
+  for (const v of values) {
+    if (typeof v === 'string' && v.trim().length > 0) return v.trim()
+  }
+  return null
+}
+
+/** Place-order body: requires `order_code` and at least one redirect URL (`worldpay_url` or `payment_success_url`). */
+export function parsePlaceOrderResponseData(
+  data: unknown
+): { order_code: string; worldpay_url: string | null; payment_success_url: string | null } | null {
+  if (data == null || typeof data !== 'object') return null
+  const o = data as Record<string, unknown>
+  const orderCodeRaw = o.order_code
+  if (orderCodeRaw == null || orderCodeRaw === '') return null
+  const order_code = String(orderCodeRaw)
+
+  const nested =
+    o.order_details != null && typeof o.order_details === 'object'
+      ? (o.order_details as Record<string, unknown>)
+      : null
+
+  const worldpay_url = pickNonEmptyUrl(o.worldpay_url)
+  const payment_success_url = pickNonEmptyUrl(o.payment_success_url, nested?.payment_success_url)
+
+  if (!worldpay_url && !payment_success_url) return null
+
+  return { order_code, worldpay_url, payment_success_url }
+}
+
+/** WorldPay first; otherwise `payment_success_url` for zero-balance orders. */
+export function resolvePlaceOrderRedirectUrl(data: unknown): string | null {
+  const parsed = parsePlaceOrderResponseData(data)
+  if (!parsed) return null
+  return parsed.worldpay_url ?? parsed.payment_success_url
 }
 
 type EnabledShippingOptions = {

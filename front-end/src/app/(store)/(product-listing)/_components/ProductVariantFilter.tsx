@@ -22,7 +22,7 @@ const VARIANT_FILTER_SELECT_STYLE = `
 }
 `;
 
-const OUT_OF_STOCK_LABEL = '(Discontinued) - Out of stock';
+const OUT_OF_STOCK_LABEL = '- Out of stock';
 
 function variantTermSlug(variant: ProductVariant, attributeId: number): string | undefined {
     return variant.attributes.find((a) => a.attribute_id === attributeId)?.term_slug;

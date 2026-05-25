@@ -155,15 +155,17 @@ const SelectAttributeTerms = ({
                     innerWrapper: 'w-full min-w-0',
                     value: 'text-left font-opensans text-sm min-w-0 flex-1 text-black',
                     listboxWrapper:
-                        'max-h-[min(400px,50vh)] overflow-y-auto rounded-lg border-2 border-skin-neutral-100 bg-white py-1 shadow-base',
-                    listbox: 'gap-0 p-0 font-opensans text-sm',
+                        'pvf-variant-dropdown-list max-h-[min(400px,50vh)] overflow-y-auto overflow-x-hidden rounded-none !bg-white py-1 shadow-none opacity-100',
+                    listbox: 'gap-0 p-0 font-opensans text-sm !bg-white overflow-hidden',
                 }}
                 popoverProps={{
                     placement: 'bottom-start',
-                    offset: 5,
+                    offset: 0,
+                    backdrop: 'transparent',
                     classNames: {
+                        base: 'pvf-variant-dropdown !m-0 !p-0',
                         content:
-                            'w-full max-h-[min(400px,50vh)] overflow-hidden rounded-lg border-0 bg-transparent p-0 shadow-none',
+                            'pvf-variant-dropdown w-full max-h-[min(400px,50vh)] overflow-hidden rounded-none !bg-white !p-0 !m-0 shadow-none opacity-100 backdrop-blur-none',
                     },
                 }}
             >
@@ -202,7 +204,7 @@ const SelectAttributeTerms = ({
                             </svg>
                         }
                         classNames={{
-                            base: `font-opensans text-black data-[hover=true]:bg-skin-neutral-50 data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground ${
+                            base: `!bg-white opacity-100 font-opensans text-black data-[hover=true]:!bg-skin-neutral-50 data-[selected=true]:!bg-primary data-[selected=true]:text-primary-foreground ${
                                 outOfStock ? 'data-[disabled=true]:opacity-100' : ''
                             }`,
                             title: `!whitespace-normal !break-words font-opensans ${

@@ -656,6 +656,50 @@ input[type="checkbox"] + span {
   background: #555;
 }
 
+/* Product variant flavour dropdown (portaled) — flush under trigger, opaque while scrolling */
+.pvf-variant-dropdown,
+.pvf-variant-dropdown [data-slot="content"] {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #000000 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.pvf-variant-dropdown-list,
+.pvf-variant-dropdown [data-slot="listboxWrapper"] {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  border: none !important;
+  margin: 0 !important;
+  isolation: isolate;
+}
+.pvf-variant-dropdown [data-slot="listbox"],
+.pvf-variant-dropdown-list [data-slot="listbox"],
+.pvf-variant-dropdown [role="listbox"],
+.pvf-variant-dropdown-list [role="listbox"],
+.pvf-variant-dropdown-list ul {
+  overflow: hidden !important;
+  background-color: #ffffff !important;
+}
+.pvf-variant-dropdown [data-slot="listbox"] [data-slot="base"],
+.pvf-variant-dropdown-list [data-slot="listbox"] [data-slot="base"] {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+}
+.pvf-variant-dropdown [data-slot="listbox"] [data-slot="base"]:not([data-selected="true"]),
+.pvf-variant-dropdown-list [data-slot="listbox"] [data-slot="base"]:not([data-selected="true"]) {
+  background-color: #ffffff !important;
+}
+.pvf-variant-dropdown [data-slot="listbox"] [data-slot="base"][data-hover="true"]:not([data-selected="true"]),
+.pvf-variant-dropdown-list [data-slot="listbox"] [data-slot="base"][data-hover="true"]:not([data-selected="true"]) {
+  background-color: #f5f5f5 !important;
+}
+
 /* NextUI Select dropdown scrollbar with smooth scrolling - single scrollbar only */
 /* Only wrapper should scroll, listbox should not scroll */
 [data-slot="listboxWrapper"],

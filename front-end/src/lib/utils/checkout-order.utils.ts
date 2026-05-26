@@ -151,6 +151,42 @@ export function buildOrderLoyaltyFields(
   return { loyalty: true, points_to_redeem: clampPointsToRedeemBounds(raw, minPts, maxPts) }
 }
 
+/** Cap loyalty so stale apply-coupon values cannot exceed merchandise subtotal. */
+export function effectiveLoyaltyDiscountAmount(
+  loyalty: CheckoutLoyaltySlice,
+  merchandiseSubtotal: number
+): number {
+  if (!loyalty.isRedeemed) return 0
+  const raw = Number.isFinite(loyalty.discountValue) ? (loyalty.discountValue ?? 0) : 0
+  const cap = Number.isFinite(merchandiseSubtotal) && merchandiseSubtotal > 0 ? merchandiseSubtotal : 0
+  return Math.min(Math.max(0, raw), cap)
+}
+
+/**
+ * Catalog rules: optional min/max merchandise totals on a shipping method row.
+ * Uses pre-discount cart subtotal (matches typical backend eligibility checks).
+ */
+export function isShippingMethodEligibleForMerchandiseTotal(
+  method: SHIPPING_METHOD_DATA,
+  merchandiseSubtotal: number
+): boolean {
+  const total = Number.isFinite(merchandiseSubtotal) && merchandiseSubtotal > 0 ? merchandiseSubtotal : 0
+
+  const minRaw = method.min_order_total
+  if (minRaw != null && String(minRaw).trim() !== '') {
+    const min = parseFloat(String(minRaw))
+    if (Number.isFinite(min) && min > 0 && total < min) return false
+  }
+
+  const maxRaw = method.max_order_total
+  if (maxRaw != null && String(maxRaw).trim() !== '') {
+    const max = parseFloat(String(maxRaw))
+    if (Number.isFinite(max) && max > 0 && total > max) return false
+  }
+
+  return true
+}
+
 /**
  * Net merchandise total before shipping: cart (with deals) − coupon − mail subscription − loyalty.
  * Used for free-shipping threshold checks (same basis as CartTotal display, excluding shipping).
@@ -167,10 +203,9 @@ export function calculateOrderTotalBeforeShipping(
       ? couponDiscount.mailSubscriptionDiscount
       : 0
   const couponValue = Number.isFinite(couponDiscount.value) ? (couponDiscount.value ?? 0) : 0
-  const loyaltyValue =
-    loyalty.isRedeemed && Number.isFinite(loyalty.discountValue) ? (loyalty.discountValue ?? 0) : 0
+  const loyaltyValue = effectiveLoyaltyDiscountAmount(loyalty, displaySubTotal)
   const orderTotal = displaySubTotal - couponValue - mailSubscriptionDiscount - loyaltyValue
-  return Number.isFinite(orderTotal) ? orderTotal : 0
+  return Number.isFinite(orderTotal) ? Math.max(0, orderTotal) : 0
 }
 
 /** Customer-facing grand total including shipping (matches consolidated CartTotal formula). */
@@ -319,13 +354,15 @@ export function deriveShippingMethodsForCheckout(
     .filter((method) => method.is_enabled && !method.deletedAt)
     .sort((a, b) => a.method_order - b.method_order)
 
+  const merchandiseSubtotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0
   const safeTotal = calculateOrderTotalBeforeShipping(cartTotal, couponDiscount, loyalty)
 
   const loyaltyZeroApplyCouponShipping =
     loyaltyApplyCouponSnapshot?.isRedeemed &&
     loyaltyApplyCouponSnapshot.applyCouponShippingCost !== null &&
     Number.isFinite(loyaltyApplyCouponSnapshot.applyCouponShippingCost) &&
-    loyaltyApplyCouponSnapshot.applyCouponShippingCost === 0
+    loyaltyApplyCouponSnapshot.applyCouponShippingCost === 0 &&
+    safeTotal <= 0
 
   const filteredMethods = enabledMethods.filter((method) => {
     const isEnabled = method.is_enabled ?? false
@@ -333,6 +370,7 @@ export function deriveShippingMethodsForCheckout(
     const freeShippingThreshold = method.free_shipping_threshold
 
     if (!isEnabled) return false
+    if (!isShippingMethodEligibleForMerchandiseTotal(method, merchandiseSubtotal)) return false
     if (!isFreeShipping) return true
 
     if (!freeShippingThreshold) return true
@@ -359,4 +397,86 @@ export function deriveShippingMethodsForCheckout(
     filteredSortedMethods: sortedMethods,
     safeTotalForThreshold: safeTotal
   }
+}
+
+/**
+ * Default carrier for checkout / apply-coupon: prefer free shipping when listed, else keep current if still valid, else first option.
+ */
+export function pickCheckoutShippingMethod(
+  filteredSortedMethods: SHIPPING_METHOD_DATA[],
+  currentMethodId?: number | null
+): SHIPPING_METHOD_DATA | null {
+  if (!filteredSortedMethods.length) return null
+  const freeShippingMethod = filteredSortedMethods.find((method) => method.is_free_shipping ?? false)
+  const matchedMethod = currentMethodId
+    ? filteredSortedMethods.find((method) => method.id === currentMethodId)
+    : undefined
+  return freeShippingMethod ?? matchedMethod ?? filteredSortedMethods[0]
+}
+
+/**
+ * Shipping method id for apply-coupon: derived from cart + discounts, not a stale UI selection.
+ * Pass `loyaltyApplyCouponSnapshot: undefined` after quantity/cart changes so old API shipping ids are not reused.
+ */
+export function resolveShippingMethodIdForApplyCoupon(
+  shippingMethodsData: SHIPPING_METHOD_DATA[] | undefined,
+  cartTotal: number,
+  couponDiscount: CheckoutCouponSlice,
+  loyalty: CheckoutLoyaltySlice,
+  loyaltyApplyCouponSnapshot?: LoyaltyApplyCouponShippingSnapshot | null,
+  fallbackMethodId?: number | null
+): number {
+  const { filteredSortedMethods } = deriveShippingMethodsForCheckout(
+    shippingMethodsData,
+    cartTotal,
+    couponDiscount,
+    loyalty,
+    loyaltyApplyCouponSnapshot
+  )
+
+  if (!filteredSortedMethods.length) {
+    const fb = fallbackMethodId != null ? Number(fallbackMethodId) : 0
+    return Number.isFinite(fb) && fb > 0 ? Math.trunc(fb) : 0
+  }
+
+  const apiId = loyaltyApplyCouponSnapshot?.applyCouponShippingMethodId
+  if (apiId != null && apiId > 0 && filteredSortedMethods.some((m) => m.id === apiId)) {
+    return Math.trunc(apiId)
+  }
+
+  const picked = pickCheckoutShippingMethod(filteredSortedMethods, fallbackMethodId ?? null)
+  const id = picked?.id != null ? Number(picked.id) : 0
+  return Number.isFinite(id) && id > 0 ? Math.trunc(id) : 0
+}
+
+/** Ordered method ids valid for the current cart (used for apply-coupon retries). */
+export function listShippingMethodIdsForApplyCoupon(
+  shippingMethodsData: SHIPPING_METHOD_DATA[] | undefined,
+  cartTotal: number,
+  couponDiscount: CheckoutCouponSlice,
+  loyalty: CheckoutLoyaltySlice,
+  loyaltyApplyCouponSnapshot?: LoyaltyApplyCouponShippingSnapshot | null
+): number[] {
+  const { filteredSortedMethods } = deriveShippingMethodsForCheckout(
+    shippingMethodsData,
+    cartTotal,
+    couponDiscount,
+    loyalty,
+    loyaltyApplyCouponSnapshot
+  )
+  const primary = resolveShippingMethodIdForApplyCoupon(
+    shippingMethodsData,
+    cartTotal,
+    couponDiscount,
+    loyalty,
+    loyaltyApplyCouponSnapshot,
+    null
+  )
+  const ids: number[] = []
+  if (primary > 0) ids.push(primary)
+  for (const m of filteredSortedMethods) {
+    const id = Number(m.id)
+    if (Number.isFinite(id) && id > 0 && !ids.includes(id)) ids.push(Math.trunc(id))
+  }
+  return ids
 }

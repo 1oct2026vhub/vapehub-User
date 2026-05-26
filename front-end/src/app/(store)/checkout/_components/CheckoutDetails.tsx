@@ -41,6 +41,7 @@ import {
     buildOrderLoyaltyFields,
     calculateCheckoutPayloadTotal,
     deriveShippingMethodsForCheckout,
+    pickCheckoutShippingMethod,
     parsePlaceOrderResponseData,
     resolveIsPaymentRequiredForOrder,
     toApiUseShippingAsBilling,
@@ -425,9 +426,12 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         }
 
         const currentMethodId = form.getValues('shippingMethodId');
-        const matchedMethod = filteredSortedMethods.find((method) => method.id === currentMethodId);
-        const freeShippingMethod = filteredSortedMethods.find((method) => (method.is_free_shipping ?? false));
-        const nextMethod = freeShippingMethod || matchedMethod || filteredSortedMethods[0];
+        const nextMethod = pickCheckoutShippingMethod(filteredSortedMethods, currentMethodId);
+        if (!nextMethod) {
+            setSelectedCarrier(null);
+            form.setValue('shippingMethodId', 0);
+            return;
+        }
         setSelectedCarrier(nextMethod);
         setSelectedShippingMethod(nextMethod);
         form.setValue('shippingMethodId', nextMethod.id);

@@ -469,7 +469,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 {/* Title section mobile ends */}
 
                 <div className='space-y-4 w-full lg:w-fit'>
-                    <div className={`bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit${isDiscontinued ? ' has-discontinued-badge' : ''}`}>
+                    <div className='bg-skin-white border border-skin-neutral-200 rounded-md relative flex flex-col items-center justify-center shrink shadow-brand-card lg:shadow-image-box py-5 px-1.5  w-full max-w-full min-[500px]:w-[400px] mx-auto aspect-square h-fit'>
                         <CustomImageMagnifier
                             src={resolvedMainImage?.url || ''}
                             alt={resolvedMainImage?.alt_text ?? product?.name ?? ''}
@@ -479,19 +479,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                             zoomLevel={2}
                         />
 
-                        {isDiscontinued && (
-                            <div className="discontinued-product">
-                                <span>Discontinued</span>
-                            </div>
-                        )}
-
-                        {
-                            product?.created_at && isLessThanOneMonth(product?.created_at) &&
-                            <div className='new-product'>
-                                <span>New</span>
-                            </div>
-                        }
-
                         {
                             product?.puff_count && (
                                 <div className='quantity'>
@@ -499,6 +486,18 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                                 </div>
                             )
                         }
+
+                        {isDiscontinued ? (
+                            <div className="discontinued-product">
+                                <span>Discontinued</span>
+                            </div>
+                        ) : (
+                            product?.created_at && isLessThanOneMonth(product?.created_at) && (
+                                <div className='new-product'>
+                                    <span>New</span>
+                                </div>
+                            )
+                        )}
 
                     </div>
 

@@ -144,7 +144,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <Link prefetch={false} href={link} className="block h-full">
       <div className="bg-skin-white rounded-md flex flex-col h-full shadow-mob-product-card md:shadow-product-card hover:shadow-card transition-all duration-300">
-        <div className={`relative p-1.5 md:py-6 md:px-3 bg-skin-neutral-50 rounded-t-md${isDiscontinued ? ' has-discontinued-badge' : ''}`}>
+        <div className="relative p-1.5 md:py-6 md:px-3 bg-skin-neutral-50 rounded-t-md">
           <NoImage
             src={imageSrc}
             alt={altText ?? title}
@@ -152,24 +152,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
             height={275}
             className="w-full aspect-square rounded mix-blend-multiply"
           />
-          {isDiscontinued && (
-            <div className="discontinued-product">
-              <span>Discontinued</span>
-            </div>
-          )}
           {totalPuffs && (
             <div className='quantity'>
               <span>{totalPuffs.replace(/\bpuffs\b/gi, 'Puffs')}</span>
             </div>
           )}
 
-          {
+          {isDiscontinued ? (
+            <div className="discontinued-product">
+              <span>Discontinued</span>
+            </div>
+          ) : (
             isNew && (
               <div className='new-product'>
                 <span>{isNew}</span>
               </div>
             )
-          }
+          )}
 
         </div>
         <div className="flex flex-col px-2.5 py-3 md:py-5 flex-grow">

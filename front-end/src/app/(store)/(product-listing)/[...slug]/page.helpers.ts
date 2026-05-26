@@ -55,12 +55,12 @@ export const fetchDynamicPageSlugWithFallback = cache(
       return await fetchDynamicPageSlug(primarySlug);
     }
 
-    // Resolve both candidates in parallel and keep primary precedence.
+    // Prefer full-path slug (variant URL) for variant-specific SEO when available.
     const [primaryResult, fullPathResult] = await Promise.all([
       fetchDynamicPageSlug(primarySlug),
       fetchDynamicPageSlug(fullPathSlug),
     ]);
-    return primaryResult ?? fullPathResult;
+    return fullPathResult ?? primaryResult;
   }
 );
 
@@ -153,12 +153,16 @@ export const buildProductJsonLdData = ({
   productUrl,
   faqs,
   ratingData,
+  schemaDescription,
+  schemaName,
 }: {
   baseUrl: string;
   data: ProductResponse;
   productUrl: string;
   faqs: FaqResponse[];
   ratingData: ReturnType<typeof getRatingFromReviewResponse> | null;
+  schemaDescription?: string;
+  schemaName?: string;
 }) => {
   const productSchema = buildProductSchema({
     productResponse: data,
@@ -166,6 +170,8 @@ export const buildProductJsonLdData = ({
     baseUrl,
     ratingData,
     currency: "GBP",
+    descriptionOverride: schemaDescription,
+    nameOverride: schemaName,
   });
   const breadcrumbSchema = buildBreadcrumbSchema({
     baseUrl,

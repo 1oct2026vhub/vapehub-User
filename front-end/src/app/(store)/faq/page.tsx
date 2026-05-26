@@ -36,7 +36,6 @@ const FAQPage: NextPage<Props> = async ({
                         title="Frequently Asked Questions"
                         type={type}
                         id={id}
-                        showAll={true}
                     />              
             </section>
         </main>

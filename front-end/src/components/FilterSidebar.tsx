@@ -69,9 +69,10 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 selectionMode="multiple"
             >
                 {filterOptions.map(({ title, content }, index) => (
-                    <AccordionItem 
-                        key={index} 
-                        aria-label={title} 
+                    <AccordionItem
+                        key={index}
+                        aria-label={title}
+                        HeadingComponent="div"
                         title={title}
                     >
                         {content}

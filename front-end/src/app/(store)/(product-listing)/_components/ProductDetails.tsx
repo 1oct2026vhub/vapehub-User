@@ -24,10 +24,17 @@ import { useReviews } from '@/lib/context/ReviewContext'
 import { PRODUCT_VARIANT_ATTRIBUTE } from '@/lib/api-routes'
 import { VariantSelectionPayload } from '@/lib/hooks/useVariantFilter'
 import { useProductData } from '@/lib/context/ProductDataContext'
+import {
+    buildVariantFirstDescription,
+    buildVariantFirstTitle,
+    findVariantDescriptionBySelections,
+} from '@/lib/seo-schema'
 
 type ProductViewProps = {
     data: ProductResponse;
-    selectedVariant?: AttributeProductTerms
+    selectedVariant?: AttributeProductTerms;
+    parentSeoDescription?: string;
+    parentSeoTitle?: string;
 }
 
 type AttributeSelection = {
@@ -69,8 +76,27 @@ const settings: Settings = {
     ],
 
 };
-const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selectedVariant: initialSelectedVariant }) => {
+
+function mergeVariantsById(existing: ProductVariant[], incoming: ProductVariant[]): ProductVariant[] {
+    if (!incoming.length) {
+        return existing;
+    }
+    const byId = new Map(existing.map((v) => [v.id, v]));
+    for (const variant of incoming) {
+        byId.set(variant.id, variant);
+    }
+    return Array.from(byId.values());
+}
+
+const ProductDetails: React.FC<ProductViewProps> = ({
+    data: initialData,
+    selectedVariant: initialSelectedVariant,
+    parentSeoDescription = '',
+    parentSeoTitle = '',
+}) => {
     const [productData, setProductData] = useState<ProductResponse>(initialData);
+    /** Full variant list for stock labels; API filter responses only return matching variants. */
+    const [allVariantsCatalog, setAllVariantsCatalog] = useState<ProductVariant[]>(initialData.variants ?? []);
     const { setProductData: setContextProductData } = useProductData();
     const [selectedVariant, setSelectedVariant] = useState<AttributeProductTerms | undefined>(initialSelectedVariant);
     const [attributeSelections, setAttributeSelections] = useState<Record<number, AttributeSelection>>(() => {
@@ -310,6 +336,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                         setAttributeSelections(fallbackSelections);
                         setProductData(fallbackResponse.data);
                         setContextProductData(fallbackResponse.data);
+                        setAllVariantsCatalog((prev) => mergeVariantsById(prev, fallbackResponse.data.variants ?? []));
                         setVariantSelectionError('This combination is unavailable. Please choose another option.');
                         if ((fallbackResponse.data.available_terms?.length ?? 0) > 0) {
                             setLastKnownAvailableTerms(fallbackResponse.data.available_terms);
@@ -322,6 +349,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                 setVariantSelectionError(null);
                 setProductData(response.data);
                 setContextProductData(response.data);
+                setAllVariantsCatalog((prev) => mergeVariantsById(prev, response.data.variants ?? []));
                 if ((response.data.available_terms?.length ?? 0) > 0) {
                     setLastKnownAvailableTerms(response.data.available_terms);
                 }
@@ -338,6 +366,29 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             console.error('Error fetching variant data:', error);
         }
     }, [product.id, setContextProductData]);
+
+    // Load unfiltered variants so out-of-stock labels stay correct after a selection.
+    useEffect(() => {
+        let cancelled = false;
+        const productId = initialData.product.id;
+        (async () => {
+            try {
+                const response = await getProductVariantByID({
+                    product_id: productId,
+                    attribute_terms: [],
+                });
+                if (cancelled || response.status !== ServerActionStatus.SUCCESS || !response.data?.variants?.length) {
+                    return;
+                }
+                setAllVariantsCatalog((prev) => mergeVariantsById(prev, response.data.variants));
+            } catch (error) {
+                console.error('Error fetching full variant catalog:', error);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [initialData.product.id]);
 
     const handleVariantSelectionChange = useCallback((payload: VariantSelectionPayload) => {
         const selectedAttributeId = payload.attributeTerm.attribute.id;
@@ -429,7 +480,52 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
             }
         };
         fetchLinkedProducts();
-    }, [product.id]);  
+    }, [product.id]);
+
+    useEffect(() => {
+        const variantName = selectedVariant?.terms.name?.trim();
+        if (!variantName || variantAttributes.length === 0) return;
+        const title = buildVariantFirstTitle(variantName, parentSeoTitle || product.name);
+        const variantRecordDescription =
+            cartEntity?.description?.trim()
+            || findVariantDescriptionBySelections(allVariantsCatalog, selectedAttributeSlugs);
+        const description = buildVariantFirstDescription(
+            variantName,
+            product.name,
+            parentSeoDescription,
+            product.description,
+            variantRecordDescription,
+        );
+        if (!description.trim()) return;
+        document.title = title;
+        const tags: [string, string, string][] = [
+            ["name", "description", description],
+            ["property", "og:title", title],
+            ["property", "og:description", description],
+            ["name", "twitter:title", title],
+            ["name", "twitter:description", description],
+        ];
+        for (const [attr, key, value] of tags) {
+            const nodes = document.querySelectorAll<HTMLMetaElement>(`meta[${attr}="${key}"]`);
+            nodes.forEach((node, i) => (i ? node.remove() : node.setAttribute("content", value)));
+            if (!nodes.length) {
+                const meta = document.createElement("meta");
+                meta.setAttribute(attr, key);
+                meta.setAttribute("content", value);
+                document.head.appendChild(meta);
+            }
+        }
+    }, [
+        selectedVariant?.terms.name,
+        product.name,
+        product.description,
+        parentSeoTitle,
+        parentSeoDescription,
+        variantAttributes.length,
+        cartEntity?.description,
+        allVariantsCatalog,
+        selectedAttributeSlugs,
+    ]);
 
     return (
         <section className='bg-skin-white p-4 md:p-6 xl:p-7.5 rounded-10 shadow-card flex flex-col gap-4'>
@@ -596,7 +692,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({ data: initialData, selecte
                         selectedVariant={selectedVariant}
                         availableAttributes={availableAttributes ?? []}
                         filteredAttributeTerms={productData.filtered_attribute_terms ?? []}
-                        allVariants={productData.variants ?? []}
+                        allVariants={allVariantsCatalog}
                         onVariantChange={handleVariantSelectionChange}
                         selectedAttributeSlugs={selectedAttributeSlugs}
                         primaryAttributeId={primaryAttributeId}

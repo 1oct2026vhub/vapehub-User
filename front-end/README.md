@@ -1,5 +1,29 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Prerender.io (SEO for crawlers)
+
+This app proxies search, social, and AI crawlers to [Prerender.io](https://prerender.io/) via Next.js middleware.
+
+1. Create a Prerender.io account and add your production domain.
+2. Copy your token from **Security and Access → Prerender Token** in the [dashboard](https://dashboard.prerender.io/security/prerender-token).
+3. Set on the production server (PM2 / hosting env):
+
+```bash
+PRERENDER_TOKEN=your_token_here
+```
+
+Prerender runs automatically when `NODE_ENV=production` and `PRERENDER_TOKEN` is set. For local testing, also set `PRERENDER_ENABLED=true`.
+
+Verify after deploy ([testing guide](https://docs.prerender.io/docs/how-to-test-your-site-after-you-have-successfully-validated-your-prerender-integration)):
+
+```bash
+curl -A "Mozilla/5.0 (compatible; Googlebot/2.1)" -I "https://your-domain.com/some-page/"
+```
+
+Look for `X-Redirected-From` in the response headers.
+
+Implementation: `src/lib/prerender.ts`, wired in `src/middleware.ts`.
+
 ## Getting Started
 
 First, run the development server:

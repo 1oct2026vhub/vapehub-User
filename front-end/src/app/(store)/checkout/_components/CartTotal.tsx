@@ -18,8 +18,10 @@ import {
     parseShippingMethodIdFromApplyCouponResponse,
     parseShippingCostFromApplyCouponResponse,
     parseIsPaymentRequiredFromApplyCouponResponse,
+    parseTotalFromApplyCouponResponse,
     resolveShippingMethodIdForApplyCoupon,
     listShippingMethodIdsForApplyCoupon,
+    resolveCheckoutShippingLineDisplayAmount,
     effectiveLoyaltyDiscountAmount,
     type CheckoutCouponSlice,
     type CheckoutLoyaltySlice,
@@ -96,26 +98,32 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption, setShippingMethodIdForCoupon } = useCart();
     const { selectedShippingMethod, setSelectedShippingMethod } = useCheckout();
     const [isApplyingLoyalty, setIsApplyingLoyalty] = useState(false);
-    const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage, pointsToRedeem, applyCouponShippingCost, applyCouponMailSubscriptionDiscount } = loyaltyRedemption;
+    const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage, pointsToRedeem, applyCouponShippingCost, applyCouponMailSubscriptionDiscount, applyCouponTotal } = loyaltyRedemption;
     const { status } = useSession();
     const isAuthenticated = status === 'authenticated';
     const loyaltyRefreshDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const displayLoyaltyDiscount = useMemo(
-        () =>
-            effectiveLoyaltyDiscountAmount(
-                { isRedeemed, discountValue: loyaltyDiscountValue },
-                cartTotal
-            ),
-        [isRedeemed, loyaltyDiscountValue, cartTotal]
-    );
+    /** Full API loyalty discount (may include shipping); capped value only for stale fallbacks before refresh. */
+    const displayLoyaltyDiscount = useMemo(() => {
+        if (!isRedeemed) return 0;
+        if (Number.isFinite(loyaltyDiscountValue) && loyaltyDiscountValue > 0) {
+            return loyaltyDiscountValue;
+        }
+        return effectiveLoyaltyDiscountAmount(
+            { isRedeemed, discountValue: loyaltyDiscountValue },
+            cartTotal
+        );
+    }, [isRedeemed, loyaltyDiscountValue, cartTotal]);
 
     const loyaltyForShipping = useMemo(
         (): CheckoutLoyaltySlice => ({
             isRedeemed,
-            discountValue: displayLoyaltyDiscount,
+            discountValue: effectiveLoyaltyDiscountAmount(
+                { isRedeemed, discountValue: loyaltyDiscountValue },
+                cartTotal
+            ),
         }),
-        [isRedeemed, displayLoyaltyDiscount]
+        [isRedeemed, loyaltyDiscountValue, cartTotal]
     );
 
     const couponSliceForShipping = useMemo((): CheckoutCouponSlice => {
@@ -205,6 +213,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 applyCouponShippingMethodId: null,
                 applyCouponMailSubscriptionDiscount: null,
                 applyCouponIsPaymentRequired: null,
+                applyCouponTotal: null,
             }));
         }
     }, [couponDiscount, setLoyaltyRedemption]);
@@ -221,6 +230,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 applyCouponShippingMethodId: null,
                 applyCouponMailSubscriptionDiscount: null,
                 applyCouponIsPaymentRequired: null,
+                applyCouponTotal: null,
             }));
         }
     }, [itemCount, setLoyaltyRedemption]);
@@ -303,6 +313,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                 : null,
                         applyCouponMailSubscriptionDiscount: snapshotMailDiscountFromApplyCoupon(response.data),
                         applyCouponIsPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(response.data),
+                        applyCouponTotal: parseTotalFromApplyCouponResponse(response.data),
                     }));
                     if (resolvedShippingMethodId != null && resolvedShippingMethodId > 0) {
                         syncSelectedShippingMethod(resolvedShippingMethodId);
@@ -386,6 +397,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 applyCouponIsPaymentRequired: checked
                     ? parseIsPaymentRequiredFromApplyCouponResponse(response.data)
                     : null,
+                applyCouponTotal: checked ? parseTotalFromApplyCouponResponse(response.data) : null,
             }));
             if (checked) {
                 setCouponDiscount({ value: 0, isApplied: false, code: null, message: null, discountValue: '' });
@@ -446,14 +458,23 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         );
     }, [shippingMethodsData]);
 
-    // Shipping: when loyalty is redeemed, show apply-coupon API shipping (matches server pricing); otherwise catalog price from selected method.
+    // Shipping Cost row: apply-coupon API `shippingCost` when loyalty/coupon priced the cart; else catalog rate.
     const currentShippingCost = parseFloat(selectedShippingMethod?.shipping_cost || '0');
     const catalogShippingCost = Number.isFinite(currentShippingCost) ? currentShippingCost : 0;
-    const useLoyaltyApplyCouponShipping =
-        isRedeemed && applyCouponShippingCost !== null && Number.isFinite(applyCouponShippingCost);
-    const safeShippingCost = useLoyaltyApplyCouponShipping ? (applyCouponShippingCost as number) : catalogShippingCost;
-    /** Align with the Shipping Cost line: loyalty + £0 effective shipping (API snapshot or catalog Free method). */
-    const loyaltyApplyCouponZeroShipping = isRedeemed && safeShippingCost === 0;
+    const applyCouponShippingFromApi = isRedeemed
+        ? applyCouponShippingCost
+        : couponDiscount.isApplied && couponDiscount.shippingCost !== undefined
+          ? couponDiscount.shippingCost
+          : null;
+    const safeShippingCost = resolveCheckoutShippingLineDisplayAmount(
+        catalogShippingCost,
+        applyCouponShippingFromApi
+    );
+    const loyaltyApplyCouponZeroShipping =
+        isRedeemed &&
+        applyCouponShippingCost !== null &&
+        Number.isFinite(applyCouponShippingCost) &&
+        applyCouponShippingCost === 0;
     
     // Subtotal: use cartTotal (includes deal discounts), not coupon API subTotal
     const displaySubTotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0;
@@ -465,12 +486,24 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         return m !== undefined && Number.isFinite(m) ? m : 0
     }, [couponSliceForTotals.mailSubscriptionDiscount])
 
-    const displayTotal = calculateOrderGrandTotal(
+    const displayTotal = useMemo(() => {
+        if (isRedeemed && applyCouponTotal !== null && Number.isFinite(applyCouponTotal)) {
+            return Math.max(0, applyCouponTotal);
+        }
+        return calculateOrderGrandTotal(
+            cartTotal,
+            couponSliceForTotals,
+            { isRedeemed, discountValue: displayLoyaltyDiscount },
+            safeShippingCost
+        );
+    }, [
+        isRedeemed,
+        applyCouponTotal,
         cartTotal,
         couponSliceForTotals,
-        { isRedeemed, discountValue: displayLoyaltyDiscount },
-        safeShippingCost
-    )
+        displayLoyaltyDiscount,
+        safeShippingCost,
+    ]);
 
     const safeSubTotal = Number.isFinite(displaySubTotal) ? displaySubTotal : 0;
     const safeTotal = Number.isFinite(displayTotal) ? displayTotal : 0;
@@ -494,6 +527,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                     applyCouponShippingMethodId: null,
                                     applyCouponMailSubscriptionDiscount: null,
                                     applyCouponIsPaymentRequired: null,
+                                    applyCouponTotal: null,
                                 }));
                             }
                         }}

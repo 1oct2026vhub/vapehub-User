@@ -40,6 +40,7 @@ import {
     buildOrderIsPaymentRequiredFields,
     buildOrderLoyaltyFields,
     calculateCheckoutPayloadTotal,
+    resolveCheckoutPayloadTotal,
     deriveShippingMethodsForCheckout,
     pickCheckoutShippingMethod,
     parsePlaceOrderResponseData,
@@ -207,10 +208,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 payment_method: {
                     method: data.paymentMethod
                 },
-                total: calculateCheckoutPayloadTotal(
+                total: resolveCheckoutPayloadTotal(
                     cartTotal,
                     couponDiscount.value,
-                    loyaltyRedemption.discountValue ?? undefined,
+                    loyaltyRedemption,
                     mailDiscountForCheckoutPayload
                 ),
                 ...buildOrderLoyaltyFields(
@@ -286,10 +287,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             payment_method: {
                 method: data.paymentMethod
             },
-            total: calculateCheckoutPayloadTotal(
+            total: resolveCheckoutPayloadTotal(
                 cartTotal,
                 couponDiscount.value,
-                loyaltyRedemption.discountValue ?? undefined,
+                loyaltyRedemption,
                 mailDiscountForCheckoutPayload
             ),
             ...buildOrderLoyaltyFields(

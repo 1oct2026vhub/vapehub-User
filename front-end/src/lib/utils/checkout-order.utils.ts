@@ -71,6 +71,32 @@ export function parseShippingCostFromApplyCouponResponse(data: unknown): number 
   return parseApiMoney(raw)
 }
 
+/** Grand total from apply-coupon; `null` when the field is absent. */
+export function parseTotalFromApplyCouponResponse(data: unknown): number | null {
+  if (data == null || typeof data !== 'object') return null
+  const o = data as Record<string, unknown>
+  if (!('total' in o) && !('grand_total' in o)) return null
+  const n = parseApiMoney(o.total ?? o.grand_total)
+  return Number.isFinite(n) ? n : null
+}
+
+/**
+ * Shipping Cost row: prefer apply-coupon `shippingCost` when present (including £0); else catalog rate.
+ */
+export function resolveCheckoutShippingLineDisplayAmount(
+  catalogShippingCost: number,
+  applyCouponShippingCost: number | null | undefined
+): number {
+  if (
+    applyCouponShippingCost !== null &&
+    applyCouponShippingCost !== undefined &&
+    Number.isFinite(applyCouponShippingCost)
+  ) {
+    return Math.max(0, applyCouponShippingCost)
+  }
+  return Number.isFinite(catalogShippingCost) ? Math.max(0, catalogShippingCost) : 0
+}
+
 /** `is_payment_required` from apply-coupon; `null` when the field is absent. */
 export function parseIsPaymentRequiredFromApplyCouponResponse(data: unknown): boolean | null {
   if (data == null || typeof data !== 'object') return null
@@ -224,6 +250,28 @@ export function calculateOrderGrandTotal(
 /**
  * Total sent on place-order / guest-checkout payloads (legacy: cart − coupon − loyalty; optional mail when loyalty uses apply-coupon snapshot).
  */
+/** Place-order / guest-checkout total: prefer apply-coupon `total` when loyalty priced the order. */
+export function resolveCheckoutPayloadTotal(
+  cartTotal: number,
+  couponValue: number | undefined,
+  loyalty: { isRedeemed: boolean; discountValue?: number | null; applyCouponTotal?: number | null },
+  mailSubscriptionDiscount?: number | undefined
+): number {
+  if (
+    loyalty.isRedeemed &&
+    loyalty.applyCouponTotal != null &&
+    Number.isFinite(loyalty.applyCouponTotal)
+  ) {
+    return Math.max(0, loyalty.applyCouponTotal)
+  }
+  return calculateCheckoutPayloadTotal(
+    cartTotal,
+    couponValue,
+    loyalty.discountValue ?? undefined,
+    mailSubscriptionDiscount
+  )
+}
+
 export function calculateCheckoutPayloadTotal(
   cartTotal: number,
   couponValue: number | undefined,

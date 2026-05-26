@@ -50,6 +50,8 @@ export interface LoyaltyRedemption {
   applyCouponMailSubscriptionDiscount: number | null;
   /** Last apply-coupon `is_payment_required` when loyalty is on. */
   applyCouponIsPaymentRequired: boolean | null;
+  /** Last apply-coupon `total` when loyalty is on (authoritative grand total including shipping). */
+  applyCouponTotal: number | null;
 }
 export interface CartContextType {
   cartItems: CartItem[];
@@ -120,6 +122,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     applyCouponShippingMethodId: null,
     applyCouponMailSubscriptionDiscount: null,
     applyCouponIsPaymentRequired: null,
+    applyCouponTotal: null,
   });
   const [isRemoveCoupon, setIsRemoveCoupon] = useState<boolean>(false);
   const [itemCount, setItemCount] = useState<number>(0);
@@ -654,6 +657,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               applyCouponShippingMethodId: null,
               applyCouponMailSubscriptionDiscount: null,
               applyCouponIsPaymentRequired: null,
+              applyCouponTotal: null,
             });
           }
         }
@@ -685,6 +689,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
              applyCouponShippingMethodId: null,
              applyCouponMailSubscriptionDiscount: null,
              applyCouponIsPaymentRequired: null,
+             applyCouponTotal: null,
            });
          }
        }
@@ -722,6 +727,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
            applyCouponShippingMethodId: null,
            applyCouponMailSubscriptionDiscount: null,
            applyCouponIsPaymentRequired: null,
+           applyCouponTotal: null,
          });
        }
     } finally {
@@ -922,6 +928,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       applyCouponShippingMethodId: null,
       applyCouponMailSubscriptionDiscount: null,
       applyCouponIsPaymentRequired: null,
+      applyCouponTotal: null,
     });
     removeGuestCart();
     deleteCookie(CART_COOKIE_NAME);

@@ -39,7 +39,6 @@ import {
     buildGuestShippingAddress,
     buildOrderIsPaymentRequiredFields,
     buildOrderLoyaltyFields,
-    calculateCheckoutPayloadTotal,
     resolveCheckoutPayloadTotal,
     deriveShippingMethodsForCheckout,
     pickCheckoutShippingMethod,

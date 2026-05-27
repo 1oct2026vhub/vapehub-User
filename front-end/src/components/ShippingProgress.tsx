@@ -30,9 +30,9 @@ const ShippingProgress: React.FC<ShippingProgressProps> = ({
     const totalPrice = totalAmount ?? (Number.isFinite(cartTotal) ? cartTotal : calculatedTotalPrice);
     const threshold = freeShippingThreshold ?? FREE_DELIVERY_THRESHOLD;
     
-    // Calculate remaining amount based on: threshold - (total amount - shipping cost)
-    // This gives the amount needed to reach free shipping threshold (pence-safe vs float totals)
-    const amountForFreeShipping = totalPrice - shippingCost;
+    // Calculate remaining amount based on: threshold - (total amount - shipping cost).
+    // Clamp at zero so loyalty-covered orders cannot produce negative progress bases (e.g. 0 - 3.95).
+    const amountForFreeShipping = Math.max(0, totalPrice - shippingCost);
     const thresholdPence = Math.round(threshold * 100);
     const amountPence = Math.round(amountForFreeShipping * 100);
     const remainingAmount = thresholdPence > 0 ? Math.max(0, thresholdPence - amountPence) / 100 : 0;

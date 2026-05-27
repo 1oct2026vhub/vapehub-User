@@ -589,7 +589,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                 </span>
                             </Checkbox>
                         </div>
-                        {/* {isRedeemed && loyaltyPoints && (
+                        {isRedeemed && loyaltyPoints && (
                             <div className="ml-7 flex flex-col gap-1 max-w-xs">
                                 <label htmlFor="loyalty-points-to-redeem" className="text-xs text-gray-600">
                                     Points to redeem (leave blank for the maximum allowed for this order)
@@ -616,7 +616,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                     }}
                                 />
                             </div>
-                        )} */}
+                        )}
                     </div>
                 )}
                 <Divider className='border-2' />

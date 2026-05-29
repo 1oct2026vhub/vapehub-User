@@ -4,7 +4,7 @@ import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.co
 import { useCart, type LoyaltyRedemption } from '@/lib/context/CartContext'
 import { useCheckout } from '@/lib/context/CheckoutContext'
 import { Divider, Checkbox } from '@nextui-org/react'
-import React, { useEffect, useMemo, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import CouponForm from '@/components/CouponForm'
 import { applyCoupon } from '@/lib/server.actions'
 import { toast } from 'sonner'
@@ -23,6 +23,7 @@ import {
     listShippingMethodIdsForApplyCoupon,
     resolveCheckoutShippingLineDisplayAmount,
     effectiveLoyaltyDiscountAmount,
+    evaluateLoyaltyRedemptionForCart,
     type CheckoutCouponSlice,
     type CheckoutLoyaltySlice,
     type LoyaltyApplyCouponShippingSnapshot,
@@ -98,10 +99,60 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption, setShippingMethodIdForCoupon } = useCart();
     const { selectedShippingMethod, setSelectedShippingMethod } = useCheckout();
     const [isApplyingLoyalty, setIsApplyingLoyalty] = useState(false);
+    const [loyaltyValidationMessage, setLoyaltyValidationMessage] = useState<string | null>(null);
     const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage, pointsToRedeem, applyCouponShippingCost, applyCouponMailSubscriptionDiscount, applyCouponTotal } = loyaltyRedemption;
     const { status } = useSession();
     const isAuthenticated = status === 'authenticated';
     const loyaltyRefreshDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const loyaltyWasEligibleRef = useRef(true);
+
+    const loyaltyEligibility = useMemo(
+        () => evaluateLoyaltyRedemptionForCart(cartTotal, loyaltyPoints),
+        [cartTotal, loyaltyPoints]
+    );
+
+    const loyaltyIneligibleMessage = useMemo(() => {
+        const {
+            blockingReason,
+            shortfallMinLoyaltyAmount,
+            shortfallMinOrderValue,
+            minAmountForLoyaltyPoints,
+            minimumOrderValueToRedeem,
+        } = loyaltyEligibility;
+        switch (blockingReason) {
+            case 'insufficient_points':
+                return loyaltyPoints
+                    ? `You need at least ${loyaltyPoints.minimum_points_required} loyalty points to redeem (${loyaltyPoints.points_needed} more required).`
+                    : null;
+            case 'below_min_loyalty_amount':
+                return minAmountForLoyaltyPoints > 0
+                    ? `Add ${DEFAULT_CURRENCY_SYMBOL}${shortfallMinLoyaltyAmount.toFixed(2)} more to reach the ${DEFAULT_CURRENCY_SYMBOL}${minAmountForLoyaltyPoints.toFixed(2)} minimum order value for loyalty redemption.`
+                    : null;
+            case 'below_minimum_order_value':
+                return minimumOrderValueToRedeem > 0
+                    ? `Add ${DEFAULT_CURRENCY_SYMBOL}${shortfallMinOrderValue.toFixed(2)} more to reach the ${DEFAULT_CURRENCY_SYMBOL}${minimumOrderValueToRedeem.toFixed(2)} minimum order value to redeem loyalty points.`
+                    : null;
+            case 'api_disallowed':
+                return 'Loyalty points cannot be redeemed on this order.';
+            default:
+                return null;
+        }
+    }, [loyaltyEligibility, loyaltyPoints]);
+
+    const clearLoyaltyRedemptionState = useCallback(() => {
+        setLoyaltyRedemption((prev) => ({
+            ...prev,
+            isRedeemed: false,
+            discountValue: 0,
+            message: null,
+            pointsToRedeem: null,
+            applyCouponShippingCost: null,
+            applyCouponShippingMethodId: null,
+            applyCouponMailSubscriptionDiscount: null,
+            applyCouponIsPaymentRequired: null,
+            applyCouponTotal: null,
+        }));
+    }, [setLoyaltyRedemption]);
 
     /** Full API loyalty discount (may include shipping); capped value only for stale fallbacks before refresh. */
     const displayLoyaltyDiscount = useMemo(() => {
@@ -202,38 +253,37 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     };
 
     useEffect(() => {
-        if (couponDiscount.isApplied && couponDiscount.code) {
-            setLoyaltyRedemption(prev => ({
-                ...prev,
-                isRedeemed: false,
-                discountValue: 0,
-                message: null,
-                pointsToRedeem: null,
-                applyCouponShippingCost: null,
-                applyCouponShippingMethodId: null,
-                applyCouponMailSubscriptionDiscount: null,
-                applyCouponIsPaymentRequired: null,
-                applyCouponTotal: null,
-            }));
+        if (loyaltyEligibility.canRedeemOnCart) {
+            loyaltyWasEligibleRef.current = true;
+            setLoyaltyValidationMessage(null);
+            return;
         }
-    }, [couponDiscount, setLoyaltyRedemption]);
+        if (!isRedeemed) return;
+        clearLoyaltyRedemptionState();
+        if (loyaltyWasEligibleRef.current) {
+            toast.error(
+                loyaltyIneligibleMessage ||
+                    'Loyalty points were removed because the cart no longer qualifies for redemption.'
+            );
+            loyaltyWasEligibleRef.current = false;
+        }
+    }, [
+        loyaltyEligibility.canRedeemOnCart,
+        isRedeemed,
+        loyaltyIneligibleMessage,
+        clearLoyaltyRedemptionState,
+    ]);
+
+    useEffect(() => {
+        if (couponDiscount.isApplied && couponDiscount.code) {
+            clearLoyaltyRedemptionState();
+        }
+    }, [couponDiscount, clearLoyaltyRedemptionState]);
     useEffect(() => {
         if (itemCount === 0) {
-            // Reset loyalty points when cart becomes empty
-            setLoyaltyRedemption(prev => ({
-                ...prev,
-                isRedeemed: false,
-                discountValue: 0,
-                message: null,
-                pointsToRedeem: null,
-                applyCouponShippingCost: null,
-                applyCouponShippingMethodId: null,
-                applyCouponMailSubscriptionDiscount: null,
-                applyCouponIsPaymentRequired: null,
-                applyCouponTotal: null,
-            }));
+            clearLoyaltyRedemptionState();
         }
-    }, [itemCount, setLoyaltyRedemption]);
+    }, [itemCount, clearLoyaltyRedemptionState]);
     
     // When cart quantity/total changes with loyalty on, pick a carrier valid for the new merchandise total immediately.
     useEffect(() => {
@@ -270,7 +320,13 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     // Authenticated loyalty: debounced applyCoupon keeps discount aligned with API when cart/shipping changes.
     // CartContext owns coupon revalidation; toggling loyalty still calls applyCoupon immediately in handleRedeemToggle (may duplicate once ~400ms after redeem).
     useEffect(() => {
-        if (!isAuthenticated || !isRedeemed || couponDiscount.code || !loyaltyPoints) {
+        if (
+            !isAuthenticated ||
+            !isRedeemed ||
+            couponDiscount.code ||
+            !loyaltyPoints ||
+            !loyaltyEligibility.canRedeemOnCart
+        ) {
             if (loyaltyRefreshDebounceRef.current) {
                 clearTimeout(loyaltyRefreshDebounceRef.current);
                 loyaltyRefreshDebounceRef.current = null;
@@ -346,9 +402,18 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         listApplyCouponShippingMethodIds,
         setLoyaltyRedemption,
         pointsToRedeem,
+        loyaltyEligibility.canRedeemOnCart,
     ]);
 
     const handleRedeemToggle = async (checked: boolean) => {
+        if (checked && !loyaltyEligibility.canRedeemOnCart) {
+            setLoyaltyValidationMessage(
+                loyaltyIneligibleMessage || 'Cannot apply loyalty points on this order.'
+            );
+            return;
+        }
+
+        setLoyaltyValidationMessage(null);
         setIsApplyingLoyalty(true);
         let response: Awaited<ReturnType<typeof applyCoupon>> | null = null;
         let shippingMethodId = 0;
@@ -419,7 +484,11 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         if (!loyaltyPoints) return "";
 
         const { minimum_points_required, user_points } = loyaltyPoints;
-        return `Apply loyalty discount on this order (${user_points} points available; minimum ${minimum_points_required} points required to redeem).`;
+        const minOrder =
+            loyaltyEligibility.minAmountForLoyaltyPoints > 0
+                ? `; minimum order ${DEFAULT_CURRENCY_SYMBOL}${loyaltyEligibility.minAmountForLoyaltyPoints.toFixed(2)}`
+                : '';
+        return `Apply loyalty discount on this order (${user_points} points available; minimum ${minimum_points_required} points required to redeem${minOrder}).`;
     }
 
     const handleRemoveDiscount = () => {
@@ -580,15 +649,22 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                         </div>
                     </div>
                 )}
-                {loyaltyPoints?.can_redeem && !couponDiscount.code && (
+                {isAuthenticated && loyaltyPoints && !couponDiscount.code && (
                     <div className="mt-2 flex flex-col gap-2">
                         <div className="flex items-start">
-                            <Checkbox isSelected={isRedeemed} onValueChange={handleRedeemToggle} isDisabled={isApplyingLoyalty}>
+                            <Checkbox
+                                isSelected={isRedeemed}
+                                onValueChange={handleRedeemToggle}
+                                isDisabled={isApplyingLoyalty}
+                            >
                                 <span className="ml-2 text-sm text-gray-600">
                                     {getRedemptionLabel()}
                                 </span>
                             </Checkbox>
                         </div>
+                        {loyaltyValidationMessage && (
+                            <p className="text-danger text-tiny p-1 ml-7">{loyaltyValidationMessage}</p>
+                        )}
                         {isRedeemed && loyaltyPoints && (
                             <div className="ml-7 flex flex-col gap-1 max-w-xs">
                                 <label htmlFor="loyalty-points-to-redeem" className="text-xs text-gray-600">

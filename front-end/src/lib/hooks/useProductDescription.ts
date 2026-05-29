@@ -6,65 +6,96 @@ import { ProductResponse } from '@/lib/config/product.config';
 import {
   buildDescriptionCacheKey,
   buildProductDescriptionQuery,
-  resolveDescriptionHtml,
+  getResolvedVariant,
+  getVariantDescriptionFromProductData,
+  resolveDisplayDescription,
+  resolveProductDescriptionHtml,
 } from '@/lib/product-description.utils';
 import { getProductDescription } from '@/lib/server.actions';
 
-const descriptionCache = new Map<string, string>();
-const inflightRequests = new Map<string, Promise<string>>();
+const productDescriptionCache = new Map<string, string>();
+const inflightProductRequests = new Map<string, Promise<string>>();
 
-async function fetchDescriptionHtml(
+async function fetchProductDescriptionHtml(
   productId: number,
   cacheKey: string,
   query: ReturnType<typeof buildProductDescriptionQuery>,
 ): Promise<string> {
-  const cached = descriptionCache.get(cacheKey);
+  const cached = productDescriptionCache.get(cacheKey);
   if (cached !== undefined) return cached;
 
-  const inflight = inflightRequests.get(cacheKey);
+  const inflight = inflightProductRequests.get(cacheKey);
   if (inflight) return inflight;
 
-  const request = getProductDescription(productId, query, false).then((response) => {
-    if (response.status === ServerActionStatus.SUCCESS && response.data) {
-      const html = resolveDescriptionHtml(response.data);
-      descriptionCache.set(cacheKey, html);
-      return html;
-    }
-    descriptionCache.set(cacheKey, '');
-    throw new Error(
-      response.status === ServerActionStatus.ERROR
-        ? response.message ?? 'Failed to load description'
-        : 'Failed to load description',
-    );
-  }).finally(() => {
-    inflightRequests.delete(cacheKey);
-  });
+  const request = getProductDescription(productId, query, false)
+    .then((response) => {
+      if (response.status === ServerActionStatus.SUCCESS && response.data) {
+        const html = resolveProductDescriptionHtml(response.data);
+        productDescriptionCache.set(cacheKey, html);
+        return html;
+      }
+      productDescriptionCache.set(cacheKey, '');
+      throw new Error(
+        response.status === ServerActionStatus.ERROR
+          ? response.message ?? 'Failed to load description'
+          : 'Failed to load description',
+      );
+    })
+    .finally(() => {
+      inflightProductRequests.delete(cacheKey);
+    });
 
-  inflightRequests.set(cacheKey, request);
+  inflightProductRequests.set(cacheKey, request);
   return request;
 }
 
 export function useProductDescription(productId: number, productData: ProductResponse) {
-  const cacheKey = useMemo(() => {
-    const query = buildProductDescriptionQuery(productData);
-    return buildDescriptionCacheKey(productId, query);
-  }, [
-    productId,
+  const resolvedVariant = useMemo(() => getResolvedVariant(productData), [
     productData.filtered_attribute_terms,
     productData.available_terms,
     productData.variants,
   ]);
-  const query = useMemo(() => buildProductDescriptionQuery(productData), [cacheKey]);
-  const cached = descriptionCache.get(cacheKey);
+  const variantDescriptionFromFilter = useMemo(
+    () => getVariantDescriptionFromProductData(productData),
+    [resolvedVariant, productData.variants],
+  );
+  const query = useMemo(() => buildProductDescriptionQuery(productData), [
+    productData.filtered_attribute_terms,
+    productData.available_terms,
+    productData.variants,
+  ]);
+  const productCacheKey = useMemo(
+    () => buildDescriptionCacheKey(productId, query, resolvedVariant?.id ?? null),
+    [productId, query, resolvedVariant?.id],
+  );
 
-  const [description, setDescription] = useState(cached ?? '');
-  const [loading, setLoading] = useState(cached === undefined);
+  const needsProductDescriptionApi = !variantDescriptionFromFilter;
+  const cachedProductHtml = needsProductDescriptionApi
+    ? productDescriptionCache.get(productCacheKey)
+    : undefined;
+
+  const [productDescription, setProductDescription] = useState(cachedProductHtml ?? '');
+  const [loading, setLoading] = useState(
+    needsProductDescriptionApi && cachedProductHtml === undefined,
+  );
   const [error, setError] = useState<string | null>(null);
   const requestIdRef = useRef(0);
 
+  const description = useMemo(
+    () => resolveDisplayDescription(variantDescriptionFromFilter, productDescription),
+    [variantDescriptionFromFilter, productDescription],
+  );
+
   useEffect(() => {
-    if (descriptionCache.has(cacheKey)) {
-      setDescription(descriptionCache.get(cacheKey) ?? '');
+    if (!needsProductDescriptionApi) {
+      setProductDescription('');
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    if (productDescriptionCache.has(productCacheKey)) {
+      setProductDescription(productDescriptionCache.get(productCacheKey) ?? '');
       setLoading(false);
       setError(null);
       return;
@@ -76,14 +107,14 @@ export function useProductDescription(productId: number, productData: ProductRes
     setLoading(true);
     setError(null);
 
-    fetchDescriptionHtml(productId, cacheKey, query)
+    fetchProductDescriptionHtml(productId, productCacheKey, query)
       .then((html) => {
         if (cancelled || requestId !== requestIdRef.current) return;
-        setDescription(html);
+        setProductDescription(html);
       })
       .catch((err: unknown) => {
         if (cancelled || requestId !== requestIdRef.current) return;
-        setDescription('');
+        setProductDescription('');
         setError(err instanceof Error ? err.message : 'Failed to load description');
       })
       .finally(() => {
@@ -95,7 +126,14 @@ export function useProductDescription(productId: number, productData: ProductRes
     return () => {
       cancelled = true;
     };
-  }, [cacheKey, productId, query]);
+  }, [needsProductDescriptionApi, productCacheKey, productId, query]);
 
-  return { description, loading, error };
+  return {
+    /** HTML shown in the Description tab (variant from filter-variants, else product API). */
+    description,
+    variantDescription: variantDescriptionFromFilter,
+    productDescription,
+    loading,
+    error,
+  };
 }

@@ -17,7 +17,11 @@ import {
 } from "@/lib/config/product.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
 import { PRODUCT_DESCRIPTION_QUERY, PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
-import { resolveDescriptionHtml } from "@/lib/product-description.utils";
+import {
+  getVariantDescriptionFromProductData,
+  resolveDisplayDescription,
+  resolveProductDescriptionHtml,
+} from "@/lib/product-description.utils";
 import {
   buildProductSchema,
   buildBreadcrumbSchema,
@@ -103,7 +107,17 @@ export const fetchProductDescription = cache(async (
   if (response.status === ServerActionStatus.ERROR || !response.data) {
     return "";
   }
-  return resolveDescriptionHtml(response.data);
+  return resolveProductDescriptionHtml(response.data);
+});
+
+export const fetchDisplayDescription = cache(async (
+  productId: number,
+  productData: ProductResponse | null,
+  attributeTerms: PRODUCT_VARIANT_ATTRIBUTE[] = [],
+): Promise<string> => {
+  const variantFromFilter = productData ? getVariantDescriptionFromProductData(productData) : '';
+  const productFromApi = await fetchProductDescription(productId, attributeTerms);
+  return resolveDisplayDescription(variantFromFilter, productFromApi);
 });
 
 export const fetchProductDescriptionData = cache(async (

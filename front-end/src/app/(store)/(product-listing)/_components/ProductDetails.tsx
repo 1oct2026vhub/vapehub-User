@@ -134,13 +134,18 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     }, [attributeSelections]);
 
     const { product } = productData;
-    const { description: fetchedDescriptionHtml, loading: descriptionLoading } = useProductDescription(
-        product.id,
-        productData,
+    const {
+        variantDescription: variantDescriptionHtml,
+        productDescription: productDescriptionHtml,
+        loading: descriptionLoading,
+    } = useProductDescription(product.id, productData);
+    const variantRecordDescriptionPlain = useMemo(
+        () => htmlToPlainText(variantDescriptionHtml ?? '', 0).trim(),
+        [variantDescriptionHtml],
     );
-    const fetchedDescriptionPlain = useMemo(
-        () => htmlToPlainText(fetchedDescriptionHtml ?? '', 0).trim(),
-        [fetchedDescriptionHtml],
+    const productDescriptionPlain = useMemo(
+        () => htmlToPlainText(productDescriptionHtml ?? '', 0).trim(),
+        [productDescriptionHtml],
     );
     const hasFilteredTerms = (productData.filtered_attribute_terms?.length ?? 0) > 0;
     const hasAvailableTerms = (productData.available_terms?.length ?? 0) > 0;
@@ -497,13 +502,13 @@ const ProductDetails: React.FC<ProductViewProps> = ({
         if (!variantName || variantAttributes.length === 0 || descriptionLoading) return;
         const title = buildVariantFirstTitle(variantName, parentSeoTitle || product.name);
         const variantRecordDescription =
-            fetchedDescriptionPlain
+            variantRecordDescriptionPlain
             || findVariantDescriptionBySelections(allVariantsCatalog, selectedAttributeSlugs);
         const description = buildVariantFirstDescription(
             variantName,
             product.name,
             parentSeoDescription,
-            fetchedDescriptionPlain,
+            productDescriptionPlain,
             variantRecordDescription,
         );
         if (!description.trim()) return;
@@ -528,7 +533,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     }, [
         selectedVariant?.terms.name,
         product.name,
-        fetchedDescriptionPlain,
+        variantRecordDescriptionPlain,
+        productDescriptionPlain,
         descriptionLoading,
         parentSeoTitle,
         parentSeoDescription,

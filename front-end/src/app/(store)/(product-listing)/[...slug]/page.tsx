@@ -19,6 +19,10 @@ import {
   toAbsoluteUrl,
 } from "@/lib/seo-schema";
 import {
+  getVariantDescriptionFromProductData,
+  resolveDisplayDescription,
+} from "@/lib/product-description.utils";
+import {
   buildProductJsonLdData,
   buildVariantParams,
   fetchBlogByCategoryAndSlug,
@@ -207,14 +211,14 @@ const Page = async ({
     const parentSeoDescription = parentPage?.seo?.description?.trim() ?? "";
     const parentSeoTitle = parentPage?.seo?.title?.trim() ?? data.product.name;
     const variantName = variant.terms.name.trim();
-    const variantRecordDescription =
-      data.variants?.[0]?.description?.trim()
-      || htmlToPlainText(productDescriptionHtml, 0).trim();
+    const variantHtml = getVariantDescriptionFromProductData(data);
+    const variantRecordDescription = htmlToPlainText(variantHtml, 0).trim();
+    const productPlainDescription = htmlToPlainText(productDescriptionHtml, 0).trim();
     const variantDescription = buildVariantFirstDescription(
       variantName,
       data.product.name,
       parentSeoDescription,
-      productDescriptionHtml,
+      productPlainDescription,
       variantRecordDescription,
     );
     const variantTitle = buildVariantFirstTitle(variantName, parentSeoTitle);
@@ -386,8 +390,10 @@ const Page = async ({
         : null;
       const parentSeoDescription = dynamicPageSlug.seo?.description?.trim() ?? "";
       const parentSeoTitle = dynamicPageSlug.seo?.title?.trim() ?? data.product.name;
+      const variantHtml = getVariantDescriptionFromProductData(data);
       const schemaDescription =
-        parentSeoDescription || htmlToPlainText(productDescriptionHtml, 0).trim();
+        parentSeoDescription
+        || htmlToPlainText(resolveDisplayDescription(variantHtml, productDescriptionHtml), 0).trim();
       const jsonLdData = buildProductJsonLdData({
         baseUrl: BASE_URL,
         data,
@@ -516,18 +522,18 @@ export async function generateMetadata({ params, searchParams }: {
       const variantName = variant?.terms.name?.trim();
       const titleBase = (parentSeoTitle || dynamicPageSlug.seo?.title || data.product.name || "").trim();
       const title = variantName ? buildVariantFirstTitle(variantName, titleBase || data.product.name) : titleBase;
-      const variantRecordDescription =
-        data.variants?.[0]?.description?.trim()
-        || htmlToPlainText(productDescriptionHtml, 0).trim();
+      const variantHtml = getVariantDescriptionFromProductData(data);
+      const variantRecordDescription = htmlToPlainText(variantHtml, 0).trim();
+      const productPlainDescription = htmlToPlainText(productDescriptionHtml, 0).trim();
       const description = variantName
         ? buildVariantFirstDescription(
             variantName,
             data.product.name,
             productMetaDescription,
-            productDescriptionHtml,
+            productPlainDescription,
             variantRecordDescription,
           )
-        : productMetaDescription || htmlToPlainText(productDescriptionHtml ?? "");
+        : productMetaDescription || htmlToPlainText(resolveDisplayDescription(variantHtml, productDescriptionHtml));
       return {
         title,
         description,
@@ -545,14 +551,14 @@ export async function generateMetadata({ params, searchParams }: {
     const variantName = variant.terms.name.trim();
     const titleBase = parentSeoTitle || dynamicPageSlug.seo?.title?.trim() || data.product.name;
     const title = buildVariantFirstTitle(variantName, titleBase);
-    const variantRecordDescription =
-      data.variants?.[0]?.description?.trim()
-      || htmlToPlainText(productDescriptionHtml, 0).trim();
+    const variantHtml = getVariantDescriptionFromProductData(data);
+    const variantRecordDescription = htmlToPlainText(variantHtml, 0).trim();
+    const productPlainDescription = htmlToPlainText(productDescriptionHtml, 0).trim();
     const description = buildVariantFirstDescription(
       variantName,
       data.product.name,
       productMetaDescription,
-      productDescriptionHtml,
+      productPlainDescription,
       variantRecordDescription,
     );
     const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
@@ -706,7 +712,11 @@ export async function generateMetadata({ params, searchParams }: {
       const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
       if (!data?.product || !data.product.category) return null;
       const productDescriptionHtml = await fetchProductDescription(dynamicPageSlug?.entity_id ?? 0, []);
-      const description = htmlToPlainText(productDescriptionHtml, 0).trim();
+      const variantHtml = getVariantDescriptionFromProductData(data);
+      const description = htmlToPlainText(
+        resolveDisplayDescription(variantHtml, productDescriptionHtml),
+        0,
+      ).trim();
 
         return {
           title: data.product.name,

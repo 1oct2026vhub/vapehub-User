@@ -131,6 +131,17 @@ export const API_ROUTES = {
     GET_DEAL_PRODUCTS: (dealId: number, params?: { limit?: number; offset?: number; product_id?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${params ? `?${toQueryString(params)}` : ''}`),
     GET_PRODUCTS_BY_DEAL_SLUG: (slug: string, params?: Record<string, unknown>) => buildRequestUrl(`/api/deals/slug/${slug}${params ? `?${toQueryString(params)}` : ''}`),
     GET_LINKED_PRODUCTS: (productId: number, params?: { limit?: number; offset?: number; page?: number }) => buildRequestUrl(`/api/product/${productId}/linked-products${params ? `?${toQueryString(params)}` : ''}`),
+    GET_PRODUCT_DESCRIPTION: (productId: number, params?: PRODUCT_DESCRIPTION_QUERY) => {
+        const searchParams = new URLSearchParams();
+        if (params?.variant_id != null) {
+            searchParams.set('variant_id', String(params.variant_id));
+        }
+        if (params?.attribute_terms?.length) {
+            searchParams.set('attribute_terms', JSON.stringify(params.attribute_terms));
+        }
+        const queryString = searchParams.toString();
+        return buildRequestUrl(`/api/product/${productId}/description${queryString ? `?${queryString}` : ''}`);
+    },
     GET_MAIL_SUBSCRIPTION_SETTINGS: buildRequestUrl('/api/mailSubscription/settings'),
     GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${toQueryString(payload)}` : ''}`),
     GET_WELCOME_CONTENT: buildRequestUrl('/api/home/welcome-content'),
@@ -179,6 +190,11 @@ export interface PRODUCT_VARIANT_PAYLOAD {
 export interface PRODUCT_VARIANT_ATTRIBUTE {
     attribute_id: number;
     term_id: number;
+}
+
+export interface PRODUCT_DESCRIPTION_QUERY {
+    attribute_terms?: PRODUCT_VARIANT_ATTRIBUTE[];
+    variant_id?: number;
 }
 
 // Worldpay payment types

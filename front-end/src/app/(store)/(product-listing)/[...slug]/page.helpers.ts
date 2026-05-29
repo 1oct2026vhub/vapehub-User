@@ -4,6 +4,7 @@ import {
   getBlogBySlug,
   getDynamicPageSlug,
   getProductByCategory,
+  getProductDescription,
   getProductVariantByID,
   getSeoMetaBySlug,
 } from "@/lib/server.actions";
@@ -11,10 +12,12 @@ import { ServerActionStatus } from "@/lib/config/app.config";
 import { DynamicPageSlugResponse, FaqResponse, SeoMetaResponse } from "@/lib/config/global.config";
 import {
   CategoryResponseData,
+  ProductDescriptionResponse,
   ProductResponse,
 } from "@/lib/config/product.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
-import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
+import { PRODUCT_DESCRIPTION_QUERY, PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
+import { resolveDescriptionHtml } from "@/lib/product-description.utils";
 import {
   buildProductSchema,
   buildBreadcrumbSchema,
@@ -88,6 +91,34 @@ export const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE
   }
   return response.data;
 };
+
+export const fetchProductDescription = cache(async (
+  productId: number,
+  attributeTerms: PRODUCT_VARIANT_ATTRIBUTE[] = [],
+): Promise<string> => {
+  const params: PRODUCT_DESCRIPTION_QUERY | undefined = attributeTerms.length
+    ? { attribute_terms: attributeTerms }
+    : undefined;
+  const response = await getProductDescription(productId, params, true);
+  if (response.status === ServerActionStatus.ERROR || !response.data) {
+    return "";
+  }
+  return resolveDescriptionHtml(response.data);
+});
+
+export const fetchProductDescriptionData = cache(async (
+  productId: number,
+  attributeTerms: PRODUCT_VARIANT_ATTRIBUTE[] = [],
+): Promise<ProductDescriptionResponse | null> => {
+  const params: PRODUCT_DESCRIPTION_QUERY | undefined = attributeTerms.length
+    ? { attribute_terms: attributeTerms }
+    : undefined;
+  const response = await getProductDescription(productId, params, true);
+  if (response.status === ServerActionStatus.ERROR || !response.data) {
+    return null;
+  }
+  return response.data;
+});
 
 export const fetchBlogByCategoryAndSlug = async (categorySlug: string): Promise<BlogByCategoryAndSlugResponse | null> => {
   const response = await getBlogByCategoryAndSlug(categorySlug);

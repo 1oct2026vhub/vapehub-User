@@ -1,9 +1,9 @@
 "use client"
 import { Card, CardBody,  Tab, Tabs, Pagination } from '@nextui-org/react'
 // import Image from 'next/image'
-import React, { ReactElement, useEffect, useState, useMemo } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import ReviewCard from './ReviewCard'; 
-import { ProductResponse, ProductVariant } from '@/lib/config/product.config';
+import { ProductResponse } from '@/lib/config/product.config';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'; 
 // import { REVIEWS } from '@/lib/config/order.config';
@@ -13,11 +13,7 @@ import { getShippingMethodsDisplay } from '@/lib/server.actions';
 import { SHIPPING_METHOD_DISPLAY } from '@/lib/config/order.config';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { useProductData } from '@/lib/context/ProductDataContext';
-
-type ProductWithDescription = {
-    description?: string;
-    product_description?: string;
-};
+import { useProductDescription } from '@/lib/hooks/useProductDescription';
 
 type ProductContentProps = {
     data: ProductResponse;
@@ -28,6 +24,7 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
     // Use context data if available (updated when variant is selected), otherwise use prop data
     const productData = contextProductData ?? data;
     const { product } = productData;
+    const { description, loading: descriptionLoading } = useProductDescription(product.id, productData);
     const { reviewData, loading, fetchReviews } = useReviews();
     const [selectedTab, setSelectedTab] = useState('Description');
     const [currentPage, setCurrentPage] = useState(1);
@@ -35,38 +32,6 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
     const [shippingLoading, setShippingLoading] = useState(true);
     const [shippingError, setShippingError] = useState<string | null>(null);
     const limit = 10;
-
-    // Determine the description using the same logic as ProductDetails
-    const description = useMemo(() => {
-        const hasFilteredTerms = (productData.filtered_attribute_terms?.length ?? 0) > 0;
-        const hasAvailableTerms = (productData.available_terms?.length ?? 0) > 0;
-        
-        // A variant is ready when all attributes have been selected
-        const isReadyVariant = hasFilteredTerms && !hasAvailableTerms && productData.variants?.length === 1;
-        
-        // A product is simple if it has no attributes to filter by
-        const isSimpleProduct = !hasFilteredTerms && !hasAvailableTerms;
-        
-        // If a variant is ready, that's our selected variant
-        const productVariant: ProductVariant | null = isReadyVariant ? productData.variants[0] : null;
-        
-        // For simple products, use the first variant if available
-        const simpleProductVariant = isSimpleProduct && productData.variants.length > 0 ? productData.variants[0] : null;
-        
-        // The definitive entity (either a selected variant or a simple product's variant)
-        const cartEntity = productVariant ?? simpleProductVariant;
-        
-        // Determine description: use variant description if available and not empty, otherwise use product description
-        const variantDescription = cartEntity?.description;
-        // Handle both 'description' and 'product_description' fields for product (API might return either)
-        const productWithDescription = product as ProductWithDescription;
-        const productDescription = productWithDescription?.description || productWithDescription?.product_description || '';
-        const finalDescription = (variantDescription && variantDescription.trim() !== '') 
-            ? variantDescription 
-            : productDescription;
-        
-        return finalDescription;
-    }, [productData, product]);
 
     useEffect(() => {
         if (selectedTab === 'Reviews' && product.id) {
@@ -162,8 +127,16 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
                                 <div className='space-y-6'>
                                     <div className='space-y-3.5'>
                                         <h2 className='text-h5 lg:text-h3 font-bold text-black'>Description</h2>
-                                        {/* <h3 className='text-title-1 md:text-h4 font-semibold text-black ml-0.5'>Description</h3> */}
-                                        <div className='product-content' dangerouslySetInnerHTML={{ __html: description }}></div>
+                                        {descriptionLoading ? (
+                                            <div className='flex items-center gap-2 text-skin-neutral-500' role="status" aria-live="polite">
+                                                <div className='loader h-5 w-5 rounded-full border-2 border-t-2 border-gray-200 ease-linear shrink-0' />
+                                                <span className='text-content-2 font-semibold'>Loading description...</span>
+                                            </div>
+                                        ) : description ? (
+                                            <div className='product-content' dangerouslySetInnerHTML={{ __html: description }} />
+                                        ) : (
+                                            <p className='text-content-2 text-skin-neutral-500'>No description available.</p>
+                                        )}
                                     </div>
                                     {/* <Divider />
                                     <div className='space-y-3.5'>

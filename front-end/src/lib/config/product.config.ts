@@ -297,12 +297,20 @@ export interface LoyaltyPoints {
   calculated: number;
 }
 
+export interface ProductDescriptionResponse {
+    product_id: number;
+    description?: string;
+    product_description?: string;
+    variant_description?: string;
+    variant_id?: number | null;
+}
+
 export interface ProductViewDetails {
 
     id: number;
     name: string;
     slug: string;
-    description: string;
+    description?: string;
     key_highlights?: string;
     category: Category | null;
     brand: BrandConfig | null;

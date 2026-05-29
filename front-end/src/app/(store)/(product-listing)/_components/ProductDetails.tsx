@@ -18,6 +18,8 @@ import CustomImageMagnifier from '@/components/CustomImageMagnifier'
 // import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import { getProductVariantByID, getLinkedProducts, LinkedProduct } from '@/lib/server.actions'
+import { useProductDescription } from '@/lib/hooks/useProductDescription'
+import { htmlToPlainText } from '@/lib/seo-schema'
 import { ProductInDeal } from '@/lib/config/deal.config'
 import { Product } from '@/lib/config/product.config'
 import { useReviews } from '@/lib/context/ReviewContext'
@@ -131,7 +133,15 @@ const ProductDetails: React.FC<ProductViewProps> = ({
         }, {});
     }, [attributeSelections]);
 
-    const { product } = productData;    
+    const { product } = productData;
+    const { description: fetchedDescriptionHtml, loading: descriptionLoading } = useProductDescription(
+        product.id,
+        productData,
+    );
+    const fetchedDescriptionPlain = useMemo(
+        () => htmlToPlainText(fetchedDescriptionHtml ?? '', 0).trim(),
+        [fetchedDescriptionHtml],
+    );
     const hasFilteredTerms = (productData.filtered_attribute_terms?.length ?? 0) > 0;
     const hasAvailableTerms = (productData.available_terms?.length ?? 0) > 0;
 
@@ -484,16 +494,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({
 
     useEffect(() => {
         const variantName = selectedVariant?.terms.name?.trim();
-        if (!variantName || variantAttributes.length === 0) return;
+        if (!variantName || variantAttributes.length === 0 || descriptionLoading) return;
         const title = buildVariantFirstTitle(variantName, parentSeoTitle || product.name);
         const variantRecordDescription =
-            cartEntity?.description?.trim()
+            fetchedDescriptionPlain
             || findVariantDescriptionBySelections(allVariantsCatalog, selectedAttributeSlugs);
         const description = buildVariantFirstDescription(
             variantName,
             product.name,
             parentSeoDescription,
-            product.description,
+            fetchedDescriptionPlain,
             variantRecordDescription,
         );
         if (!description.trim()) return;
@@ -518,11 +528,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     }, [
         selectedVariant?.terms.name,
         product.name,
-        product.description,
+        fetchedDescriptionPlain,
+        descriptionLoading,
         parentSeoTitle,
         parentSeoDescription,
         variantAttributes.length,
-        cartEntity?.description,
         allVariantsCatalog,
         selectedAttributeSlugs,
     ]);

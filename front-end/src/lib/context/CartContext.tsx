@@ -13,7 +13,12 @@ import { toast } from 'sonner';
 import { LoyaltyPointsRedemptionResponse } from '../config/loyalty-points.config';
 import { CouponResponse } from '../config/order.config';
 import { roundCurrency } from '../utils';
-import { parseApiMoney, parseIsPaymentRequiredFromApplyCouponResponse } from '../utils/checkout-order.utils';
+import {
+  parseApiMoney,
+  parseIsPaymentRequiredFromApplyCouponResponse,
+  evaluateLoyaltyRedemptionForCart,
+  getLoyaltyOrderMinimumBlockingMessage,
+} from '../utils/checkout-order.utils';
 
 interface CouponDiscount {
   value: number;
@@ -101,6 +106,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
   // Store shipping method ID for coupon revalidation (set by CartTotal on checkout page)
   const [shippingMethodIdForCoupon, setShippingMethodIdForCoupon] = useState<number>(0);
+  const loyaltyCartWasEligibleRef = useRef<boolean | null>(null);
   const [cartTotal, setCartTotal] = useState<number>(0);
   const [cartSubtotal, setCartSubtotal] = useState<number>(0);
   const [cartDiscount, setCartDiscount] = useState<number>(0);
@@ -317,6 +323,51 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     };
     fetchLoyaltyPoints();
   }, [isAuthenticated]);
+
+  /** When cart total drops below `minimum_order_value_to_redeem`, remove applied loyalty and toast. */
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const eligibility = evaluateLoyaltyRedemptionForCart(cartTotal, loyaltyRedemption.pointsData);
+    const wasEligible = loyaltyCartWasEligibleRef.current;
+    const isEligible = eligibility.canRedeemOnCart;
+
+    if (isEligible) {
+      loyaltyCartWasEligibleRef.current = true;
+      return;
+    }
+
+    loyaltyCartWasEligibleRef.current = false;
+
+    if (!loyaltyRedemption.isRedeemed) return;
+
+    const toastMessage =
+      getLoyaltyOrderMinimumBlockingMessage(eligibility, DEFAULT_CURRENCY_SYMBOL) ??
+      'Loyalty points were removed because the cart no longer qualifies for redemption.';
+
+    setLoyaltyRedemption((prev) => ({
+      ...prev,
+      isRedeemed: false,
+      discountValue: 0,
+      message: null,
+      pointsToRedeem: null,
+      applyCouponShippingCost: null,
+      applyCouponShippingMethodId: null,
+      applyCouponMailSubscriptionDiscount: null,
+      applyCouponIsPaymentRequired: null,
+      applyCouponTotal: null,
+    }));
+
+    if (wasEligible === true) {
+      toast.error(toastMessage);
+    }
+  }, [
+    cartTotal,
+    itemCount,
+    isAuthenticated,
+    loyaltyRedemption.isRedeemed,
+    loyaltyRedemption.pointsData,
+  ]);
 
   // Load cart items on mount and when auth status changes
   useEffect(() => {

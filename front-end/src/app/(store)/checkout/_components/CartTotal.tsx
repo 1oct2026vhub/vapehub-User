@@ -105,7 +105,6 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     const { status } = useSession();
     const isAuthenticated = status === 'authenticated';
     const loyaltyRefreshDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const loyaltyWasEligibleRef = useRef(true);
 
     const loyaltyEligibility = useMemo(
         () => evaluateLoyaltyRedemptionForCart(cartTotal, loyaltyPoints),
@@ -256,25 +255,9 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
 
     useEffect(() => {
         if (loyaltyEligibility.canRedeemOnCart) {
-            loyaltyWasEligibleRef.current = true;
             setLoyaltyValidationMessage(null);
-            return;
         }
-        if (!isRedeemed) return;
-        clearLoyaltyRedemptionState();
-        if (loyaltyWasEligibleRef.current) {
-            toast.error(
-                loyaltyIneligibleMessage ||
-                    'Loyalty points were removed because the cart no longer qualifies for redemption.'
-            );
-            loyaltyWasEligibleRef.current = false;
-        }
-    }, [
-        loyaltyEligibility.canRedeemOnCart,
-        isRedeemed,
-        loyaltyIneligibleMessage,
-        clearLoyaltyRedemptionState,
-    ]);
+    }, [loyaltyEligibility.canRedeemOnCart]);
 
     useEffect(() => {
         if (couponDiscount.isApplied && couponDiscount.code) {

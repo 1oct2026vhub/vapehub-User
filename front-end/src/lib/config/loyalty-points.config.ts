@@ -8,7 +8,7 @@ export interface LoyaltyRedemptionMailSubscriptionData {
 export interface LoyaltyPointsRedemptionResponse {
   user_points: number;
   minimum_points_required: number;
-  minimum_order_value_to_redeem?: number;
+  minimum_order_value_to_redeem?: number | string;
   can_redeem: boolean;
   has_enough_points?: boolean;
   meets_minimum_order_value?: boolean;

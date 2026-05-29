@@ -24,6 +24,7 @@ import {
     resolveCheckoutShippingLineDisplayAmount,
     effectiveLoyaltyDiscountAmount,
     evaluateLoyaltyRedemptionForCart,
+    getLoyaltyOrderMinimumBlockingMessage,
     type CheckoutCouponSlice,
     type CheckoutLoyaltySlice,
     type LoyaltyApplyCouponShippingSnapshot,
@@ -111,33 +112,26 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         [cartTotal, loyaltyPoints]
     );
 
+    const loyaltyOrderMinimumHint = useMemo(
+        () => getLoyaltyOrderMinimumBlockingMessage(loyaltyEligibility, DEFAULT_CURRENCY_SYMBOL),
+        [loyaltyEligibility]
+    );
+
     const loyaltyIneligibleMessage = useMemo(() => {
-        const {
-            blockingReason,
-            shortfallMinLoyaltyAmount,
-            shortfallMinOrderValue,
-            minAmountForLoyaltyPoints,
-            minimumOrderValueToRedeem,
-        } = loyaltyEligibility;
+        const { blockingReason } = loyaltyEligibility;
         switch (blockingReason) {
             case 'insufficient_points':
                 return loyaltyPoints
                     ? `You need at least ${loyaltyPoints.minimum_points_required} loyalty points to redeem (${loyaltyPoints.points_needed} more required).`
                     : null;
-            case 'below_min_loyalty_amount':
-                return minAmountForLoyaltyPoints > 0
-                    ? `Add ${DEFAULT_CURRENCY_SYMBOL}${shortfallMinLoyaltyAmount.toFixed(2)} more to reach the ${DEFAULT_CURRENCY_SYMBOL}${minAmountForLoyaltyPoints.toFixed(2)} minimum order value for loyalty redemption.`
-                    : null;
             case 'below_minimum_order_value':
-                return minimumOrderValueToRedeem > 0
-                    ? `Add ${DEFAULT_CURRENCY_SYMBOL}${shortfallMinOrderValue.toFixed(2)} more to reach the ${DEFAULT_CURRENCY_SYMBOL}${minimumOrderValueToRedeem.toFixed(2)} minimum order value to redeem loyalty points.`
-                    : null;
+                return loyaltyOrderMinimumHint;
             case 'api_disallowed':
                 return 'Loyalty points cannot be redeemed on this order.';
             default:
                 return null;
         }
-    }, [loyaltyEligibility, loyaltyPoints]);
+    }, [loyaltyEligibility, loyaltyPoints, loyaltyOrderMinimumHint]);
 
     const clearLoyaltyRedemptionState = useCallback(() => {
         setLoyaltyRedemption((prev) => ({
@@ -485,8 +479,8 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
 
         const { minimum_points_required, user_points } = loyaltyPoints;
         const minOrder =
-            loyaltyEligibility.minAmountForLoyaltyPoints > 0
-                ? `; minimum order ${DEFAULT_CURRENCY_SYMBOL}${loyaltyEligibility.minAmountForLoyaltyPoints.toFixed(2)}`
+            loyaltyEligibility.minimumOrderValueToRedeem > 0
+                ? `; minimum order ${DEFAULT_CURRENCY_SYMBOL}${loyaltyEligibility.minimumOrderValueToRedeem.toFixed(2)}`
                 : '';
         return `Apply loyalty discount on this order (${user_points} points available; minimum ${minimum_points_required} points required to redeem${minOrder}).`;
     }
@@ -662,8 +656,10 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                 </span>
                             </Checkbox>
                         </div>
-                        {loyaltyValidationMessage && (
-                            <p className="text-danger text-tiny p-1 ml-7">{loyaltyValidationMessage}</p>
+                        {(loyaltyValidationMessage || loyaltyOrderMinimumHint) && (
+                            <p className="text-danger text-tiny p-1 ml-7">
+                                {loyaltyValidationMessage || loyaltyOrderMinimumHint}
+                            </p>
                         )}
                         {isRedeemed && loyaltyPoints && (
                             <div className="ml-7 flex flex-col gap-1 max-w-xs">

@@ -148,31 +148,24 @@ export function clampPointsToRedeemBounds(n: number, minPts: number, maxPts: num
 export type LoyaltyCartEligibilityBlockingReason =
   | 'none'
   | 'insufficient_points'
-  | 'below_min_loyalty_amount'
   | 'below_minimum_order_value'
   | 'api_disallowed'
 
 /** Client-side eligibility from redemption API + current merchandise total (deal-discounted cart total). */
 export type LoyaltyCartEligibility = {
   canRedeemOnCart: boolean
-  meetsMinAmountForLoyaltyPoints: boolean
   meetsMinimumOrderValueToRedeem: boolean
   hasEnoughPoints: boolean
-  minAmountForLoyaltyPoints: number
   minimumOrderValueToRedeem: number
-  shortfallMinLoyaltyAmount: number
   shortfallMinOrderValue: number
   blockingReason: LoyaltyCartEligibilityBlockingReason
 }
 
 const EMPTY_LOYALTY_CART_ELIGIBILITY: LoyaltyCartEligibility = {
   canRedeemOnCart: false,
-  meetsMinAmountForLoyaltyPoints: false,
   meetsMinimumOrderValueToRedeem: false,
   hasEnoughPoints: false,
-  minAmountForLoyaltyPoints: 0,
   minimumOrderValueToRedeem: 0,
-  shortfallMinLoyaltyAmount: 0,
   shortfallMinOrderValue: 0,
   blockingReason: 'api_disallowed',
 }
@@ -184,10 +177,7 @@ export function evaluateLoyaltyRedemptionForCart(
   if (!data) return EMPTY_LOYALTY_CART_ELIGIBILITY
 
   const safeTotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0
-  const minLoyalty = parseApiMoney(data.min_amount_for_loyalty_points)
   const minOrder = parseApiMoney(data.minimum_order_value_to_redeem)
-
-  const meetsMinLoyalty = minLoyalty <= 0 || safeTotal >= minLoyalty
   const meetsMinOrder = minOrder <= 0 || safeTotal >= minOrder
   const hasEnoughPoints =
     data.has_enough_points !== undefined
@@ -197,28 +187,45 @@ export function evaluateLoyaltyRedemptionForCart(
   let blockingReason: LoyaltyCartEligibilityBlockingReason = 'none'
   if (!hasEnoughPoints) {
     blockingReason = 'insufficient_points'
-  } else if (!meetsMinLoyalty) {
-    blockingReason = 'below_min_loyalty_amount'
   } else if (!meetsMinOrder) {
     blockingReason = 'below_minimum_order_value'
   } else if (!data.can_redeem) {
     blockingReason = 'api_disallowed'
   }
 
-  // Cart total can change after redemption info was fetched; re-validate order minimums client-side.
-  const canRedeemOnCart = hasEnoughPoints && meetsMinLoyalty && meetsMinOrder
+  // Cart total can change after redemption info was fetched; re-validate order minimum client-side.
+  const canRedeemOnCart = hasEnoughPoints && meetsMinOrder
 
   return {
     canRedeemOnCart,
-    meetsMinAmountForLoyaltyPoints: meetsMinLoyalty,
     meetsMinimumOrderValueToRedeem: meetsMinOrder,
     hasEnoughPoints,
-    minAmountForLoyaltyPoints: minLoyalty,
     minimumOrderValueToRedeem: minOrder,
-    shortfallMinLoyaltyAmount: Math.max(0, minLoyalty - safeTotal),
     shortfallMinOrderValue: Math.max(0, minOrder - safeTotal),
     blockingReason: canRedeemOnCart ? 'none' : blockingReason,
   }
+}
+
+export function formatLoyaltyMinimumOrderShortfallMessage(
+  shortfall: number,
+  minimum: number,
+  currencySymbol: string
+): string | null {
+  if (minimum <= 0 || shortfall <= 0) return null
+  return `Add ${currencySymbol}${shortfall.toFixed(2)} more to reach the ${currencySymbol}${minimum.toFixed(2)} minimum order value for loyalty redemption.`
+}
+
+/** Inline validation / toast copy when cart is below `minimum_order_value_to_redeem`. */
+export function getLoyaltyOrderMinimumBlockingMessage(
+  eligibility: LoyaltyCartEligibility,
+  currencySymbol: string
+): string | null {
+  if (eligibility.blockingReason !== 'below_minimum_order_value') return null
+  return formatLoyaltyMinimumOrderShortfallMessage(
+    eligibility.shortfallMinOrderValue,
+    eligibility.minimumOrderValueToRedeem,
+    currencySymbol
+  )
 }
 
 /** Session apply-coupon body: omit `points_to_redeem` to let the server redeem the maximum allowed. */

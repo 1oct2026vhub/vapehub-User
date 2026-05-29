@@ -133,6 +133,14 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         }
     }, [loyaltyEligibility, loyaltyPoints, loyaltyOrderMinimumHint]);
 
+    const loyaltyPointsToRedeemError = useMemo(() => {
+        if (!loyaltyPoints || pointsToRedeem == null) return null;
+        if (pointsToRedeem > loyaltyPoints.user_points) {
+            return 'Value must be less than or equal to loyalty points';
+        }
+        return null;
+    }, [loyaltyPoints, pointsToRedeem]);
+
     const clearLoyaltyRedemptionState = useCallback(() => {
         setLoyaltyRedemption((prev) => ({
             ...prev,
@@ -319,7 +327,8 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             !isRedeemed ||
             couponDiscount.code ||
             !loyaltyPoints ||
-            !loyaltyEligibility.canRedeemOnCart
+            !loyaltyEligibility.canRedeemOnCart ||
+            loyaltyPointsToRedeemError
         ) {
             if (loyaltyRefreshDebounceRef.current) {
                 clearTimeout(loyaltyRefreshDebounceRef.current);
@@ -397,6 +406,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         setLoyaltyRedemption,
         pointsToRedeem,
         loyaltyEligibility.canRedeemOnCart,
+        loyaltyPointsToRedeemError,
     ]);
 
     const handleRedeemToggle = async (checked: boolean) => {
@@ -673,7 +683,12 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                     min={loyaltyPoints.minimum_points_required}
                                     max={loyaltyPoints.user_points}
                                     disabled={isApplyingLoyalty}
-                                    className="rounded border border-skin-neutral-100 px-2 py-1.5 text-sm text-gray-800 disabled:opacity-50 [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                    aria-invalid={loyaltyPointsToRedeemError ? true : undefined}
+                                    className={`rounded border px-2 py-1.5 text-sm text-gray-800 disabled:opacity-50 [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                                        loyaltyPointsToRedeemError
+                                            ? 'border-danger'
+                                            : 'border-skin-neutral-100'
+                                    }`}
                                     placeholder="Maximum"
                                     value={pointsToRedeem ?? ''}
                                     onWheel={(e) => e.currentTarget.blur()}
@@ -688,6 +703,11 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                         setLoyaltyRedemption((prev) => ({ ...prev, pointsToRedeem: n }));
                                     }}
                                 />
+                                {loyaltyPointsToRedeemError && (
+                                    <p className="text-danger text-tiny p-1">
+                                        {loyaltyPointsToRedeemError}
+                                    </p>
+                                )}
                             </div>
                         )}
                     </div>

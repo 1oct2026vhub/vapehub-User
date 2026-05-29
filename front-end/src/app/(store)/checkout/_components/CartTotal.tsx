@@ -601,9 +601,10 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                                     min={loyaltyPoints.minimum_points_required}
                                     max={loyaltyPoints.user_points}
                                     disabled={isApplyingLoyalty}
-                                    className="rounded border border-skin-neutral-100 px-2 py-1.5 text-sm text-gray-800 disabled:opacity-50"
+                                    className="rounded border border-skin-neutral-100 px-2 py-1.5 text-sm text-gray-800 disabled:opacity-50 [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                     placeholder="Maximum"
                                     value={pointsToRedeem ?? ''}
+                                    onWheel={(e) => e.currentTarget.blur()}
                                     onChange={(e) => {
                                         const v = e.target.value;
                                         if (v === '') {

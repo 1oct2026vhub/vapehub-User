@@ -21,13 +21,14 @@ import {
   CategoryResponseData, 
   BrandByProductResponse,
   MoreLikeThisResponse,
-  ProductResponse
+  ProductResponse,
+  ProductDescriptionResponse,
 } from '@/lib/config/product.config';
 import { ReferralStatsResponse } from "./config/referral.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
 import { handleRequest, PRODUCT_VARIANT_FILTER_TIMEOUT_MS } from "./request.config";
-import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD, WORLDPAY_PAYMENT_PAYLOAD, WORLDPAY_PAYMENT_SUCCESS_RESPONSE, WORLDPAY_PAYMENT_CANCEL_RESPONSE } from '@/lib/api-routes';
+import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_DESCRIPTION_QUERY, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD, WORLDPAY_PAYMENT_PAYLOAD, WORLDPAY_PAYMENT_SUCCESS_RESPONSE, WORLDPAY_PAYMENT_CANCEL_RESPONSE } from '@/lib/api-routes';
 
 export const signInAction = async (
     email: string,
@@ -189,6 +190,21 @@ export const getProductVariantByID = async (payload: PRODUCT_VARIANT_PAYLOAD): P
     payload,
     method: 'POST',
     timeoutMs: PRODUCT_VARIANT_FILTER_TIMEOUT_MS,
+  });
+};
+
+/** Product HTML description — decoupled from filter-variants for faster PDP load. */
+export const getProductDescription = async (
+  productId: number,
+  params?: PRODUCT_DESCRIPTION_QUERY,
+  canCache: boolean = true,
+): Promise<ServerActionResponse<ProductDescriptionResponse>> => {
+  const hasVariantFilter = Boolean(params?.variant_id != null || params?.attribute_terms?.length);
+  return await handleRequest<ProductDescriptionResponse, unknown>({
+    endpoint: API_ROUTES.GET_PRODUCT_DESCRIPTION(productId, params),
+    method: 'GET',
+    canCache: canCache && !hasVariantFilter,
+    cacheStrategy: canCache && !hasVariantFilter ? { revalidate: 3600 } : undefined,
   });
 };
 

@@ -29,7 +29,7 @@ type HandleRequest<G> =
     const REQUEST_TIMEOUT_MS = 5000;
 
 /** filter-variants can return large variant sets and exceed the default 5s timeout. */
-export const PRODUCT_VARIANT_FILTER_TIMEOUT_MS = 15_000;
+export const PRODUCT_VARIANT_FILTER_TIMEOUT_MS = 20_000;
 
     const fetchWithRetry = async (input: RequestInfo, init?: RequestInit, retries = MAX_RETRIES): Promise<Response> => {
       try {

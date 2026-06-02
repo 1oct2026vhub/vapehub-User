@@ -226,8 +226,11 @@ const PaymentSuccessContent = () => {
     return (
       <div className="auth-form-container md:!py-[84px]">
         <div className="auth-form-wrapper !space-y-0 !rounded-2xl !max-w-[600px] !p-5 !gap-5">
-          <div className="text-center">
-            <p className="text-content-1 font-semibold">Verifying payment...</p>
+          <div className="text-center space-y-2">
+            <p className="text-content-1 font-semibold">Verifying payment.</p>
+            <p className="text-content-2 text-skin-neutral-300 font-medium">
+              Please do not close or refresh this window. This may take a few seconds while we confirm your order.
+            </p>
           </div>
         </div>
       </div>

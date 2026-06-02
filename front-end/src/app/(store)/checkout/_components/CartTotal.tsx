@@ -134,8 +134,11 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
 
     const loyaltyPointsToRedeemError = useMemo(() => {
         if (!loyaltyPoints || pointsToRedeem == null) return null;
+        if (pointsToRedeem < loyaltyPoints.minimum_points_required) {
+            return `Value must be greater than or equal to ${loyaltyPoints.minimum_points_required}.`;
+        }
         if (pointsToRedeem > loyaltyPoints.user_points) {
-            return 'Value must be less than or equal to loyalty points';
+            return `Value must be less than or equal to ${loyaltyPoints.user_points}.`;
         }
         return null;
     }, [loyaltyPoints, pointsToRedeem]);

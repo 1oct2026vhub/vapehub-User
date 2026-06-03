@@ -70,9 +70,9 @@ const EXCLUDED_PATH_PREFIXES = [
 ] as const
 
 export function isPrerenderEnabled(): boolean {
-  const token = process.env.NEXT_PUBLIC_PRERENDER_TOKEN?.trim()
+  const token = process.env.PRERENDER_TOKEN?.trim()
   if (!token) return false
-  if (process.env.NEXT_PUBLIC_PRERENDER_ENABLED === 'true') return true
+  if (process.env.PRERENDER_ENABLED === 'true') return true
   return process.env.NODE_ENV === 'production'
 }
 
@@ -120,7 +120,7 @@ export async function tryPrerenderResponse(
 ): Promise<NextResponse | null> {
   if (!shouldProxyToPrerender(request)) return null
 
-  const token = process.env.NEXT_PUBLIC_PRERENDER_TOKEN?.trim()
+  const token = process.env.PRERENDER_TOKEN?.trim()
   if (!token) return null
 
   const prerenderUrl = `${PRERENDER_SERVICE_URL}/${request.url}`

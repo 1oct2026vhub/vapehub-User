@@ -127,7 +127,6 @@ export async function tryPrerenderResponse(
   const headers = new Headers(request.headers)
   headers.set('X-Prerender-Token', token)
   headers.set('X-Prerender-Int-Type', 'NextJS')
-
   try {
     const res = await fetch(
       new Request(prerenderUrl, {

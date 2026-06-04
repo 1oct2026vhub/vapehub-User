@@ -226,6 +226,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                                         link={`/${product.slug}`}
                                         totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
                                         isNew={isLessThanOneMonth(product.created_at) ? "New" : ""}
+                                        isDiscontinued={Boolean(product.is_discontinued)}
                                         averageRating={averageRating}
                                         totalReviews={totalReviews}
                                         outOfStock={product.out_of_stock}

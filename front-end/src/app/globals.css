@@ -386,6 +386,25 @@ input[type='search'] {
   @apply -bottom-[12px] md:-bottom-[13.5px];
 }
 
+.discontinued-product {
+  @apply w-24 h-5 md:w-28 md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-center items-center pl-2;
+  flex-shrink: 0;
+  border-radius: 10px 10px 0px 10px;
+  background: #c41e3a;
+  position: absolute;
+  top: 0px;
+  right: -6px;
+  line-height: normal;
+}
+
+.discontinued-product::after {
+  @apply content-discontinued-after relative block -right-[11px] -bottom-[12px] md:-right-[12.5px] md:-bottom-[13px];
+}
+
+.section-slider .discontinued-product::after {
+  @apply -bottom-[12px] md:-bottom-[13.5px];
+}
+
 .product-listing-container {
   @apply px-4 lg:px-12.5 py-4.5 lg:py-10 flex gap-4.5 lg:gap-10
 }

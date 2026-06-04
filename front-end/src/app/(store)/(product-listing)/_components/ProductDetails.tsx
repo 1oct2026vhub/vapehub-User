@@ -177,6 +177,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     const regularPrice = Number(rawRegularPrice) || 0;
     // When sale price is zero, fall back to regular price for display only
     const effectivePrice = price > 0 ? price : (regularPrice > 0 ? regularPrice : 0);
+    const isDiscontinued = Boolean(product?.is_discontinued || cartEntity?.is_discontinued);
     
     // Create a set of attribute IDs that are used in variation for filtering
     const variationAttributeIds = useMemo(() => {
@@ -268,7 +269,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     };
 
     const handleAddToCart = async () => {
-        if (!canAddToCart || !cartEntity) {
+        if (!canAddToCart || !cartEntity || isDiscontinued) {
             // This is a safeguard; the button should be disabled if this is the case.
             return;
         }
@@ -571,6 +572,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                         </div>
                         <p className="text-content-2 sm:text-lg text-black font-bold mt-1">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
                     </div>
+                    {isDiscontinued && (
+                        <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
+                            This product has been discontinued
+                        </p>
+                    )}
                 </div>
                 {/* Title section mobile ends */}
 
@@ -586,19 +592,24 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                         />
 
                         {
-                            product?.created_at && isLessThanOneMonth(product?.created_at) &&
-                            <div className='new-product'>
-                                <span>New</span>
-                            </div>
-                        }
-
-                        {
                             product?.puff_count && (
                                 <div className='quantity'>
                                     <span>{String(product.puff_count).replace(/\bpuffs\b/gi, 'Puffs')}</span>
                                 </div>
                             )
                         }
+
+                        {isDiscontinued ? (
+                            <div className="discontinued-product">
+                                <span>Discontinued</span>
+                            </div>
+                        ) : (
+                            product?.created_at && isLessThanOneMonth(product?.created_at) && (
+                                <div className='new-product'>
+                                    <span>New</span>
+                                </div>
+                            )
+                        )}
 
                     </div>
 
@@ -657,6 +668,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             </div>
                             <p className="text-title-2 xl:text-lg text-black font-bold mt-0.5">({reviewData?.totalReviews || 0} {(reviewData?.totalReviews || 0) <= 1 ? 'Review' : 'Reviews'})</p>
                         </div>
+                        {isDiscontinued && (
+                            <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
+                                This product has been discontinued
+                            </p>
+                        )}
                     </div>
                     <div className='flex items-center justify-between gap-2 text-skin-neutral-500'>
                         <p className='text-xl md:text-h5 !font-oswald font-bold'>{DEFAULT_CURRENCY_SYMBOL}{effectivePrice}</p>
@@ -773,9 +789,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             radius="md"
                             color="primary"
                             isLoading={isAddingToCart}
-                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || isDiscontinued || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
-                            disabled={isAddingToCart || !canAddToCart || quantity <= 0 || quantity > stock}
+                            disabled={isAddingToCart || !canAddToCart || isDiscontinued || quantity <= 0 || quantity > stock}
                         >
                             Add to Cart
                         </Button>

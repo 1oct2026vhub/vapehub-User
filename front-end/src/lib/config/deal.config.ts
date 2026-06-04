@@ -108,6 +108,7 @@ export interface ProductInDeal {
     puff_count: number;
     ProductImages: { image_url: string }[];
     out_of_stock?: boolean;
+    is_discontinued?: boolean;
 }
 
 export interface CategoriesWithDealsResponse {

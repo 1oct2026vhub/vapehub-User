@@ -20,6 +20,7 @@ interface ProductCardProps {
   totalPuffs?: string;
   link: string;
   isNew?: string;
+  isDiscontinued?: boolean;
   averageRating?: number;
   totalReviews?: number;
   outOfStock?: boolean;
@@ -37,6 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   totalPuffs,
   link,
   isNew,
+  isDiscontinued = false,
   averageRating = 0,
   totalReviews = 0,
 }) => {
@@ -156,13 +158,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           )}
 
-          {
+          {isDiscontinued ? (
+            <div className="discontinued-product">
+              <span>Discontinued</span>
+            </div>
+          ) : (
             isNew && (
               <div className='new-product'>
                 <span>{isNew}</span>
               </div>
             )
-          }
+          )}
 
         </div>
         <div className="flex flex-col px-2.5 py-3 md:py-5 flex-grow">

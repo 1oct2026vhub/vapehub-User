@@ -152,6 +152,7 @@ export interface Product {
     puff_count?: number | string;
     createdAt?: string;
     out_of_stock?: boolean;
+    is_discontinued?: boolean;
     reviews?: ProductReview[];
     review_stats?: {
         average_rating: number | string;
@@ -236,6 +237,7 @@ export interface ProductVariant {
     stock_status: string;
     status: string;
     is_in_stock: boolean;
+    is_discontinued?: boolean;
     description?: string;
     primary_image: {
         id: number;
@@ -324,6 +326,7 @@ export interface ProductViewDetails {
     loyaltySettings: LoyaltySettings | null;
     loyaltyPoints?: LoyaltyPoints | null;
     puff_count?: number | string;
+    is_discontinued?: boolean;
 };
 
 export interface AppliedFilters {

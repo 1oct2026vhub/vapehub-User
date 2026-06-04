@@ -433,15 +433,14 @@ input[type='search'] {
 }
 
 
-.blog-details h1, 
-.blog-details h2, 
-.blog-details h3,
-.blog-details h4, 
-.blog-details h5, 
-.blog-details h6, 
-.blog-details p {
-  font-size: revert;
-  font-weight: revert;
+/* Let .rich-text control heading scale; avoid revert which matches body on Tailwind preflight. */
+.blog-details.rich-text h1,
+.blog-details.rich-text h2,
+.blog-details.rich-text h3,
+.blog-details.rich-text h4,
+.blog-details.rich-text h5,
+.blog-details.rich-text h6 {
+  font-family: inherit;
 }
 
 .border-default {
@@ -505,6 +504,15 @@ input[type="checkbox"] + span {
 .blog-details .wp-block-list,
 .blog-details figure {
   margin-bottom: 1rem;
+}
+
+.blog-details.rich-text {
+  overflow-wrap: anywhere;
+}
+
+.blog-details.rich-text figure:has(table),
+.blog-details.rich-text table {
+  max-width: 100%;
 }
 
 .product-content ul {

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { resolveSiteUrl } from '@/lib/site-url'
 
 const PRERENDER_SERVICE_URL =
   process.env.PRERENDER_SERVICE_URL?.replace(/\/$/, '') ?? 'https://service.prerender.io'
@@ -111,6 +112,27 @@ function shouldProxyToPrerender(request: NextRequest): boolean {
   return isBotRequest(userAgent) || escapedFragment
 }
 
+/** Public URL Prerender should fetch (not raw request.url behind a proxy). */
+function getPrerenderTargetUrl(request: NextRequest): string {
+  const { pathname, search } = request.nextUrl
+  const pathWithQuery = `${pathname}${search}`
+
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
+  const host = request.headers.get('host')
+
+  if (forwardedProto && (forwardedHost || host)) {
+    return `${forwardedProto}://${forwardedHost ?? host}${pathWithQuery}`
+  }
+
+  const siteUrl = resolveSiteUrl()
+  if (!siteUrl.includes('localhost') && !siteUrl.includes('127.0.0.1')) {
+    return `${siteUrl}${pathWithQuery}`
+  }
+
+  return request.url
+}
+
 /**
  * Proxies bot traffic to Prerender.io and returns the rendered HTML response.
  * Returns null when the request should continue through normal middleware.
@@ -138,7 +160,9 @@ export async function tryPrerenderResponse(
   const token = process.env.PRERENDER_TOKEN?.trim()
   if (!token) return null
 
-  const prerenderUrl = `${PRERENDER_SERVICE_URL}/${request.url}`
+  const targetUrl = getPrerenderTargetUrl(request)
+  const prerenderUrl = `${PRERENDER_SERVICE_URL}/${targetUrl}`
+  console.log('Prerender target URL:', targetUrl)
   console.log('Prerender URL:', prerenderUrl)
   const headers = new Headers(request.headers)
   headers.set('X-Prerender-Token', token)
@@ -153,7 +177,7 @@ export async function tryPrerenderResponse(
     )
 
     const responseHeaders = new Headers(res.headers)
-    responseHeaders.set('X-Redirected-From', request.url)
+    responseHeaders.set('X-Redirected-From', targetUrl)
     responseHeaders.delete('content-encoding')
     responseHeaders.delete('content-length')
     responseHeaders.delete('transfer-encoding')

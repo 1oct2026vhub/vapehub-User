@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 const PRERENDER_SERVICE_URL =
-  process.env.PRERENDER_SERVICE_URL?.replace(/\/$/, '') ?? 'http://service.prerender.io'
+  process.env.PRERENDER_SERVICE_URL?.replace(/\/$/, '') ?? 'https://service.prerender.io'
 
 /** Crawlers and preview bots served pre-rendered HTML from Prerender.io */
 const PRERENDER_BOTS = [
@@ -135,6 +135,7 @@ export async function tryPrerenderResponse(
   if (!token) return null
 
   const prerenderUrl = `${PRERENDER_SERVICE_URL}/${request.url}`
+  console.log('Prerender URL:', prerenderUrl)
   const headers = new Headers(request.headers)
   headers.set('X-Prerender-Token', token)
   headers.set('X-Prerender-Int-Type', 'NextJS')

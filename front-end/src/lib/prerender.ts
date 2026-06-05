@@ -118,7 +118,18 @@ function shouldProxyToPrerender(request: NextRequest): boolean {
 export async function tryPrerenderResponse(
   request: NextRequest,
 ): Promise<NextResponse | null> {
-  if (!shouldProxyToPrerender(request)) return null
+  console.log('=== PRERENDER START ===')
+  console.log('UA:', request.headers.get('user-agent'))
+  console.log('TOKEN EXISTS:', !!process.env.PRERENDER_TOKEN)
+  console.log('ENABLED:', process.env.PRERENDER_ENABLED)
+  console.log('NODE_ENV:', process.env.NODE_ENV)
+
+  if (!shouldProxyToPrerender(request)) {
+    console.log('Skipping prerender')
+    return null
+  }
+
+  console.log('Forwarding to prerender')
 
   const token = process.env.PRERENDER_TOKEN?.trim()
   if (!token) return null
@@ -154,7 +165,8 @@ export async function tryPrerenderResponse(
       statusText: res.statusText,
       headers: responseHeaders,
     })
-  } catch {
+  } catch (error) {
+    console.error('PRERENDER ERROR:', error)
     return null
   }
 }

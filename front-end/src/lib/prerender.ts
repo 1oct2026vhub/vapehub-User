@@ -120,6 +120,10 @@ export async function tryPrerenderResponse(
 ): Promise<NextResponse | null> {
   console.log('=== PRERENDER START ===')
   console.log('UA:', request.headers.get('user-agent'))
+  console.log('request.url:', request.url)
+  console.log('host:', request.headers.get('host'))
+  console.log('x-forwarded-host:', request.headers.get('x-forwarded-host'))
+  console.log('x-forwarded-proto:', request.headers.get('x-forwarded-proto'))
   console.log('TOKEN EXISTS:', !!process.env.PRERENDER_TOKEN)
   console.log('ENABLED:', process.env.PRERENDER_ENABLED)
   console.log('NODE_ENV:', process.env.NODE_ENV)

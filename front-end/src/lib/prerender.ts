@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { resolveSiteUrl } from '@/lib/site-url'
+import { resolvePublicSiteUrl } from '@/lib/site-url'
 
 const PRERENDER_SERVICE_URL =
   process.env.PRERENDER_SERVICE_URL?.replace(/\/$/, '') ?? 'https://service.prerender.io'
@@ -96,6 +96,12 @@ function isExcludedPath(pathname: string): boolean {
   )
 }
 
+function isLocalOrInternalHost(host: string): boolean {
+  const hostname = host.toLowerCase().split(':')[0]
+  if (hostname === 'localhost' || hostname === '127.0.0.1') return true
+  return /^(10\.|172\.(1[6-9]|2\d|3[0-1])\.|192\.168\.)/.test(hostname)
+}
+
 function shouldProxyToPrerender(request: NextRequest): boolean {
   if (!isPrerenderEnabled()) return false
   if (request.method !== 'GET' && request.method !== 'HEAD') return false
@@ -120,12 +126,14 @@ function getPrerenderTargetUrl(request: NextRequest): string {
   const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
   const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
   const host = request.headers.get('host')
+  const publicHost = forwardedHost ?? host
 
-  if (forwardedProto && (forwardedHost || host)) {
-    return `${forwardedProto}://${forwardedHost ?? host}${pathWithQuery}`
+  if (publicHost && !isLocalOrInternalHost(publicHost)) {
+    const proto = forwardedProto ?? 'https'
+    return `${proto}://${publicHost}${pathWithQuery}`
   }
 
-  const siteUrl = resolveSiteUrl()
+  const siteUrl = resolvePublicSiteUrl()
   if (!siteUrl.includes('localhost') && !siteUrl.includes('127.0.0.1')) {
     return `${siteUrl}${pathWithQuery}`
   }
@@ -140,38 +148,24 @@ function getPrerenderTargetUrl(request: NextRequest): string {
 export async function tryPrerenderResponse(
   request: NextRequest,
 ): Promise<NextResponse | null> {
-  console.log('=== PRERENDER START ===')
-  console.log('UA:', request.headers.get('user-agent'))
-  console.log('request.url:', request.url)
-  console.log('host:', request.headers.get('host'))
-  console.log('x-forwarded-host:', request.headers.get('x-forwarded-host'))
-  console.log('x-forwarded-proto:', request.headers.get('x-forwarded-proto'))
-  console.log('TOKEN EXISTS:', !!process.env.PRERENDER_TOKEN)
-  console.log('ENABLED:', process.env.PRERENDER_ENABLED)
-  console.log('NODE_ENV:', process.env.NODE_ENV)
-
   if (!shouldProxyToPrerender(request)) {
-    console.log('Skipping prerender')
     return null
   }
-
-  console.log('Forwarding to prerender')
 
   const token = process.env.PRERENDER_TOKEN?.trim()
   if (!token) return null
 
   const targetUrl = getPrerenderTargetUrl(request)
   const prerenderUrl = `${PRERENDER_SERVICE_URL}/${targetUrl}`
-  console.log('Prerender target URL:', targetUrl)
-  console.log('Prerender URL:', prerenderUrl)
-  const headers = new Headers(request.headers)
-  headers.set('X-Prerender-Token', token)
-  headers.set('X-Prerender-Int-Type', 'NextJS')
+
   try {
     const res = await fetch(
       new Request(prerenderUrl, {
         method: request.method,
-        headers,
+        headers: {
+          'X-Prerender-Token': token,
+          'X-Prerender-Int-Type': 'NextJS',
+        },
         redirect: 'manual',
       }),
     )

@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
     PRERENDER_TOKEN: process.env.PRERENDER_TOKEN,
     PRERENDER_SERVICE_URL: process.env.PRERENDER_SERVICE_URL,
     PRERENDER_ENABLED: process.env.PRERENDER_ENABLED,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXT_PUBLIC_AUTH_URL: process.env.NEXT_PUBLIC_AUTH_URL,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
   images: {
     remotePatterns: [

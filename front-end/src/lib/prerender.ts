@@ -120,7 +120,8 @@ export async function tryPrerenderResponse(
 ): Promise<NextResponse | null> {
   if (!shouldProxyToPrerender(request)) return null
 
-  const token = process.env.PRERENDER_TOKEN
+  // const token = process.env.PRERENDER_TOKEN
+  const token = "ECjXhVlWZ2eQdG2fuhdo";
   if (!token) return null
 
   const prerenderUrl = `${PRERENDER_SERVICE_URL}/${request.url}`

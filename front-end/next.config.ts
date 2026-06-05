@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   // Edge middleware inlines env at build time; expose PRERENDER_TOKEN explicitly.
   env: {
     PRERENDER_TOKEN: process.env.PRERENDER_TOKEN,
+    PRERENDER_SERVICE_URL: process.env.PRERENDER_SERVICE_URL,
+    PRERENDER_ENABLED: process.env.PRERENDER_ENABLED,
   },
   images: {
     remotePatterns: [

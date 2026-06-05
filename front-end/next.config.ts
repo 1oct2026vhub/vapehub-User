@@ -1,8 +1,15 @@
+import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
+
+// Ensure .env / .env.local are loaded before reading PRERENDER_TOKEN for the env block.
+loadEnvConfig(process.cwd());
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
-  /* config options here */
+  // Edge middleware inlines env at build time; expose PRERENDER_TOKEN explicitly.
+  env: {
+    PRERENDER_TOKEN: process.env.PRERENDER_TOKEN,
+  },
   images: {
     remotePatterns: [
       {

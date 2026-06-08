@@ -21,7 +21,7 @@ import {
   getVariantDescriptionFromProductData,
   resolveDisplayDescription,
 } from "@/lib/product-description.utils";
-import { resolvePdpReviewSummary } from "@/lib/product-review-summary";
+import { resolvePdpReviewSummaryForProduct } from "@/lib/product-review-summary";
 import {
   buildProductJsonLdData,
   buildVariantParams,
@@ -203,12 +203,12 @@ const Page = async ({
       variantTermId: variant?.terms?.id,
       categoryId: data.product.category?.id,
     });
-    const { initialData: initialReviewData, ratingData } = resolvePdpReviewSummary({
+    const { initialData: initialReviewData, ratingData } = await resolvePdpReviewSummaryForProduct({
       productId: data.product.id,
       productSlug: data.product.slug,
       reviewApiResult: ratingRes,
       product: data.product,
-      reviewApiProductId: entityId,
+      entityId,
     });
 
     const parentPage = primarySlug ? await fetchDynamicPageSlugWithFallback(primarySlug) : null;
@@ -389,12 +389,12 @@ const Page = async ({
         variantId: data.variants?.[0]?.id,
         categoryId: data.product.category?.id,
       });
-      const { initialData: initialReviewData, ratingData } = resolvePdpReviewSummary({
+      const { initialData: initialReviewData, ratingData } = await resolvePdpReviewSummaryForProduct({
         productId: data.product.id,
         productSlug: data.product.slug,
         reviewApiResult: ratingRes,
         product: data.product,
-        reviewApiProductId: entityId,
+        entityId,
       });
       const parentSeoDescription = dynamicPageSlug.seo?.description?.trim() ?? "";
       const parentSeoTitle = dynamicPageSlug.seo?.title?.trim() ?? data.product.name;

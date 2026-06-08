@@ -47,7 +47,7 @@ export interface ProductSchemaInput {
   productResponse: ProductResponse;
   productUrl: string;
   baseUrl: string;
-  ratingData: { avgRating: number; reviewCount: number } | null;
+  ratingData: AggregateRatingData | null;
   currency?: string;
   descriptionOverride?: string;
   nameOverride?: string;
@@ -409,15 +409,59 @@ export function buildBrandJsonLdData(input: BrandJsonLdInput): Record<string, un
   };
 }
 
+export type AggregateRatingData = { avgRating: number; reviewCount: number };
+
+/**
+ * Build aggregate rating for schema/UI. Falls back to averaging individual review ratings
+ * when summary average_rating is missing or zero.
+ */
+export function deriveAggregateRating(
+  totalReviews: number,
+  averageRating: number | string | null | undefined,
+  reviews?: Array<{ rating?: number | string | null }>,
+): AggregateRatingData | null {
+  const reviewCount = Math.max(0, Math.floor(Number(totalReviews) || 0));
+  if (reviewCount <= 0) return null;
+
+  let avgRating = parseFloat(String(averageRating ?? "").trim());
+  if (!Number.isFinite(avgRating) || avgRating <= 0) {
+    const ratings = (reviews ?? [])
+      .map((review) => parseFloat(String(review.rating ?? "")))
+      .filter((value) => Number.isFinite(value) && value > 0);
+    if (ratings.length > 0) {
+      avgRating = ratings.reduce((sum, value) => sum + value, 0) / ratings.length;
+    } else {
+      return null;
+    }
+  }
+
+  return { avgRating, reviewCount };
+}
+
+/** Merge rating candidates; prefers the source with the highest review count. */
+export function mergeAggregateRatingData(
+  ...sources: Array<AggregateRatingData | null | undefined>
+): AggregateRatingData | null {
+  const valid = sources.filter(
+    (source): source is AggregateRatingData =>
+      !!source && source.reviewCount > 0 && source.avgRating > 0,
+  );
+  if (!valid.length) return null;
+
+  return valid.reduce((best, current) =>
+    current.reviewCount > best.reviewCount
+      || (current.reviewCount === best.reviewCount && current.avgRating > best.avgRating)
+      ? current
+      : best,
+  );
+}
+
 /**
  * Extract rating summary from review API response for schema (must match UI).
  */
-export function getRatingFromReviewResponse(data: REVIEW_ORDER_RESPONSE | null): { avgRating: number; reviewCount: number } | null {
+export function getRatingFromReviewResponse(data: REVIEW_ORDER_RESPONSE | null): AggregateRatingData | null {
   if (!data) return null;
-  const reviewCount = data.total_reviews ?? 0;
-  if (reviewCount <= 0) return null;
-  const avgRating = parseFloat(String(data.average_rating ?? 0)) || 0;
-  return { avgRating, reviewCount };
+  return deriveAggregateRating(data.total_reviews, data.average_rating, data.reviews);
 }
 
 const VARIANT_OFFERS_DESC = /^the\s+(.+?)\s+offers\s+([\s\S]+)$/i;

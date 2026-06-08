@@ -3,17 +3,17 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, PropsWithChildren } from 'react';
 import { getReviewOrderByProductId } from '../server.actions';
 import { ServerActionStatus } from '../config/app.config';
-import { REVIEWS } from '../config/order.config';
+import { ProductReviewInitialData } from '../product-review-summary';
 
-interface ReviewData {
-  reviews: REVIEWS[];
-  averageRating: number;
-  totalReviews: number;
-  pagination?: {
-    totalPages: number;
-    currentPage: number;
-    limit: number;
-  };
+type ReviewData = ProductReviewInitialData;
+
+const isReviewDebugEnabled = (): boolean =>
+  process.env.NEXT_PUBLIC_DEBUG_PDP_REVIEWS === 'true' ||
+  process.env.NODE_ENV === 'development';
+
+function logClientReview(productId: number, message: string, payload?: Record<string, unknown>): void {
+  if (!isReviewDebugEnabled()) return;
+  console.log(`[PDP Reviews][client] productId=${productId} — ${message}`, payload ?? '');
 }
 
 interface ReviewContextType {
@@ -28,6 +28,7 @@ const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
 
 interface ReviewProviderProps extends PropsWithChildren {
   productId?: number;
+  /** Server-resolved summary so SSR HTML matches JSON-LD review counts */
   initialData?: ReviewData | null;
 }
 
@@ -44,19 +45,30 @@ export const ReviewProvider: React.FC<ReviewProviderProps> = ({
     try {
       setLoading(true);
       setError(null);
-      
+
+      logClientReview(productId, 'fetching review summary via getReviewOrderByProductId');
       const response = await getReviewOrderByProductId(productId, 1, 1);
-      
+
       if (response.status === ServerActionStatus.SUCCESS && response.data) {
-        setReviewData({
+        const next = {
           reviews: response.data.reviews || [],
           averageRating: parseFloat(response.data.average_rating) || 0,
           totalReviews: response.data.total_reviews || 0,
+        };
+        logClientReview(productId, 'review API success', {
+          totalReviews: next.totalReviews,
+          averageRating: next.averageRating,
+          reviewsReturned: next.reviews.length,
         });
+        setReviewData(next);
       } else {
+        logClientReview(productId, 'review API error', {
+          message: response.status === ServerActionStatus.ERROR ? response.message : 'unknown',
+        });
         setError('Failed to fetch review summary');
       }
     } catch (err) {
+      logClientReview(productId, 'review API exception', { error: String(err) });
       setError('An error occurred while fetching review summary');
       console.error('Review summary fetch error:', err);
     } finally {
@@ -93,11 +105,16 @@ export const ReviewProvider: React.FC<ReviewProviderProps> = ({
     }
   }, []);
 
-  // Auto-fetch review summary if productId is provided and no initial data
   useEffect(() => {
-    if (productId && !initialData) {
-      fetchReviewSummary(productId);
+    if (!productId) return;
+    if (initialData) {
+      logClientReview(productId, 'using server initialData (skipping client summary fetch)', {
+        totalReviews: initialData.totalReviews,
+        averageRating: initialData.averageRating,
+      });
+      return;
     }
+    fetchReviewSummary(productId);
   }, [productId, initialData, fetchReviewSummary]);
 
   return (

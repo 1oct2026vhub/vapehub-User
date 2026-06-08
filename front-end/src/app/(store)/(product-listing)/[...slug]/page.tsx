@@ -14,7 +14,6 @@ import JsonLd from "@/components/JsonLd";
 import {
   buildVariantFirstDescription,
   buildVariantFirstTitle,
-  getRatingFromReviewResponse,
   htmlToPlainText,
   toAbsoluteUrl,
 } from "@/lib/seo-schema";
@@ -22,6 +21,7 @@ import {
   getVariantDescriptionFromProductData,
   resolveDisplayDescription,
 } from "@/lib/product-description.utils";
+import { resolvePdpReviewSummary } from "@/lib/product-review-summary";
 import {
   buildProductJsonLdData,
   buildVariantParams,
@@ -203,9 +203,13 @@ const Page = async ({
       variantTermId: variant?.terms?.id,
       categoryId: data.product.category?.id,
     });
-    const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
-      ? getRatingFromReviewResponse(ratingRes.value.data)
-      : null;
+    const { initialData: initialReviewData, ratingData } = resolvePdpReviewSummary({
+      productId: data.product.id,
+      productSlug: data.product.slug,
+      reviewApiResult: ratingRes,
+      product: data.product,
+      reviewApiProductId: entityId,
+    });
 
     const parentPage = primarySlug ? await fetchDynamicPageSlugWithFallback(primarySlug) : null;
     const parentSeoDescription = parentPage?.seo?.description?.trim() ?? "";
@@ -222,7 +226,6 @@ const Page = async ({
       variantRecordDescription,
     );
     const variantTitle = buildVariantFirstTitle(variantName, parentSeoTitle);
-
     const jsonLdData = buildProductJsonLdData({
       baseUrl: BASE_URL,
       data,
@@ -243,6 +246,7 @@ const Page = async ({
           productFaqs={faqs}
           parentSeoDescription={parentSeoDescription}
           parentSeoTitle={parentSeoTitle}
+          initialReviewData={initialReviewData}
         />
       </>
     );
@@ -385,9 +389,13 @@ const Page = async ({
         variantId: data.variants?.[0]?.id,
         categoryId: data.product.category?.id,
       });
-      const ratingData = ratingRes.status === "fulfilled" && ratingRes.value?.status === ServerActionStatus.SUCCESS && ratingRes.value.data
-        ? getRatingFromReviewResponse(ratingRes.value.data)
-        : null;
+      const { initialData: initialReviewData, ratingData } = resolvePdpReviewSummary({
+        productId: data.product.id,
+        productSlug: data.product.slug,
+        reviewApiResult: ratingRes,
+        product: data.product,
+        reviewApiProductId: entityId,
+      });
       const parentSeoDescription = dynamicPageSlug.seo?.description?.trim() ?? "";
       const parentSeoTitle = dynamicPageSlug.seo?.title?.trim() ?? data.product.name;
       const variantHtml = getVariantDescriptionFromProductData(data);
@@ -410,6 +418,7 @@ const Page = async ({
             productFaqs={faqs}
             parentSeoDescription={parentSeoDescription}
             parentSeoTitle={parentSeoTitle}
+            initialReviewData={initialReviewData}
           />
         </>
       );

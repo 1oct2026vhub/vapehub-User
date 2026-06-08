@@ -2,6 +2,11 @@ import type { ProductResponse, ProductVariant } from "@/lib/config/product.confi
 import type { FaqResponse } from "@/lib/config/global.config";
 import type { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
+export type BrandListingProductRef = {
+  name: string;
+  slug: string;
+};
+
 export const SCHEMA_CONTEXT = "https://schema.org";
 
 /** Max length for product schema description (plain text, SEO-friendly). */
@@ -268,6 +273,140 @@ export function dedupeSchemaGraphNodes(
   }
 
   return deduped;
+}
+
+export interface BrandBreadcrumbSchemaInput {
+  baseUrl: string;
+  brandPageUrl: string;
+  brandName: string;
+  brandsLabel?: string;
+  brandsPath?: string;
+}
+
+/** BreadcrumbList JSON-LD: Home -> Brands -> Brand. */
+export function buildBrandBreadcrumbSchema(input: BrandBreadcrumbSchemaInput): Record<string, unknown> {
+  const {
+    baseUrl,
+    brandPageUrl,
+    brandName,
+    brandsLabel = "Brands",
+    brandsPath = "/brands",
+  } = input;
+
+  const homeUrl = baseUrl.replace(/\/$/, "");
+  const brandsUrl = toAbsoluteUrl(baseUrl, brandsPath);
+
+  return {
+    "@id": `${brandPageUrl}#breadcrumb`,
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: homeUrl },
+      { "@type": "ListItem", position: 2, name: brandsLabel, item: brandsUrl },
+      { "@type": "ListItem", position: 3, name: brandName, item: brandPageUrl },
+    ],
+  };
+}
+
+export interface BrandItemListSchemaInput {
+  baseUrl: string;
+  brandPageUrl: string;
+  products: BrandListingProductRef[];
+}
+
+/** ItemList JSON-LD for products on the current brand listing page. */
+export function buildBrandItemListSchema(
+  input: BrandItemListSchemaInput,
+): Record<string, unknown> | null {
+  const { baseUrl, brandPageUrl, products } = input;
+  if (!products.length) return null;
+
+  const itemListId = `${brandPageUrl}#itemlist`;
+
+  return {
+    "@id": itemListId,
+    "@type": "ItemList",
+    itemListElement: products.map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Product",
+        name: product.name,
+        url: toAbsoluteUrl(baseUrl, `/${product.slug}/`),
+      },
+    })),
+  };
+}
+
+export interface BrandCollectionPageSchemaInput {
+  baseUrl: string;
+  brandPageUrl: string;
+  brandName: string;
+  description?: string;
+  itemListId?: string;
+}
+
+/** CollectionPage JSON-LD for brand listing pages. */
+export function buildBrandCollectionPageSchema(
+  input: BrandCollectionPageSchemaInput,
+): Record<string, unknown> {
+  const { baseUrl, brandPageUrl, brandName, description, itemListId } = input;
+  const plainDescription = htmlToPlainText(description ?? "");
+
+  const schema: Record<string, unknown> = {
+    "@id": `${brandPageUrl}#webpage`,
+    "@type": "CollectionPage",
+    name: brandName,
+    url: brandPageUrl,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "VapeHub",
+      url: baseUrl.replace(/\/$/, ""),
+    },
+  };
+
+  if (plainDescription) {
+    schema.description = plainDescription;
+  }
+  if (itemListId) {
+    schema.mainEntity = { "@id": itemListId };
+  }
+
+  return schema;
+}
+
+export interface BrandJsonLdInput {
+  baseUrl: string;
+  brandPageUrl: string;
+  brandName: string;
+  description?: string;
+  products: BrandListingProductRef[];
+}
+
+/** Build brand page JSON-LD: CollectionPage + ItemList + BreadcrumbList @graph. */
+export function buildBrandJsonLdData(input: BrandJsonLdInput): Record<string, unknown> {
+  const { baseUrl, brandPageUrl, brandName, description, products } = input;
+  const itemListSchema = buildBrandItemListSchema({ baseUrl, brandPageUrl, products });
+  const itemListId =
+    itemListSchema && typeof itemListSchema["@id"] === "string"
+      ? itemListSchema["@id"]
+      : undefined;
+
+  const graph = dedupeSchemaGraphNodes([
+    buildBrandCollectionPageSchema({
+      baseUrl,
+      brandPageUrl,
+      brandName,
+      description,
+      itemListId,
+    }),
+    itemListSchema,
+    buildBrandBreadcrumbSchema({ baseUrl, brandPageUrl, brandName }),
+  ]);
+
+  return {
+    "@context": SCHEMA_CONTEXT,
+    "@graph": graph,
+  };
 }
 
 /**

@@ -8,13 +8,14 @@ import { ServerActionStatus } from '@/lib/config/app.config';
 
 interface BannerImageProps {
   banner: BannerResponse;
+  src: string;
   width: number;
   height: number;
   priority?: boolean;
   className?: string;
 }
 
-const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, priority = false, className = '' }) => {
+const BannerImage: React.FC<BannerImageProps> = memo(({ banner, src, width, height, priority = false, className = '' }) => {
   // Determine if this is a square banner based on width and height (for mobile only)
   const isSquare = width === height;
   const aspectClass = isSquare ? 'aspect-square' : 'aspect-video';
@@ -22,7 +23,7 @@ const BannerImage: React.FC<BannerImageProps> = memo(({ banner, width, height, p
   return (
     <Link href={banner.redirect_url}>
       <NoImage
-        src={banner.image_url}
+        src={src}
         alt={banner.alt_text ?? banner.title}
         width={width}
         height={height}
@@ -55,6 +56,7 @@ const PromotionalBanners: React.FC = async () => {
         {sortedBanners[0] && (
           <BannerImage
             banner={sortedBanners[0]}
+            src={sortedBanners[0].image_url}
             width={600}
             height={600}
             priority
@@ -67,6 +69,7 @@ const PromotionalBanners: React.FC = async () => {
             <BannerImage
               key={`desktop-banner-${banner.title}-${index}`}
               banner={banner}
+              src={banner.image_url}
               width={662}
               height={274}
               className='h-full rounded-md md:rounded-lg max-h-[334px]'
@@ -79,6 +82,7 @@ const PromotionalBanners: React.FC = async () => {
         {sortedBanners[0] && (
           <BannerImage
             banner={sortedBanners[0]}
+            src={sortedBanners[0].image_url_low || sortedBanners[0].image_url}
             width={361}
             height={361}
             priority
@@ -89,6 +93,7 @@ const PromotionalBanners: React.FC = async () => {
           <BannerImage
             key={`mobile-banner-${banner.title}-${index}`}
             banner={banner}
+            src={banner.image_url_low || banner.image_url}
             width={361}
             height={274}
             className='max-h-[274px] rounded-md md:rounded-lg'

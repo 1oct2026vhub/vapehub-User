@@ -129,6 +129,14 @@ export type ProductReview = {
     } | null;
 };
 
+export type ProductReviewStats = {
+    average_rating: number | string;
+    total_reviews: number;
+    rating_distribution: Record<string | number, number>;
+    verified_reviews: number;
+    testimonials: number;
+};
+
 export interface Product {
     id: number;
     name: string;
@@ -154,13 +162,7 @@ export interface Product {
     out_of_stock?: boolean;
     is_discontinued?: boolean;
     reviews?: ProductReview[];
-    review_stats?: {
-        average_rating: number | string;
-        total_reviews: number;
-        rating_distribution: Record<string | number, number>;
-        verified_reviews: number;
-        testimonials: number;
-    };
+    review_stats?: ProductReviewStats;
 }
 
 export interface SimilarProduct extends Product {
@@ -327,6 +329,7 @@ export interface ProductViewDetails {
     loyaltyPoints?: LoyaltyPoints | null;
     puff_count?: number | string;
     is_discontinued?: boolean;
+    review_stats?: ProductReviewStats;
 };
 
 export interface AppliedFilters {

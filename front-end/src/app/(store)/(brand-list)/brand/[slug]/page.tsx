@@ -9,6 +9,9 @@ import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import { Product, ProductReview } from '@/lib/config/product.config';
+import JsonLd from '@/components/JsonLd';
+import { buildBrandJsonLdData, toAbsoluteUrl } from '@/lib/seo-schema';
+import { resolveSiteUrl } from '@/lib/site-url';
 interface Props {
   params: Promise<RouteParams>; 
   searchParams: Promise<Record<string, string>>
@@ -108,8 +111,31 @@ const BrandPage: NextPage<Props> = async ({
       }
     })) : [];
 
+    const baseUrl = resolveSiteUrl();
+    const brandPageUrl = toAbsoluteUrl(baseUrl, `/brand/${slug}/`);
+    const seoTitleCandidate = dynamicPageSlug?.seo?.title?.trim();
+    const brandName =
+      seoTitleCandidate || dynamicPageSlug?.name || brandProduct.name || slug;
+    const description =
+      dynamicPageSlug?.seo?.description?.trim() ||
+      brandProduct.description?.trim() ||
+      "";
+    const jsonLdData = buildBrandJsonLdData({
+      baseUrl,
+      brandPageUrl,
+      brandName,
+      description,
+      products: (brandProduct.products ?? []).map((product) => ({
+        name: product.name,
+        slug: product.slug,
+      })),
+    });
+
     return (
-      <BrandProducts data={brandProduct} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
+      <>
+        <JsonLd data={jsonLdData} />
+        <BrandProducts data={brandProduct} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
+      </>
     );
   }
   return <PageNotFound />;

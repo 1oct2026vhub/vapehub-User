@@ -2,6 +2,11 @@ import type { ProductResponse, ProductVariant } from "@/lib/config/product.confi
 import type { FaqResponse } from "@/lib/config/global.config";
 import type { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
+export type BrandListingProductRef = {
+  name: string;
+  slug: string;
+};
+
 export const SCHEMA_CONTEXT = "https://schema.org";
 
 /** Max length for product schema description (plain text, SEO-friendly). */
@@ -42,7 +47,7 @@ export interface ProductSchemaInput {
   productResponse: ProductResponse;
   productUrl: string;
   baseUrl: string;
-  ratingData: { avgRating: number; reviewCount: number } | null;
+  ratingData: AggregateRatingData | null;
   currency?: string;
   descriptionOverride?: string;
   nameOverride?: string;
@@ -270,15 +275,193 @@ export function dedupeSchemaGraphNodes(
   return deduped;
 }
 
+export interface BrandBreadcrumbSchemaInput {
+  baseUrl: string;
+  brandPageUrl: string;
+  brandName: string;
+  brandsLabel?: string;
+  brandsPath?: string;
+}
+
+/** BreadcrumbList JSON-LD: Home -> Brands -> Brand. */
+export function buildBrandBreadcrumbSchema(input: BrandBreadcrumbSchemaInput): Record<string, unknown> {
+  const {
+    baseUrl,
+    brandPageUrl,
+    brandName,
+    brandsLabel = "Brands",
+    brandsPath = "/brands",
+  } = input;
+
+  const homeUrl = baseUrl.replace(/\/$/, "");
+  const brandsUrl = toAbsoluteUrl(baseUrl, brandsPath);
+
+  return {
+    "@id": `${brandPageUrl}#breadcrumb`,
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: homeUrl },
+      { "@type": "ListItem", position: 2, name: brandsLabel, item: brandsUrl },
+      { "@type": "ListItem", position: 3, name: brandName, item: brandPageUrl },
+    ],
+  };
+}
+
+export interface BrandItemListSchemaInput {
+  baseUrl: string;
+  brandPageUrl: string;
+  products: BrandListingProductRef[];
+}
+
+/** ItemList JSON-LD for products on the current brand listing page. */
+export function buildBrandItemListSchema(
+  input: BrandItemListSchemaInput,
+): Record<string, unknown> | null {
+  const { baseUrl, brandPageUrl, products } = input;
+  if (!products.length) return null;
+
+  const itemListId = `${brandPageUrl}#itemlist`;
+
+  return {
+    "@id": itemListId,
+    "@type": "ItemList",
+    itemListElement: products.map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Product",
+        name: product.name,
+        url: toAbsoluteUrl(baseUrl, `/${product.slug}/`),
+      },
+    })),
+  };
+}
+
+export interface BrandCollectionPageSchemaInput {
+  baseUrl: string;
+  brandPageUrl: string;
+  brandName: string;
+  description?: string;
+  itemListId?: string;
+}
+
+/** CollectionPage JSON-LD for brand listing pages. */
+export function buildBrandCollectionPageSchema(
+  input: BrandCollectionPageSchemaInput,
+): Record<string, unknown> {
+  const { baseUrl, brandPageUrl, brandName, description, itemListId } = input;
+  const plainDescription = htmlToPlainText(description ?? "");
+
+  const schema: Record<string, unknown> = {
+    "@id": `${brandPageUrl}#webpage`,
+    "@type": "CollectionPage",
+    name: brandName,
+    url: brandPageUrl,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "VapeHub",
+      url: baseUrl.replace(/\/$/, ""),
+    },
+  };
+
+  if (plainDescription) {
+    schema.description = plainDescription;
+  }
+  if (itemListId) {
+    schema.mainEntity = { "@id": itemListId };
+  }
+
+  return schema;
+}
+
+export interface BrandJsonLdInput {
+  baseUrl: string;
+  brandPageUrl: string;
+  brandName: string;
+  description?: string;
+  products: BrandListingProductRef[];
+}
+
+/** Build brand page JSON-LD: CollectionPage + ItemList + BreadcrumbList @graph. */
+export function buildBrandJsonLdData(input: BrandJsonLdInput): Record<string, unknown> {
+  const { baseUrl, brandPageUrl, brandName, description, products } = input;
+  const itemListSchema = buildBrandItemListSchema({ baseUrl, brandPageUrl, products });
+  const itemListId =
+    itemListSchema && typeof itemListSchema["@id"] === "string"
+      ? itemListSchema["@id"]
+      : undefined;
+
+  const graph = dedupeSchemaGraphNodes([
+    buildBrandCollectionPageSchema({
+      baseUrl,
+      brandPageUrl,
+      brandName,
+      description,
+      itemListId,
+    }),
+    itemListSchema,
+    buildBrandBreadcrumbSchema({ baseUrl, brandPageUrl, brandName }),
+  ]);
+
+  return {
+    "@context": SCHEMA_CONTEXT,
+    "@graph": graph,
+  };
+}
+
+export type AggregateRatingData = { avgRating: number; reviewCount: number };
+
+/**
+ * Build aggregate rating for schema/UI. Falls back to averaging individual review ratings
+ * when summary average_rating is missing or zero.
+ */
+export function deriveAggregateRating(
+  totalReviews: number,
+  averageRating: number | string | null | undefined,
+  reviews?: Array<{ rating?: number | string | null }>,
+): AggregateRatingData | null {
+  const reviewCount = Math.max(0, Math.floor(Number(totalReviews) || 0));
+  if (reviewCount <= 0) return null;
+
+  let avgRating = parseFloat(String(averageRating ?? "").trim());
+  if (!Number.isFinite(avgRating) || avgRating <= 0) {
+    const ratings = (reviews ?? [])
+      .map((review) => parseFloat(String(review.rating ?? "")))
+      .filter((value) => Number.isFinite(value) && value > 0);
+    if (ratings.length > 0) {
+      avgRating = ratings.reduce((sum, value) => sum + value, 0) / ratings.length;
+    } else {
+      return null;
+    }
+  }
+
+  return { avgRating, reviewCount };
+}
+
+/** Merge rating candidates; prefers the source with the highest review count. */
+export function mergeAggregateRatingData(
+  ...sources: Array<AggregateRatingData | null | undefined>
+): AggregateRatingData | null {
+  const valid = sources.filter(
+    (source): source is AggregateRatingData =>
+      !!source && source.reviewCount > 0 && source.avgRating > 0,
+  );
+  if (!valid.length) return null;
+
+  return valid.reduce((best, current) =>
+    current.reviewCount > best.reviewCount
+      || (current.reviewCount === best.reviewCount && current.avgRating > best.avgRating)
+      ? current
+      : best,
+  );
+}
+
 /**
  * Extract rating summary from review API response for schema (must match UI).
  */
-export function getRatingFromReviewResponse(data: REVIEW_ORDER_RESPONSE | null): { avgRating: number; reviewCount: number } | null {
+export function getRatingFromReviewResponse(data: REVIEW_ORDER_RESPONSE | null): AggregateRatingData | null {
   if (!data) return null;
-  const reviewCount = data.total_reviews ?? 0;
-  if (reviewCount <= 0) return null;
-  const avgRating = parseFloat(String(data.average_rating ?? 0)) || 0;
-  return { avgRating, reviewCount };
+  return deriveAggregateRating(data.total_reviews, data.average_rating, data.reviews);
 }
 
 const VARIANT_OFFERS_DESC = /^the\s+(.+?)\s+offers\s+([\s\S]+)$/i;

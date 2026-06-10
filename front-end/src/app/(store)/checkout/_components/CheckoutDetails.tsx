@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm, useWatch, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -15,7 +15,7 @@ import { SHIPPING_METHOD_DATA, ORDER_RESPONSE_DATA, GuestCheckoutResponseData } 
 import InputForm from '@/components/InputForm';
 import CustomCheckbox from '@/components/FormCheckbox';
 import { CustomRadio } from '@/components/CustomRadio';
-import { Button, RadioGroup, useDisclosure } from '@nextui-org/react';
+import { Button, RadioGroup, Spinner, useDisclosure } from '@nextui-org/react';
 import { Form } from '@/components/ui/Form';
 import { useCheckout } from '@/lib/context/CheckoutContext';
 import { useCart } from '@/lib/context/CartContext';
@@ -97,7 +97,13 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
+    const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+    const isSubmittingOrderRef = useRef(false);
     const onSubmit = async (data: CHECKOUT_FORM_TYPE) => {
+        if (isSubmittingOrderRef.current || isProcessing) return;
+        isSubmittingOrderRef.current = true;
+        setIsSubmittingOrder(true);
+        try {
         // Validate cart items before proceeding with order
         const isCartValid = await validateCartItems();
          
@@ -270,8 +276,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         } else {
            toast.error(response.message);
         }
-         
-
+        } finally {
+            isSubmittingOrderRef.current = false;
+            setIsSubmittingOrder(false);
+        }
     };
 
     const handleAddressSelect = useCallback((address: Address) => {
@@ -744,10 +752,17 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                 radius="md"
                                 color="primary"
                                 className="w-full btn primary-btn shadow-button !text-skin-white !rounded-md text-content-1 md:text-2xl uppercase !py-1.5 !px-3"
-                                isLoading={isProcessing}
+                                isDisabled={isProcessing || isSubmittingOrder}
 
                             >
-                                Place Order Now
+                                {isProcessing || isSubmittingOrder ? (
+                                    <span className='flex items-center justify-center gap-2'>
+                                        <Spinner size="sm" color="current" />
+                                        <span>Processing...</span>
+                                    </span>
+                                ) : (
+                                    'Place Order Now'
+                                )}
                             </Button>
                             <p className='text-content-2 lg:text-title-2 text-skin-neutral-300 font-semibold'>We Respect Your Privacy & Information</p>
                             <div className='flex items-center gap-5 flex-wrap justify-center'>

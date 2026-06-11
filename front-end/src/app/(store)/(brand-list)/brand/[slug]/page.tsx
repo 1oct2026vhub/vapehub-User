@@ -2,12 +2,12 @@ import { AsyncReactElement, RouteParams, ServerActionResponse, ServerActionStatu
 import { NextPage } from 'next';
 import React from 'react';
 import BrandProducts from '../_components/BrandProducts';
-import { getProductByBrand, getDynamicPageSlug } from '@/lib/server.actions';
+import { getProductByBrand, getDynamicPageSlug, getFaqs } from '@/lib/server.actions';
 import { redirect } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
-import { DynamicPageSlugResponse } from '@/lib/config/global.config';
+import { DynamicPageSlugResponse, FaqResponse } from '@/lib/config/global.config';
 import { Product, ProductReview } from '@/lib/config/product.config';
 import JsonLd from '@/components/JsonLd';
 import { buildBrandJsonLdData, toAbsoluteUrl } from '@/lib/seo-schema';
@@ -131,10 +131,17 @@ const BrandPage: NextPage<Props> = async ({
       })),
     });
 
+    const brandFaqs = await fetchBrandFaqs(brandProduct.id);
+
     return (
       <>
         <JsonLd data={jsonLdData} />
-        <BrandProducts data={brandProduct} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
+        <BrandProducts
+          data={brandProduct}
+          reviews={reviews}
+          dynamicPageSlug={dynamicPageSlug}
+          brandFaqs={brandFaqs}
+        />
       </>
     );
   }
@@ -159,6 +166,14 @@ const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
     return null;
   }
   return response.data;
+};
+
+const fetchBrandFaqs = async (brandId: number): Promise<FaqResponse[]> => {
+  const response = await getFaqs("brand", brandId);
+  if (response.status === ServerActionStatus.ERROR) {
+    return [];
+  }
+  return response.data ?? [];
 };
 
 function normalizeRedirectUrl(input?: string): string | null {

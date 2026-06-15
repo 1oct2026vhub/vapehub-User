@@ -1,11 +1,9 @@
 import { z } from 'zod'
-import type { CHECKOUT_FORM_TYPE, CHECKOUT_PAYLOAD } from '@/lib/config/checkout.config'
-import { getDefaultCheckoutPaymentMethod } from '@/lib/config/checkout.config'
-import type { GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config'
+import type { CHECKOUT_FORM_TYPE } from '@/lib/config/checkout.config'
+import type { CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD } from '@/lib/config/checkout.config'
 import { DEFAULT_COUNTRY } from '@/lib/utils/address.utils'
 import { orderMeetsFreeShippingThreshold } from '@/lib/utils'
-import type { ORDER, REFERRAL, SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
-import type { Address } from '@/lib/config/user.config'
+import type { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
 
 /** Slice of coupon state used for order totals (matches CartContext / CartTotal shape). */
 export type CheckoutCouponSlice = {
@@ -134,82 +132,6 @@ const worldPayOrderDataSchema = z.object({
 export function parseWorldPayPlaceOrderData(data: unknown): { order_code: string; worldpay_url: string } | null {
   const r = worldPayOrderDataSchema.safeParse(data)
   return r.success ? r.data : null
-}
-
-function mapOrderAddressToPayload(
-  address: ORDER['orderShippingAddress'] | ORDER['orderBillingAddress']
-): CHECKOUT_PAYLOAD['shipping_address'] {
-  return {
-    first_name: address.name,
-    last_name: address.last_name,
-    address_line_1: address.street,
-    city: address.town,
-    region: address.region || '',
-    country: address.country || DEFAULT_COUNTRY,
-    post_code: address.post_code,
-  }
-}
-
-function orderAddressesMatch(
-  shipping: ORDER['orderShippingAddress'],
-  billing: ORDER['orderBillingAddress']
-): boolean {
-  return (
-    shipping.name === billing.name &&
-    shipping.last_name === billing.last_name &&
-    shipping.street === billing.street &&
-    shipping.town === billing.town &&
-    shipping.post_code === billing.post_code &&
-    shipping.region === billing.region &&
-    shipping.country === billing.country
-  )
-}
-
-function findShippingAddressId(order: ORDER, addresses?: Address[]): number {
-  if (!addresses?.length) return 0
-
-  const shipping = order.orderShippingAddress
-  const match = addresses.find(
-    (address) =>
-      address.name === shipping.name &&
-      address.last_name === shipping.last_name &&
-      address.street === shipping.street &&
-      address.town === shipping.town &&
-      address.post_code === shipping.post_code &&
-      address.region === shipping.region &&
-      address.country === shipping.country
-  )
-
-  return match?.id ?? 0
-}
-
-/** Build POST /api/order payload from an existing pending order (Pay Now flow). */
-export function buildPlaceOrderPayloadFromOrder(
-  order: ORDER,
-  options?: { referral?: REFERRAL | null; userAddresses?: Address[] }
-): CHECKOUT_PAYLOAD {
-  const shippingAddress = mapOrderAddressToPayload(order.orderShippingAddress)
-  const billingAddress = mapOrderAddressToPayload(order.orderBillingAddress)
-  const useShippingAsBilling = orderAddressesMatch(
-    order.orderShippingAddress,
-    order.orderBillingAddress
-  )
-
-  return {
-    email: order.email,
-    phone: order.phone,
-    receive_promotions: false,
-    shipping_address_id: findShippingAddressId(order, options?.userAddresses),
-    couponCode: options?.referral?.coupon_code || undefined,
-    shipping_method_id: order.shippingMethod.id,
-    shipping_address: shippingAddress,
-    billing_address: billingAddress,
-    useShippingAsBilling,
-    payment_method: {
-      method: getDefaultCheckoutPaymentMethod(),
-    },
-    total: parseApiMoney(order.total),
-  }
 }
 
 type EnabledShippingOptions = {

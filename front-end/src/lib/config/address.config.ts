@@ -29,12 +29,7 @@ export const addressSchema = z.object({
       message: "Town/City cannot be only whitespace"
     }),
 
-  region: z.string()
-    .min(1, "Region is required")
-    .max(50, "Region must not exceed 50 characters")
-    .refine((val) => val.trim().length > 0, {
-      message: "Region cannot be only whitespace"
-    }),
+  region: z.string().optional(),
   post_code: z.string()
     .min(1, "Postcode is required")
     .max(20, "Postcode must not exceed 20 characters")

@@ -37,7 +37,12 @@ const OrdersListingPage: NextPage<{ params: Promise<{ id: string }> }> = async (
                 <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>My Order</h1>
                 {
                     result.order.status === ORDER_STATUS.PENDING && (
-                       <OrderPaymentAction orderId={Number(id)} />
+                       <OrderPaymentAction
+                           orderId={Number(id)}
+                           order={result.order}
+                           referral={result.referral}
+                           userAddresses={result.user?.UserAddresses}
+                       />
                     )
                 }
             </div>

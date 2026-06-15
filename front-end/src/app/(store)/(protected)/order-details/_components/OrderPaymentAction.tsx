@@ -59,14 +59,14 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
     return (
         <>
             <div className='flex items-center gap-4'>
-                <Button
+                {/* <Button
                     size='md'
                     radius='sm'
                     color='primary'
                     onPress={payNow}
                     isLoading={isLoading}
                     isDisabled={isLoading}
-                >Pay Now</Button>
+                >Pay Now</Button> */}
                 {/* <Button
                     size='md'
                     radius='sm'

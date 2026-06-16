@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
+import {
+  applyListingEdgeCacheHeaders,
+  shouldApplyListingEdgeCache,
+} from '@/lib/edge-cache'
 import { ROUTES } from '@/lib/routes'
 import { tryPrerenderResponse } from '@/lib/prerender'
 
@@ -111,10 +115,25 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  const listingEntityType = slugResult.type === 'next' ? slugResult.entityType : undefined
+  if (
+    shouldApplyListingEdgeCache(
+      request,
+      listingEntityType,
+      slugResult.type,
+      response.status,
+    )
+  ) {
+    applyListingEdgeCacheHeaders(response)
+  }
+
   return response
 }
 
-type SlugResult = { type: 'next' } | { type: 'redirect'; url: URL; temporary?: boolean } | { type: 'not-found' }
+type SlugResult =
+  | { type: 'next'; entityType?: string }
+  | { type: 'redirect'; url: URL; temporary?: boolean }
+  | { type: 'not-found' }
 
 async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   if (request.method !== 'GET' && request.method !== 'HEAD') return { type: 'next' }
@@ -161,7 +180,9 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
           return { type: 'redirect', url, temporary }
         }
       }
-      return { type: 'next' }
+      const entityType =
+        typeof json.data?.entity_type === 'string' ? json.data.entity_type : undefined
+      return { type: 'next', entityType }
     } catch {
       return { type: 'next' }
     }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import { ROUTES } from '@/lib/routes'
+import { tryPrerenderResponse } from '@/lib/prerender'
 
 // Response typing for slug-relation API
 type SlugData = {
@@ -49,6 +50,12 @@ export async function middleware(request: NextRequest) {
     /\.[a-zA-Z0-9]+$/.test(pathname) // any file extension (e.g. .png, .css, .js)
   ) {
     return NextResponse.next()
+  }
+
+  // Prerender.io: serve pre-rendered HTML to search/social/AI crawlers (official Next.js integration).
+  const prerenderResponse = await tryPrerenderResponse(request)
+  if (prerenderResponse) {
+    return prerenderResponse
   }
 
   // Check if the current path is in the protected routes

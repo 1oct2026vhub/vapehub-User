@@ -28,3 +28,20 @@ export const resolveSiteUrl = (): string => {
 
   return LOCAL_FALLBACK_URL;
 };
+
+/** Public storefront URL for crawlers (prefers NEXT_PUBLIC_* over NEXTAUTH_URL). */
+export const resolvePublicSiteUrl = (): string => {
+  const candidates = [
+    process.env.NEXT_PUBLIC_AUTH_URL,
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.NEXTAUTH_URL,
+    process.env.VERCEL_URL,
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = normalizeUrl(candidate);
+    if (normalized) return normalized;
+  }
+
+  return LOCAL_FALLBACK_URL;
+};

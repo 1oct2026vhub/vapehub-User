@@ -7,15 +7,16 @@ import { ROUTES } from '@/lib/routes';
 import React, { ReactElement } from 'react';
 import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
-import { DynamicPageSlugResponse } from '@/lib/config/global.config';
+import { DynamicPageSlugResponse, FaqResponse } from '@/lib/config/global.config';
 
 type BrandProps = {
     data: BrandByProductResponse;
     reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
     dynamicPageSlug?: DynamicPageSlugResponse;
+    brandFaqs?: FaqResponse[];
 }
 
-const BrandProducts: React.FC<BrandProps> = ({ data, reviews, dynamicPageSlug }): ReactElement => {
+const BrandProducts: React.FC<BrandProps> = ({ data, reviews, dynamicPageSlug, brandFaqs = [] }): ReactElement => {
     const brandName = data.name || dynamicPageSlug?.name || "";
     const breadcrumbs = [
         { label: "Home", href: "/" },
@@ -36,9 +37,11 @@ const BrandProducts: React.FC<BrandProps> = ({ data, reviews, dynamicPageSlug })
                 <h2 className="sr-only">{`Shop ${brandName} Products`}</h2>
                 <ProductList data={data} reviews={reviews} />
             </section>
-            <section className="product-listing-container">
-                <FAQSection type="brand" id={data.id} title="FAQs" />
-            </section>
+            {brandFaqs.length > 0 && (
+                <section className="product-listing-container">
+                    <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} />
+                </section>
+            )}
         </div>
 
     );

@@ -82,7 +82,7 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
         street: addressData.street,
         apartment: addressData.apartment || '',
         town: addressData.town, 
-        region: addressData.region,
+        region: addressData.region || '',
         post_code: addressData.post_code,
         phone: addressData.phone || '',
       };
@@ -122,7 +122,7 @@ export const AddressProvider: React.FC<AddressProviderProps> = ({ children }) =>
         town: addressData.town, 
         post_code: addressData.post_code,
         phone: addressData.phone || '',
-        region: addressData.region,
+        region: addressData.region || '',
       };
       
       const response = await updateUserAddress(id, payload);

@@ -27,7 +27,7 @@ import {
 import { ReferralStatsResponse } from "./config/referral.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
-import { handleRequest, PRODUCT_VARIANT_FILTER_TIMEOUT_MS } from "./request.config";
+import { handleRequest } from "./request.config";
 import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_DESCRIPTION_QUERY, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD, WORLDPAY_PAYMENT_PAYLOAD, WORLDPAY_PAYMENT_SUCCESS_RESPONSE, WORLDPAY_PAYMENT_CANCEL_RESPONSE } from '@/lib/api-routes';
 
 export const signInAction = async (
@@ -189,7 +189,6 @@ export const getProductVariantByID = async (payload: PRODUCT_VARIANT_PAYLOAD): P
     endpoint: API_ROUTES.GET_PRODUCT_VARIANT_BY_ID,
     payload,
     method: 'POST',
-    timeoutMs: PRODUCT_VARIANT_FILTER_TIMEOUT_MS,
   });
 };
 

@@ -26,27 +26,35 @@ type HandleRequest<G> =
 
     const MAX_RETRIES = 1;
     const RETRY_DELAY = 1000; // in milliseconds
-    const REQUEST_TIMEOUT_MS = 5000;
+    const REQUEST_TIMEOUT_MS = 20000;
 
-/** filter-variants can return large variant sets and exceed the default 5s timeout. */
-export const PRODUCT_VARIANT_FILTER_TIMEOUT_MS = 20_000;
+const fetchWithRetry = async (
+  input: RequestInfo,
+  init: RequestInit | undefined,
+  retries: number,
+  timeoutMs: number
+): Promise<Response> => {
+  const executeFetch = () =>
+    fetch(input, {
+      ...init,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
 
-    const fetchWithRetry = async (input: RequestInfo, init?: RequestInit, retries = MAX_RETRIES): Promise<Response> => {
-      try {
-        const response = await fetch(input, init);
-        if (!response.ok && retries > 0) {
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-          return fetchWithRetry(input, init, retries - 1);
-        }
-        return response;
-      } catch (error) {
-        if (retries > 0) {
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-          return fetchWithRetry(input, init, retries - 1);
-        }
-        throw error;
-      }
-    };
+  try {
+    const response = await executeFetch();
+    if (!response.ok && retries > 0) {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+      return fetchWithRetry(input, init, retries - 1, timeoutMs);
+    }
+    return response;
+  } catch (error) {
+    if (retries > 0) {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+      return fetchWithRetry(input, init, retries - 1, timeoutMs);
+    }
+    throw error;
+  }
+};
 // * API helper functions
 export const handleRequest = async <T, G>(
     requestData: HandleRequest<G>
@@ -69,15 +77,20 @@ export const handleRequest = async <T, G>(
         : undefined;
     try {
       const headers = await buildHeaders(requestData, canCache);
-      
-      const response = await fetchWithRetry(endpoint, {
-        method,
-        headers,
-        body: buildRequestBody(requestData),
-        signal: AbortSignal.timeout(timeoutMs ?? REQUEST_TIMEOUT_MS),
-        cache: resolvedCache,
-        next: resolvedNext,
-      }, retries);
+      const resolvedTimeoutMs = timeoutMs ?? REQUEST_TIMEOUT_MS;
+
+      const response = await fetchWithRetry(
+        endpoint,
+        {
+          method,
+          headers,
+          body: buildRequestBody(requestData),
+          cache: resolvedCache,
+          next: resolvedNext,
+        },
+        retries,
+        resolvedTimeoutMs
+      );
           
       const responseJson = await response.json();
 

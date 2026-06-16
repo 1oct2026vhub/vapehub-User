@@ -144,8 +144,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
           control={form.control}
           name="region"
           label="Region"
-          placeholder="Enter your region"
-          isRequired
+          placeholder="Enter your region (optional)"
           className="w-full"
         />
         <InputForm

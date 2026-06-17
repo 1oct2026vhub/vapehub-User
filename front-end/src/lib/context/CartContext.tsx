@@ -310,19 +310,20 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     }
   }, [isAuthenticated, calculateGuestDealsAndTotals, calculateTotals]);
-  
-  useEffect(() => {
+
+  const refreshLoyaltyPoints = useCallback(async () => {
     if (!isAuthenticated) return;
 
-    const fetchLoyaltyPoints = async () => {
-      const response = await getLoyaltyPointsRedemption();
+    const response = await getLoyaltyPointsRedemption();
 
-      if (response.status === ServerActionStatus.SUCCESS) {
-        setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));
-      }
-    };
-    fetchLoyaltyPoints();
+    if (response.status === ServerActionStatus.SUCCESS) {
+      setLoyaltyRedemption((prev) => ({ ...prev, pointsData: response.data }));
+    }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    void refreshLoyaltyPoints();
+  }, [refreshLoyaltyPoints]);
 
   /** When cart total drops below `minimum_order_value_to_redeem`, remove applied loyalty and toast. */
   useEffect(() => {
@@ -985,7 +986,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     deleteCookie(CART_COOKIE_NAME);
     deleteCookie('couponDiscount');
     deleteCookie(LOYALTY_COOKIE_NAME);
-  }, [loyaltyRedemption.pointsData, couponDiscount.mailSubscriptionData]);
+    void refreshLoyaltyPoints();
+  }, [loyaltyRedemption.pointsData, couponDiscount.mailSubscriptionData, refreshLoyaltyPoints]);
 
   useEffect(() => {
     if (prevSessionRef.current?.user?.id && prevSessionRef.current.user.id !== session?.user?.id) {

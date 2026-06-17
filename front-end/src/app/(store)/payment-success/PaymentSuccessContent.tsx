@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ROUTES } from '@/lib/routes'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
@@ -36,6 +36,8 @@ const PaymentSuccessContent = () => {
     currencyLabel: DEFAULT_CURRENCY_SYMBOL,
   })
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(true)
+  const clearCartRef = useRef(clearCart)
+  clearCartRef.current = clearCart
 
   useEffect(() => {
     return () => {
@@ -104,7 +106,7 @@ const PaymentSuccessContent = () => {
 
             if (worldpayResponse && typeof worldpayResponse === 'object') {
               if (worldpayResponse.status === ServerActionStatus.SUCCESS) {
-                clearCart()
+                clearCartRef.current()
                 toast.success('Payment processed successfully!')
               } else {
                 const isStockValidationError =
@@ -112,7 +114,7 @@ const PaymentSuccessContent = () => {
                   worldpayResponse.message?.includes('Validation min on stock')
 
                 if (isStockValidationError) {
-                  clearCart()
+                  clearCartRef.current()
                   toast.success('Payment completed successfully! (Stock validation completed)')
                 } else {
                   toast.error(
@@ -145,7 +147,7 @@ const PaymentSuccessContent = () => {
 
             if (response && typeof response === 'object') {
               if (response.status === ServerActionStatus.SUCCESS) {
-                clearCart()
+                clearCartRef.current()
                 toast.success('Payment processed successfully!')
                 const newTransactionDetails = {
                   id: transactionId,
@@ -220,7 +222,7 @@ const PaymentSuccessContent = () => {
     return () => {
       cancelled = true
     }
-  }, [queryKey, clearCart])
+  }, [queryKey])
 
   if (isVerifyingPayment) {
     return (

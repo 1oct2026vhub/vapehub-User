@@ -961,18 +961,18 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCartSubtotal(0);
     setCartDiscount(0);
     setItemCount(0);
-    setCouponDiscount({
+    setCouponDiscount((prev) => ({
       value: 0,
       isApplied: false,
       code: null,
       message: null,
       discountValue: '',
-      mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
+      mailSubscriptionData: prev.mailSubscriptionData,
       mailSubscriptionDiscount: undefined,
-    });
-    setLoyaltyRedemption({
+    }));
+    setLoyaltyRedemption((prev) => ({
       isRedeemed: false,
-      pointsData: loyaltyRedemption.pointsData, // Preserve points data
+      pointsData: prev.pointsData,
       discountValue: 0,
       message: null,
       pointsToRedeem: null,
@@ -981,13 +981,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       applyCouponMailSubscriptionDiscount: null,
       applyCouponIsPaymentRequired: null,
       applyCouponTotal: null,
-    });
+    }));
     removeGuestCart();
     deleteCookie(CART_COOKIE_NAME);
     deleteCookie('couponDiscount');
     deleteCookie(LOYALTY_COOKIE_NAME);
     void refreshLoyaltyPoints();
-  }, [loyaltyRedemption.pointsData, couponDiscount.mailSubscriptionData, refreshLoyaltyPoints]);
+  }, [refreshLoyaltyPoints]);
 
   useEffect(() => {
     if (prevSessionRef.current?.user?.id && prevSessionRef.current.user.id !== session?.user?.id) {

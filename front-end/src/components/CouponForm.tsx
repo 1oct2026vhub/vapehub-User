@@ -14,6 +14,7 @@ import { Form } from './ui/Form'
 import InputForm from './InputForm'
 import { useCart } from '@/lib/context/CartContext'
 import { CouponResponse } from '@/lib/config/order.config'
+import { parseIsPaymentRequiredFromApplyCouponResponse } from '@/lib/utils/checkout-order.utils'
 
 interface CouponFormProps {
     onCouponApplied: (discount: {
@@ -32,6 +33,7 @@ interface CouponFormProps {
             isDiscountUsed: boolean;
         };
         mailSubscriptionDiscount?: number;
+        isPaymentRequired?: boolean | null;
     }) => void;
     initialCouponCode?: string;
     cartTotal: number;
@@ -141,7 +143,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     subTotal: apiSubTotal,
                     total: apiTotal,
                     mailSubscriptionData: couponData.mail_subscription_data,
-                    mailSubscriptionDiscount: mailSubscriptionDiscountValue
+                    mailSubscriptionDiscount: mailSubscriptionDiscountValue,
+                    isPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(couponData),
                 });
             } else {
                 toast.error(response.message);
@@ -154,7 +157,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     message: null,
                     discountValue: '',
                     mailSubscriptionData: undefined,
-                    mailSubscriptionDiscount: undefined
+                    mailSubscriptionDiscount: undefined,
+                    isPaymentRequired: null,
                 });
             }
         } else {
@@ -214,7 +218,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     subTotal: apiSubTotal,
                     total: apiTotal,
                     mailSubscriptionData: couponData.mail_subscription_data,
-                    mailSubscriptionDiscount: mailSubscriptionDiscountValue
+                    mailSubscriptionDiscount: mailSubscriptionDiscountValue,
+                    isPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(couponData),
                 });
             } else {
                 toast.error(response.message);
@@ -227,7 +232,8 @@ const CouponForm: React.FC<CouponFormProps> = ({ onCouponApplied, initialCouponC
                     message: null,
                     discountValue: '',
                     mailSubscriptionData: undefined,
-                    mailSubscriptionDiscount: undefined
+                    mailSubscriptionDiscount: undefined,
+                    isPaymentRequired: null,
                 });
             }
         }

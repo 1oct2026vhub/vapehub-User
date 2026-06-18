@@ -10,9 +10,19 @@ interface ShippingProgressProps {
     totalAmount?: number;
     freeShippingThreshold?: number;
     shippingCost?: number;
+    /**
+     * Checkout loyalty only: last apply-coupon returned £0 shipping — show qualified copy even when
+     * basket total is below the catalog free-shipping threshold.
+     */
+    loyaltyApplyCouponZeroShipping?: boolean;
 }
 
-const ShippingProgress: React.FC<ShippingProgressProps> = ({ totalAmount, freeShippingThreshold, shippingCost = 0 }) => {
+const ShippingProgress: React.FC<ShippingProgressProps> = ({
+    totalAmount,
+    freeShippingThreshold,
+    shippingCost = 0,
+    loyaltyApplyCouponZeroShipping = false,
+}) => {
     const { cartItems, cartTotal } = useCart();
     const calculatedTotalPrice = cartItems.reduce((acc: number, item: CartItem) => acc + parseFloat(item.price) * item.quantity, 0);
 
@@ -20,20 +30,25 @@ const ShippingProgress: React.FC<ShippingProgressProps> = ({ totalAmount, freeSh
     const totalPrice = totalAmount ?? (Number.isFinite(cartTotal) ? cartTotal : calculatedTotalPrice);
     const threshold = freeShippingThreshold ?? FREE_DELIVERY_THRESHOLD;
     
-    // Calculate remaining amount based on: threshold - (total amount - shipping cost)
-    // This gives the amount needed to reach free shipping threshold (pence-safe vs float totals)
-    const amountForFreeShipping = totalPrice - shippingCost;
+    // Calculate remaining amount based on: threshold - (total amount - shipping cost).
+    // Clamp at zero so loyalty-covered orders cannot produce negative progress bases (e.g. 0 - 3.95).
+    const amountForFreeShipping = Math.max(0, totalPrice - shippingCost);
     const thresholdPence = Math.round(threshold * 100);
     const amountPence = Math.round(amountForFreeShipping * 100);
     const remainingAmount = thresholdPence > 0 ? Math.max(0, thresholdPence - amountPence) / 100 : 0;
     const progress = thresholdPence > 0 ? Math.min((amountPence / thresholdPence) * 100, 100) : 0;
 
     const getProgressLabel = () => {
+        if (loyaltyApplyCouponZeroShipping) {
+            return "You've qualified for free shipping!";
+        }
         if (orderMeetsFreeShippingThreshold(amountForFreeShipping, threshold)) {
             return "You've qualified for free shipping!";
         }
         return `You're £${remainingAmount.toFixed(2)} away from free shipping!`;
     };
+
+    const progressValue = loyaltyApplyCouponZeroShipping ? 100 : progress;
 
     return (
         <Progress
@@ -46,7 +61,7 @@ const ShippingProgress: React.FC<ShippingProgressProps> = ({ totalAmount, freeSh
             label={getProgressLabel()}
             radius="sm"
             size="lg"
-            value={progress}
+            value={progressValue}
         />
     )
 }

@@ -90,6 +90,12 @@ export interface PLACE_ORDER_PAYLOAD {
         method: string;
     };
     total: number;
+    loyalty?: boolean;
+    receive_promotions?: boolean;
+    shipping_address_id?: number;
+    points_to_redeem?: number;
+    /** From last apply-coupon when present (e.g. fully covered by loyalty). */
+    is_payment_required?: boolean;
 }
 
 export interface SHIPPING_METHOD {
@@ -129,8 +135,9 @@ export interface SHIPPING_METHOD {
 
 export interface WorldPayOrderData {
     order_code: string;
-    worldpay_url: string;
-    // Include other properties from the nested 'data' object if needed
+    worldpay_url?: string | null;
+    /** Zero-balance / loyalty-covered orders: redirect here when `worldpay_url` is absent. */
+    payment_success_url?: string | null;
 }
 
 export interface GuestCheckoutResponseData {
@@ -158,8 +165,12 @@ export interface GuestCheckoutResponseData {
     };
     order: {
         order_code: string;
-        worldpay_url: string;
-        order_details: unknown;
+        worldpay_url?: string | null;
+        payment_success_url?: string | null;
+        order_details?: {
+            payment_success_url?: string | null;
+            [key: string]: unknown;
+        } | unknown;
     };
     tokens: {
         accessToken: string;
@@ -441,6 +452,12 @@ export interface Coupon {
 export interface CouponResponse {
     totalItems: number;
     shippingCost: number;
+    shipping_cost?: number | string;
+    /** Resolved shipping method id from pricing (e.g. loyalty free-shipping row). May be snake_case from API. */
+    shipping_method_id?: number;
+    shippingMethodId?: number;
+    shippingMethod?: { id: number; shipping_method?: string; shipping_cost?: number | string };
+    shipping_method?: { id: number; shipping_method?: string; shipping_cost?: number | string };
     subTotal: number;
     total: number;
     coupon: Coupon;
@@ -455,6 +472,9 @@ export interface CouponResponse {
         isDiscountUsed: boolean;
     };
     mail_subscription_discount?: number; // Mail subscription discount amount from API
+    /** When false, order total is fully covered — omit on place-order unless apply-coupon returned it. */
+    is_payment_required?: boolean;
+    payment_required?: boolean;
 }
 
 export interface REVIEW_ORDER_PAYLOAD {

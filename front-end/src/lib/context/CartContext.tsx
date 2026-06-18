@@ -13,7 +13,12 @@ import { toast } from 'sonner';
 import { LoyaltyPointsRedemptionResponse } from '../config/loyalty-points.config';
 import { CouponResponse } from '../config/order.config';
 import { roundCurrency } from '../utils';
-import { parseApiMoney } from '../utils/checkout-order.utils';
+import {
+  parseApiMoney,
+  parseIsPaymentRequiredFromApplyCouponResponse,
+  evaluateLoyaltyRedemptionForCart,
+  getLoyaltyOrderMinimumBlockingMessage,
+} from '../utils/checkout-order.utils';
 
 interface CouponDiscount {
   value: number;
@@ -31,15 +36,29 @@ interface CouponDiscount {
     isDiscountUsed: boolean;
   };
   mailSubscriptionDiscount?: number; // Mail subscription discount amount from API
+  /** Last apply-coupon `is_payment_required`; `null` = field not returned. */
+  isPaymentRequired?: boolean | null;
 }
 
-interface LoyaltyRedemption {
+export interface LoyaltyRedemption {
   isRedeemed: boolean;
   pointsData: LoyaltyPointsRedemptionResponse | null;
   discountValue: number;
   message: string | null;
+  /** When `null`, omit `points_to_redeem` on the API so the server redeems the maximum allowed. */
+  pointsToRedeem: number | null;
+  /** Last apply-coupon `shippingCost` when loyalty is on; `null` = use catalog shipping from selected method. */
+  applyCouponShippingCost: number | null;
+  /** From apply-coupon when loyalty is on; used for place-order when priced shipping is non-zero. If apply-coupon shipping is £0, checkout uses the selected method (catalog free row). */
+  applyCouponShippingMethodId: number | null;
+  /** Last apply-coupon `mail_subscription_discount` when loyalty is on (coupon UI cleared but API still applies mail). */
+  applyCouponMailSubscriptionDiscount: number | null;
+  /** Last apply-coupon `is_payment_required` when loyalty is on. */
+  applyCouponIsPaymentRequired: boolean | null;
+  /** Last apply-coupon `total` when loyalty is on (authoritative grand total including shipping). */
+  applyCouponTotal: number | null;
 }
-interface CartContextType {
+export interface CartContextType {
   cartItems: CartItem[];
   isLoading: boolean;
   addItemToCart: (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => Promise<void>;
@@ -87,6 +106,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [hasAttemptedSync, setHasAttemptedSync] = useState(false);
   // Store shipping method ID for coupon revalidation (set by CartTotal on checkout page)
   const [shippingMethodIdForCoupon, setShippingMethodIdForCoupon] = useState<number>(0);
+  const loyaltyCartWasEligibleRef = useRef<boolean | null>(null);
   const [cartTotal, setCartTotal] = useState<number>(0);
   const [cartSubtotal, setCartSubtotal] = useState<number>(0);
   const [cartDiscount, setCartDiscount] = useState<number>(0);
@@ -103,6 +123,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     pointsData: null,
     discountValue: 0,
     message: null,
+    pointsToRedeem: null,
+    applyCouponShippingCost: null,
+    applyCouponShippingMethodId: null,
+    applyCouponMailSubscriptionDiscount: null,
+    applyCouponIsPaymentRequired: null,
+    applyCouponTotal: null,
   });
   const [isRemoveCoupon, setIsRemoveCoupon] = useState<boolean>(false);
   const [itemCount, setItemCount] = useState<number>(0);
@@ -284,19 +310,65 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     }
   }, [isAuthenticated, calculateGuestDealsAndTotals, calculateTotals]);
-  
+
+  const refreshLoyaltyPoints = useCallback(async () => {
+    if (!isAuthenticated) return;
+
+    const response = await getLoyaltyPointsRedemption();
+
+    if (response.status === ServerActionStatus.SUCCESS) {
+      setLoyaltyRedemption((prev) => ({ ...prev, pointsData: response.data }));
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    void refreshLoyaltyPoints();
+  }, [refreshLoyaltyPoints]);
+
+  /** When cart total drops below `minimum_order_value_to_redeem`, remove applied loyalty and toast. */
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    const fetchLoyaltyPoints = async () => {
-      const response = await getLoyaltyPointsRedemption();
+    const eligibility = evaluateLoyaltyRedemptionForCart(cartTotal, loyaltyRedemption.pointsData);
+    const wasEligible = loyaltyCartWasEligibleRef.current;
+    const isEligible = eligibility.canRedeemOnCart;
 
-      if (response.status === ServerActionStatus.SUCCESS) {
-        setLoyaltyRedemption(prev => ({ ...prev, pointsData: response.data }));
-      }
-    };
-    fetchLoyaltyPoints();
-  }, [isAuthenticated]);
+    if (isEligible) {
+      loyaltyCartWasEligibleRef.current = true;
+      return;
+    }
+
+    loyaltyCartWasEligibleRef.current = false;
+
+    if (!loyaltyRedemption.isRedeemed) return;
+
+    const toastMessage =
+      getLoyaltyOrderMinimumBlockingMessage(eligibility, DEFAULT_CURRENCY_SYMBOL) ??
+      'Loyalty points were removed because the cart no longer qualifies for redemption.';
+
+    setLoyaltyRedemption((prev) => ({
+      ...prev,
+      isRedeemed: false,
+      discountValue: 0,
+      message: null,
+      pointsToRedeem: null,
+      applyCouponShippingCost: null,
+      applyCouponShippingMethodId: null,
+      applyCouponMailSubscriptionDiscount: null,
+      applyCouponIsPaymentRequired: null,
+      applyCouponTotal: null,
+    }));
+
+    if (wasEligible === true) {
+      toast.error(toastMessage);
+    }
+  }, [
+    cartTotal,
+    itemCount,
+    isAuthenticated,
+    loyaltyRedemption.isRedeemed,
+    loyaltyRedemption.pointsData,
+  ]);
 
   // Load cart items on mount and when auth status changes
   useEffect(() => {
@@ -632,6 +704,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               pointsData: loyaltyRedemption.pointsData,
               discountValue: 0,
               message: null,
+              pointsToRedeem: null,
+              applyCouponShippingCost: null,
+              applyCouponShippingMethodId: null,
+              applyCouponMailSubscriptionDiscount: null,
+              applyCouponIsPaymentRequired: null,
+              applyCouponTotal: null,
             });
           }
         }
@@ -658,6 +736,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
              pointsData: loyaltyRedemption.pointsData,
              discountValue: 0,
              message: null,
+             pointsToRedeem: null,
+             applyCouponShippingCost: null,
+             applyCouponShippingMethodId: null,
+             applyCouponMailSubscriptionDiscount: null,
+             applyCouponIsPaymentRequired: null,
+             applyCouponTotal: null,
            });
          }
        }
@@ -690,6 +774,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
            pointsData: loyaltyRedemption.pointsData,
            discountValue: 0,
            message: null,
+           pointsToRedeem: null,
+           applyCouponShippingCost: null,
+           applyCouponShippingMethodId: null,
+           applyCouponMailSubscriptionDiscount: null,
+           applyCouponIsPaymentRequired: null,
+           applyCouponTotal: null,
          });
        }
     } finally {
@@ -871,26 +961,33 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCartSubtotal(0);
     setCartDiscount(0);
     setItemCount(0);
-    setCouponDiscount({
+    setCouponDiscount((prev) => ({
       value: 0,
       isApplied: false,
       code: null,
       message: null,
       discountValue: '',
-      mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
+      mailSubscriptionData: prev.mailSubscriptionData,
       mailSubscriptionDiscount: undefined,
-    });
-    setLoyaltyRedemption({
+    }));
+    setLoyaltyRedemption((prev) => ({
       isRedeemed: false,
-      pointsData: loyaltyRedemption.pointsData, // Preserve points data
+      pointsData: prev.pointsData,
       discountValue: 0,
       message: null,
-    });
+      pointsToRedeem: null,
+      applyCouponShippingCost: null,
+      applyCouponShippingMethodId: null,
+      applyCouponMailSubscriptionDiscount: null,
+      applyCouponIsPaymentRequired: null,
+      applyCouponTotal: null,
+    }));
     removeGuestCart();
     deleteCookie(CART_COOKIE_NAME);
     deleteCookie('couponDiscount');
     deleteCookie(LOYALTY_COOKIE_NAME);
-  }, [loyaltyRedemption.pointsData, couponDiscount.mailSubscriptionData]);
+    void refreshLoyaltyPoints();
+  }, [refreshLoyaltyPoints]);
 
   useEffect(() => {
     if (prevSessionRef.current?.user?.id && prevSessionRef.current.user.id !== session?.user?.id) {
@@ -964,6 +1061,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           total: apiTotal,
           mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData,
           mailSubscriptionDiscount: mailSubscriptionDiscountValue,
+          isPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(couponData),
         });
       } else {
         if (couponDiscount.isApplied) {
@@ -975,6 +1073,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             discountValue: '',
             mailSubscriptionData: couponDiscount.mailSubscriptionData,
             mailSubscriptionDiscount: undefined,
+            isPaymentRequired: null,
           });
         }
       }
@@ -1039,6 +1138,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           total: apiTotal,
           mailSubscriptionData: couponData.mail_subscription_data || couponDiscount.mailSubscriptionData, // Use new data or preserve existing
           mailSubscriptionDiscount: mailSubscriptionDiscountValue,
+          isPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(couponData),
         });
       } else {
         // Only update state if the coupon was previously applied to avoid loops
@@ -1051,6 +1151,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             message: null,
             discountValue: '',
             mailSubscriptionData: couponDiscount.mailSubscriptionData, // Preserve mailSubscriptionData
+            isPaymentRequired: null,
           });
         }
       }
@@ -1154,7 +1255,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     loyaltyRedemption,
     setLoyaltyRedemption,
     setShippingMethodIdForCoupon,
-  };
+  } satisfies CartContextType;
 
   return (
     <CartContext.Provider value={value}>
@@ -1163,7 +1264,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useCart = () => {
+export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
   if (context === undefined) {
     throw new Error('useCart must be used within a CartProvider');

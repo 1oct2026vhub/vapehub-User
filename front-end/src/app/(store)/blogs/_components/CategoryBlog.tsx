@@ -1,65 +1,178 @@
 import BreadCrumbs from "@/components/BreadCrumbs";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import FAQSection from "@/components/FAQSection";
+import { ServerActionStatus } from "@/lib/config/app.config";
 import { BlogByCategoryAndSlugResponse } from "@/lib/config/blog.config";
 import { ROUTES } from "@/lib/routes";
+import { getTrustpilotReviews } from "@/lib/server.actions";
 import Image from "next/image";
 import { Suspense } from "react";
 import SuspenseLoader from "@/components/ui/SuspenseLoader";
-import { prepareBlogHtml } from "@/lib/blog-content.utils";
+import {
+  ensureBlogBodySegments,
+  extractAndStripBlogSources,
+  injectBlogHeadingIds,
+  normalizeBlogCitationLinks,
+  parseBlogBodySegments,
+  prepareBlogHtml,
+  processBlogBodyHtml,
+  splitBlogIntroAndBody,
+} from "@/lib/blog-content.utils";
+import { DEFAULT_BLOG_SOURCES } from "@/lib/config/blog-sources.config";
+import { DEFAULT_CONTINUE_READING } from "@/lib/config/blog-continue-reading.config";
+import BlogArticleBody from "./BlogArticleBody";
+import BlogAuthorBioCard from "./BlogAuthorBioCard";
+import BlogAuthorMeta from "./BlogAuthorMeta";
+import BlogContinueReading from "./BlogContinueReading";
+import BlogSourcesSection from "./BlogSourcesSection";
+import BlogTableOfContents from "./BlogTableOfContents";
+import BlogTrustSidebar from "./BlogTrustSidebar";
+import { mapRelatedBlogsToContinueReading } from "./blog-continue-reading.utils";
 
 interface CategoryBlogsProps {
   data: BlogByCategoryAndSlugResponse;
 }
 
-// Function to process HTML content and fix relative links
 const processBlogContent = (html: string): string => {
-  // Use regex to fix relative links in anchor tags
   return html.replace(/<a\s+([^>]*\s+)?href=["']([^"']+)["']([^>]*)>/gi, (match, before, href, after) => {
-    // If href doesn't start with http://, https://, mailto:, tel:, #, or /, make it absolute
     if (href && !href.match(/^(https?:\/\/|mailto:|tel:|#|\/)/)) {
-      // Convert relative link to absolute by adding leading slash
-      return `<a ${before || ''}href="/${href}"${after || ''}>`;
+      return `<a ${before || ""}href="/${href}"${after || ""}>`;
     }
     return match;
   });
 };
 
-const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
+const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
   if (!data) {
-    return <EmptyPlaceholder title='Uh, oh!' description='No blogs found' />
-  }  
-  const breadcrumbs = [ 
+    return <EmptyPlaceholder title="Uh, oh!" description="No blogs found" />;
+  }
+
+  const trustResponse = await getTrustpilotReviews();
+  const trustStats =
+    trustResponse.status === ServerActionStatus.SUCCESS
+      ? trustResponse.data?.overallStats
+      : null;
+  const trustStars = trustStats?.scoreBreakdown?.stars ?? 4.8;
+  const trustTotalReviews = trustStats?.totalReviews ?? 12000;
+
+  const category = data.categories?.[0];
+  const categoryBreadcrumbs = category
+    ? category.parent?.slug
+      ? [
+          { label: category.parent.name, href: `/${category.parent.slug}` },
+          { label: category.name, href: category.slug ? `/${category.slug}` : ROUTES.BLOGS },
+        ]
+      : category.slug
+        ? [{ label: category.name, href: `/${category.slug}` }]
+        : [{ label: category.name, href: ROUTES.BLOGS }]
+    : [];
+
+  const blogHref = data.slug
+    ? data.slug.startsWith("/")
+      ? data.slug
+      : `/${data.slug}`
+    : ROUTES.BLOGS;
+
+  const breadcrumbs = [
     { label: "Home", href: ROUTES.WELCOME },
     { label: "Blogs", href: ROUTES.BLOGS },
-    ...(data.categories?.[0]?.parent ? [
-      { label: data.categories[0].parent.name, href: `/${data.categories[0].parent.slug}` },
-      { label: data.categories?.[0]?.name, href: `/${data.categories[0].slug}` },  
-    ] : [
-      { label: data.categories?.[0]?.name, href: `/${data.categories[0]?.slug}` },
-    ]),
-    { label: data.title, href: data.slug.startsWith('/') ? data.slug : `/${data.slug}`, isActive: true },
+    ...categoryBreadcrumbs,
+    { label: data.title, href: blogHref, isActive: true },
   ];
 
-  const processedContent = processBlogContent(prepareBlogHtml(data.content));
+  const preparedContent = processBlogContent(prepareBlogHtml(data.content));
+  const { introHtml, bodyHtml } = splitBlogIntroAndBody(preparedContent);
+  const { html: bodyWithoutSources, sources: cmsSources } = extractAndStripBlogSources(bodyHtml);
+  const processedBody = normalizeBlogCitationLinks(processBlogBodyHtml(bodyWithoutSources));
+  const { html: bodyWithIds, headings } = injectBlogHeadingIds(processedBody);
+  const bodySegments = ensureBlogBodySegments(parseBlogBodySegments(bodyWithIds));
+  const tocHeadings = headings.length >= 3 ? headings : [];
+
+  const relatedFromApi = mapRelatedBlogsToContinueReading(data.related_blogs ?? []);
+  const continueReadingArticles =
+    relatedFromApi.length > 0 ? relatedFromApi : DEFAULT_CONTINUE_READING.articles;
+
+  const sources =
+    data.sources?.length ? data.sources : cmsSources.length ? cmsSources : DEFAULT_BLOG_SOURCES;
 
   return (
-    <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
+    <main className="blog-post-main flex max-w-full min-w-0 flex-col gap-5 px-4 py-5 sm:gap-6 sm:py-7 lg:px-9 xl:gap-10 xl:px-12.5 xl:py-10">
       <BreadCrumbs items={breadcrumbs} />
+
       <Image
-        src={data.image_url ?? '/images/blog-list-card.jpg'}
+        src={data.image_url ?? "/images/blog-list-card.jpg"}
         alt={data.alt_text ?? data.title}
         width={0}
         height={0}
         sizes="100vw"
-        className='rounded-10 w-full max-h-80'
+        className="max-h-52 w-full rounded-10 object-cover sm:max-h-64 md:max-h-80"
         priority
       />
-      <h1 className='primary-gradient-600 text-h5 md:text-h3 font-semibold w-fit'>{data.title ?? "Blogs"}</h1>
-      <div className="w-full blog-details rich-text" dangerouslySetInnerHTML={{ __html: processedContent }} />
-      <Suspense fallback={<SuspenseLoader height="h-40" />}>
-        <FAQSection type="blog" id={data.id} title="Frequently Asked Questions" />
-      </Suspense>
+
+      <div
+        className={`blog-post-grid grid min-w-0 max-w-full grid-cols-1 gap-6 blog:items-start blog:gap-10 ${
+          tocHeadings.length > 0
+            ? "blog:grid-cols-[minmax(0,220px)_minmax(0,1fr)_minmax(0,280px)]"
+            : "blog:grid-cols-[minmax(0,1fr)_minmax(0,280px)]"
+        }`}
+      >
+        {tocHeadings.length > 0 ? (
+          <aside className="blog-post-rail hidden min-w-0 blog:block">
+            <BlogTableOfContents headings={tocHeadings} />
+          </aside>
+        ) : null}
+
+        <div className="flex min-w-0 max-w-full flex-col gap-5 sm:gap-7">
+          <article className="flex min-w-0 flex-col gap-4 sm:gap-5">
+            <h1 className="primary-gradient-600 mt-0 w-full max-w-full break-words text-h4 font-semibold md:text-h3 xl:text-h2">
+              {data.title ?? "Blogs"}
+            </h1>
+
+            {introHtml ? (
+              <div
+                className="blog-intro ck-content rich-text text-title-2 text-skin-neutral-300"
+                dangerouslySetInnerHTML={{ __html: introHtml }}
+              />
+            ) : null}
+
+            <BlogAuthorMeta
+              author={data.author}
+              publishedAt={data.published_at}
+              updatedAt={data.updated_at}
+            />
+
+            {tocHeadings.length > 0 ? (
+              <div className="blog:hidden">
+                <BlogTableOfContents headings={tocHeadings} variant="mobile" />
+              </div>
+            ) : null}
+
+            <BlogArticleBody segments={bodySegments} />
+          </article>
+
+          {sources.length > 0 ? <BlogSourcesSection sources={sources} /> : null}
+
+          <BlogAuthorBioCard author={data.author} />
+
+          <aside className="blog:hidden">
+            <BlogTrustSidebar stars={trustStars} totalReviews={trustTotalReviews} />
+          </aside>
+        </div>
+
+        <aside className="blog-post-rail hidden min-w-0 blog:block">
+          <BlogTrustSidebar stars={trustStars} totalReviews={trustTotalReviews} />
+        </aside>
+      </div>
+
+      <div className="flex min-w-0 max-w-full flex-col gap-5 border-t border-skin-neutral-100 pt-5 sm:gap-7 sm:pt-7 xl:gap-10 xl:pt-10">
+        {continueReadingArticles.length > 0 ? (
+          <BlogContinueReading articles={continueReadingArticles} />
+        ) : null}
+
+        <Suspense fallback={<SuspenseLoader height="h-40" />}>
+          <FAQSection type="blog" id={data.id} title="Frequently Asked Questions" />
+        </Suspense>
+      </div>
     </main>
   );
 };

@@ -17,11 +17,22 @@ interface TimeStampFields {
 }
 
 // Base interface for author information
-interface Author {
+export interface Author {
     id: number;
     first_name: string | null;
     last_name: string | null;
     email: string;
+    avatar_url?: string | null;
+    role?: string | null;
+    bio?: string | null;
+    archive_url?: string | null;
+    team_url?: string | null;
+}
+
+export interface BlogSourceItem {
+    label: string;
+    href: string;
+    description: string;
 }
 
 // Base interface for blog content
@@ -68,6 +79,7 @@ export interface BlogCategory  {
 export interface BlogByCategoryAndSlugResponse extends BlogContent {
     categories: BlogCategory[];
     tags: unknown[];
+    sources?: BlogSourceItem[];
     related_blogs: (BlogContent & {
         categories: (BaseBlogEntity & TimeStampFields)[];
     })[];

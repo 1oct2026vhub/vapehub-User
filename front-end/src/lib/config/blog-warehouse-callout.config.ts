@@ -1,5 +1,5 @@
 /** Toggle off when every article has CMS callout markers or inline warehouse blocks. */
-export const BLOG_WAREHOUSE_CALLOUT_TEST_MODE = true;
+export const BLOG_WAREHOUSE_CALLOUT_TEST_MODE = false;
 
 export const DEFAULT_WAREHOUSE_CALLOUT = {
   label: "FROM OUR WAREHOUSE",

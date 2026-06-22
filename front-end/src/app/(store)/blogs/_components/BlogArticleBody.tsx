@@ -1,4 +1,9 @@
 import { BlogBodySegment } from "@/lib/blog-content.utils";
+import {
+  BLOG_RENDER_INDUSTRY_QUOTE,
+  BLOG_RENDER_PROMO_BANNER,
+  BLOG_RENDER_WAREHOUSE_CALLOUT,
+} from "@/lib/config/blog-optional-blocks.config";
 import BlogIndustryQuote from "./BlogIndustryQuote";
 import BlogPromoBanner from "./BlogPromoBanner";
 import BlogWarehouseCallout from "./BlogWarehouseCallout";
@@ -11,6 +16,8 @@ const BlogArticleBody = ({ segments }: BlogArticleBodyProps) => (
   <div className="blog-details flex w-full min-w-0 max-w-full flex-col gap-6">
     {segments.map((segment, index) => {
       if (segment.type === "warehouse-callout") {
+        if (!BLOG_RENDER_WAREHOUSE_CALLOUT) return null;
+
         return (
           <BlogWarehouseCallout
             key={`callout-${index}`}
@@ -22,6 +29,8 @@ const BlogArticleBody = ({ segments }: BlogArticleBodyProps) => (
       }
 
       if (segment.type === "industry-quote") {
+        if (!BLOG_RENDER_INDUSTRY_QUOTE) return null;
+
         return (
           <BlogIndustryQuote
             key={`quote-${index}`}
@@ -32,6 +41,8 @@ const BlogArticleBody = ({ segments }: BlogArticleBodyProps) => (
       }
 
       if (segment.type === "promo-banner") {
+        if (!BLOG_RENDER_PROMO_BANNER) return null;
+
         return (
           <BlogPromoBanner
             key={`promo-${index}`}

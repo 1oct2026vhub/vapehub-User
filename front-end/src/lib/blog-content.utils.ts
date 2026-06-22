@@ -8,6 +8,11 @@ import {
   DEFAULT_INDUSTRY_QUOTE,
 } from "@/lib/config/blog-industry-quote.config";
 import {
+  BLOG_RENDER_INDUSTRY_QUOTE,
+  BLOG_RENDER_PROMO_BANNER,
+  BLOG_RENDER_WAREHOUSE_CALLOUT,
+} from "@/lib/config/blog-optional-blocks.config";
+import {
   BLOG_PROMO_BANNER_TEST_MODE,
   DEFAULT_PROMO_BANNER,
 } from "@/lib/config/blog-promo-banner.config";
@@ -906,9 +911,20 @@ export function ensureTestIndustryQuoteSegments(segments: BlogBodySegment[]): Bl
 
 /** Apply template fallbacks for optional per-article body blocks. */
 export function ensureBlogBodySegments(segments: BlogBodySegment[]): BlogBodySegment[] {
-  let result = ensureTestWarehouseCalloutSegments(segments);
-  result = ensureIndustryQuoteSegments(result);
-  result = ensurePromoBannerSegments(result);
+  let result = segments;
+
+  if (BLOG_RENDER_WAREHOUSE_CALLOUT) {
+    result = ensureTestWarehouseCalloutSegments(result);
+  }
+
+  if (BLOG_RENDER_INDUSTRY_QUOTE) {
+    result = ensureIndustryQuoteSegments(result);
+  }
+
+  if (BLOG_RENDER_PROMO_BANNER) {
+    result = ensurePromoBannerSegments(result);
+  }
+
   return result;
 }
 
@@ -917,18 +933,28 @@ export function ensureTestBlogBodySegments(segments: BlogBodySegment[]): BlogBod
   return ensureBlogBodySegments(segments);
 }
 
-/** Run all warehouse callout transforms on article body HTML. */
+/** Run optional body-block transforms on article HTML. */
 export function processBlogBodyHtml(html: string): string {
   let result = html;
-  result = convertWarehouseCalloutBlockquotes(result);
-  result = convertWarehouseCalloutFlexible(result);
-  result = convertWarehouseCalloutParagraphs(result);
-  result = injectWarehouseCalloutByPosition(result);
-  result = injectTestWarehouseCallout(result);
-  result = injectIndustryQuoteByPosition(result);
-  result = injectPromoBannerByPosition(result);
-  result = injectTestIndustryQuote(result);
-  result = injectTestPromoBanner(result);
+
+  if (BLOG_RENDER_WAREHOUSE_CALLOUT) {
+    result = convertWarehouseCalloutBlockquotes(result);
+    result = convertWarehouseCalloutFlexible(result);
+    result = convertWarehouseCalloutParagraphs(result);
+    result = injectWarehouseCalloutByPosition(result);
+    result = injectTestWarehouseCallout(result);
+  }
+
+  if (BLOG_RENDER_INDUSTRY_QUOTE) {
+    result = injectIndustryQuoteByPosition(result);
+    result = injectTestIndustryQuote(result);
+  }
+
+  if (BLOG_RENDER_PROMO_BANNER) {
+    result = injectPromoBannerByPosition(result);
+    result = injectTestPromoBanner(result);
+  }
+
   result = wrapBlogTablesForScroll(result);
   return result;
 }
@@ -1005,13 +1031,21 @@ function collectBodyMarkers(html: string): BodyMarkerMatch[] {
 
 function parseWarehouseCalloutDiv(fullMatch: string): BlogWarehouseCalloutSegment {
   const openTag = fullMatch.match(/^<div[^>]*>/i)?.[0] ?? "";
+  const inner = fullMatch.replace(/^<div[^>]*>/i, "").replace(/<\/div>\s*$/i, "").trim();
+  const paragraphs = inner.match(/<p[^>]*>[\s\S]*?<\/p>/gi) ?? [];
+
   const label =
-    openTag.match(/data-label=["']([^"']*)["']/i)?.[1] ?? "FROM OUR WAREHOUSE";
-  const title = openTag.match(/data-title=["']([^"']*)["']/i)?.[1] ?? "";
-  const bodyHtml = decodeCalloutAttr(
-    openTag.match(/data-body-html=["']([^"']*)["']/i)?.[1] ??
-      fullMatch.replace(/^<div[^>]*>/i, "").replace(/<\/div>\s*$/i, "").trim(),
-  );
+    openTag.match(/data-label=["']([^"']*)["']/i)?.[1] ??
+    (paragraphs[0] ? stripHtmlTags(paragraphs[0]) : "FROM OUR WAREHOUSE");
+  const title =
+    openTag.match(/data-title=["']([^"']*)["']/i)?.[1] ??
+    (paragraphs[1] ? stripHtmlTags(paragraphs[1]) : "");
+  const bodyFromAttr = openTag.match(/data-body-html=["']([^"']*)["']/i)?.[1];
+  const bodyHtml = bodyFromAttr
+    ? decodeCalloutAttr(bodyFromAttr)
+    : paragraphs.length >= 3
+      ? paragraphs.slice(2).join("")
+      : inner;
 
   return { type: "warehouse-callout", label, title, bodyHtml };
 }

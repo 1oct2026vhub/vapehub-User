@@ -19,7 +19,6 @@ import {
   splitBlogIntroAndBody,
 } from "@/lib/blog-content.utils";
 import { DEFAULT_BLOG_SOURCES } from "@/lib/config/blog-sources.config";
-import { DEFAULT_CONTINUE_READING } from "@/lib/config/blog-continue-reading.config";
 import BlogArticleBody from "./BlogArticleBody";
 import BlogAuthorBioCard from "./BlogAuthorBioCard";
 import BlogAuthorMeta from "./BlogAuthorMeta";
@@ -27,7 +26,7 @@ import BlogContinueReading from "./BlogContinueReading";
 import BlogSourcesSection from "./BlogSourcesSection";
 import BlogTableOfContents from "./BlogTableOfContents";
 import BlogTrustSidebar from "./BlogTrustSidebar";
-import { mapRelatedBlogsToContinueReading } from "./blog-continue-reading.utils";
+import { resolveContinueReadingArticles } from "./blog-continue-reading.utils";
 
 interface CategoryBlogsProps {
   data: BlogByCategoryAndSlugResponse;
@@ -88,9 +87,7 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
   const bodySegments = ensureBlogBodySegments(parseBlogBodySegments(bodyWithIds));
   const tocHeadings = headings.length >= 3 ? headings : [];
 
-  const relatedFromApi = mapRelatedBlogsToContinueReading(data.related_blogs ?? []);
-  const continueReadingArticles =
-    relatedFromApi.length > 0 ? relatedFromApi : DEFAULT_CONTINUE_READING.articles;
+  const continueReadingArticles = await resolveContinueReadingArticles(data);
 
   const sources =
     data.sources?.length ? data.sources : cmsSources.length ? cmsSources : DEFAULT_BLOG_SOURCES;

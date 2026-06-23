@@ -18,7 +18,9 @@ const BlogAuthorBioCard = ({
   teamHref,
 }: BlogAuthorBioCardProps) => {
   const authorName =
-    [author.first_name, author.last_name].filter(Boolean).join(" ").trim() || "VapeHub";
+    author.role?.trim() ||
+    [author.first_name, author.last_name].filter(Boolean).join(" ").trim() ||
+    "VapeHub";
   const initials = authorName
     .split(" ")
     .map((part) => part[0])

@@ -18,7 +18,6 @@ import {
   processBlogBodyHtml,
   splitBlogIntroAndBody,
 } from "@/lib/blog-content.utils";
-import { DEFAULT_BLOG_SOURCES } from "@/lib/config/blog-sources.config";
 import BlogArticleBody from "./BlogArticleBody";
 import BlogAuthorBioCard from "./BlogAuthorBioCard";
 import BlogAuthorMeta from "./BlogAuthorMeta";
@@ -81,16 +80,13 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
 
   const preparedContent = processBlogContent(prepareBlogHtml(data.content));
   const { introHtml, bodyHtml } = splitBlogIntroAndBody(preparedContent);
-  const { html: bodyWithoutSources, sources: cmsSources } = extractAndStripBlogSources(bodyHtml);
+  const { html: bodyWithoutSources } = extractAndStripBlogSources(bodyHtml);
   const processedBody = normalizeBlogCitationLinks(processBlogBodyHtml(bodyWithoutSources));
   const { html: bodyWithIds, headings } = injectBlogHeadingIds(processedBody);
   const bodySegments = ensureBlogBodySegments(parseBlogBodySegments(bodyWithIds));
   const tocHeadings = headings.length >= 3 ? headings : [];
 
   const continueReadingArticles = await resolveContinueReadingArticles(data);
-
-  const sources =
-    data.sources?.length ? data.sources : cmsSources.length ? cmsSources : DEFAULT_BLOG_SOURCES;
 
   return (
     <main className="blog-post-main flex max-w-full min-w-0 flex-col gap-5 px-4 py-5 sm:gap-6 sm:py-7 lg:px-9 xl:gap-10 xl:px-12.5 xl:py-10">
@@ -147,9 +143,9 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
             <BlogArticleBody segments={bodySegments} />
           </article>
 
-          {sources.length > 0 ? <BlogSourcesSection sources={sources} /> : null}
+          {data.sources?.length ? <BlogSourcesSection sources={data.sources} /> : null}
 
-          <BlogAuthorBioCard author={data.author} />
+          <BlogAuthorBioCard author={data.author} authorId={data.author_id} />
 
           <aside className="blog:hidden">
             <BlogTrustSidebar stars={trustStars} totalReviews={trustTotalReviews} />

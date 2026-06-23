@@ -6,6 +6,7 @@ import { ROUTES } from "@/lib/routes";
 
 interface BlogAuthorBioCardProps {
   author: Author;
+  authorId?: number;
   bio?: string;
   articlesHref?: string;
   teamHref?: string;
@@ -13,6 +14,7 @@ interface BlogAuthorBioCardProps {
 
 const BlogAuthorBioCard = ({
   author,
+  authorId,
   bio,
   articlesHref,
   teamHref,
@@ -29,11 +31,13 @@ const BlogAuthorBioCard = ({
     .toUpperCase();
   const avatarUrl = author.avatar_url?.trim();
   const resolvedBio = bio?.trim() || author.bio?.trim() || DEFAULT_AUTHOR_BIO.bio;
+  const resolvedAuthorId = author.id || authorId;
   const resolvedArticlesHref =
     articlesHref ||
-    author.archive_url?.trim() ||
-    (author.id ? ROUTES.BLOGS_BY_AUTHOR(author.id) : ROUTES.BLOGS);
-  const resolvedTeamHref = teamHref || author.team_url?.trim() || ROUTES.BLOGS;
+    (resolvedAuthorId
+      ? ROUTES.BLOGS_BY_AUTHOR(resolvedAuthorId)
+      : DEFAULT_AUTHOR_BIO.articlesHref);
+  const resolvedTeamHref = teamHref || DEFAULT_AUTHOR_BIO.teamHref;
 
   return (
     <aside className="blog-author-bio rounded-xl border border-skin-neutral-100 bg-skin-white p-4 sm:p-5 md:p-6">

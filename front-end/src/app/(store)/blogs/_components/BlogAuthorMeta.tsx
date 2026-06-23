@@ -7,8 +7,6 @@ interface BlogAuthorMetaProps {
   updatedAt: string;
 }
 
-const AUTHOR_PILLS = ["Experience", "Expertise"] as const;
-
 const formatBlogDate = (dateString: string) =>
   new Date(dateString).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -52,16 +50,6 @@ const BlogAuthorMeta = ({ author, publishedAt, updatedAt }: BlogAuthorMetaProps)
             {authorName}
           </p>
           <p className="text-content-1 text-skin-neutral-300">{authorRole}</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {AUTHOR_PILLS.map((pill) => (
-              <span
-                key={pill}
-                className="rounded-full border border-skin-primary-500 bg-[#f0f9f9] px-2.5 py-0.5 text-[11px] font-bold uppercase text-skin-primary-500"
-              >
-                {pill}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
       <div className="shrink-0 text-content-1 text-skin-neutral-300 sm:text-right">

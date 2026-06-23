@@ -507,7 +507,6 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             );
             return;
         }
-
         setLoyaltyValidationMessage(null);
         setIsApplyingLoyalty(true);
         let response: Awaited<ReturnType<typeof applyCoupon>> | null = null;

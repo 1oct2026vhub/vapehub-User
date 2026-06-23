@@ -644,8 +644,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         isRedeemed &&
         applyCouponShippingCost !== null &&
         Number.isFinite(applyCouponShippingCost) &&
-        applyCouponShippingCost === 0;
-    
+        applyCouponShippingCost === 0;    
     // Subtotal: use cartTotal (includes deal discounts), not coupon API subTotal
     const displaySubTotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0;
 

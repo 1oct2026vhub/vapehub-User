@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ContinueReadingArticle } from "@/lib/config/blog-continue-reading.config";
 
-interface BlogContinueReadingCardProps extends ContinueReadingArticle {}
+type BlogContinueReadingCardProps = ContinueReadingArticle;
 
 const BlogContinueReadingCard = ({
   category,

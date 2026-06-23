@@ -237,7 +237,7 @@ export function injectBlogHeadingIds(html: string): { html: string; headings: Bl
         return match;
       }
 
-      let baseId = slugifyHeading(text);
+      const baseId = slugifyHeading(text);
       const count = usedIds.get(baseId) ?? 0;
       usedIds.set(baseId, count + 1);
       const id = count > 0 ? `${baseId}-${count}` : baseId;
@@ -556,24 +556,6 @@ function findSignsHeadingIndex(html: string): number {
   }
 
   return -1;
-}
-
-function hasOpeningSectionBefore(html: string, insertAt: number): boolean {
-  const before = html.slice(0, insertAt);
-  const headingRe = /<h[23][^>]*>[\s\S]*?<\/h[23]>/gi;
-
-  for (const match of before.matchAll(headingRe)) {
-    const headingText = stripHtmlTags(match[0]);
-    if (
-      /(?:off after opening|after opening|go(?:es)?\s+off|shelf\s*life|go\s+out\s+of\s+date)/i.test(
-        headingText,
-      )
-    ) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 /** Insert callout before the "signs of out of date" section when structure matches the design. */

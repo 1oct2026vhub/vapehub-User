@@ -30,7 +30,9 @@ const BlogAuthorBioCard = ({
   const avatarUrl = author.avatar_url?.trim();
   const resolvedBio = bio?.trim() || author.bio?.trim() || DEFAULT_AUTHOR_BIO.bio;
   const resolvedArticlesHref =
-    articlesHref || author.archive_url?.trim() || ROUTES.BLOGS;
+    articlesHref ||
+    author.archive_url?.trim() ||
+    (author.id ? ROUTES.BLOGS_BY_AUTHOR(author.id) : ROUTES.BLOGS);
   const resolvedTeamHref = teamHref || author.team_url?.trim() || ROUTES.BLOGS;
 
   return (

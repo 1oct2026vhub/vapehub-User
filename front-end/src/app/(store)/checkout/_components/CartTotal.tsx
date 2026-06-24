@@ -639,6 +639,13 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         catalogShippingCost,
         applyCouponShippingFromApi
     );
+    const effectiveShippingCost =
+        !isRedeemed &&
+        !couponDiscount.isApplied &&
+        applyCouponShippingFromApi == null &&
+        (selectedShippingMethod?.is_free_shipping ?? false)
+            ? 0
+            : safeShippingCost;
     const loyaltyApplyCouponZeroShipping =
         isRedeemed &&
         applyCouponShippingCost !== null &&
@@ -662,7 +669,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             cartTotal,
             couponSliceForTotals,
             { isRedeemed, discountValue: displayLoyaltyDiscount },
-            safeShippingCost
+            effectiveShippingCost
         );
     }, [
         isRedeemed,
@@ -670,7 +677,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         cartTotal,
         couponSliceForTotals,
         displayLoyaltyDiscount,
-        safeShippingCost,
+        effectiveShippingCost,
     ]);
 
     const safeSubTotal = Number.isFinite(displaySubTotal) ? displaySubTotal : 0;
@@ -815,7 +822,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
                         <p className='text-skin-neutral-500 !font-oswald'>Shipping Cost</p>
-                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{safeShippingCost.toFixed(2)}</p>
+                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{effectiveShippingCost.toFixed(2)}</p>
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
                         <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
@@ -834,7 +841,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                         <ShippingProgress 
                             totalAmount={safeTotal} 
                             freeShippingThreshold={freeShippingThreshold} 
-                            shippingCost={safeShippingCost}
+                            shippingCost={effectiveShippingCost}
                             loyaltyApplyCouponZeroShipping={loyaltyApplyCouponZeroShipping}
                         />
                         <Divider className='border-2' />

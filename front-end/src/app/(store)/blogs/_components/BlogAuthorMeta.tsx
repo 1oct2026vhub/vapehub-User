@@ -46,8 +46,7 @@ const BlogAuthorMeta = ({ author, publishedAt, updatedAt }: BlogAuthorMetaProps)
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="!font-opensans text-title-2 font-semibold text-skin-neutral-500">
-            {authorName}
+          <p className="!font-opensans text-title-2 font-semibold primary-gradient-600">            {authorName}
           </p>
           <p className="text-content-1 text-skin-neutral-300">{authorRole}</p>
         </div>

@@ -85,12 +85,16 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
       return
     }
     setSelectedShippingMethod((prev) => {
+      const freeMethod = filteredSortedMethods.find((m) => m.is_free_shipping ?? false)
+      if (!loyaltyRedemption.isRedeemed && freeMethod) {
+        return freeMethod
+      }
       if (prev && filteredSortedMethods.some((m) => m.id === prev.id)) {
         return prev
       }
       return filteredSortedMethods[0]
     })
-  }, [filteredSortedMethods])
+  }, [filteredSortedMethods, loyaltyRedemption.isRedeemed])
 
   useEffect(() => {
     const shippingMethodId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0
@@ -150,7 +154,13 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
   const shippingCost = selectedShippingMethod
     ? parseFloat(selectedShippingMethod.shipping_cost || '0')
     : 0
-  const safeShippingCost = Number.isFinite(shippingCost) ? shippingCost : 0
+  const catalogShippingCost = Number.isFinite(shippingCost) ? shippingCost : 0
+  const safeShippingCost =
+    !loyaltyRedemption.isRedeemed &&
+    !couponDiscount.isApplied &&
+    (selectedShippingMethod?.is_free_shipping ?? false)
+      ? 0
+      : catalogShippingCost
 
   const safeTotal = useMemo(
     () => calculateOrderGrandTotal(cartTotal, couponForTotals, loyaltyForTotals, safeShippingCost),

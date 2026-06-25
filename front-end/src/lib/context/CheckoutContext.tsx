@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useRef, useCallback } from 'react';
 import { CHECKOUT_PAYLOAD, CHECKOUT_PAYMENT_METHODS } from '@/lib/config/checkout.config';
 // import { ROUTES } from '@/lib/routes';
 import { useVivaWallet } from '@/lib/hooks/useVivaWallet';
@@ -12,6 +12,12 @@ import { resolvePlaceOrderRedirectUrl } from '../utils/checkout-order.utils';
 interface CheckoutContextType {
     selectedShippingMethod: SHIPPING_METHOD_DATA | null;
     setSelectedShippingMethod: (method: SHIPPING_METHOD_DATA) => void;
+    /** Register handler for explicit user shipping-method selection (e.g. loyalty apply-coupon). */
+    registerShippingMethodSelectedHandler: (
+        handler: ((shippingMethodId: number) => void) | null
+    ) => void;
+    /** Invoke only when the customer picks a shipping method in checkout UI. */
+    notifyShippingMethodSelected: (shippingMethodId: number) => void;
     /** `true` only when a payment redirect was started (or equivalent); callers should not reset the form on `false`. */
     handlePlaceOrder: (data: CHECKOUT_PAYLOAD, response: ORDER_RESPONSE_DATA) => Promise<boolean>;
     isProcessing: boolean;
@@ -34,6 +40,7 @@ interface CheckoutProviderProps {
 export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) => {
     const [selectedShippingMethod, setSelectedShippingMethod] = useState<SHIPPING_METHOD_DATA | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const shippingMethodSelectedHandlerRef = useRef<((shippingMethodId: number) => void) | null>(null);
     const { initiatePayment: initiateVivaPayment } = useVivaWallet();
     // const { initiatePayment: initiateWorldPayPayment } = useWorldPay();
 
@@ -111,11 +118,25 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
         }
         return false;
     };
-    
+
+    const registerShippingMethodSelectedHandler = useCallback(
+        (handler: ((shippingMethodId: number) => void) | null) => {
+            shippingMethodSelectedHandlerRef.current = handler;
+        },
+        []
+    );
+
+    const notifyShippingMethodSelected = useCallback((shippingMethodId: number) => {
+        if (shippingMethodId > 0) {
+            shippingMethodSelectedHandlerRef.current?.(shippingMethodId);
+        }
+    }, []);
 
     const value = {
         selectedShippingMethod,
         setSelectedShippingMethod,
+        registerShippingMethodSelectedHandler,
+        notifyShippingMethodSelected,
         handlePlaceOrder,
         isProcessing
     };

@@ -130,7 +130,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         name: 'useDifferentBillingAddress',
         defaultValue: false,
     });
-    const { handlePlaceOrder, isProcessing, setSelectedShippingMethod } = useCheckout();
+    const { handlePlaceOrder, isProcessing, setSelectedShippingMethod, notifyShippingMethodSelected } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
     const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
@@ -434,7 +434,25 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         }
 
         const currentMethodId = form.getValues('shippingMethodId');
-        const nextMethod = pickCheckoutShippingMethod(filteredSortedMethods, currentMethodId);
+        const matchedCurrent =
+            currentMethodId > 0
+                ? filteredSortedMethods.find((m) => Number(m.id) === Number(currentMethodId))
+                : undefined;
+        const freeShippingMethod = filteredSortedMethods.find((m) => m.is_free_shipping ?? false);
+
+        let nextMethod: SHIPPING_METHOD_DATA | null = null;
+        if (loyaltyRedemption.isRedeemed && matchedCurrent) {
+            // Loyalty: keep the current carrier so apply-coupon is not re-triggered in a loop.
+            nextMethod = matchedCurrent;
+        } else if (!loyaltyRedemption.isRedeemed && freeShippingMethod) {
+            // No loyalty: when the basket qualifies, use the free-shipping option automatically.
+            nextMethod = freeShippingMethod;
+        } else if (matchedCurrent) {
+            nextMethod = matchedCurrent;
+        } else {
+            nextMethod = pickCheckoutShippingMethod(filteredSortedMethods, currentMethodId);
+        }
+
         if (!nextMethod) {
             setSelectedCarrier(null);
             form.setValue('shippingMethodId', 0);
@@ -733,15 +751,17 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                             </div>
                             <RadioGroup
                                 value={form.watch('shippingMethodId').toString()}
-
-                                onChange={(e) => {
-                                    const method = e.target.value;
-                                    form.setValue('shippingMethodId', Number(method));
-                                    const selectedMethod = shippingMethods.find(m => m.id.toString() === method.toString()) || shippingMethods[0];
+                                onValueChange={(value) => {
+                                    const methodId = Number(value);
+                                    form.setValue('shippingMethodId', methodId);
+                                    const selectedMethod =
+                                        shippingMethods.find(
+                                            (m) => m.id.toString() === value.toString()
+                                        ) || shippingMethods[0];
                                     setSelectedCarrier(selectedMethod);
                                     setSelectedShippingMethod(selectedMethod);
+                                    notifyShippingMethodSelected(methodId);
                                 }}
-
                             >
                                 {shippingMethods.map((method) => (
                                     <CustomRadio key={method.id} value={method.id.toString()}>

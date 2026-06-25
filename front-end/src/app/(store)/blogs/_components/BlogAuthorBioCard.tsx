@@ -63,7 +63,7 @@ const BlogAuthorBioCard = ({
           <p className="text-[11px] font-bold uppercase tracking-wide text-skin-neutral-300">
             Written by
           </p>
-          <p className="mt-1 text-title-1 font-semibold text-skin-neutral-500">{authorName}</p>
+          <p className="mt-1 text-title-1 font-semibold text-skin-primary-500">{authorName}</p>
           <p className="mt-2 text-[13.5px] leading-[150%] text-skin-neutral-400">{resolvedBio}</p>
 
           <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-1">

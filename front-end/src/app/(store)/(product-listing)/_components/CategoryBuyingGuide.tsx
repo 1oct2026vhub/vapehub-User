@@ -9,6 +9,7 @@ import CategoryBuyingGuideTabs from "./CategoryBuyingGuideTabs";
 
 interface CategoryBuyingGuideProps extends CategoryBuyingGuideData {
   embedded?: boolean;
+  hideHeader?: boolean;
 }
 
 const BuyingGuideHighlight = ({ label }: { label: string }) => (
@@ -30,6 +31,7 @@ const CategoryBuyingGuide = ({
   tabs,
   defaultTabId,
   embedded = false,
+  hideHeader = false,
 }: CategoryBuyingGuideProps) => (
   <section
     className={
@@ -39,10 +41,12 @@ const CategoryBuyingGuide = ({
     }
     aria-label={label}
   >
-    <div className="space-y-1.5">
-      <p className="text-content-2 font-semibold text-skin-neutral-300">{label}</p>
-      <h2 className="primary-gradient-600 text-h5 font-semibold md:text-h3">{title}</h2>
-    </div>
+    {!hideHeader ? (
+      <div className="space-y-1.5">
+        <p className="text-content-2 font-semibold text-skin-neutral-300">{label}</p>
+        <h2 className="primary-gradient-600 text-h5 font-semibold md:text-h3">{title}</h2>
+      </div>
+    ) : null}
 
     {highlights.length > 0 && (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

@@ -8,6 +8,7 @@ import { ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import CategoryBuyingGuide from './_components/CategoryBuyingGuide';
+import CategoryBuyingGuideAccordion from './_components/CategoryBuyingGuideAccordion';
 import RelatedGuides from './_components/RelatedGuides';
 import { resolveCategoryBuyingGuide } from './_components/category-buying-guide.utils';
 
@@ -88,26 +89,29 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
       </section>
       <ProductList data={data} reviews={reviews}>
         {showContentPanel ? (
-          <div
-            id="buying-guide-faqs"
-            className="scroll-mt-24 w-full pt-7.5 md:pt-9"
-          >
-            <div className="category-bottom-panel w-full rounded-2xl bg-skin-white p-5 shadow-card md:p-7 xl:p-10 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-skin-neutral-100 [&>*:not(:first-child)]:pt-8 md:[&>*:not(:first-child)]:pt-10">
+          <div className="w-full pt-7.5 md:pt-9">
+            <CategoryBuyingGuideAccordion
+              title={buyingGuide?.title ?? enhancedCategoryData.name}
+              imageUrl={buyingGuide?.imageUrl ?? data.logo_url}
+              imageAlt={buyingGuide?.imageAlt ?? enhancedCategoryData.name}
+            >
               {buyingGuide ? (
                 <CategoryBuyingGuide
                   key={`buying-guide-${pageSlug ?? enhancedCategoryData.slug ?? categoryId}`}
                   embedded
+                  hideHeader
                   {...buyingGuide}
                 />
               ) : null}
               {categoryId ? (
                 <RelatedGuides
                   key={`related-guides-${categoryId}`}
+                  title="Related Blogs"
                   embedded
                   currentCategoryId={categoryId}
                 />
               ) : null}
-            </div>
+            </CategoryBuyingGuideAccordion>
           </div>
         ) : null}
       </ProductList>

@@ -21,8 +21,12 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
 
   return (
     <div className="space-y-4 md:space-y-5">
-      <div className="mx-auto w-full max-w-[627px] rounded-lg border border-skin-neutral-100 bg-skin-white p-2 md:p-2.5">
-        <div className="flex flex-wrap items-center justify-center gap-2 md:gap-2.5">
+      <div className="relative mx-auto w-full max-w-[627px] overflow-hidden rounded-lg border border-skin-neutral-100 bg-skin-white">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-skin-white to-transparent md:hidden"
+        />
+        <div className="category-buying-guide-tabs-scroll px-2 py-2 md:p-2.5">
           {tabs.map((tab) => {
             const isActive = tab.id === activeTab.id;
 
@@ -31,7 +35,7 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTabId(tab.id)}
-                className={`min-h-10 rounded-lg border px-4 py-2 font-oswald text-content-1 font-semibold transition-all md:min-h-11 md:px-5 ${
+                className={`shrink-0 whitespace-nowrap min-h-10 rounded-lg border px-4 py-2 font-oswald text-content-1 font-semibold transition-all md:min-h-11 md:px-5 ${
                   isActive
                     ? "border-skin-primary-500 bg-skin-primary-500 text-skin-white shadow-card"
                     : "border-skin-primary-500 bg-skin-white text-skin-primary-500 hover:bg-skin-neutral-25"

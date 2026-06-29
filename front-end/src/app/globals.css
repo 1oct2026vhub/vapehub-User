@@ -834,6 +834,38 @@ input[type="checkbox"] + span {
   @apply text-skin-neutral-400 !text-title-2;
 }
 
+.category-buying-guide-tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.category-buying-guide-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.category-buying-guide-tabs-scroll > button {
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .category-buying-guide-tabs-scroll {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.625rem;
+    overflow-x: visible;
+    overscroll-behavior-x: auto;
+    scroll-snap-type: none;
+  }
+}
+
 /* Styles for webkit-based browsers */
 ::-webkit-scrollbar {
   width: 5px;

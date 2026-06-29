@@ -50,7 +50,8 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
     trustResponse.status === ServerActionStatus.SUCCESS
       ? trustResponse.data?.overallStats
       : null;
-  const trustStars = trustStats?.scoreBreakdown?.stars ?? 4.8;
+  const trustStars =
+    trustStats?.scoreBreakdown?.stars ?? trustStats?.averageRating ?? 4.8;
   const trustTotalReviews = trustStats?.totalReviews ?? 12000;
 
   const category = data.categories?.[0];
@@ -148,12 +149,20 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
           <BlogAuthorBioCard author={data.author} authorId={data.author_id} />
 
           <aside className="blog:hidden">
-            <BlogTrustSidebar stars={trustStars} totalReviews={trustTotalReviews} />
+            <BlogTrustSidebar
+              stars={trustStars}
+              totalReviews={trustTotalReviews}
+              idPrefix="blog-trust-inline"
+            />
           </aside>
         </div>
 
         <aside className="blog-post-rail hidden min-w-0 blog:block">
-          <BlogTrustSidebar stars={trustStars} totalReviews={trustTotalReviews} />
+          <BlogTrustSidebar
+            stars={trustStars}
+            totalReviews={trustTotalReviews}
+            idPrefix="blog-trust-rail"
+          />
         </aside>
       </div>
 

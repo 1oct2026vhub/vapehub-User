@@ -104,3 +104,7 @@ export interface BlogList extends BlogContent {
     categories: (BaseBlogEntity & TimeStampFields)[];
 }
 
+export interface RelatedGuidesResponse {
+    guides: BlogList[];
+}
+

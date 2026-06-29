@@ -1,6 +1,6 @@
 import { ServerActionResponse, ServerActionStatus } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia } from "./config/auth.config";
-import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
+import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse, RelatedGuidesResponse } from "./config/blog.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
@@ -903,6 +903,28 @@ export const getAllDeals = async (payload?: { limit?: number; offset?: number; d
 export const getMoreLikeThis = async (payload: { product_id: number; limit?: number; offset?: number }, canCache: boolean = true): Promise<ServerActionResponse<MoreLikeThisResponse>> => {
     return await handleRequest<MoreLikeThisResponse, unknown>({
         endpoint: API_ROUTES.GET_MORE_LIKE_THIS(payload),
+        method: 'GET',
+        canCache,
+    });
+};
+
+export const getRelatedGuides = async (
+    payload: { product_id: number; limit?: number },
+    canCache: boolean = true,
+): Promise<ServerActionResponse<RelatedGuidesResponse>> => {
+    return await handleRequest<RelatedGuidesResponse, unknown>({
+        endpoint: API_ROUTES.GET_RELATED_GUIDES(payload),
+        method: 'GET',
+        canCache,
+    });
+};
+
+export const getCategoryRelatedGuides = async (
+    payload: { category_id: number; limit?: number },
+    canCache: boolean = true,
+): Promise<ServerActionResponse<RelatedGuidesResponse>> => {
+    return await handleRequest<RelatedGuidesResponse, unknown>({
+        endpoint: API_ROUTES.GET_CATEGORY_RELATED_GUIDES(payload),
         method: 'GET',
         canCache,
     });

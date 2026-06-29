@@ -360,7 +360,12 @@ const Page = async ({
         })) : [];
         return (
           <>
-            <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
+            <CategoryProducts
+              data={category}
+              reviews={reviews}
+              dynamicPageSlug={dynamicPageSlug}
+              pageSlug={primarySlug ?? undefined}
+            />
           </>
         );
       }

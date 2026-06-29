@@ -100,6 +100,25 @@ export interface DynamicPageSlugResponse {
         url: string;
         order: number;
     }>;
+    buying_guide?: {
+        label?: string;
+        title?: string;
+        highlights?: Array<string | { label: string }>;
+        content?: string;
+        contentHtml?: string;
+        image_url?: string;
+        imageUrl?: string;
+        image_alt?: string;
+        imageAlt?: string;
+        defaultTabId?: string;
+        tabs?: Array<{
+            id?: string;
+            label?: string;
+            heading?: string;
+            content?: string;
+            contentHtml?: string;
+        }>;
+    };
 }
 
 export type FlashNewsResponse = FlashNewsItem[];

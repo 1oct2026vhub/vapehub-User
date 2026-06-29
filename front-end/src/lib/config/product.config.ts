@@ -1,5 +1,6 @@
 import { BrandConfig } from "./brand.config";
 import { Category } from "./category.config";
+import { DynamicPageSlugResponse } from "./global.config";
 
 export interface ProductFilters {
     brand?: string;
@@ -193,7 +194,7 @@ export interface CategoryResponseData extends Category {
     price_ranges: PriceRange[],
     brand: BRAND[],
     category?: CATEGORY[]
-  
+    buying_guide?: DynamicPageSlugResponse["buying_guide"];
 }
 interface BRAND {
     id: number;

@@ -101,6 +101,8 @@ export const API_ROUTES = {
     REVIEWS: (payload: { page?: number, limit?: number, product_id?: number, user_id?: number, is_visible?: boolean, testimonial?: boolean }) => buildRequestUrl(`/api/review?${toQueryString(payload)}`),
     GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string, show_home_page?: boolean }) => buildRequestUrl(`/api/product/deals${payload ? `?${toQueryString(payload)}` : ''}`),
     GET_MORE_LIKE_THIS: (payload: { product_id: number; limit?: number; offset?: number }) => buildRequestUrl(`/api/product/more-like-this?${toQueryString(payload)}`),
+    GET_RELATED_GUIDES: (payload: { product_id: number; limit?: number }) => buildRequestUrl(`/api/product/related-guides?${toQueryString(payload)}`),
+    GET_CATEGORY_RELATED_GUIDES: (payload: { category_id: number; limit?: number }) => buildRequestUrl(`/api/category/related-guides?${toQueryString(payload)}`),
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),

@@ -18,7 +18,7 @@ import {
   NON_VARIANT_FILTERS 
 } from '@/lib/config/product.config';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FunctionComponent, ReactElement, useState } from "react";
+import { FunctionComponent, ReactElement, ReactNode, useState } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
 import { setScrollToTopOnNextNavigation } from "@/components/HistoryProvider";
 import { PRODUCT_LISTING_START_ID } from "@/lib/utils/scrollToTop";
@@ -52,7 +52,11 @@ type DealOption = {
   product_count: number;
 };
 
-const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]}> = ({ data, reviews = [] }): ReactElement => { 
+const ProductList: FunctionComponent<{
+  data: ProductListData;
+  reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+  children?: ReactNode;
+}> = ({ data, reviews = [], children }): ReactElement => { 
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -369,6 +373,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
               </div>
             </>
           }
+          {children}
         </div>
       </section>
 

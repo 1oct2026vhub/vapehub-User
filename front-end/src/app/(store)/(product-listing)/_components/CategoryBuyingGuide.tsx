@@ -45,7 +45,7 @@ const CategoryBuyingGuide = ({
     {!hideHeader ? (
       <div className="space-y-1.5">
         <p className="text-content-2 font-semibold text-skin-neutral-300">{label}</p>
-        <SectionHeading title={title} className="w-fit" />
+        {title ? <SectionHeading title={title} className="w-fit" /> : null}
       </div>
     ) : null}
 

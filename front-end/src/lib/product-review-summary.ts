@@ -41,6 +41,7 @@ function logPdpReview(
   payload?: Record<string, unknown>,
 ): void {
   if (!isReviewDebugEnabled()) return;
+  void [productId, productSlug, message, payload];
 }
 
 function ratingFromProductStats(

@@ -13,6 +13,7 @@ const isReviewDebugEnabled = (): boolean =>
 
 function logClientReview(productId: number, message: string, payload?: Record<string, unknown>): void {
   if (!isReviewDebugEnabled()) return;
+  void [productId, message, payload];
 }
 
 interface ReviewContextType {

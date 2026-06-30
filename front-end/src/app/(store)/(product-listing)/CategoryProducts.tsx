@@ -92,7 +92,7 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
           <div className="w-full pt-7.5 md:pt-9">
             <CategoryBuyingGuideAccordion
               title={buyingGuide?.title ?? enhancedCategoryData.name}
-              imageUrl={buyingGuide?.imageUrl ?? data.logo_url}
+              imageUrl={data.logo_url ?? buyingGuide?.imageUrl}
               imageAlt={buyingGuide?.imageAlt ?? enhancedCategoryData.name}
             >
               {buyingGuide ? (

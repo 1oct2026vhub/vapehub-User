@@ -6,6 +6,7 @@ import {
   DEFAULT_CATEGORY_BUYING_GUIDE_LABEL,
 } from "@/lib/config/category-buying-guide.config";
 import CategoryBuyingGuideTabs from "./CategoryBuyingGuideTabs";
+import SectionHeading from "@/components/ui/SectionHeading";
 
 interface CategoryBuyingGuideProps extends CategoryBuyingGuideData {
   embedded?: boolean;
@@ -44,7 +45,7 @@ const CategoryBuyingGuide = ({
     {!hideHeader ? (
       <div className="space-y-1.5">
         <p className="text-content-2 font-semibold text-skin-neutral-300">{label}</p>
-        <h2 className="primary-gradient-600 text-h5 font-semibold md:text-h3">{title}</h2>
+        <SectionHeading title={title} className="w-fit" />
       </div>
     ) : null}
 

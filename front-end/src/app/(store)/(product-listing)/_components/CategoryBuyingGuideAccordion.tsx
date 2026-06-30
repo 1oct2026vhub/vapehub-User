@@ -2,6 +2,7 @@
 
 import NoImage from "@/components/NoImage";
 import { DownArrowIcon } from "@/components/Icons";
+import SectionHeading from "@/components/ui/SectionHeading";
 import { useEffect, useId, useState, type ReactNode } from "react";
 
 const ACCORDION_HASH = "#buying-guide-faqs";
@@ -60,7 +61,7 @@ const CategoryBuyingGuideAccordion = ({
         className="flex w-full items-center gap-3.5 p-4 text-left md:gap-5 md:p-5 xl:p-6"
       >
         {imageUrl ? (
-          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-skin-neutral-100 md:h-16 md:w-16">
+          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg md:h-16 md:w-16">
             <NoImage
               src={imageUrl}
               alt={imageAlt || title}
@@ -70,13 +71,11 @@ const CategoryBuyingGuideAccordion = ({
             />
           </div>
         ) : null}
-        <div className="min-w-0 flex-1 space-y-0.5">
-          <p className="text-content-2 font-semibold uppercase text-skin-primary-500">
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <p className="text-content-2 font-semibold text-skin-neutral-300">
             {ACCORDION_LABEL}
           </p>
-          <h2 className="font-oswald text-title-1 font-bold text-skin-neutral-700 md:text-h5">
-            {title}
-          </h2>
+          <SectionHeading title={title} className="w-fit" />
         </div>
         <DownArrowIcon
           className={`h-5 w-5 shrink-0 text-skin-neutral-500 transition-transform duration-200 ${
@@ -89,7 +88,7 @@ const CategoryBuyingGuideAccordion = ({
       {isOpen ? (
         <div
           id={contentId}
-          className="border-t border-skin-neutral-100 px-4 pb-5 pt-6 md:px-5 md:pb-7 md:pt-8 xl:px-6 xl:pb-10 xl:pt-10 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-skin-neutral-100 [&>*:not(:first-child)]:pt-8 md:[&>*:not(:first-child)]:pt-10"
+          className="px-4 pb-5 pt-6 md:px-5 md:pb-7 md:pt-8 xl:px-6 xl:pb-10 xl:pt-10 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-skin-neutral-100 [&>*:not(:first-child)]:pt-8 md:[&>*:not(:first-child)]:pt-10"
         >
           {children}
         </div>

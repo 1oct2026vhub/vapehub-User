@@ -64,7 +64,6 @@ const PREFILLED_POD_KITS_GUIDE: CategoryBuyingGuideData = {
   highlights: ["50+ Flavours", "6000 Puffs", "MIX & MATCH 3 FOR £30"],
   contentHtml: `<p>Prefilled pod kits are one of the most straightforward ways to vape. A <a href="/prefilled-pod-kits">pod kit</a> pairs a rechargeable battery with <a href="/prefilled-pods">prefilled pods</a> that click straight in — no refilling, no coil changes, and none of the waste of a single-use disposable. You get the convenience of a disposable with the lower running cost of a reusable device.</p>
 <p>Most prefilled pod kits sit in the <a href="/6000-puff-vapes">6000 Puff Vapes</a> to <a href="/15000-puff-vapes">15000 Puff Vapes</a> range, with some newer models pushing <a href="/30000-puff-vapes">30000 Puff Vapes</a>. They are almost always <a href="/mtl-pod-kits">MTL Pod Kits</a> (mouth-to-lung), which means a tighter draw and higher nicotine strengths — the style most ex-smokers find closest to a cigarette.</p>`,
-  imageUrl: "/images/blog-list-card.jpg",
   imageAlt: "Hayati Pro Max prefilled pod kits",
   tabs: PREFILLED_POD_KITS_TABS,
   defaultTabId: "flavours",

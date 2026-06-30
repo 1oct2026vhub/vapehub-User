@@ -441,17 +441,9 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         const freeShippingMethod = filteredSortedMethods.find((m) => m.is_free_shipping ?? false);
 
         let nextMethod: SHIPPING_METHOD_DATA | null = null;
-        if (loyaltyRedemption.isRedeemed) {
-            const apiMethodId = loyaltyRedemption.applyCouponShippingMethodId;
-            const fromApplyCoupon =
-                apiMethodId != null && apiMethodId > 0
-                    ? filteredSortedMethods.find((m) => Number(m.id) === apiMethodId)
-                    : undefined;
-            nextMethod =
-                fromApplyCoupon ??
-                pickCheckoutShippingMethod(filteredSortedMethods, currentMethodId) ??
-                matchedCurrent ??
-                null;
+        if (loyaltyRedemption.isRedeemed && matchedCurrent) {
+            // Loyalty: keep the current carrier so apply-coupon is not re-triggered in a loop.
+            nextMethod = matchedCurrent;
         } else if (!loyaltyRedemption.isRedeemed && freeShippingMethod) {
             // No loyalty: when the basket qualifies, use the free-shipping option automatically.
             nextMethod = freeShippingMethod;
@@ -476,7 +468,6 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         loyaltyRedemption.isRedeemed,
         loyaltyRedemption.discountValue,
         loyaltyRedemption.applyCouponShippingCost,
-        loyaltyRedemption.applyCouponShippingMethodId,
         form,
         setSelectedShippingMethod,
     ]);

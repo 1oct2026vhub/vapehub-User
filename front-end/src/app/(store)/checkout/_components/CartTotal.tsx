@@ -107,13 +107,6 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     const loyaltyRefreshDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastLoyaltyShippingMethodIdRef = useRef<number>(0);
     const loyaltyApplyCouponInFlightKeyRef = useRef<string | null>(null);
-    const selectedShippingMethodIdRef = useRef<number>(0);
-
-    useEffect(() => {
-        selectedShippingMethodIdRef.current = selectedShippingMethod?.id
-            ? Number(selectedShippingMethod.id)
-            : 0;
-    }, [selectedShippingMethod?.id]);
 
     const commitLoyaltyApplyCouponResponse = useCallback(
         (
@@ -449,24 +442,17 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
 
         loyaltyRefreshDebounceRef.current = setTimeout(async () => {
             loyaltyRefreshDebounceRef.current = null;
-            const preferredId = selectedShippingMethodIdRef.current;
-            const fallbackIds = listApplyCouponShippingMethodIds(true);
-            const methodIds =
-                preferredId > 0
-                    ? [preferredId, ...fallbackIds.filter((id) => id !== preferredId)]
-                    : fallbackIds;
+            // Derive carrier from cart + loyalty (free shipping first when qualified), not stale UI selection.
+            const methodIds = listApplyCouponShippingMethodIds(true);
             try {
                 const { response, shippingMethodId } = await applyLoyaltyCouponWithShippingCandidates(
                     methodIds,
                     pointsToRedeem,
                     loyaltyPoints,
-                    (id) => {
-                        if (preferredId > 0 && id !== preferredId) return;
-                        syncSelectedShippingMethod(id);
-                    }
+                    (id) => syncSelectedShippingMethod(id)
                 );
                 if (response && commitLoyaltyApplyCouponResponse(response, shippingMethodId)) {
-                    if (preferredId <= 0 && shippingMethodId > 0) {
+                    if (shippingMethodId > 0) {
                         syncSelectedShippingMethod(shippingMethodId);
                     }
                 } else if (response?.status === ServerActionStatus.ERROR) {

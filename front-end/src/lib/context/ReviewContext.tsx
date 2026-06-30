@@ -13,7 +13,6 @@ const isReviewDebugEnabled = (): boolean =>
 
 function logClientReview(productId: number, message: string, payload?: Record<string, unknown>): void {
   if (!isReviewDebugEnabled()) return;
-  console.log(`[PDP Reviews][client] productId=${productId} — ${message}`, payload ?? '');
 }
 
 interface ReviewContextType {

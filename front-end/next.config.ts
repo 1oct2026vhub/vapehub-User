@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 
 // Ensure .env / .env.local are loaded before reading PRERENDER_TOKEN for the env block.
 loadEnvConfig(process.cwd());
-
 const nextConfig: NextConfig = {
   trailingSlash: true,
   // Edge middleware inlines env at build time; expose PRERENDER_TOKEN explicitly.

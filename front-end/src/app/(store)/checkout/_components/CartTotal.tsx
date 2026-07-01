@@ -366,7 +366,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         }
     }, [isRedeemed]);
     
-    // When cart quantity/total changes with loyalty on, pick a carrier valid for the new merchandise total immediately.
+    // When cart quantity/total or loyalty points change, pick a carrier valid for the new merchandise total immediately.
     useEffect(() => {
         if (!isRedeemed) return;
         const shippingMethodId = resolveApplyCouponShippingMethodId(undefined, true);
@@ -378,6 +378,8 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         cartTotal,
         itemCount,
         isRedeemed,
+        pointsToRedeem,
+        loyaltyDiscountValue,
         resolveApplyCouponShippingMethodId,
         setShippingMethodIdForCoupon,
     ]);
@@ -449,24 +451,21 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
 
         loyaltyRefreshDebounceRef.current = setTimeout(async () => {
             loyaltyRefreshDebounceRef.current = null;
-            const preferredId = selectedShippingMethodIdRef.current;
+            const resolvedId = resolveApplyCouponShippingMethodId(undefined, true);
             const fallbackIds = listApplyCouponShippingMethodIds(true);
             const methodIds =
-                preferredId > 0
-                    ? [preferredId, ...fallbackIds.filter((id) => id !== preferredId)]
+                resolvedId > 0
+                    ? [resolvedId, ...fallbackIds.filter((id) => id !== resolvedId)]
                     : fallbackIds;
             try {
                 const { response, shippingMethodId } = await applyLoyaltyCouponWithShippingCandidates(
                     methodIds,
                     pointsToRedeem,
                     loyaltyPoints,
-                    (id) => {
-                        if (preferredId > 0 && id !== preferredId) return;
-                        syncSelectedShippingMethod(id);
-                    }
+                    (id) => syncSelectedShippingMethod(id)
                 );
                 if (response && commitLoyaltyApplyCouponResponse(response, shippingMethodId)) {
-                    if (preferredId <= 0 && shippingMethodId > 0) {
+                    if (shippingMethodId > 0) {
                         syncSelectedShippingMethod(shippingMethodId);
                     }
                 } else if (response?.status === ServerActionStatus.ERROR) {
@@ -498,6 +497,8 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         loyaltyEligibility.canRedeemOnCart,
         loyaltyPointsToRedeemError,
         commitLoyaltyApplyCouponResponse,
+        resolveApplyCouponShippingMethodId,
+        listApplyCouponShippingMethodIds,
     ]);
 
     const handleRedeemToggle = async (checked: boolean) => {

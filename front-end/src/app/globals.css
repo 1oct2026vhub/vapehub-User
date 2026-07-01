@@ -444,6 +444,33 @@ input[type='search'] {
   z-index: 1;
 }
 
+/* TOC: one left green indicator only — native scrollbar fully hidden */
+.blog-post-toc-scroll-clip {
+  overflow: hidden;
+}
+
+.blog-post-toc-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  margin-right: -20px;
+  padding-right: 20px;
+}
+
+.blog-post-toc-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+.blog-post-toc-scroll::-webkit-scrollbar-thumb,
+.blog-post-toc-scroll::-webkit-scrollbar-track,
+.blog-post-toc-scroll::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 .blog-details {
   width: 100%;
   max-width: 100%;
@@ -617,6 +644,7 @@ input[type="checkbox"] + span {
 .blog-details .rich-text h2,
 .blog-details.rich-text h2 {
   @apply text-h5 md:text-h4;
+  scroll-margin-top: 7rem;
 }
 
 .blog-details .rich-text h3,

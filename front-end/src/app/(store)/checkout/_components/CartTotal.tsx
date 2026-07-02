@@ -107,6 +107,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     const loyaltyRefreshDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastLoyaltyShippingMethodIdRef = useRef<number>(0);
     const loyaltyApplyCouponInFlightKeyRef = useRef<string | null>(null);
+    const loyaltyManualShippingSelectionRef = useRef(false);
     const selectedShippingMethodIdRef = useRef<number>(0);
 
     useEffect(() => {
@@ -130,7 +131,11 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 loyaltyParsed > 0 ? loyaltyParsed : Math.max(0, apiSub - apiTot);
             const apiShippingMethodId = parseShippingMethodIdFromApplyCouponResponse(response.data);
             const resolvedShippingMethodId =
-                apiShippingMethodId ?? (fallbackShippingMethodId > 0 ? fallbackShippingMethodId : null);
+                fallbackShippingMethodId > 0
+                    ? fallbackShippingMethodId
+                    : apiShippingMethodId != null && apiShippingMethodId > 0
+                      ? apiShippingMethodId
+                      : null;
             setLoyaltyRedemption((prev) => ({
                 ...prev,
                 isRedeemed: true,
@@ -363,8 +368,13 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     useEffect(() => {
         if (!isRedeemed) {
             lastLoyaltyShippingMethodIdRef.current = 0;
+            loyaltyManualShippingSelectionRef.current = false;
         }
     }, [isRedeemed]);
+
+    useEffect(() => {
+        loyaltyManualShippingSelectionRef.current = false;
+    }, [cartTotal, itemCount, pointsToRedeem]);
     
     // When cart quantity/total or loyalty points change, pick a carrier valid for the new merchandise total immediately.
     useEffect(() => {
@@ -384,23 +394,28 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         setShippingMethodIdForCoupon,
     ]);
 
-    // Keep CartContext coupon revalidation aligned with the selected shipping method when set.
+    // Keep CartContext coupon revalidation aligned with the priced shipping method when loyalty is on.
     useEffect(() => {
+        if (isRedeemed) {
+            const pricedId =
+                loyaltyRedemption.applyCouponShippingMethodId != null &&
+                loyaltyRedemption.applyCouponShippingMethodId > 0
+                    ? loyaltyRedemption.applyCouponShippingMethodId
+                    : resolveApplyCouponShippingMethodId(undefined, true);
+            if (pricedId > 0) {
+                setShippingMethodIdForCoupon(pricedId);
+            }
+            return;
+        }
         const selectedId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0;
         if (selectedId > 0) {
             setShippingMethodIdForCoupon(selectedId);
-            return;
-        }
-        const shippingMethodId = isRedeemed
-            ? resolveApplyCouponShippingMethodId(undefined, true)
-            : 0;
-        if (shippingMethodId > 0) {
-            setShippingMethodIdForCoupon(shippingMethodId);
         }
     }, [
         selectedShippingMethod,
         setShippingMethodIdForCoupon,
         isRedeemed,
+        loyaltyRedemption.applyCouponShippingMethodId,
         resolveApplyCouponShippingMethodId,
         cartTotal,
         itemCount,
@@ -422,6 +437,13 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         registerShippingMethodSelectedHandler((shippingMethodId: number) => {
             if (!canRefreshLoyaltyForShippingRef.current) return;
             if (lastLoyaltyShippingMethodIdRef.current === shippingMethodId) return;
+
+            loyaltyManualShippingSelectionRef.current = true;
+            if (loyaltyRefreshDebounceRef.current) {
+                clearTimeout(loyaltyRefreshDebounceRef.current);
+                loyaltyRefreshDebounceRef.current = null;
+            }
+
             void refreshLoyaltyApplyCouponForShippingRef.current(shippingMethodId);
         });
         return () => registerShippingMethodSelectedHandler(null);
@@ -430,6 +452,10 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
     // Authenticated loyalty: debounced applyCoupon keeps discount aligned with API when cart quantity/total changes only.
     // CartContext owns coupon revalidation; toggling loyalty still calls applyCoupon immediately in handleRedeemToggle (may duplicate once ~400ms after redeem).
     useEffect(() => {
+        if (loyaltyManualShippingSelectionRef.current) {
+            return;
+        }
+
         if (
             !isAuthenticated ||
             !isRedeemed ||
@@ -467,6 +493,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 if (response && commitLoyaltyApplyCouponResponse(response, shippingMethodId)) {
                     if (shippingMethodId > 0) {
                         syncSelectedShippingMethod(shippingMethodId);
+                        setShippingMethodIdForCoupon(shippingMethodId);
                     }
                 } else if (response?.status === ServerActionStatus.ERROR) {
                     const errMsg =
@@ -539,7 +566,11 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 : 0;
             const apiShippingMethodId = parseShippingMethodIdFromApplyCouponResponse(response.data);
             const resolvedShippingMethodId =
-                apiShippingMethodId ?? (shippingMethodId > 0 ? shippingMethodId : null);
+                shippingMethodId > 0
+                    ? shippingMethodId
+                    : apiShippingMethodId != null && apiShippingMethodId > 0
+                      ? apiShippingMethodId
+                      : null;
             setLoyaltyRedemption(prev => ({
                 ...prev,
                 isRedeemed: checked,

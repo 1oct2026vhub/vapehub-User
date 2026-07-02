@@ -414,6 +414,14 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             return;
         }
 
+        const loyaltyApplyCouponSnapshot = loyaltyRedemption.isRedeemed
+            ? {
+                  isRedeemed: true,
+                  applyCouponShippingCost: loyaltyRedemption.applyCouponShippingCost,
+                  applyCouponShippingMethodId: loyaltyRedemption.applyCouponShippingMethodId,
+              }
+            : undefined;
+
         const { filteredSortedMethods } = deriveShippingMethodsForCheckout(
             shippingMethodsData,
             cartTotal,
@@ -421,7 +429,8 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
             {
                 isRedeemed: loyaltyRedemption.isRedeemed,
                 discountValue: loyaltyRedemption.discountValue,
-            }
+            },
+            loyaltyApplyCouponSnapshot
         );
 
         setShippingMethods(filteredSortedMethods);
@@ -452,7 +461,9 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                   {
                       isRedeemed: loyaltyRedemption.isRedeemed,
                       discountValue: loyaltyRedemption.discountValue,
-                  }
+                  },
+                  loyaltyApplyCouponSnapshot,
+                  true
               );
         const thresholdMethod =
             thresholdShippingId > 0

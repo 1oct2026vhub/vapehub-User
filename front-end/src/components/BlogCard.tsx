@@ -44,12 +44,16 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
                 />
             </div>
             <div className="min-w-0 flex-1">
-                <p className="blog-card-excerpt line-clamp-3 sm:min-h-[72px] text-skin-neutral-300">
-                    {excerpt}
-                </p>
-                <span className="text-skin-primary-300 text-content-3 md:text-content-1 font-semibold mt-2 inline-block">
-                    Read more...
-                </span>
+                {excerpt ? (
+                    <>
+                        <p className="blog-card-excerpt line-clamp-3 sm:min-h-[72px] text-skin-neutral-300">
+                            {excerpt}
+                        </p>
+                        <span className="text-skin-primary-300 text-content-3 md:text-content-1 font-semibold mt-2 inline-block">
+                            Read more...
+                        </span>
+                    </>
+                ) : null}
             </div>
             <div className="mt-3.5 pt-0.5">
                 <p className="primary-gradient-100 text-content-3 md:text-content-1 font-semibold">

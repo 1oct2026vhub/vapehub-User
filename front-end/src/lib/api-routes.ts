@@ -144,6 +144,8 @@ export const API_ROUTES = {
         const queryString = searchParams.toString();
         return buildRequestUrl(`/api/product/${productId}/description${queryString ? `?${queryString}` : ''}`);
     },
+    GET_PRODUCT_RELATED_BLOGS: (productId: number, params?: { limit?: number }) =>
+        buildRequestUrl(`/api/product/${productId}/related-blogs${params ? `?${toQueryString(params)}` : ''}`),
     GET_MAIL_SUBSCRIPTION_SETTINGS: buildRequestUrl('/api/mailSubscription/settings'),
     GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${toQueryString(payload)}` : ''}`),
     GET_WELCOME_CONTENT: buildRequestUrl('/api/home/welcome-content'),

@@ -1,6 +1,6 @@
 import { ServerActionResponse, ServerActionStatus } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia } from "./config/auth.config";
-import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse, RelatedGuidesResponse } from "./config/blog.config";
+import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse, ProductRelatedBlogsResponse, RelatedGuidesResponse } from "./config/blog.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
@@ -204,6 +204,20 @@ export const getProductDescription = async (
     method: 'GET',
     canCache: canCache && !hasVariantFilter,
     cacheStrategy: canCache && !hasVariantFilter ? { revalidate: 3600 } : undefined,
+  });
+};
+
+export const getProductRelatedBlogs = async (
+  productId: number,
+  params?: { limit?: number },
+  canCache: boolean = true,
+): Promise<ServerActionResponse<ProductRelatedBlogsResponse>> => {
+  const endpoint = API_ROUTES.GET_PRODUCT_RELATED_BLOGS(productId, params);
+  return await handleRequest<ProductRelatedBlogsResponse, unknown>({
+    endpoint,
+    method: "GET",
+    canCache,
+    cacheStrategy: canCache ? { revalidate: 120 } : undefined,
   });
 };
 

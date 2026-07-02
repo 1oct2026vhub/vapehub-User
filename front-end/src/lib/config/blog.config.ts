@@ -108,3 +108,24 @@ export interface RelatedGuidesResponse {
     guides: BlogList[];
 }
 
+export interface ProductRelatedBlogCategory {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+export interface ProductRelatedBlog {
+    id: number;
+    title: string;
+    slug: string;
+    image_url: string | null;
+    alt_text: string | null;
+    published_at: string;
+    categories: ProductRelatedBlogCategory[];
+}
+
+export interface ProductRelatedBlogsResponse {
+    product_id: number;
+    related_blogs: ProductRelatedBlog[];
+}
+

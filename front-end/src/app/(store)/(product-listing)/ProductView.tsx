@@ -14,6 +14,7 @@ import { FaqResponse } from '@/lib/config/global.config';
 import { ReviewProvider } from '@/lib/context/ReviewContext';
 import { ProductDataProvider } from '@/lib/context/ProductDataContext';
 import { ProductReviewInitialData } from '@/lib/product-review-summary';
+import { BlogList } from '@/lib/config/blog.config';
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -24,6 +25,7 @@ type ProductViewProps = {
     parentSeoTitle?: string;
     /** Server-resolved review summary for SSR-visible counts */
     initialReviewData?: ProductReviewInitialData | null;
+    initialRelatedBlogs?: BlogList[];
 }
 
 const ProductView: FunctionComponent<ProductViewProps> = ({
@@ -33,6 +35,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({
     parentSeoDescription = '',
     parentSeoTitle = '',
     initialReviewData = null,
+    initialRelatedBlogs = [],
 }): ReactElement => {
 
     const productFeatures = data?.product?.attribute_terms.filter((attrTerm: AttributeTerms) => (attrTerm.attribute.is_visible_page && !attrTerm.attribute.used_in_variation));
@@ -73,7 +76,9 @@ const ProductView: FunctionComponent<ProductViewProps> = ({
                     }
                     <ProductContent data={data} />
                     <FAQSection type="product" id={data.product.id} initialFaqs={productFaqs} />
-                    <RelatedGuides currentProductId={data.product.id} />
+                    {initialRelatedBlogs.length > 0 ? (
+                        <RelatedGuides currentProductId={data.product.id} initialBlogs={initialRelatedBlogs} />
+                    ) : null}
                     <RelatedProducts viewAllHref={viewAllHref} currentProductId={data.product.id} />
 
                 </main>

@@ -42,6 +42,8 @@ import {
     resolveCheckoutPayloadTotal,
     deriveShippingMethodsForCheckout,
     pickCheckoutShippingMethod,
+    resolveShippingMethodIdForThreshold,
+    resolveShippingMethodIdForLoyaltyApplyCoupon,
     parsePlaceOrderResponseData,
     resolveIsPaymentRequiredForOrder,
     toApiUseShippingAsBilling,
@@ -402,7 +404,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
 
     useEffect(() => {
         userPickedShippingRef.current = false;
-    }, [loyaltyRedemption.isRedeemed]);
+    }, [loyaltyRedemption.isRedeemed, loyaltyRedemption.pointsToRedeem]);
 
     useEffect(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {
@@ -445,18 +447,36 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                 ? filteredSortedMethods.find((m) => Number(m.id) === Number(currentMethodId))
                 : undefined;
         const freeShippingMethod = filteredSortedMethods.find((m) => m.is_free_shipping ?? false);
+        const thresholdShippingId = loyaltyRedemption.isRedeemed
+            ? resolveShippingMethodIdForLoyaltyApplyCoupon(
+                  shippingMethodsData,
+                  cartTotal,
+                  couponDiscount,
+                  loyaltyRedemption.discountValue
+              )
+            : resolveShippingMethodIdForThreshold(
+                  shippingMethodsData,
+                  cartTotal,
+                  couponDiscount,
+                  {
+                      isRedeemed: loyaltyRedemption.isRedeemed,
+                      discountValue: loyaltyRedemption.discountValue,
+                  },
+                  loyaltyApplyCouponSnapshot,
+                  true
+              );
+        const thresholdMethod =
+            thresholdShippingId > 0
+                ? filteredSortedMethods.find((m) => Number(m.id) === thresholdShippingId) ??
+                  shippingMethodsData.find((m) => Number(m.id) === thresholdShippingId)
+                : undefined;
 
         let nextMethod: SHIPPING_METHOD_DATA | null = null;
         if (loyaltyRedemption.isRedeemed) {
-            const apiMethodId = loyaltyRedemption.applyCouponShippingMethodId;
-            const apiMethod =
-                apiMethodId != null && apiMethodId > 0
-                    ? filteredSortedMethods.find((m) => Number(m.id) === Number(apiMethodId))
-                    : undefined;
-            if (apiMethod) {
-                nextMethod = apiMethod;
-            } else if (userPickedShippingRef.current && matchedCurrent) {
+            if (userPickedShippingRef.current && matchedCurrent) {
                 nextMethod = matchedCurrent;
+            } else if (thresholdMethod) {
+                nextMethod = thresholdMethod;
             } else if (freeShippingMethod) {
                 nextMethod = freeShippingMethod;
             } else if (matchedCurrent) {

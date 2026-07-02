@@ -133,6 +133,8 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     const { handlePlaceOrder, isProcessing, setSelectedShippingMethod, notifyShippingMethodSelected } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
     const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
+    /** True after the customer picks a shipping method in the radio group (cleared when loyalty is toggled). */
+    const userPickedShippingRef = useRef(false);
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
     const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
@@ -399,6 +401,10 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     }, [status, fetchProfile, form]);
 
     useEffect(() => {
+        userPickedShippingRef.current = false;
+    }, [loyaltyRedemption.isRedeemed]);
+
+    useEffect(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {
             setShippingMethods([]);
             setSelectedCarrier(null);
@@ -449,6 +455,8 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                     : undefined;
             if (apiMethod) {
                 nextMethod = apiMethod;
+            } else if (userPickedShippingRef.current && matchedCurrent) {
+                nextMethod = matchedCurrent;
             } else if (freeShippingMethod) {
                 nextMethod = freeShippingMethod;
             } else if (matchedCurrent) {
@@ -767,6 +775,7 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                                 value={form.watch('shippingMethodId').toString()}
                                 onValueChange={(value) => {
                                     const methodId = Number(value);
+                                    userPickedShippingRef.current = true;
                                     form.setValue('shippingMethodId', methodId);
                                     const selectedMethod =
                                         shippingMethods.find(

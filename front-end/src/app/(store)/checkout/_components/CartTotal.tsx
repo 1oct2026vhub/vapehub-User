@@ -1,7 +1,7 @@
 'use client'
 import ShippingProgress from '@/components/ShippingProgress'
 import { DEFAULT_CURRENCY_SYMBOL, ServerActionStatus } from '@/lib/config/app.config'
-import { useCart } from '@/lib/context/CartContext'
+import { useCart, type LoyaltyRedemption } from '@/lib/context/CartContext'
 import { useCheckout } from '@/lib/context/CheckoutContext'
 import { Divider, Checkbox } from '@nextui-org/react'
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
@@ -20,6 +20,7 @@ import {
     parseIsPaymentRequiredFromApplyCouponResponse,
     parseTotalFromApplyCouponResponse,
     resolveShippingMethodIdForApplyCoupon,
+    listShippingMethodIdsForApplyCoupon,
     resolveShippingMethodIdForLoyaltyApplyCoupon,
     listShippingMethodIdsForLoyaltyApplyCoupon,
     calculateOrderTotalBeforeShipping,
@@ -46,6 +47,20 @@ function snapshotMailDiscountFromApplyCoupon(data: unknown): number | null {
     if (!('mail_subscription_discount' in o)) return null
     const n = parseApiMoney(o.mail_subscription_discount)
     return Number.isFinite(n) ? n : null
+}
+
+function buildLoyaltyApplyCouponSnapshot(
+    loyalty: Pick<
+        LoyaltyRedemption,
+        'isRedeemed' | 'applyCouponShippingCost' | 'applyCouponShippingMethodId'
+    >
+): LoyaltyApplyCouponShippingSnapshot | undefined {
+    if (!loyalty.isRedeemed) return undefined
+    return {
+        isRedeemed: true,
+        applyCouponShippingCost: loyalty.applyCouponShippingCost,
+        applyCouponShippingMethodId: loyalty.applyCouponShippingMethodId,
+    }
 }
 
 function isShippingMethodUnavailableMessage(message: string | undefined): boolean {
@@ -270,6 +285,31 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         couponSliceForShipping,
         loyaltyForShipping,
         selectedShippingMethod?.id,
+    ]);
+
+    const listApplyCouponShippingMethodIds = useMemo(() => {
+        return (fresh = false) =>
+            listShippingMethodIdsForApplyCoupon(
+                shippingMethodsData,
+                cartTotal,
+                couponSliceForShipping,
+                loyaltyForShipping,
+                fresh
+                    ? undefined
+                    : buildLoyaltyApplyCouponSnapshot({
+                          isRedeemed: true,
+                          applyCouponShippingCost: loyaltyRedemption.applyCouponShippingCost,
+                          applyCouponShippingMethodId: loyaltyRedemption.applyCouponShippingMethodId,
+                      }),
+                fresh
+            );
+    }, [
+        shippingMethodsData,
+        cartTotal,
+        couponSliceForShipping,
+        loyaltyForShipping,
+        loyaltyRedemption.applyCouponShippingCost,
+        loyaltyRedemption.applyCouponShippingMethodId,
     ]);
 
     const listLoyaltyApplyCouponShippingMethodIds = useMemo(() => {

@@ -12,7 +12,7 @@ import { useSession } from 'next-auth/react'
 import CouponForm from '@/components/CouponForm'
 import { SHIPPING_METHOD_DATA } from '@/lib/config/order.config'
 import { FREE_DELIVERY_THRESHOLD } from '@/lib/utils'
-import { calculateOrderGrandTotal, deriveShippingMethodsForCheckout, resolveShippingMethodIdForLoyaltyApplyCoupon } from '@/lib/utils/checkout-order.utils'
+import { calculateOrderGrandTotal, deriveShippingMethodsForCheckout } from '@/lib/utils/checkout-order.utils'
 
 interface CartDetailsProps {
   shippingMethodsData: SHIPPING_METHOD_DATA[]
@@ -85,23 +85,7 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
       return
     }
     setSelectedShippingMethod((prev) => {
-      const thresholdId = loyaltyRedemption.isRedeemed
-        ? resolveShippingMethodIdForLoyaltyApplyCoupon(
-            shippingMethodsData,
-            cartTotal,
-            couponForTotals,
-            loyaltyRedemption.discountValue
-          )
-        : 0
       const freeMethod = filteredSortedMethods.find((m) => m.is_free_shipping ?? false)
-      const thresholdMethod =
-        thresholdId > 0
-          ? filteredSortedMethods.find((m) => m.id === thresholdId) ??
-            shippingMethodsData.find((m) => m.id === thresholdId)
-          : undefined
-      if (thresholdMethod) {
-        return thresholdMethod
-      }
       if (!loyaltyRedemption.isRedeemed && freeMethod) {
         return freeMethod
       }
@@ -110,14 +94,7 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
       }
       return filteredSortedMethods[0]
     })
-  }, [
-    filteredSortedMethods,
-    loyaltyRedemption.isRedeemed,
-    loyaltyRedemption.discountValue,
-    shippingMethodsData,
-    cartTotal,
-    couponForTotals,
-  ])
+  }, [filteredSortedMethods, loyaltyRedemption.isRedeemed])
 
   useEffect(() => {
     const shippingMethodId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0

@@ -51,32 +51,15 @@ const CartDetails: React.FC<CartDetailsProps> = ({ shippingMethodsData }) => {
     [loyaltyRedemption.isRedeemed, loyaltyRedemption.discountValue]
   )
 
-  const loyaltyApplyCouponSnapshot = useMemo(
-    () =>
-      loyaltyRedemption.isRedeemed
-        ? {
-            isRedeemed: true as const,
-            applyCouponShippingCost: loyaltyRedemption.applyCouponShippingCost,
-            applyCouponShippingMethodId: loyaltyRedemption.applyCouponShippingMethodId,
-          }
-        : undefined,
-    [
-      loyaltyRedemption.isRedeemed,
-      loyaltyRedemption.applyCouponShippingCost,
-      loyaltyRedemption.applyCouponShippingMethodId,
-    ]
-  )
-
   const filteredSortedMethods = useMemo(
     () =>
       deriveShippingMethodsForCheckout(
         shippingMethodsData,
         cartTotal,
         couponForTotals,
-        loyaltyForTotals,
-        loyaltyApplyCouponSnapshot
+        loyaltyForTotals
       ).filteredSortedMethods,
-    [shippingMethodsData, cartTotal, couponForTotals, loyaltyForTotals, loyaltyApplyCouponSnapshot]
+    [shippingMethodsData, cartTotal, couponForTotals, loyaltyForTotals]
   )
 
   useEffect(() => {

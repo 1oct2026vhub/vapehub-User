@@ -400,9 +400,7 @@ export function resolveShippingMethodIdForThreshold(
   shippingMethodsData: SHIPPING_METHOD_DATA[] | undefined,
   cartTotal: number,
   couponDiscount: CheckoutCouponSlice,
-  loyalty: CheckoutLoyaltySlice,
-  loyaltyApplyCouponSnapshot?: LoyaltyApplyCouponShippingSnapshot | null,
-  fresh = false
+  loyalty: CheckoutLoyaltySlice
 ): number {
   if (!shippingMethodsData?.length) return 0
 
@@ -411,8 +409,7 @@ export function resolveShippingMethodIdForThreshold(
       shippingMethodsData,
       cartTotal,
       couponDiscount,
-      loyalty,
-      fresh ? undefined : loyaltyApplyCouponSnapshot
+      loyalty
     )
 
   const merchandiseSubtotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0
@@ -701,8 +698,7 @@ export function deriveShippingMethodsForCheckout(
   shippingMethodsData: SHIPPING_METHOD_DATA[] | undefined,
   cartTotal: number,
   couponDiscount: CheckoutCouponSlice,
-  loyalty: CheckoutLoyaltySlice,
-  loyaltyApplyCouponSnapshot?: LoyaltyApplyCouponShippingSnapshot | null
+  loyalty: CheckoutLoyaltySlice
 ): EnabledShippingOptions {
   if (!shippingMethodsData?.length) {
     return { enabledMethods: [], filteredSortedMethods: [], safeTotalForThreshold: 0 }
@@ -781,9 +777,7 @@ export function resolveShippingMethodIdForApplyCoupon(
     shippingMethodsData,
     cartTotal,
     couponDiscount,
-    loyalty,
-    loyaltyApplyCouponSnapshot,
-    fresh
+    loyalty
   )
   if (thresholdId > 0) return thresholdId
 
@@ -791,8 +785,7 @@ export function resolveShippingMethodIdForApplyCoupon(
     shippingMethodsData,
     cartTotal,
     couponDiscount,
-    loyalty,
-    fresh ? undefined : loyaltyApplyCouponSnapshot
+    loyalty
   )
 
   if (!filteredSortedMethods.length) {
@@ -826,8 +819,7 @@ export function listShippingMethodIdsForApplyCoupon(
     shippingMethodsData,
     cartTotal,
     couponDiscount,
-    loyalty,
-    snapshot
+    loyalty
   )
   const primary = resolveShippingMethodIdForApplyCoupon(
     shippingMethodsData,

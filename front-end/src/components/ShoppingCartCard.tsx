@@ -12,16 +12,21 @@ import { RatingStarEmpty, RatingStarFilled } from './Icons';
 type CartCardProps = {
   item?: CartItem;
   reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+  refreshCartAfterRemove?: boolean;
 };
 
-const ShoppingCartCard: React.FC<CartCardProps> = ({ item, reviews = [] }) => {
+const ShoppingCartCard: React.FC<CartCardProps> = ({
+  item,
+  reviews = [],
+  refreshCartAfterRemove = false,
+}) => {
 
   const { removeItem, isLoading, stockValidationErrors, updateItemQuantity } = useCart();
   const error = stockValidationErrors.find(error => error.itemId === item?.id);
 
   const handleRemove = async () => {
     if (!item?.id) return;
-    await removeItem(item.id);
+    await removeItem(item.id, { refreshFromApi: refreshCartAfterRemove });
   };
 
   const handleAddNow = async () => {

@@ -691,14 +691,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (isAuthenticated) {
         const response = await removeFromCart(cartId);
         if (response.status === ServerActionStatus.SUCCESS) {
-          // Update local state immediately instead of reloading from server
-          const updatedCart = cartItems.filter(item => item.id !== cartId);
-          setCartItems(updatedCart);
-          calculateTotals(updatedCart);
+          const willBeEmpty = cartItems.filter(item => item.id !== cartId).length === 0;
+          await loadCartItems();
           toast.error(`${itemToRemove?.name || 'Item'} removed from cart`);
-          
-          // Reset loyalty points if cart becomes empty
-          if (updatedCart.length === 0) {
+
+          if (willBeEmpty) {
             setLoyaltyRedemption({
               isRedeemed: false,
               pointsData: loyaltyRedemption.pointsData,

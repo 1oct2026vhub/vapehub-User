@@ -1,4 +1,4 @@
-import { getBlogList, getBlogPostList, getFaqs, getProductRelatedBlogs, getReviewOrderByProductId } from "@/lib/server.actions";
+import { getBlogList, getBlogPostList, getFaqs, getReviewOrderByProductId } from "@/lib/server.actions";
 import CategoryProducts from "../CategoryProducts";
 import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import { redirect, RedirectType } from 'next/navigation';
@@ -10,7 +10,6 @@ import { AttributeProductTerms, AttributeTerms, Product, ProductReview } from "@
 import BlogListView from "../../blogs/_components/BlogList";
 import { PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE } from "@/lib/api-routes";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
-import { parseProductRelatedBlogsPayload, RELATED_GUIDES_LIMIT } from "../_components/related-guides.utils";
 import JsonLd from "@/components/JsonLd";
 import {
   buildVariantFirstDescription,
@@ -172,21 +171,16 @@ const Page = async ({
 
     // Parallel fetch: Product (required), FAQ, Rating, Description (optional, non-blocking for page shell)
     const entityId = dynamicPageSlug?.entity_id ?? 0;
-    const [productRes, , ratingRes, descriptionRes, relatedBlogsRes] = await Promise.allSettled([
+    const [productRes, , ratingRes, descriptionRes] = await Promise.allSettled([
       fetchProduct(entityId, payload),
       getFaqs("product", entityId),
       getReviewOrderByProductId(entityId, 1, 1),
       fetchProductDescription(entityId, payload),
-      getProductRelatedBlogs(entityId, { limit: RELATED_GUIDES_LIMIT }, true),
     ]);
 
     const data = productRes.status === "fulfilled" ? productRes.value : null;
     const productDescriptionHtml =
       descriptionRes.status === "fulfilled" ? descriptionRes.value : "";
-    const initialRelatedBlogs =
-      relatedBlogsRes.status === "fulfilled" && relatedBlogsRes.value.status === ServerActionStatus.SUCCESS
-        ? parseProductRelatedBlogsPayload(relatedBlogsRes.value.data)
-        : [];
     if (data && !data.variants.length) {
       const lastPayload = payload[payload.length - 1];
       const newSlug = data?.filtered_attribute_terms.find(term => term.attribute.id === lastPayload.attribute_id)?.terms.find(t => t.id === lastPayload.term_id)?.slug;
@@ -253,7 +247,6 @@ const Page = async ({
           parentSeoDescription={parentSeoDescription}
           parentSeoTitle={parentSeoTitle}
           initialReviewData={initialReviewData}
-          initialRelatedBlogs={initialRelatedBlogs}
         />
       </>
     );
@@ -380,21 +373,16 @@ const Page = async ({
     },
     product: async () => {
       const entityId = dynamicPageSlug?.entity_id ?? 0;
-      const [productRes, , ratingRes, descriptionRes, relatedBlogsRes] = await Promise.allSettled([
+      const [productRes, , ratingRes, descriptionRes] = await Promise.allSettled([
         fetchProduct(entityId, []),
         getFaqs("product", entityId),
         getReviewOrderByProductId(entityId, 1, 1),
         fetchProductDescription(entityId, []),
-        getProductRelatedBlogs(entityId, { limit: RELATED_GUIDES_LIMIT }, true),
       ]);
 
       const data = productRes.status === "fulfilled" ? productRes.value : null;
       const productDescriptionHtml =
         descriptionRes.status === "fulfilled" ? descriptionRes.value : "";
-      const initialRelatedBlogs =
-        relatedBlogsRes.status === "fulfilled" && relatedBlogsRes.value.status === ServerActionStatus.SUCCESS
-          ? parseProductRelatedBlogsPayload(relatedBlogsRes.value.data)
-          : [];
       if (!data?.product || !data.product.category) {
         return <PageNotFound />;
       }
@@ -436,7 +424,6 @@ const Page = async ({
             parentSeoDescription={parentSeoDescription}
             parentSeoTitle={parentSeoTitle}
             initialReviewData={initialReviewData}
-            initialRelatedBlogs={initialRelatedBlogs}
           />
         </>
       );

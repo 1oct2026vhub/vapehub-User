@@ -14,9 +14,8 @@ const RelatedGuides: React.FC<RelatedGuidesRenderProps> = async ({
   viewAllHref = ROUTES.BLOGS,
   currentProductId,
   currentCategoryId,
-  initialBlogs,
 }): AsyncReactElement => {
-  const guides = initialBlogs ?? await resolveRelatedGuidesGuides({
+  const guides = await resolveRelatedGuidesGuides({
     currentProductId,
     currentCategoryId,
   });

@@ -7,7 +7,6 @@ import { getFaqs } from "@/lib/server.actions";
 import { FaqResponse } from "@/lib/config/global.config";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { toast } from "sonner";
-import EmptyPlaceholder from "./ui/EmptyPlaceholder";
 // import Link from "next/link";
 // import { ROUTES } from "@/lib/routes";
 
@@ -55,6 +54,10 @@ const FAQSection: React.FC<FAQProps> = ({
         fetchFaqs();
       }, [type, id, initialFaqs]);
 
+    if (faqs.length === 0) {
+        return null;
+    }
+
     return (
         <div className="w-full space-y-3 md:space-y-5 xl:space-y-7.5">
             {/* FAQ Heading & View All */}
@@ -62,8 +65,6 @@ const FAQSection: React.FC<FAQProps> = ({
                 <SectionHeading title={title} />
                 {/* <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} /> */}
             </div>
-            {faqs.length > 0 ? (
-               
             <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
                 {faqs.map((faq, index) => (
                     <AccordionItem
@@ -78,10 +79,7 @@ const FAQSection: React.FC<FAQProps> = ({
                 //     {faq.question}
                 // </Link>
                 ))}
-            </Accordion> 
-            ) : (
-                <EmptyPlaceholder title='Uh, oh!' description='No FAQs found' />
-            )}
+            </Accordion>
         </div>
     );
 };

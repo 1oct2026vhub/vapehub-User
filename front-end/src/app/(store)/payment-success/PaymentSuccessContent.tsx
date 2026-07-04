@@ -102,6 +102,7 @@ const PaymentSuccessContent = () => {
               currency,
               amount: amountParsed,
             })
+            console.log('Worldpay payment success response:', worldpayResponse)
             if (cancelled) return
 
             if (worldpayResponse && typeof worldpayResponse === 'object') {

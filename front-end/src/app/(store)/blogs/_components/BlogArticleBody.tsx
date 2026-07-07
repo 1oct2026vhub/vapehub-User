@@ -13,7 +13,7 @@ interface BlogArticleBodyProps {
 }
 
 const BlogArticleBody = ({ segments }: BlogArticleBodyProps) => (
-  <div className="blog-details flex w-full min-w-0 max-w-full flex-col gap-6">
+  <div className="blog-details flex w-full min-w-0 max-w-full flex-col gap-6 break-words">
     {segments.map((segment, index) => {
       if (segment.type === "warehouse-callout") {
         if (!BLOG_RENDER_WAREHOUSE_CALLOUT) return null;
@@ -60,7 +60,7 @@ const BlogArticleBody = ({ segments }: BlogArticleBodyProps) => (
       return (
         <div
           key={`html-${index}`}
-          className="ck-content rich-text min-w-0 max-w-full"
+          className="ck-content rich-text min-w-0 w-full max-w-full break-words"
           dangerouslySetInnerHTML={{ __html: segment.content }}
         />
       );

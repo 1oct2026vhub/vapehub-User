@@ -116,15 +116,15 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
           </aside>
         ) : null}
 
-        <div className="flex min-w-0 max-w-full flex-col gap-5 sm:gap-7">
-          <article className="flex min-w-0 flex-col gap-4 sm:gap-5">
+        <div className="flex min-w-0 max-w-full flex-col gap-5 overflow-x-clip sm:gap-7">
+          <article className="flex min-w-0 w-full max-w-full flex-col gap-4 overflow-x-clip sm:gap-5">
             <h1 className="primary-gradient-600 mt-0 w-full max-w-full break-words text-h4 font-semibold md:text-h3 xl:text-h2">
               {data.title ?? "Blogs"}
             </h1>
 
             {introHtml ? (
               <div
-                className="blog-intro ck-content rich-text text-title-2 text-skin-neutral-300"
+                className="blog-intro ck-content rich-text w-full max-w-full break-words text-title-2 text-skin-neutral-300"
                 dangerouslySetInnerHTML={{ __html: introHtml }}
               />
             ) : null}

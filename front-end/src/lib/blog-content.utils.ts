@@ -20,7 +20,7 @@ import {
   BLOG_WAREHOUSE_CALLOUT_TEST_MODE,
   DEFAULT_WAREHOUSE_CALLOUT,
 } from "@/lib/config/blog-warehouse-callout.config";
-import { BlogSourceItem } from "@/lib/config/blog.config";
+import { BlogInlineProductCard, BlogPullQuote, BlogSourceItem } from "@/lib/config/blog.config";
 
 const BLOCK_TAG_RE = /<(p|div|h[1-6]|ul|ol|li|table|figure|blockquote)\b/i;
 
@@ -344,7 +344,7 @@ export interface BlogIndustryQuoteSegment {
 
 export interface BlogPromoBannerSegment {
   type: "promo-banner";
-  badge: string;
+  badge?: string;
   title: string;
   description: string;
   buttonLabel: string;
@@ -363,6 +363,53 @@ export type BlogBodySegment =
   | BlogWarehouseCalloutSegment
   | BlogIndustryQuoteSegment
   | BlogPromoBannerSegment;
+
+export interface BlogOptionalBlocks {
+  pullQuote?: BlogPullQuote | null;
+  inlineProductCard?: BlogInlineProductCard | null;
+}
+
+function normalizeBlogProductHref(url: string): string {
+  if (!url) return "/";
+  if (url.match(/^(https?:\/\/|mailto:|tel:|#|\/)/)) return url;
+  return `/${url}`;
+}
+
+function hasPullQuoteData(pullQuote?: BlogPullQuote | null): pullQuote is BlogPullQuote {
+  return Boolean(pullQuote?.body?.trim());
+}
+
+function hasInlineProductCardData(
+  inlineProductCard?: BlogInlineProductCard | null,
+): inlineProductCard is BlogInlineProductCard {
+  const product = inlineProductCard?.product;
+  return Boolean(product?.title?.trim() && product?.url?.trim() && product?.image?.trim());
+}
+
+function mapPullQuoteToSegment(pullQuote: BlogPullQuote): BlogIndustryQuoteSegment {
+  return {
+    type: "industry-quote",
+    quote: pullQuote.body.trim(),
+    attribution: pullQuote.attribution?.trim() ?? "",
+  };
+}
+
+function mapInlineProductCardToSegment(
+  inlineProductCard: BlogInlineProductCard,
+): BlogPromoBannerSegment {
+  const product = inlineProductCard.product;
+
+  return {
+    type: "promo-banner",
+    badge: DEFAULT_PROMO_BANNER.badge,
+    title: product.title.trim(),
+    description: product.blurb?.trim() ?? "",
+    buttonLabel: inlineProductCard.cta_label?.trim() || "Shop now",
+    buttonHref: normalizeBlogProductHref(product.url.trim()),
+    imageUrl: product.image.trim(),
+    imageAlt: product.title.trim(),
+  };
+}
 
 const WAREHOUSE_CALLOUT_DIV_RE =
   /<div[^>]*\bclass=["'][^"']*\bblog-warehouse-callout\b[^"']*["'][^>]*(?:\/>|>[\s\S]*?<\/div>)/gi;
@@ -891,20 +938,30 @@ export function ensureTestIndustryQuoteSegments(segments: BlogBodySegment[]): Bl
   return ensureIndustryQuoteSegments(segments);
 }
 
-/** Apply template fallbacks for optional per-article body blocks. */
-export function ensureBlogBodySegments(segments: BlogBodySegment[]): BlogBodySegment[] {
+/** Apply API-driven optional body blocks when present. */
+export function ensureBlogBodySegments(
+  segments: BlogBodySegment[],
+  optionalBlocks?: BlogOptionalBlocks,
+): BlogBodySegment[] {
   let result = segments;
 
   if (BLOG_RENDER_WAREHOUSE_CALLOUT) {
     result = ensureTestWarehouseCalloutSegments(result);
   }
 
-  if (BLOG_RENDER_INDUSTRY_QUOTE) {
-    result = ensureIndustryQuoteSegments(result);
+  if (BLOG_RENDER_INDUSTRY_QUOTE && hasPullQuoteData(optionalBlocks?.pullQuote)) {
+    if (!result.some((segment) => segment.type === "industry-quote")) {
+      result = insertIndustryQuoteSegment(result, mapPullQuoteToSegment(optionalBlocks.pullQuote));
+    }
   }
 
-  if (BLOG_RENDER_PROMO_BANNER) {
-    result = ensurePromoBannerSegments(result);
+  if (BLOG_RENDER_PROMO_BANNER && hasInlineProductCardData(optionalBlocks?.inlineProductCard)) {
+    if (!result.some((segment) => segment.type === "promo-banner")) {
+      result = insertPromoBannerSegment(
+        result,
+        mapInlineProductCardToSegment(optionalBlocks.inlineProductCard),
+      );
+    }
   }
 
   return result;
@@ -925,16 +982,6 @@ export function processBlogBodyHtml(html: string): string {
     result = convertWarehouseCalloutParagraphs(result);
     result = injectWarehouseCalloutByPosition(result);
     result = injectTestWarehouseCallout(result);
-  }
-
-  if (BLOG_RENDER_INDUSTRY_QUOTE) {
-    result = injectIndustryQuoteByPosition(result);
-    result = injectTestIndustryQuote(result);
-  }
-
-  if (BLOG_RENDER_PROMO_BANNER) {
-    result = injectPromoBannerByPosition(result);
-    result = injectTestPromoBanner(result);
   }
 
   result = wrapBlogTablesForScroll(result);

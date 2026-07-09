@@ -8,9 +8,11 @@ const BlogIndustryQuote = ({ quote, attribution }: BlogIndustryQuoteProps) => (
     <p className="!font-opensans text-[13.5px] font-semibold leading-[150%] text-skin-primary-500">
       &ldquo;{quote}&rdquo;
     </p>
-    <footer className="mt-2 text-[13px] uppercase tracking-wide text-skin-neutral-300">
-      &mdash; {attribution}
-    </footer>
+    {attribution ? (
+      <footer className="mt-2 text-[13px] uppercase tracking-wide text-skin-neutral-300">
+        &mdash; {attribution}
+      </footer>
+    ) : null}
   </blockquote>
 );
 

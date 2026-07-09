@@ -85,7 +85,10 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
   const sources = data.sources?.length ? data.sources : cmsSources;
   const processedBody = normalizeBlogCitationLinks(processBlogBodyHtml(bodyWithoutSources));
   const { html: bodyWithIds, headings } = injectBlogHeadingIds(processedBody);
-  const bodySegments = ensureBlogBodySegments(parseBlogBodySegments(bodyWithIds));
+  const bodySegments = ensureBlogBodySegments(parseBlogBodySegments(bodyWithIds), {
+    pullQuote: data.pull_quote,
+    inlineProductCard: data.inline_product_card,
+  });
   const tocHeadings = headings.length >= 3 ? headings : [];
 
   const continueReadingArticles = await resolveContinueReadingArticles(data);

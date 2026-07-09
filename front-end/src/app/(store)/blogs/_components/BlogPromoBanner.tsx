@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface BlogPromoBannerProps {
-  badge: string;
+  badge?: string;
   title: string;
   description: string;
   buttonLabel: string;
@@ -34,10 +34,12 @@ const BlogPromoBanner = ({
 
       <div className="flex min-w-0 flex-1 flex-col gap-4 sm:gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-5">
         <div className="min-w-0 flex-1">
-          <p className="!font-opensans text-[13.5px] font-bold uppercase leading-[140%] !text-skin-red-400">
-            {badge}
-          </p>
-          <p className="mt-1 !font-opensans text-[13.5px] font-semibold leading-[150%] text-skin-neutral-500">
+          {badge ? (
+            <p className="!font-opensans text-[13.5px] font-bold uppercase leading-[140%] !text-skin-red-400">
+              {badge}
+            </p>
+          ) : null}
+          <p className={`!font-opensans text-[13.5px] font-semibold leading-[150%] text-skin-neutral-500 ${badge ? "mt-1" : ""}`}>
             {title}
           </p>
           <p className="mt-1 !font-opensans text-[13.5px] leading-[150%] text-skin-neutral-400">

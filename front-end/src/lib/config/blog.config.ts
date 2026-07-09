@@ -35,6 +35,25 @@ export interface BlogSourceItem {
     description: string;
 }
 
+export interface BlogPullQuote {
+    body: string;
+    location?: string;
+    source_url?: string;
+    attribution?: string;
+    source_type?: string;
+}
+
+export interface BlogInlineProductCard {
+    location?: string;
+    cta_label?: string;
+    product: {
+        image: string;
+        title: string;
+        blurb?: string;
+        url: string;
+    };
+}
+
 // Base interface for blog content
 export interface BlogContent extends TimeStampFields {
     id: number;
@@ -80,6 +99,8 @@ export interface BlogByCategoryAndSlugResponse extends BlogContent {
     categories: BlogCategory[];
     tags: unknown[];
     sources?: BlogSourceItem[];
+    pull_quote?: BlogPullQuote | null;
+    inline_product_card?: BlogInlineProductCard | null;
     related_blogs: (BlogContent & {
         categories: (BaseBlogEntity & TimeStampFields)[];
     })[];

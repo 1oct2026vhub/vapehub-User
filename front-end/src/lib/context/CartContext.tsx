@@ -95,6 +95,70 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_COOKIE_NAME = 'guest_cart';
 const LOYALTY_COOKIE_NAME = 'loyalty_redemption';
 
+type GuestCartItemPayload = {
+  product_id: number;
+  variant_id?: number;
+  quantity: number;
+};
+
+const getGuestCartItemTotalStock = (apiItem: {
+  available_stock?: number;
+  out_of_stock?: boolean;
+  variant?: { stock?: number };
+}): number => {
+  if (typeof apiItem.variant?.stock === 'number') return apiItem.variant.stock;
+  if (typeof apiItem.available_stock === 'number') return apiItem.available_stock;
+  return 0;
+};
+
+const showGuestCartStockValidationError = (totalStock: number, quantityInBasket: number) => {
+  toast.error(
+    `You cannot add that amount to the basket — we have ${totalStock} in stock and you already have ${quantityInBasket} in your basket.`
+  );
+};
+
+const validateGuestCartStock = async (
+  proposedItems: GuestCartItemPayload[],
+  currentCartItems: Pick<CartItem, 'product_id' | 'variant_id' | 'quantity'>[] = []
+): Promise<{
+  valid: boolean;
+  totalStock?: number;
+  quantityInBasket?: number;
+  availableStock?: number;
+}> => {
+  if (proposedItems.length === 0) {
+    return { valid: true };
+  }
+
+  try {
+    const response = await calculateGuestDeals(proposedItems);
+    if (response.status !== ServerActionStatus.SUCCESS || !response.data?.items) {
+      return { valid: true };
+    }
+
+    for (const apiItem of response.data.items) {
+      const totalStock = getGuestCartItemTotalStock(apiItem);
+      const quantityInBasket = currentCartItems.find(
+        item => item.product_id === apiItem.product_id && item.variant_id === apiItem.variant_id
+      )?.quantity ?? 0;
+
+      if (apiItem.quantity > totalStock) {
+        return {
+          valid: false,
+          totalStock,
+          quantityInBasket,
+          availableStock: totalStock,
+        };
+      }
+    }
+
+    return { valid: true };
+  } catch (error) {
+    console.error('Error validating guest cart stock:', error);
+    return { valid: true };
+  }
+};
+
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -181,8 +245,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
            );
            
            if (apiItem) {
+             const totalStock = getGuestCartItemTotalStock(apiItem);
              return {
                ...item,
+               stock: totalStock > 0 ? totalStock : item.stock,
                // Update with API response data
                subtotal: apiItem.subtotal || (parseFloat(item.price) * item.quantity),
                total: apiItem.total || (parseFloat(item.price) * item.quantity),
@@ -567,6 +633,25 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         // Handle as guest cart
+        const proposedCartItems: GuestCartItemPayload[] = [
+          ...cartItems.map(item => ({
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            quantity: item.quantity,
+          })),
+          { product_id: productId, variant_id: variantId, quantity },
+        ];
+        const stockValidation = await validateGuestCartStock(proposedCartItems, cartItems);
+        if (!stockValidation.valid) {
+          if (
+            typeof stockValidation.totalStock === 'number' &&
+            typeof stockValidation.quantityInBasket === 'number'
+          ) {
+            showGuestCartStockValidationError(stockValidation.totalStock, stockValidation.quantityInBasket);
+          }
+          return;
+        }
+
         const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
         const updatedCart = [...cartItems, newItem];
         setCartItems(updatedCart);
@@ -625,6 +710,29 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             toast.error(response.message);
           }
       } else {
+        const proposedCartItems: GuestCartItemPayload[] = cartItems.map(item => ({
+          product_id: item.product_id,
+          variant_id: item.variant_id,
+          quantity: item.id === cartId ? quantity : item.quantity,
+        }));
+        const stockValidation = await validateGuestCartStock(proposedCartItems, cartItems);
+        if (!stockValidation.valid) {
+          if (typeof stockValidation.availableStock === 'number') {
+            const updatedCart = cartItems.map(item =>
+              item.id === cartId ? { ...item, stock: stockValidation.availableStock! } : item
+            );
+            setCartItems(updatedCart);
+            setGuestCart(updatedCart);
+          }
+          if (
+            typeof stockValidation.totalStock === 'number' &&
+            typeof stockValidation.quantityInBasket === 'number'
+          ) {
+            showGuestCartStockValidationError(stockValidation.totalStock, stockValidation.quantityInBasket);
+          }
+          return;
+        }
+
         // Handle as guest cart
         const updatedCart = cartItems.map(item => {
           if (item.id === cartId) {

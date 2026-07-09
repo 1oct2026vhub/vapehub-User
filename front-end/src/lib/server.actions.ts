@@ -1244,49 +1244,70 @@ export const getTrustpilotReviews = async (payload?: { page?: number; per_page?:
   });
 };
 
-type GuestDealsApiItem = {
-  product_id: number;
-  variant_id: number;
-  quantity: number;
-  price: string;
-  discount_price: string;
-  subtotal: number;
-  total: number;
-  out_of_stock?: boolean;
-  available_stock?: number;
-  variant?: {
-    stock: number;
-    stock_status: string;
-  };
-  applied_deals: Array<{
-    deal_id: number;
-    deal_name: string;
-    discount_amount: number;
+export const calculateGuestDeals = async (cartItems: { product_id: number; variant_id?: number; quantity: number }[]): Promise<ServerActionResponse<{
+  items: Array<{
+    product_id: number;
+    variant_id: number;
+    quantity: number;
+    price: string;
+    discount_price: string;
+    subtotal: number;
+    total: number;
+    applied_deals: Array<{
+      deal_id: number;
+      deal_name: string;
+      discount_amount: number;
+    }>;
+    show_deal_toast: boolean;
+    deal_required_qty: number | null;
+    deal_qty_needed: number | null;
+    deals: Array<{
+      id: number;
+      name: string;
+      deal_type: string;
+      required_qty: number;
+      fixed_price: number;
+      discount_percent: number;
+    }>;
   }>;
-  show_deal_toast: boolean;
-  deal_required_qty: number | null;
-  deal_qty_needed: number | null;
-  deals: Array<{
-    id: number;
-    name: string;
-    deal_type: string;
-    required_qty: number;
-    fixed_price: number;
-    discount_percent: number;
-  }>;
-};
-
-type GuestDealsApiResponse = {
-  items: GuestDealsApiItem[];
   summary: {
     subtotal: number;
     total: number;
     total_discount: number;
   };
-};
-
-export const calculateGuestDeals = async (cartItems: { product_id: number; variant_id?: number; quantity: number }[]): Promise<ServerActionResponse<GuestDealsApiResponse>> => {
-  return await handleRequest<GuestDealsApiResponse, unknown>({
+}>> => {
+  return await handleRequest<{
+    items: Array<{
+      product_id: number;
+      variant_id: number;
+      quantity: number;
+      price: string;
+      discount_price: string;
+      subtotal: number;
+      total: number;
+      applied_deals: Array<{
+        deal_id: number;
+        deal_name: string;
+        discount_amount: number;
+      }>;
+      show_deal_toast: boolean;
+      deal_required_qty: number | null;
+      deal_qty_needed: number | null;
+      deals: Array<{
+        id: number;
+        name: string;
+        deal_type: string;
+        required_qty: number;
+        fixed_price: number;
+        discount_percent: number;
+      }>;
+    }>;
+    summary: {
+      subtotal: number;
+      total: number;
+      total_discount: number;
+    };
+  }, unknown>({
     endpoint: API_ROUTES.CALCULATE_GUEST_DEALS,
     method: 'POST',
     payload: { cartItems },

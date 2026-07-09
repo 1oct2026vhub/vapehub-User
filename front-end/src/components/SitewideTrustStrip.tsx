@@ -12,7 +12,7 @@ const TrustBadge = ({
   category: string;
   value: string;
 }) => (
-  <li className="min-w-0 flex-1 rounded border border-white/20 bg-white/5 px-2.5 py-2 text-center sm:min-w-[120px] sm:px-3.5 sm:py-2.5">
+  <li className="min-w-0 flex-1 rounded border border-white/20 bg-[#052a1f] px-2.5 py-2 text-center sm:min-w-[120px] sm:px-3.5 sm:py-2.5">
     <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#FFB400]">
       {category}
     </p>
@@ -38,7 +38,7 @@ const SitewideTrustStrip = async () => {
   return (
     <section
       aria-label="Accreditations and trust signals"
-      className="mt-7 bg-footer-gradient border-b border-skin-primary-300"
+      className="trust-strip mt-7"
     >
       <div className="mx-auto flex max-w-[1520px] flex-col gap-5 px-4 py-6 sm:gap-6 sm:py-8 md:flex-row md:items-center md:justify-between md:gap-10 md:px-10 md:py-9 lg:gap-14">
         <div className="max-w-md shrink-0">

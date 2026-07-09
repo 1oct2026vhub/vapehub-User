@@ -48,7 +48,7 @@ const Footer = async (): AsyncReactElement => {
   ].filter(link => link.href !== '#'); // Remove links that are not set
 
   return (
-    <footer className="bg-footer-gradient mt-7">
+    <footer className="bg-footer-gradient">
       <Suspense fallback={<SuspenseLoader />}>
         <Subscription />
       </Suspense>

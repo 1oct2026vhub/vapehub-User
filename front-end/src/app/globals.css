@@ -60,6 +60,8 @@
 
     --footer-gradient: linear-gradient(90deg, #083122 0%, #035335 50%, #083122 100%);
     --header-gradient: linear-gradient(90deg, #083122 0%, #035335 50%, #083122 100%);
+    --gradient-start: #035335;
+    --gradient-end: #083122;
 
     --border: rgba(242, 242, 242, 1);
   }
@@ -421,6 +423,10 @@ input[type='search'] {
 
 .slick-slide > div > div {
   @apply focus-visible:!outline-none focus-visible:!border-none;
+}
+
+.trust-strip {
+  background: linear-gradient(90deg, var(--gradient-end) 0%, var(--gradient-start) 100%);
 }
 
 /* Contextual overflow: page stays fixed width; wide tables scroll in-place */

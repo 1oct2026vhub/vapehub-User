@@ -81,7 +81,8 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
 
   const preparedContent = processBlogContent(prepareBlogHtml(data.content));
   const { introHtml, bodyHtml } = splitBlogIntroAndBody(preparedContent);
-  const { html: bodyWithoutSources } = extractAndStripBlogSources(bodyHtml);
+  const { html: bodyWithoutSources, sources: cmsSources } = extractAndStripBlogSources(bodyHtml);
+  const sources = data.sources?.length ? data.sources : cmsSources;
   const processedBody = normalizeBlogCitationLinks(processBlogBodyHtml(bodyWithoutSources));
   const { html: bodyWithIds, headings } = injectBlogHeadingIds(processedBody);
   const bodySegments = ensureBlogBodySegments(parseBlogBodySegments(bodyWithIds));
@@ -116,8 +117,8 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
           </aside>
         ) : null}
 
-        <div className="flex min-w-0 max-w-full flex-col gap-5 overflow-x-clip sm:gap-7">
-          <article className="flex min-w-0 w-full max-w-full flex-col gap-4 overflow-x-clip sm:gap-5">
+        <div className="flex min-w-0 max-w-full flex-col gap-5 sm:gap-7">
+          <article className="flex min-w-0 w-full max-w-full flex-col gap-4 sm:gap-5">
             <h1 className="primary-gradient-600 mt-0 w-full max-w-full break-words text-h4 font-semibold md:text-h3 xl:text-h2">
               {data.title ?? "Blogs"}
             </h1>
@@ -144,7 +145,7 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
             <BlogArticleBody segments={bodySegments} />
           </article>
 
-          {data.sources?.length ? <BlogSourcesSection sources={data.sources} /> : null}
+          {sources.length > 0 ? <BlogSourcesSection sources={sources} /> : null}
 
           <BlogAuthorBioCard author={data.author} authorId={data.author_id} />
 

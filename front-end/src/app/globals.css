@@ -475,7 +475,6 @@ input[type='search'] {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  overflow-x: clip;
 }
 
 .blog-details .ck-content,
@@ -484,19 +483,18 @@ input[type='search'] {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  overflow-x: clip;
-  contain: inline-size;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   word-break: break-word;
   white-space: normal;
 }
 
-/* Global .ck-content sets width:100% on blocks; that can stop wrapping inside flex columns on mobile */
-.blog-details .ck-content :where(p, div:not(.blog-table-scroll), h1, h2, h3, h4, h5, h6, li, blockquote),
-.blog-intro :where(p, div, h1, h2, h3, h4, h5, h6, li, blockquote) {
+/* Global .ck-content sets width:100% on blocks; that stops wrapping inside flex/grid columns */
+.blog-details .ck-content :where(p, div:not(.blog-table-scroll), span, a, strong, em, h1, h2, h3, h4, h5, h6, li, blockquote),
+.blog-intro :where(p, div, span, a, strong, em, h1, h2, h3, h4, h5, h6, li, blockquote) {
   width: auto;
   max-width: 100%;
-  overflow-wrap: anywhere;
+  min-width: 0;
+  overflow-wrap: break-word;
   word-break: break-word;
   white-space: normal;
   box-sizing: border-box;

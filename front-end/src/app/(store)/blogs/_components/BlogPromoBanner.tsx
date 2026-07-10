@@ -39,10 +39,12 @@ const BlogPromoBanner = ({
               {badge}
             </p>
           ) : null}
-          <p className={`!font-opensans text-[13.5px] font-semibold leading-[150%] text-skin-neutral-500 ${badge ? "mt-1" : ""}`}>
+          <p
+            className={`blog-promo-banner__title !font-opensans text-[13.5px] font-semibold leading-[150%] !text-[#083122] ${badge ? "mt-1" : ""}`}
+          >
             {title}
           </p>
-          <p className="mt-1 !font-opensans text-[13.5px] leading-[150%] text-skin-neutral-400">
+          <p className="blog-promo-banner__description mt-1 !font-opensans text-[13.5px] leading-[150%] !text-[#4a5e54]">
             {description}
           </p>
         </div>

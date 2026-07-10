@@ -702,6 +702,25 @@ input[type="checkbox"] + span {
   white-space: normal;
 }
 
+/* Optional blog blocks — override .blog-details p defaults */
+.blog-details .blog-industry-quote__text,
+.blog-details .blog-promo-banner__title {
+  color: #083122 !important;
+  font-size: 13.5px !important;
+  line-height: 150% !important;
+}
+
+.blog-details .blog-industry-quote__attribution,
+.blog-details .blog-promo-banner__description {
+  color: #4a5e54 !important;
+  font-size: 13.5px !important;
+  line-height: 150% !important;
+}
+
+.blog-details .blog-industry-quote__attribution {
+  font-size: 13px !important;
+}
+
 .blog-warehouse-callout-body {
   max-width: 100%;
   min-width: 0;

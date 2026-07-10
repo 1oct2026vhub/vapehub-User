@@ -374,6 +374,86 @@ export interface BlogOptionalBlocks {
   inlineProductCard?: BlogInlineProductCard | null;
 }
 
+/** Placeholder tokens from the admin CKEditor — replaced with marker divs before segment parsing. */
+export const BLOG_PLACEHOLDER_TOKENS = {
+  pullQuote: "{{pullQuote}}",
+  inlineProductCard: "{{inlineProductCard}}",
+  firstPersonCallout: (index: number) => `{{firstPersonCallout:${index}}}`,
+} as const;
+
+const PULL_QUOTE_PLACEHOLDER_RE = /\{\{pullQuote\}\}/;
+const INLINE_PRODUCT_CARD_PLACEHOLDER_RE = /\{\{inlineProductCard\}\}/;
+const FIRST_PERSON_CALLOUT_PLACEHOLDER_RE = /\{\{firstPersonCallout:\d+\}\}/;
+
+export interface BlogPlaceholderBlocks extends BlogOptionalBlocks {
+  firstPersonCallouts?: BlogFirstPersonCallout[] | null;
+}
+
+export function hasBlogPlaceholders(html: string): boolean {
+  return (
+    PULL_QUOTE_PLACEHOLDER_RE.test(html) ||
+    INLINE_PRODUCT_CARD_PLACEHOLDER_RE.test(html) ||
+    FIRST_PERSON_CALLOUT_PLACEHOLDER_RE.test(html)
+  );
+}
+
+function replaceTokenWithMarker(html: string, token: string, marker: string): string {
+  if (!html.includes(token)) return html;
+  return html.split(token).join(marker);
+}
+
+/** Replace CKEditor placeholders with storefront marker divs at their inline positions. */
+export function replaceBlogPlaceholders(
+  html: string,
+  blocks?: BlogPlaceholderBlocks,
+): string {
+  let result = html;
+
+  if (blocks?.pullQuote && hasPullQuoteData(blocks.pullQuote)) {
+    const marker = buildIndustryQuoteDiv(
+      blocks.pullQuote.body.trim(),
+      blocks.pullQuote.attribution?.trim() ?? "",
+    );
+    result = replaceTokenWithMarker(result, BLOG_PLACEHOLDER_TOKENS.pullQuote, marker);
+  }
+
+  if (blocks?.inlineProductCard && hasInlineProductCardData(blocks.inlineProductCard)) {
+    const segment = mapInlineProductCardToSegment(blocks.inlineProductCard);
+    const marker = buildPromoBannerDiv(
+      segment.badge ?? DEFAULT_PROMO_BANNER.badge,
+      segment.title,
+      segment.description,
+      segment.buttonLabel,
+      segment.buttonHref,
+      segment.imageUrl,
+      segment.imageAlt,
+    );
+    result = replaceTokenWithMarker(result, BLOG_PLACEHOLDER_TOKENS.inlineProductCard, marker);
+  }
+
+  if (blocks?.firstPersonCallouts?.length) {
+    blocks.firstPersonCallouts.forEach((callout, index) => {
+      const heading = callout.heading?.trim();
+      const body = callout.body?.trim();
+      if (!heading || !body) return;
+
+      const token = BLOG_PLACEHOLDER_TOKENS.firstPersonCallout(index + 1);
+      const marker = buildWarehouseCalloutDiv(
+        callout.label?.trim() || DEFAULT_WAREHOUSE_CALLOUT.label,
+        heading,
+        body,
+      );
+      result = replaceTokenWithMarker(result, token, marker);
+    });
+  }
+
+  return result;
+}
+
+export function hasLegacyParagraphCallouts(callouts?: BlogFirstPersonCallout[] | null): boolean {
+  return Boolean(callouts?.some((callout) => (callout.insert_after_paragraph ?? 0) > 0));
+}
+
 function normalizeBlogProductHref(url: string): string {
   if (!url) return "/";
   if (url.match(/^(https?:\/\/|mailto:|tel:|#|\/)/)) return url;
@@ -513,16 +593,20 @@ export function insertApiFirstPersonCallouts(
   html: string,
   callouts?: BlogFirstPersonCallout[] | null,
 ): string {
-  if (!callouts?.length) return html;
+  const positionedCallouts = (callouts ?? []).filter(
+    (callout) => (callout.insert_after_paragraph ?? 0) > 0,
+  );
+  if (!positionedCallouts.length) return html;
 
-  const sortedCallouts = [...callouts].sort(
-    (a, b) => b.insert_after_paragraph - a.insert_after_paragraph,
+  const sortedCallouts = [...positionedCallouts].sort(
+    (a, b) => (b.insert_after_paragraph ?? 0) - (a.insert_after_paragraph ?? 0),
   );
 
   return sortedCallouts.reduce((result, callout) => {
     const heading = callout.heading?.trim();
     const body = callout.body?.trim();
-    if (!heading || !body || callout.insert_after_paragraph < 1) return result;
+    const paragraphIndex = callout.insert_after_paragraph ?? 0;
+    if (!heading || !body || paragraphIndex < 1) return result;
 
     const marker = buildWarehouseCalloutDiv(
       callout.label?.trim() || DEFAULT_WAREHOUSE_CALLOUT.label,
@@ -530,7 +614,7 @@ export function insertApiFirstPersonCallouts(
       body,
     );
 
-    return insertAfterParagraph(result, callout.insert_after_paragraph, marker);
+    return insertAfterParagraph(result, paragraphIndex, marker);
   }, html);
 }
 
@@ -987,24 +1071,34 @@ export function ensureTestIndustryQuoteSegments(segments: BlogBodySegment[]): Bl
   return ensureIndustryQuoteSegments(segments);
 }
 
-/** Apply API-driven optional body blocks when present. */
+/** Apply API-driven optional body blocks when present and not already positioned in content. */
 export function ensureBlogBodySegments(
   segments: BlogBodySegment[],
   optionalBlocks?: BlogOptionalBlocks,
+  options?: { skipHeuristicInsertion?: boolean },
 ): BlogBodySegment[] {
   let result = segments;
+  const skipHeuristic = options?.skipHeuristicInsertion ?? false;
 
-  if (BLOG_RENDER_WAREHOUSE_CALLOUT) {
+  if (BLOG_RENDER_WAREHOUSE_CALLOUT && !skipHeuristic) {
     result = ensureTestWarehouseCalloutSegments(result);
   }
 
-  if (BLOG_RENDER_INDUSTRY_QUOTE && hasPullQuoteData(optionalBlocks?.pullQuote)) {
+  if (
+    BLOG_RENDER_INDUSTRY_QUOTE &&
+    hasPullQuoteData(optionalBlocks?.pullQuote) &&
+    !skipHeuristic
+  ) {
     if (!result.some((segment) => segment.type === "industry-quote")) {
       result = insertIndustryQuoteSegment(result, mapPullQuoteToSegment(optionalBlocks.pullQuote));
     }
   }
 
-  if (BLOG_RENDER_PROMO_BANNER && hasInlineProductCardData(optionalBlocks?.inlineProductCard)) {
+  if (
+    BLOG_RENDER_PROMO_BANNER &&
+    hasInlineProductCardData(optionalBlocks?.inlineProductCard) &&
+    !skipHeuristic
+  ) {
     if (!result.some((segment) => segment.type === "promo-banner")) {
       result = insertPromoBannerSegment(
         result,

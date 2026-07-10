@@ -11,12 +11,15 @@ import SuspenseLoader from "@/components/ui/SuspenseLoader";
 import {
   ensureBlogBodySegments,
   extractAndStripBlogSources,
+  hasBlogPlaceholders,
+  hasLegacyParagraphCallouts,
   insertApiFirstPersonCallouts,
   injectBlogHeadingIds,
   normalizeBlogCitationLinks,
   parseBlogBodySegments,
   prepareBlogHtml,
   processBlogBodyHtml,
+  replaceBlogPlaceholders,
   splitBlogIntroAndBody,
 } from "@/lib/blog-content.utils";
 import BlogArticleBody from "./BlogArticleBody";
@@ -81,24 +84,40 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
   ];
 
   const preparedContent = processBlogContent(prepareBlogHtml(data.content));
-  const hasApiFirstPersonCallouts = Array.isArray(data.first_person_callouts);
-  const contentWithCallouts = insertApiFirstPersonCallouts(
-    preparedContent,
-    data.first_person_callouts,
-  );
+  const usesPlaceholderPositioning = hasBlogPlaceholders(preparedContent);
+  const contentWithPlaceholders = replaceBlogPlaceholders(preparedContent, {
+    pullQuote: data.pull_quote,
+    inlineProductCard: data.inline_product_card,
+    firstPersonCallouts: data.first_person_callouts,
+  });
+  const hasEmbeddedCalloutMarkers = /blog-warehouse-callout/i.test(contentWithPlaceholders);
+  const contentWithCallouts = hasLegacyParagraphCallouts(data.first_person_callouts)
+    ? insertApiFirstPersonCallouts(contentWithPlaceholders, data.first_person_callouts)
+    : contentWithPlaceholders;
   const { introHtml, bodyHtml } = splitBlogIntroAndBody(contentWithCallouts);
   const { html: bodyWithoutSources, sources: cmsSources } = extractAndStripBlogSources(bodyHtml);
   const sources = data.sources?.length ? data.sources : cmsSources;
   const processedBody = normalizeBlogCitationLinks(
     processBlogBodyHtml(bodyWithoutSources, {
-      skipWarehouseHeuristics: hasApiFirstPersonCallouts,
+      skipWarehouseHeuristics:
+        usesPlaceholderPositioning || hasEmbeddedCalloutMarkers || hasLegacyParagraphCallouts(data.first_person_callouts),
     }),
   );
   const { html: bodyWithIds, headings } = injectBlogHeadingIds(processedBody);
-  const bodySegments = ensureBlogBodySegments(parseBlogBodySegments(bodyWithIds), {
-    pullQuote: data.pull_quote,
-    inlineProductCard: data.inline_product_card,
-  });
+  const bodySegments = ensureBlogBodySegments(
+    parseBlogBodySegments(bodyWithIds),
+    {
+      pullQuote: data.pull_quote,
+      inlineProductCard: data.inline_product_card,
+    },
+    {
+      skipHeuristicInsertion:
+        usesPlaceholderPositioning ||
+        hasEmbeddedCalloutMarkers ||
+        /blog-industry-quote/i.test(contentWithPlaceholders) ||
+        /blog-promo-banner/i.test(contentWithPlaceholders),
+    },
+  );
   const tocHeadings = headings.length >= 3 ? headings : [];
 
   const continueReadingArticles = await resolveContinueReadingArticles(data);

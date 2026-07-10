@@ -58,7 +58,8 @@ export interface BlogFirstPersonCallout {
     label?: string;
     heading: string;
     body: string;
-    insert_after_paragraph: number;
+    /** @deprecated Placement is via {{firstPersonCallout:n}} placeholders or embedded markers in content */
+    insert_after_paragraph?: number;
 }
 
 // Base interface for blog content

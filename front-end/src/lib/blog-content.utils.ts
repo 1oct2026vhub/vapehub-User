@@ -20,7 +20,12 @@ import {
   BLOG_WAREHOUSE_CALLOUT_TEST_MODE,
   DEFAULT_WAREHOUSE_CALLOUT,
 } from "@/lib/config/blog-warehouse-callout.config";
-import { BlogInlineProductCard, BlogPullQuote, BlogSourceItem } from "@/lib/config/blog.config";
+import {
+  BlogFirstPersonCallout,
+  BlogInlineProductCard,
+  BlogPullQuote,
+  BlogSourceItem,
+} from "@/lib/config/blog.config";
 
 const BLOCK_TAG_RE = /<(p|div|h[1-6]|ul|ol|li|table|figure|blockquote)\b/i;
 
@@ -483,6 +488,50 @@ function hasPromoBannerMarker(html: string): boolean {
 
 function buildWarehouseCalloutDiv(label: string, title: string, bodyHtml: string): string {
   return `<div class="blog-warehouse-callout" data-label="${escapeCalloutAttr(label)}" data-title="${escapeCalloutAttr(title)}" data-body-html="${escapeCalloutAttr(bodyHtml)}"></div>`;
+}
+
+const PARAGRAPH_TAG_RE = /<p[^>]*>[\s\S]*?<\/p>/gi;
+
+function insertAfterParagraph(html: string, paragraphIndex: number, insertHtml: string): string {
+  if (paragraphIndex < 1 || !insertHtml) return html;
+
+  const paragraphRanges: Array<{ end: number }> = [];
+  for (const match of html.matchAll(PARAGRAPH_TAG_RE)) {
+    if (match.index !== undefined) {
+      paragraphRanges.push({ end: match.index + match[0].length });
+    }
+  }
+
+  const target = paragraphRanges[paragraphIndex - 1];
+  if (!target) return html;
+
+  return `${html.slice(0, target.end)}${insertHtml}${html.slice(target.end)}`;
+}
+
+/** Insert API first_person_callouts as warehouse callout markers at 1-based paragraph positions. */
+export function insertApiFirstPersonCallouts(
+  html: string,
+  callouts?: BlogFirstPersonCallout[] | null,
+): string {
+  if (!callouts?.length) return html;
+
+  const sortedCallouts = [...callouts].sort(
+    (a, b) => b.insert_after_paragraph - a.insert_after_paragraph,
+  );
+
+  return sortedCallouts.reduce((result, callout) => {
+    const heading = callout.heading?.trim();
+    const body = callout.body?.trim();
+    if (!heading || !body || callout.insert_after_paragraph < 1) return result;
+
+    const marker = buildWarehouseCalloutDiv(
+      callout.label?.trim() || DEFAULT_WAREHOUSE_CALLOUT.label,
+      heading,
+      body,
+    );
+
+    return insertAfterParagraph(result, callout.insert_after_paragraph, marker);
+  }, html);
 }
 
 function buildDefaultWarehouseCalloutDiv(): string {
@@ -973,10 +1022,13 @@ export function ensureTestBlogBodySegments(segments: BlogBodySegment[]): BlogBod
 }
 
 /** Run optional body-block transforms on article HTML. */
-export function processBlogBodyHtml(html: string): string {
+export function processBlogBodyHtml(
+  html: string,
+  options?: { skipWarehouseHeuristics?: boolean },
+): string {
   let result = html;
 
-  if (BLOG_RENDER_WAREHOUSE_CALLOUT) {
+  if (BLOG_RENDER_WAREHOUSE_CALLOUT && !options?.skipWarehouseHeuristics) {
     result = convertWarehouseCalloutBlockquotes(result);
     result = convertWarehouseCalloutFlexible(result);
     result = convertWarehouseCalloutParagraphs(result);

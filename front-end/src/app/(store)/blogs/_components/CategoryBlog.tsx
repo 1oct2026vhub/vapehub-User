@@ -11,6 +11,7 @@ import SuspenseLoader from "@/components/ui/SuspenseLoader";
 import {
   ensureBlogBodySegments,
   extractAndStripBlogSources,
+  insertApiFirstPersonCallouts,
   injectBlogHeadingIds,
   normalizeBlogCitationLinks,
   parseBlogBodySegments,
@@ -80,10 +81,19 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
   ];
 
   const preparedContent = processBlogContent(prepareBlogHtml(data.content));
-  const { introHtml, bodyHtml } = splitBlogIntroAndBody(preparedContent);
+  const hasApiFirstPersonCallouts = Array.isArray(data.first_person_callouts);
+  const contentWithCallouts = insertApiFirstPersonCallouts(
+    preparedContent,
+    data.first_person_callouts,
+  );
+  const { introHtml, bodyHtml } = splitBlogIntroAndBody(contentWithCallouts);
   const { html: bodyWithoutSources, sources: cmsSources } = extractAndStripBlogSources(bodyHtml);
   const sources = data.sources?.length ? data.sources : cmsSources;
-  const processedBody = normalizeBlogCitationLinks(processBlogBodyHtml(bodyWithoutSources));
+  const processedBody = normalizeBlogCitationLinks(
+    processBlogBodyHtml(bodyWithoutSources, {
+      skipWarehouseHeuristics: hasApiFirstPersonCallouts,
+    }),
+  );
   const { html: bodyWithIds, headings } = injectBlogHeadingIds(processedBody);
   const bodySegments = ensureBlogBodySegments(parseBlogBodySegments(bodyWithIds), {
     pullQuote: data.pull_quote,

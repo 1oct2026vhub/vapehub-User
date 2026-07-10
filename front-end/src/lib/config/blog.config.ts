@@ -54,6 +54,13 @@ export interface BlogInlineProductCard {
     };
 }
 
+export interface BlogFirstPersonCallout {
+    label?: string;
+    heading: string;
+    body: string;
+    insert_after_paragraph: number;
+}
+
 // Base interface for blog content
 export interface BlogContent extends TimeStampFields {
     id: number;
@@ -101,6 +108,7 @@ export interface BlogByCategoryAndSlugResponse extends BlogContent {
     sources?: BlogSourceItem[];
     pull_quote?: BlogPullQuote | null;
     inline_product_card?: BlogInlineProductCard | null;
+    first_person_callouts?: BlogFirstPersonCallout[];
     related_blogs: (BlogContent & {
         categories: (BaseBlogEntity & TimeStampFields)[];
     })[];

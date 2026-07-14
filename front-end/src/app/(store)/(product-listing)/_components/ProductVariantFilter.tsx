@@ -23,6 +23,7 @@ const VARIANT_FILTER_SELECT_STYLE = `
 `;
 
 const OUT_OF_STOCK_LABEL = '- Out of stock';
+const DISCONTINUED_LABEL = '- Discontinued';
 
 function variantTermSlug(variant: ProductVariant, attributeId: number): string | undefined {
     return variant.attributes.find((a) => a.attribute_id === attributeId)?.term_slug;
@@ -96,6 +97,7 @@ type ProductVariantFilterProps = {
     onVariantChange?: (payload: VariantSelectionPayload) => void;
     selectedAttributeSlugs?: Record<number, string>;
     primaryAttributeId?: number | null;
+    isDiscontinued?: boolean;
 }
 
 const SelectAttributeTerms = ({
@@ -105,6 +107,7 @@ const SelectAttributeTerms = ({
     getDefaultSelectedTerm,
     allVariants,
     selectedAttributeSlugs,
+    isDiscontinued = false,
 }: {
     attributeTerm: AttributeTerms,
     handleVariantFilter: (attributeTerm: AttributeTerms, selectedTerm: AttributeTerms['terms'][number]) => void,
@@ -112,6 +115,7 @@ const SelectAttributeTerms = ({
     getDefaultSelectedTerm: (attributeId: number) => string | undefined,
     allVariants: ProductVariant[],
     selectedAttributeSlugs?: Record<number, string>,
+    isDiscontinued?: boolean,
 }) => {
     const selectedTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
     // Generate dynamic placeholder based on attribute name
@@ -176,10 +180,13 @@ const SelectAttributeTerms = ({
                         term.slug,
                         selectedAttributeSlugs
                     );
-                    const displayName = outOfStock
-                        ? `${term.name} ${OUT_OF_STOCK_LABEL}`
-                        : term.name;
-                    const disableOption = outOfStock && term.slug !== selectedTerm;
+                    const unavailable = isDiscontinued || outOfStock;
+                    const displayName = isDiscontinued
+                        ? `${term.name} ${DISCONTINUED_LABEL}`
+                        : outOfStock
+                            ? `${term.name} ${OUT_OF_STOCK_LABEL}`
+                            : term.name;
+                    const disableOption = unavailable && term.slug !== selectedTerm;
 
                     return (
                     <SelectItem
@@ -205,10 +212,10 @@ const SelectAttributeTerms = ({
                         }
                         classNames={{
                             base: `!bg-white opacity-100 font-opensans text-black data-[hover=true]:!bg-skin-neutral-50 data-[selected=true]:!bg-primary data-[selected=true]:text-primary-foreground ${
-                                outOfStock ? 'data-[disabled=true]:opacity-100' : ''
+                                unavailable ? 'data-[disabled=true]:opacity-100' : ''
                             }`,
                             title: `!whitespace-normal !break-words font-opensans ${
-                                outOfStock
+                                unavailable
                                     ? 'line-through text-skin-neutral-400 data-[selected=true]:!text-primary-foreground'
                                     : ''
                             }`,
@@ -230,6 +237,7 @@ const ButtonAttributeTerms = ({
     getDefaultSelectedTerm,
     allVariants,
     selectedAttributeSlugs,
+    isDiscontinued = false,
 }: {
     attributeTerm: AttributeTerms,
     currentTerm: string,
@@ -237,6 +245,7 @@ const ButtonAttributeTerms = ({
     getDefaultSelectedTerm: (attributeId: number) => string | undefined,
     allVariants: ProductVariant[],
     selectedAttributeSlugs?: Record<number, string>,
+    isDiscontinued?: boolean,
 }) => {
 
     const defaultTerm = getDefaultSelectedTerm(attributeTerm.attribute.id);
@@ -255,10 +264,13 @@ const ButtonAttributeTerms = ({
                         term.slug,
                         selectedAttributeSlugs
                     );
-                    const displayName = outOfStock
-                        ? `${term.name} ${OUT_OF_STOCK_LABEL}`
-                        : term.name;
-                    const disableOption = outOfStock && term.slug !== finalCurrentTerm;
+                    const unavailable = isDiscontinued || outOfStock;
+                    const displayName = isDiscontinued
+                        ? `${term.name} ${DISCONTINUED_LABEL}`
+                        : outOfStock
+                            ? `${term.name} ${OUT_OF_STOCK_LABEL}`
+                            : term.name;
+                    const disableOption = unavailable && term.slug !== finalCurrentTerm;
 
                     return (
                     <Button
@@ -277,11 +289,11 @@ const ButtonAttributeTerms = ({
 
                         }
                         className={`btn ${finalCurrentTerm === term.slug ? "primary-btn" : "bg-skin-white border-skin-neutral-200"} rounded w-full shadow-base !text-content-1 md:!text-title-1 !leading-none !h-9 !max-h-9 !px-4 !py-2 !font-bold ${
-                            outOfStock && finalCurrentTerm !== term.slug
+                            unavailable && finalCurrentTerm !== term.slug
                                 ? '!text-skin-neutral-400 line-through opacity-80'
                                 : ''
                         } ${
-                            outOfStock && finalCurrentTerm === term.slug ? 'line-through !text-white' : ''
+                            unavailable && finalCurrentTerm === term.slug ? 'line-through !text-white' : ''
                         }`}
                     >
                         {displayName}
@@ -302,7 +314,8 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
     allVariants,
     onVariantChange,
     selectedAttributeSlugs,
-    primaryAttributeId
+    primaryAttributeId,
+    isDiscontinued = false,
 }) => {
     // Filter out attributes that are not used in variation
     const attributeTermData = attributeTerms.filter(
@@ -386,6 +399,7 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
                         getDefaultSelectedTerm={getDefaultSelectedTerm}
                         allVariants={allVariants}
                         selectedAttributeSlugs={selectedAttributeSlugs}
+                        isDiscontinued={isDiscontinued}
                     /> :
                     <ButtonAttributeTerms
                         key={attributeTerm.attribute.id}
@@ -395,6 +409,7 @@ const ProductVariantFilter: FunctionComponent<ProductVariantFilterProps> = ({
                         getDefaultSelectedTerm={getDefaultSelectedTerm}
                         allVariants={allVariants}
                         selectedAttributeSlugs={selectedAttributeSlugs}
+                        isDiscontinued={isDiscontinued}
                     />
             ))}
         </div>

@@ -138,3 +138,23 @@ export interface RelatedGuidesResponse {
     guides: BlogList[];
 }
 
+/** Lightweight card from GET /api/product/{id}/related-blogs (no HTML content). */
+export interface ProductRelatedBlogCard {
+    id: number;
+    title: string;
+    slug: string;
+    image_url: string | null;
+    alt_text: string | null;
+    published_at: string;
+    categories: {
+        id: number;
+        name: string;
+        slug: string;
+    }[];
+}
+
+export interface ProductRelatedBlogsResponse {
+    product_id: number;
+    related_blogs: ProductRelatedBlogCard[];
+}
+

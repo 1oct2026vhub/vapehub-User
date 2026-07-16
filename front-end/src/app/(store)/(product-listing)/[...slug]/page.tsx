@@ -36,6 +36,7 @@ import {
   normalizeRedirectUrl,
   resolveBaseUrl,
 } from "./page.helpers";
+import { fetchProductRelatedGuides } from "../_components/related-guides.utils";
 
 type PageProps = {
   slug: string[];
@@ -169,13 +170,14 @@ const Page = async ({
       });
     }
 
-    // Parallel fetch: Product (required), FAQ, Rating, Description (optional, non-blocking for page shell)
+    // Parallel fetch: Product (required), FAQ, Rating, Description, Related blogs
     const entityId = dynamicPageSlug?.entity_id ?? 0;
     const [productRes, , ratingRes, descriptionRes] = await Promise.allSettled([
       fetchProduct(entityId, payload),
       getFaqs("product", entityId),
       getReviewOrderByProductId(entityId, 1, 1),
       fetchProductDescription(entityId, payload),
+      fetchProductRelatedGuides(entityId),
     ]);
 
     const data = productRes.status === "fulfilled" ? productRes.value : null;
@@ -378,6 +380,7 @@ const Page = async ({
         getFaqs("product", entityId),
         getReviewOrderByProductId(entityId, 1, 1),
         fetchProductDescription(entityId, []),
+        fetchProductRelatedGuides(entityId),
       ]);
 
       const data = productRes.status === "fulfilled" ? productRes.value : null;

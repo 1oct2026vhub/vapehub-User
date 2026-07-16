@@ -18,10 +18,11 @@ type BrandProps = {
 
 const BrandProducts: React.FC<BrandProps> = ({ data, reviews, dynamicPageSlug, brandFaqs = [] }): ReactElement => {
     const brandName = data.name || dynamicPageSlug?.name || "";
+    const brandSlug = data.slug || dynamicPageSlug?.slug || "";
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Brands", href: ROUTES.BRANDS },
-        { label: brandName, href: `/${data.slug || dynamicPageSlug?.slug || ""}`, isActive: true },
+        { label: brandName, href: `/brand/${brandSlug}/`, isActive: true },
     ];
     return (
         <div>

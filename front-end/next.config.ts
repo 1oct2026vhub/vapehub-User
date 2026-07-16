@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 
 // Ensure .env / .env.local are loaded before reading PRERENDER_TOKEN for the env block.
 loadEnvConfig(process.cwd());
-
 const nextConfig: NextConfig = {
   trailingSlash: true,
   // Edge middleware inlines env at build time; expose PRERENDER_TOKEN explicitly.
@@ -16,6 +15,8 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
   images: {
+    // Serve media as uploaded (e.g. WEBP on S3). No /_next/image/ transcoding to AVIF/JPEG.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -27,11 +28,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    // Re-enable Next.js Image Optimization for smaller payloads and WebP/AVIF delivery.
-    // Note: `remotePatterns` controls which external hosts are allowed for `next/image`.
-    formats: ["image/avif", "image/webp"],
-    // Cache optimized images for at least 1 hour to avoid repeated CPU work.
-    minimumCacheTTL: 60 * 60,
   },
    experimental: {
     scrollRestoration: false,

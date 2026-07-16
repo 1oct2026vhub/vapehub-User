@@ -59,6 +59,7 @@ const ShoppingCartPage: NextPage = (): ReactElement => {
                             <ShoppingCartCard
                                 key={item.id != null ? String(item.id) : `${item.product_id}-${item.variant_id}`}
                                 item={item}
+                                refreshCartAfterRemove
                             />
                         ))
                     }

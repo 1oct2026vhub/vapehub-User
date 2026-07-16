@@ -170,7 +170,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
 
     const allImages: productAllImages[] = cartEntity?.all_images ?? product?.all_images ?? [];
     const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
-    const stock = cartEntity?.stock && cartEntity?.stock_status === 'in_stock' ? cartEntity?.stock : 0;
+    const stock = cartEntity?.stock && cartEntity?.is_in_stock ? cartEntity?.stock : 0;
     const rawPrice = cartEntity?.price ?? (product as { price?: number | string })?.price ?? 0;
     const rawRegularPrice = cartEntity?.regular_price ?? (product as { regular_price?: number | string })?.regular_price ?? 0;
     const price = Number(rawPrice) || 0;

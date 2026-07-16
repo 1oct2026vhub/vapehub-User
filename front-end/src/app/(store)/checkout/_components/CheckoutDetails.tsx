@@ -130,9 +130,11 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         name: 'useDifferentBillingAddress',
         defaultValue: false,
     });
-    const { handlePlaceOrder, isProcessing, setSelectedShippingMethod } = useCheckout();
+    const { handlePlaceOrder, isProcessing, setSelectedShippingMethod, notifyShippingMethodSelected, selectedShippingMethod: contextSelectedShippingMethod } = useCheckout();
     const [selectedCarrier, setSelectedCarrier] = useState<SHIPPING_METHOD_DATA | null>(null);
-    const { cartTotal, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
+    /** True after the customer picks a shipping method in the radio group (cleared when cart/qty/points change). */
+    const userPickedShippingRef = useRef(false);
+    const { cartTotal, itemCount, couponDiscount, validateCartItems, fetchCartItems, loyaltyRedemption } = useCart();
     const { addresses } = useAddress();
     const [showNewAddressForm, setShowNewAddressForm] = useState(addresses.length === 0);
     const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
@@ -399,6 +401,33 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
     }, [status, fetchProfile, form]);
 
     useEffect(() => {
+        userPickedShippingRef.current = false;
+    }, [cartTotal, itemCount, loyaltyRedemption.pointsToRedeem]);
+
+    // Cart-driven shipping updates (e.g. loyalty qty refresh) sync context before checkout radio state.
+    useEffect(() => {
+        if (!loyaltyRedemption.isRedeemed || !contextSelectedShippingMethod || userPickedShippingRef.current) {
+            return;
+        }
+        if (selectedCarrier?.id === contextSelectedShippingMethod.id) {
+            return;
+        }
+        const method =
+            shippingMethods.find((m) => m.id === contextSelectedShippingMethod.id) ??
+            shippingMethodsData.find((m) => m.id === contextSelectedShippingMethod.id);
+        if (!method) return;
+        setSelectedCarrier(method);
+        form.setValue('shippingMethodId', method.id);
+    }, [
+        loyaltyRedemption.isRedeemed,
+        contextSelectedShippingMethod,
+        selectedCarrier?.id,
+        shippingMethods,
+        shippingMethodsData,
+        form,
+    ]);
+
+    useEffect(() => {
         if (!shippingMethodsData || shippingMethodsData.length === 0) {
             setShippingMethods([]);
             setSelectedCarrier(null);
@@ -434,7 +463,40 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         }
 
         const currentMethodId = form.getValues('shippingMethodId');
-        const nextMethod = pickCheckoutShippingMethod(filteredSortedMethods, currentMethodId);
+        const matchedCurrent =
+            currentMethodId > 0
+                ? filteredSortedMethods.find((m) => Number(m.id) === Number(currentMethodId))
+                : undefined;
+        const freeShippingMethod = filteredSortedMethods.find((m) => m.is_free_shipping ?? false);
+
+        let nextMethod: SHIPPING_METHOD_DATA | null = null;
+        if (loyaltyRedemption.isRedeemed) {
+            const apiMethodId = loyaltyRedemption.applyCouponShippingMethodId;
+            const apiMethod =
+                apiMethodId != null && apiMethodId > 0
+                    ? filteredSortedMethods.find((m) => Number(m.id) === Number(apiMethodId)) ??
+                      shippingMethodsData.find((m) => Number(m.id) === Number(apiMethodId))
+                    : undefined;
+            if (userPickedShippingRef.current && matchedCurrent) {
+                nextMethod = matchedCurrent;
+            } else if (apiMethod) {
+                nextMethod = apiMethod;
+            } else if (freeShippingMethod) {
+                nextMethod = freeShippingMethod;
+            } else if (matchedCurrent) {
+                nextMethod = matchedCurrent;
+            } else {
+                nextMethod = pickCheckoutShippingMethod(filteredSortedMethods, currentMethodId);
+            }
+        } else if (freeShippingMethod) {
+            // No loyalty: when the basket qualifies, use the free-shipping option automatically.
+            nextMethod = freeShippingMethod;
+        } else if (matchedCurrent) {
+            nextMethod = matchedCurrent;
+        } else {
+            nextMethod = pickCheckoutShippingMethod(filteredSortedMethods, currentMethodId);
+        }
+
         if (!nextMethod) {
             setSelectedCarrier(null);
             form.setValue('shippingMethodId', 0);
@@ -450,6 +512,8 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
         loyaltyRedemption.isRedeemed,
         loyaltyRedemption.discountValue,
         loyaltyRedemption.applyCouponShippingCost,
+        loyaltyRedemption.applyCouponShippingMethodId,
+        loyaltyRedemption.pointsToRedeem,
         form,
         setSelectedShippingMethod,
     ]);
@@ -733,15 +797,18 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ shippingMethodsData }
                             </div>
                             <RadioGroup
                                 value={form.watch('shippingMethodId').toString()}
-
-                                onChange={(e) => {
-                                    const method = e.target.value;
-                                    form.setValue('shippingMethodId', Number(method));
-                                    const selectedMethod = shippingMethods.find(m => m.id.toString() === method.toString()) || shippingMethods[0];
+                                onValueChange={(value) => {
+                                    const methodId = Number(value);
+                                    userPickedShippingRef.current = true;
+                                    form.setValue('shippingMethodId', methodId);
+                                    const selectedMethod =
+                                        shippingMethods.find(
+                                            (m) => m.id.toString() === value.toString()
+                                        ) || shippingMethods[0];
                                     setSelectedCarrier(selectedMethod);
                                     setSelectedShippingMethod(selectedMethod);
+                                    notifyShippingMethodSelected(methodId);
                                 }}
-
                             >
                                 {shippingMethods.map((method) => (
                                     <CustomRadio key={method.id} value={method.id.toString()}>

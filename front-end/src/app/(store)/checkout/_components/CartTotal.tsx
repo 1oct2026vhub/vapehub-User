@@ -98,13 +98,105 @@ async function applyLoyaltyCouponWithShippingCandidates(
 
 const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {  
     const { cartTotal, itemCount, setCouponDiscount, couponDiscount, setIsRemoveCoupon, loyaltyRedemption, setLoyaltyRedemption, setShippingMethodIdForCoupon } = useCart();
-    const { selectedShippingMethod, setSelectedShippingMethod } = useCheckout();
+    const { selectedShippingMethod, setSelectedShippingMethod, registerShippingMethodSelectedHandler } = useCheckout();
     const [isApplyingLoyalty, setIsApplyingLoyalty] = useState(false);
     const [loyaltyValidationMessage, setLoyaltyValidationMessage] = useState<string | null>(null);
     const { isRedeemed, pointsData: loyaltyPoints, discountValue: loyaltyDiscountValue, message: loyaltyMessage, pointsToRedeem, applyCouponShippingCost, applyCouponMailSubscriptionDiscount, applyCouponTotal } = loyaltyRedemption;
     const { status } = useSession();
     const isAuthenticated = status === 'authenticated';
     const loyaltyRefreshDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const lastLoyaltyShippingMethodIdRef = useRef<number>(0);
+    const loyaltyApplyCouponInFlightKeyRef = useRef<string | null>(null);
+    const loyaltyManualShippingSelectionRef = useRef(false);
+    const selectedShippingMethodIdRef = useRef<number>(0);
+
+    useEffect(() => {
+        selectedShippingMethodIdRef.current = selectedShippingMethod?.id
+            ? Number(selectedShippingMethod.id)
+            : 0;
+    }, [selectedShippingMethod?.id]);
+
+    const commitLoyaltyApplyCouponResponse = useCallback(
+        (
+            response: Awaited<ReturnType<typeof applyCoupon>>,
+            fallbackShippingMethodId: number
+        ) => {
+            if (response?.status !== ServerActionStatus.SUCCESS || !response.data) {
+                return false;
+            }
+            const loyaltyParsed = parseApiMoney(response.data.loyalty_discount);
+            const apiSub = parseApiMoney(response.data.subTotal);
+            const apiTot = parseApiMoney(response.data.total);
+            const discountAmount =
+                loyaltyParsed > 0 ? loyaltyParsed : Math.max(0, apiSub - apiTot);
+            const apiShippingMethodId = parseShippingMethodIdFromApplyCouponResponse(response.data);
+            const resolvedShippingMethodId =
+                fallbackShippingMethodId > 0
+                    ? fallbackShippingMethodId
+                    : apiShippingMethodId != null && apiShippingMethodId > 0
+                      ? apiShippingMethodId
+                      : null;
+            setLoyaltyRedemption((prev) => ({
+                ...prev,
+                isRedeemed: true,
+                discountValue: Number.isFinite(discountAmount) ? discountAmount : 0,
+                message: prev.message ?? 'Loyalty points applied',
+                applyCouponShippingCost: parseShippingCostFromApplyCouponResponse(response.data),
+                applyCouponShippingMethodId:
+                    resolvedShippingMethodId != null && resolvedShippingMethodId > 0
+                        ? resolvedShippingMethodId
+                        : null,
+                applyCouponMailSubscriptionDiscount: snapshotMailDiscountFromApplyCoupon(response.data),
+                applyCouponIsPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(response.data),
+                applyCouponTotal: parseTotalFromApplyCouponResponse(response.data),
+            }));
+            if (resolvedShippingMethodId != null && resolvedShippingMethodId > 0) {
+                lastLoyaltyShippingMethodIdRef.current = resolvedShippingMethodId;
+            } else if (fallbackShippingMethodId > 0) {
+                lastLoyaltyShippingMethodIdRef.current = fallbackShippingMethodId;
+            }
+            return true;
+        },
+        [setLoyaltyRedemption]
+    );
+
+    const refreshLoyaltyApplyCouponForShipping = useCallback(
+        async (shippingMethodId: number) => {
+            if (shippingMethodId <= 0 || !loyaltyPoints) return;
+
+            const requestKey = `loyalty-${shippingMethodId}-${pointsToRedeem ?? 'max'}`;
+            if (loyaltyApplyCouponInFlightKeyRef.current === requestKey) return;
+
+            loyaltyApplyCouponInFlightKeyRef.current = requestKey;
+            try {
+                const response = await applyCoupon(
+                    buildApplyCouponWithLoyalty(
+                        shippingMethodId,
+                        true,
+                        pointsToRedeem,
+                        loyaltyPoints
+                    )
+                );
+                if (commitLoyaltyApplyCouponResponse(response, shippingMethodId)) {
+                    return;
+                }
+                if (response?.status === ServerActionStatus.ERROR) {
+                    const errMsg =
+                        response && 'message' in response && typeof response.message === 'string'
+                            ? response.message
+                            : 'Failed to refresh loyalty discount for the selected shipping method.';
+                    toast.error(errMsg);
+                }
+            } catch (e) {
+                console.error('Error refreshing loyalty discount for shipping method:', e);
+            } finally {
+                if (loyaltyApplyCouponInFlightKeyRef.current === requestKey) {
+                    loyaltyApplyCouponInFlightKeyRef.current = null;
+                }
+            }
+        },
+        [loyaltyPoints, pointsToRedeem, commitLoyaltyApplyCouponResponse]
+    );
 
     const loyaltyEligibility = useMemo(
         () => evaluateLoyaltyRedemptionForCart(cartTotal, loyaltyPoints),
@@ -272,8 +364,19 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             clearLoyaltyRedemptionState();
         }
     }, [itemCount, clearLoyaltyRedemptionState]);
+
+    useEffect(() => {
+        if (!isRedeemed) {
+            lastLoyaltyShippingMethodIdRef.current = 0;
+            loyaltyManualShippingSelectionRef.current = false;
+        }
+    }, [isRedeemed]);
+
+    useEffect(() => {
+        loyaltyManualShippingSelectionRef.current = false;
+    }, [cartTotal, itemCount, pointsToRedeem]);
     
-    // When cart quantity/total changes with loyalty on, pick a carrier valid for the new merchandise total immediately.
+    // When cart quantity/total or loyalty points change, pick a carrier valid for the new merchandise total immediately.
     useEffect(() => {
         if (!isRedeemed) return;
         const shippingMethodId = resolveApplyCouponShippingMethodId(undefined, true);
@@ -285,29 +388,74 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         cartTotal,
         itemCount,
         isRedeemed,
+        pointsToRedeem,
+        loyaltyDiscountValue,
         resolveApplyCouponShippingMethodId,
         setShippingMethodIdForCoupon,
     ]);
 
-    // Keep CartContext coupon revalidation aligned with the carrier valid for the current cart.
+    // Keep CartContext coupon revalidation aligned with the priced shipping method when loyalty is on.
     useEffect(() => {
-        const fallbackId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0;
-        const shippingMethodId = isRedeemed
-            ? resolveApplyCouponShippingMethodId(undefined, true)
-            : fallbackId;
-        setShippingMethodIdForCoupon(shippingMethodId > 0 ? shippingMethodId : fallbackId);
+        if (isRedeemed) {
+            const pricedId =
+                loyaltyRedemption.applyCouponShippingMethodId != null &&
+                loyaltyRedemption.applyCouponShippingMethodId > 0
+                    ? loyaltyRedemption.applyCouponShippingMethodId
+                    : resolveApplyCouponShippingMethodId(undefined, true);
+            if (pricedId > 0) {
+                setShippingMethodIdForCoupon(pricedId);
+            }
+            return;
+        }
+        const selectedId = selectedShippingMethod?.id ? Number(selectedShippingMethod.id) : 0;
+        if (selectedId > 0) {
+            setShippingMethodIdForCoupon(selectedId);
+        }
     }, [
         selectedShippingMethod,
         setShippingMethodIdForCoupon,
         isRedeemed,
+        loyaltyRedemption.applyCouponShippingMethodId,
         resolveApplyCouponShippingMethodId,
         cartTotal,
         itemCount,
     ]);
 
-    // Authenticated loyalty: debounced applyCoupon keeps discount aligned with API when cart/shipping changes.
+    const refreshLoyaltyApplyCouponForShippingRef = useRef(refreshLoyaltyApplyCouponForShipping);
+    refreshLoyaltyApplyCouponForShippingRef.current = refreshLoyaltyApplyCouponForShipping;
+
+    const canRefreshLoyaltyForShippingRef = useRef(false);
+    canRefreshLoyaltyForShippingRef.current =
+        isAuthenticated &&
+        isRedeemed &&
+        !couponDiscount.code &&
+        !!loyaltyPoints &&
+        loyaltyEligibility.canRedeemOnCart &&
+        !loyaltyPointsToRedeemError;
+
+    useEffect(() => {
+        registerShippingMethodSelectedHandler((shippingMethodId: number) => {
+            if (!canRefreshLoyaltyForShippingRef.current) return;
+            if (lastLoyaltyShippingMethodIdRef.current === shippingMethodId) return;
+
+            loyaltyManualShippingSelectionRef.current = true;
+            if (loyaltyRefreshDebounceRef.current) {
+                clearTimeout(loyaltyRefreshDebounceRef.current);
+                loyaltyRefreshDebounceRef.current = null;
+            }
+
+            void refreshLoyaltyApplyCouponForShippingRef.current(shippingMethodId);
+        });
+        return () => registerShippingMethodSelectedHandler(null);
+    }, [registerShippingMethodSelectedHandler]);
+
+    // Authenticated loyalty: debounced applyCoupon keeps discount aligned with API when cart quantity/total changes only.
     // CartContext owns coupon revalidation; toggling loyalty still calls applyCoupon immediately in handleRedeemToggle (may duplicate once ~400ms after redeem).
     useEffect(() => {
+        if (loyaltyManualShippingSelectionRef.current) {
+            return;
+        }
+
         if (
             !isAuthenticated ||
             !isRedeemed ||
@@ -329,7 +477,12 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
 
         loyaltyRefreshDebounceRef.current = setTimeout(async () => {
             loyaltyRefreshDebounceRef.current = null;
-            const methodIds = listApplyCouponShippingMethodIds(true);
+            const resolvedId = resolveApplyCouponShippingMethodId(undefined, true);
+            const fallbackIds = listApplyCouponShippingMethodIds(true);
+            const methodIds =
+                resolvedId > 0
+                    ? [resolvedId, ...fallbackIds.filter((id) => id !== resolvedId)]
+                    : fallbackIds;
             try {
                 const { response, shippingMethodId } = await applyLoyaltyCouponWithShippingCandidates(
                     methodIds,
@@ -337,31 +490,10 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                     loyaltyPoints,
                     (id) => syncSelectedShippingMethod(id)
                 );
-                if (response?.status === ServerActionStatus.SUCCESS && response.data) {
-                    const loyaltyParsed = parseApiMoney(response.data.loyalty_discount);
-                    const apiSub = parseApiMoney(response.data.subTotal);
-                    const apiTot = parseApiMoney(response.data.total);
-                    const discountAmount =
-                        loyaltyParsed > 0 ? loyaltyParsed : Math.max(0, apiSub - apiTot);
-                    const apiShippingMethodId = parseShippingMethodIdFromApplyCouponResponse(response.data);
-                    const resolvedShippingMethodId =
-                        apiShippingMethodId ?? (shippingMethodId > 0 ? shippingMethodId : null);
-                    setLoyaltyRedemption((prev) => ({
-                        ...prev,
-                        isRedeemed: true,
-                        discountValue: Number.isFinite(discountAmount) ? discountAmount : 0,
-                        message: prev.message ?? 'Loyalty points applied',
-                        applyCouponShippingCost: parseShippingCostFromApplyCouponResponse(response.data),
-                        applyCouponShippingMethodId:
-                            resolvedShippingMethodId != null && resolvedShippingMethodId > 0
-                                ? resolvedShippingMethodId
-                                : null,
-                        applyCouponMailSubscriptionDiscount: snapshotMailDiscountFromApplyCoupon(response.data),
-                        applyCouponIsPaymentRequired: parseIsPaymentRequiredFromApplyCouponResponse(response.data),
-                        applyCouponTotal: parseTotalFromApplyCouponResponse(response.data),
-                    }));
-                    if (resolvedShippingMethodId != null && resolvedShippingMethodId > 0) {
-                        syncSelectedShippingMethod(resolvedShippingMethodId);
+                if (response && commitLoyaltyApplyCouponResponse(response, shippingMethodId)) {
+                    if (shippingMethodId > 0) {
+                        syncSelectedShippingMethod(shippingMethodId);
+                        setShippingMethodIdForCoupon(shippingMethodId);
                     }
                 } else if (response?.status === ServerActionStatus.ERROR) {
                     const errMsg =
@@ -388,11 +520,12 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         loyaltyPoints,
         cartTotal,
         itemCount,
-        listApplyCouponShippingMethodIds,
-        setLoyaltyRedemption,
         pointsToRedeem,
         loyaltyEligibility.canRedeemOnCart,
         loyaltyPointsToRedeemError,
+        commitLoyaltyApplyCouponResponse,
+        resolveApplyCouponShippingMethodId,
+        listApplyCouponShippingMethodIds,
     ]);
 
     const handleRedeemToggle = async (checked: boolean) => {
@@ -402,7 +535,6 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             );
             return;
         }
-
         setLoyaltyValidationMessage(null);
         setIsApplyingLoyalty(true);
         let response: Awaited<ReturnType<typeof applyCoupon>> | null = null;
@@ -434,7 +566,11 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                 : 0;
             const apiShippingMethodId = parseShippingMethodIdFromApplyCouponResponse(response.data);
             const resolvedShippingMethodId =
-                apiShippingMethodId ?? (shippingMethodId > 0 ? shippingMethodId : null);
+                shippingMethodId > 0
+                    ? shippingMethodId
+                    : apiShippingMethodId != null && apiShippingMethodId > 0
+                      ? apiShippingMethodId
+                      : null;
             setLoyaltyRedemption(prev => ({
                 ...prev,
                 isRedeemed: checked,
@@ -454,6 +590,12 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                     : null,
                 applyCouponTotal: checked ? parseTotalFromApplyCouponResponse(response.data) : null,
             }));
+            if (checked && resolvedShippingMethodId != null && resolvedShippingMethodId > 0) {
+                lastLoyaltyShippingMethodIdRef.current = resolvedShippingMethodId;
+            }
+            if (!checked) {
+                lastLoyaltyShippingMethodIdRef.current = 0;
+            }
             if (checked) {
                 setCouponDiscount({ value: 0, isApplied: false, code: null, message: null, discountValue: '' });
             }
@@ -529,12 +671,18 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         catalogShippingCost,
         applyCouponShippingFromApi
     );
+    const effectiveShippingCost =
+        !isRedeemed &&
+        !couponDiscount.isApplied &&
+        applyCouponShippingFromApi == null &&
+        (selectedShippingMethod?.is_free_shipping ?? false)
+            ? 0
+            : safeShippingCost;
     const loyaltyApplyCouponZeroShipping =
         isRedeemed &&
         applyCouponShippingCost !== null &&
         Number.isFinite(applyCouponShippingCost) &&
-        applyCouponShippingCost === 0;
-    
+        applyCouponShippingCost === 0;    
     // Subtotal: use cartTotal (includes deal discounts), not coupon API subTotal
     const displaySubTotal = Number.isFinite(cartTotal) && cartTotal > 0 ? cartTotal : 0;
 
@@ -553,7 +701,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
             cartTotal,
             couponSliceForTotals,
             { isRedeemed, discountValue: displayLoyaltyDiscount },
-            safeShippingCost
+            effectiveShippingCost
         );
     }, [
         isRedeemed,
@@ -561,7 +709,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
         cartTotal,
         couponSliceForTotals,
         displayLoyaltyDiscount,
-        safeShippingCost,
+        effectiveShippingCost,
     ]);
 
     const safeSubTotal = Number.isFinite(displaySubTotal) ? displaySubTotal : 0;
@@ -706,7 +854,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
                         <p className='text-skin-neutral-500 !font-oswald'>Shipping Cost</p>
-                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{safeShippingCost.toFixed(2)}</p>
+                        <p className='text-skin-neutral-300'>{DEFAULT_CURRENCY_SYMBOL}{effectiveShippingCost.toFixed(2)}</p>
                     </div>
                     <div className='flex items-center justify-between text-content-2 md:text-title-2 font-bold'>
                         <p className='text-skin-neutral-500 !font-oswald'>Subtotal</p>
@@ -725,7 +873,7 @@ const CartTotal: React.FC<CartTotalProps> = ({ shippingMethodsData }) => {
                         <ShippingProgress 
                             totalAmount={safeTotal} 
                             freeShippingThreshold={freeShippingThreshold} 
-                            shippingCost={safeShippingCost}
+                            shippingCost={effectiveShippingCost}
                             loyaltyApplyCouponZeroShipping={loyaltyApplyCouponZeroShipping}
                         />
                         <Divider className='border-2' />

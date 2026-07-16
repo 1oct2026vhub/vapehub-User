@@ -58,12 +58,15 @@ export interface LoyaltyRedemption {
   /** Last apply-coupon `total` when loyalty is on (authoritative grand total including shipping). */
   applyCouponTotal: number | null;
 }
+interface RemoveItemOptions {
+  refreshFromApi?: boolean;
+}
 export interface CartContextType {
   cartItems: CartItem[];
   isLoading: boolean;
   addItemToCart: (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => Promise<void>;
   updateItemQuantity: (cartId: number, quantity: number,productName: string) => Promise<void>;
-  removeItem: (cartId: number) => Promise<void>;
+  removeItem: (cartId: number, options?: RemoveItemOptions) => Promise<void>;
   cartTotal: number;
   cartSubtotal: number;
   cartDiscount: number;
@@ -681,9 +684,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const removeItem = async (cartId: number) => {
+  const removeItem = async (cartId: number, options?: RemoveItemOptions) => {
     setIsLoading(true);
     const itemToRemove = cartItems.find(item => item.id === cartId);
+    const shouldRefreshFromApi = Boolean(options?.refreshFromApi);
     if (!itemToRemove) {
       return;
     }
@@ -695,6 +699,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           const updatedCart = cartItems.filter(item => item.id !== cartId);
           setCartItems(updatedCart);
           calculateTotals(updatedCart);
+          if (shouldRefreshFromApi) {
+            await fetchCartItems();
+          }
           toast.error(`${itemToRemove?.name || 'Item'} removed from cart`);
           
           // Reset loyalty points if cart becomes empty

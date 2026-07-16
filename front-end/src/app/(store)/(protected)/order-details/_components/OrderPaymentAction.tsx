@@ -1,9 +1,7 @@
 "use client"
 import { ServerActionStatus } from "@/lib/config/app.config";
-// import { useVivaWallet } from "@/lib/hooks/useVivaWallet";
-import { cancelOrderById ,
-  // checkStockToPayment 
-} from "@/lib/server.actions";
+import { useVivaWallet } from "@/lib/hooks/useVivaWallet";
+import { cancelOrderById, checkStockToPayment } from "@/lib/server.actions";
 import { Button } from '@nextui-org/button'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@nextui-org/modal'
 import { useRouter } from "next/navigation";
@@ -11,8 +9,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
-    // const { initiatePayment } = useVivaWallet();
-    // const [isLoading, setIsLoading] = useState(false);
+    const { initiatePayment } = useVivaWallet();
+    const [isLoading, setIsLoading] = useState(false);
     const [isCancelLoading, setIsCancelLoading] = useState(false);
     const { isOpen,
       //  onOpen, 
@@ -20,25 +18,25 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
 
     const router = useRouter();
 
-    // const payNow = async () => {
-    //     try {
-    //         setIsLoading(true);
-    //         const response = await checkStockToPayment(orderId);
-    //         if (response.status === ServerActionStatus.SUCCESS) {
-    //             await initiatePayment({
-    //                 orderReference: response.data.order_code,
-    //             });
-    //            
-    //         } else {
-    //             toast.error(response.message);
-    //             router.refresh();
-    //         }
-    //     } catch (error) {
-    //         console.error('Error cancelling order:', error);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // }
+    const payNow = async () => {
+        try {
+            setIsLoading(true);
+            const response = await checkStockToPayment(orderId);
+            if (response.status === ServerActionStatus.SUCCESS) {
+                await initiatePayment({
+                    orderReference: response.data.order_code,
+                });
+            } else {
+                toast.error(response.message);
+                router.refresh();
+            }
+        } catch (error) {
+            console.error('Error initiating payment:', error);
+            toast.error('Failed to initiate payment. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleCancelOrder = async () => {
         try {
@@ -61,14 +59,14 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
     return (
         <>
             <div className='flex items-center gap-4'>
-                {/* <Button
+                <Button
                     size='md'
                     radius='sm'
                     color='primary'
                     onPress={payNow}
                     isLoading={isLoading}
                     isDisabled={isLoading}
-                >Pay Now</Button> */}
+                >Pay Now</Button>
                 {/* <Button
                     size='md'
                     radius='sm'

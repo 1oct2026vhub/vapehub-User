@@ -5,7 +5,7 @@ import { BrandConfig } from '@/lib/config/brand.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 import NoImage from './NoImage';
-import { DownArrowIcon } from './Icons';
+import CategoryQuickLinkCards from '@/app/(store)/(product-listing)/_components/CategoryQuickLinkCards';
 
 type CategoryProps = {
     data: Category | BrandConfig;
@@ -13,6 +13,7 @@ type CategoryProps = {
     aboutHeading?: string;
     showBuyingGuideFaqsLink?: boolean;
     buyingGuideFaqsHref?: string;
+    showCategoryQuickLinks?: boolean;
 }
 
 const ProductListingContent: React.FC<CategoryProps> = ({
@@ -21,6 +22,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({
     aboutHeading,
     showBuyingGuideFaqsLink = false,
     buyingGuideFaqsHref = '#buying-guide-faqs',
+    showCategoryQuickLinks = false,
 }) => {
     // Only use banners from API - no fallback to deals
     const banners = dynamicPageSlug?.banners || [];
@@ -45,12 +47,12 @@ const ProductListingContent: React.FC<CategoryProps> = ({
                 {showBuyingGuideFaqsLink && (
                     <Link
                         href={buyingGuideFaqsHref}
-                        className="inline-flex w-fit items-center gap-1.5 font-oswald text-title-1 font-semibold primary-gradient-600 hover:opacity-80 transition-opacity"
+                        className="w-fit font-oswald text-title-1 font-semibold text-skin-primary-500 underline underline-offset-4 hover:opacity-80 transition-opacity"
                     >
-                        Buying Guide &amp; FAQs
-                        <DownArrowIcon className="h-5 w-5 shrink-0" aria-hidden />
+                        Buying Guide &amp; FAQs ↓
                     </Link>
                 )}
+                {showCategoryQuickLinks ? <CategoryQuickLinkCards /> : null}
             </div>
             {validBanners.length > 0 && (
                 <div className={`grid gap-3.5 ${

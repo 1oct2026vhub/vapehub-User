@@ -85,6 +85,7 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
           data={enhancedCategoryData}
           dynamicPageSlug={dynamicPageSlug}
           showBuyingGuideFaqsLink
+          showCategoryQuickLinks
         />
       </section>
       <ProductList data={data} reviews={reviews}>

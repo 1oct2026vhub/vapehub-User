@@ -207,6 +207,19 @@ async function resolveSlugResult(request: NextRequest): Promise<SlugResult> {
   // Default: check the primary slug first (existing behavior).
   const primaryResult = await fetchSlugRelation(primarySlug)
   if (primaryResult.type !== 'not-found') {
+    // Brands only render under /brand/<slug>/. Bare /<brand-slug> resolves as
+    // entity_type "brand" but soft-404s on [...slug]; 301 to the canonical URL.
+    if (
+      primaryResult.type === 'next' &&
+      primaryResult.entityType === 'brand' &&
+      segments.length === 1
+    ) {
+      const dest = new URL(`/brand/${primarySlug}/`, request.url)
+      request.nextUrl.searchParams.forEach((value, key) => {
+        dest.searchParams.set(key, value)
+      })
+      return { type: 'redirect', url: dest, temporary: false }
+    }
     return primaryResult
   }
 

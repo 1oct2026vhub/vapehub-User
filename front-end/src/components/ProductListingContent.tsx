@@ -14,6 +14,8 @@ type CategoryProps = {
     showBuyingGuideFaqsLink?: boolean;
     buyingGuideFaqsHref?: string;
     showCategoryQuickLinks?: boolean;
+    /** Category leaf slug for related-categories API (required when showCategoryQuickLinks). */
+    categoryQuickLinksSlug?: string;
 }
 
 const ProductListingContent: React.FC<CategoryProps> = ({
@@ -23,6 +25,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({
     showBuyingGuideFaqsLink = false,
     buyingGuideFaqsHref = '#buying-guide-faqs',
     showCategoryQuickLinks = false,
+    categoryQuickLinksSlug = '',
 }) => {
     // Only use banners from API - no fallback to deals
     const banners = dynamicPageSlug?.banners || [];
@@ -52,7 +55,9 @@ const ProductListingContent: React.FC<CategoryProps> = ({
                         Buying Guide &amp; FAQs ↓
                     </Link>
                 )}
-                {showCategoryQuickLinks ? <CategoryQuickLinkCards /> : null}
+                {showCategoryQuickLinks && categoryQuickLinksSlug ? (
+                    <CategoryQuickLinkCards slug={categoryQuickLinksSlug} />
+                ) : null}
             </div>
             {validBanners.length > 0 && (
                 <div className={`grid gap-3.5 ${

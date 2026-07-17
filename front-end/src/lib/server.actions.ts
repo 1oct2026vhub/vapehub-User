@@ -1,10 +1,11 @@
 import { ServerActionResponse, ServerActionStatus } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia } from "./config/auth.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse, ProductRelatedBlogsResponse, RelatedGuidesResponse } from "./config/blog.config";
+import { BuyingGuideApiData } from "./config/buying-guide.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
-import { Category } from "./config/category.config";
+import { Category, RelatedCategoriesApiData } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, APPLY_GUEST_COUPON_PAYLOAD, CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD, SHOPPING_CART_CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse, SeoMetaResponse } from "./config/global.config";
@@ -940,6 +941,45 @@ export const getCategoryRelatedGuides = async (
         endpoint: API_ROUTES.GET_CATEGORY_RELATED_GUIDES(payload),
         method: 'GET',
         canCache,
+    });
+};
+
+/** Public category buying guide by slug — no auth. Null buyingGuide = hide section. */
+export const getCategoryBuyingGuide = async (
+    slug: string,
+    canCache: boolean = true,
+): Promise<ServerActionResponse<BuyingGuideApiData>> => {
+    return await handleRequest<BuyingGuideApiData, unknown>({
+        endpoint: API_ROUTES.GET_CATEGORY_BUYING_GUIDE(slug),
+        method: 'GET',
+        canCache,
+        cacheStrategy: canCache ? { revalidate: 300 } : undefined,
+    });
+};
+
+/** Public related categories by slug — no auth. Empty list = hide the row. */
+export const getCategoryRelatedCategories = async (
+    slug: string,
+    canCache: boolean = true,
+): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
+    return await handleRequest<RelatedCategoriesApiData, unknown>({
+        endpoint: API_ROUTES.GET_CATEGORY_RELATED_CATEGORIES(slug),
+        method: 'GET',
+        canCache,
+        cacheStrategy: canCache ? { revalidate: 300 } : undefined,
+    });
+};
+
+/** Public brand buying guide by slug — no auth. Null buyingGuide = hide section. */
+export const getBrandBuyingGuide = async (
+    slug: string,
+    canCache: boolean = true,
+): Promise<ServerActionResponse<BuyingGuideApiData>> => {
+    return await handleRequest<BuyingGuideApiData, unknown>({
+        endpoint: API_ROUTES.GET_BRAND_BUYING_GUIDE(slug),
+        method: 'GET',
+        canCache,
+        cacheStrategy: canCache ? { revalidate: 300 } : undefined,
     });
 };
 

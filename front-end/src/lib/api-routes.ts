@@ -103,6 +103,12 @@ export const API_ROUTES = {
     GET_MORE_LIKE_THIS: (payload: { product_id: number; limit?: number; offset?: number }) => buildRequestUrl(`/api/product/more-like-this?${toQueryString(payload)}`),
     GET_RELATED_GUIDES: (payload: { product_id: number; limit?: number }) => buildRequestUrl(`/api/product/related-guides?${toQueryString(payload)}`),
     GET_CATEGORY_RELATED_GUIDES: (payload: { category_id: number; limit?: number }) => buildRequestUrl(`/api/category/related-guides?${toQueryString(payload)}`),
+    GET_CATEGORY_BUYING_GUIDE: (slug: string) =>
+        buildRequestUrl(`/api/category/slug/${encodeURIComponent(slug)}/buying-guide`),
+    GET_CATEGORY_RELATED_CATEGORIES: (slug: string) =>
+        buildRequestUrl(`/api/category/slug/${encodeURIComponent(slug)}/related-categories`),
+    GET_BRAND_BUYING_GUIDE: (slug: string) =>
+        buildRequestUrl(`/api/brands/slug/${encodeURIComponent(slug)}/buying-guide`),
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),

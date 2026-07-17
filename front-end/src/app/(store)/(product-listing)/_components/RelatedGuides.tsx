@@ -3,22 +3,31 @@ import BlogCard from "@/components/BlogCard";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import { AsyncReactElement } from "@/lib/config/app.config";
+import { BlogList } from "@/lib/config/blog.config";
 import { ROUTES } from "@/lib/routes";
 import {
   RelatedGuidesRenderProps,
   resolveRelatedGuidesGuides,
 } from "./related-guides.utils";
 
-const RelatedGuides: React.FC<RelatedGuidesRenderProps> = async ({
+type RelatedGuidesProps = RelatedGuidesRenderProps & {
+  /** When provided (e.g. from buying-guide API), skip secondary fetches. */
+  guides?: BlogList[];
+};
+
+const RelatedGuides: React.FC<RelatedGuidesProps> = async ({
   title = "Related Guides",
   viewAllHref = ROUTES.BLOGS,
   currentProductId,
   currentCategoryId,
+  guides: prefetchedGuides,
 }): AsyncReactElement => {
-  const guides = await resolveRelatedGuidesGuides({
-    currentProductId,
-    currentCategoryId,
-  });
+  const guides =
+    prefetchedGuides ??
+    (await resolveRelatedGuidesGuides({
+      currentProductId,
+      currentCategoryId,
+    }));
 
   if (!guides.length) {
     return <></>;

@@ -21,6 +21,19 @@ export interface SubCategory {
     feature?: string;
 }
 
+/** Public related-categories card item (category page quick links). */
+export interface RelatedCategory {
+    id: number;
+    name: string;
+    slug: string;
+    logo_url: string | null;
+    alt_text: string | null;
+}
+
+export interface RelatedCategoriesApiData {
+    related_categories: RelatedCategory[];
+}
+
 export const defaultNavLinks:SubCategory[] = [
     {
         name: "Brands",

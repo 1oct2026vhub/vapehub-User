@@ -1,16 +1,16 @@
 import ProductList from '@/app/(store)/(product-listing)/_components/ProductList';
-import React, { ReactElement } from 'react';
+import React from 'react';
 import ProductListingContent from "@/components/ProductListingContent";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import { CategoryResponseData } from '@/lib/config/product.config';
 import FAQSection from '@/components/FAQSection';
-import { ServerActionResponse } from '@/lib/config/app.config';
+import { AsyncReactElement, ServerActionResponse } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import CategoryBuyingGuide from './_components/CategoryBuyingGuide';
 import CategoryBuyingGuideAccordion from './_components/CategoryBuyingGuideAccordion';
 import RelatedGuides from './_components/RelatedGuides';
-import { resolveCategoryBuyingGuide } from './_components/category-buying-guide.utils';
+import { fetchCategoryBuyingGuideSection } from './_components/buying-guide.utils';
 
 // Extended type for category data that might have additional ID fields
 type ExtendedCategoryData = CategoryResponseData & {
@@ -26,7 +26,12 @@ type CategoryProps = {
 }
 
 
-const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageSlug, pageSlug }): ReactElement => {  
+const CategoryProducts = async ({
+  data,
+  reviews,
+  dynamicPageSlug,
+  pageSlug,
+}: CategoryProps): AsyncReactElement => {
   const formatSlugToTitle = (slug?: string | null) => {
     if (!slug) return "";
     return slug
@@ -63,19 +68,17 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
                     data.category?.[0]?.id ||
                     (dynamicPageSlug?.entity_id);
 
-  const buyingGuide = resolveCategoryBuyingGuide({
-    categoryName: enhancedCategoryData.name,
-    categorySlug: enhancedCategoryData.slug,
-    pageSlug,
-    dynamicPageSlug,
-    categoryFeature: data.feature,
-    categoryBuyingGuide: data.buying_guide,
-    categoryDescription: enhancedCategoryData.description,
-    categoryImageUrl: data.logo_url,
-    dealsText: dynamicPageSlug?.deals_text,
-  });
+  const buyingGuideSlug =
+    pageSlug?.split("/").filter(Boolean).pop() ||
+    enhancedCategoryData.slug?.split("/").filter(Boolean).pop() ||
+    "";
 
-  const showContentPanel = Boolean(buyingGuide || categoryId);
+  const { guide: buyingGuide, relatedGuides } = await fetchCategoryBuyingGuideSection(
+    buyingGuideSlug,
+    enhancedCategoryData.name,
+  );
+
+  const showBuyingGuideSection = Boolean(buyingGuide);
     
   return (
     <div className='w-full max-w-[1520px] mx-auto'>
@@ -84,32 +87,31 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
         <ProductListingContent
           data={enhancedCategoryData}
           dynamicPageSlug={dynamicPageSlug}
-          showBuyingGuideFaqsLink
+          showBuyingGuideFaqsLink={showBuyingGuideSection}
           showCategoryQuickLinks
+          categoryQuickLinksSlug={buyingGuideSlug}
         />
       </section>
       <ProductList data={data} reviews={reviews}>
-        {showContentPanel ? (
+        {showBuyingGuideSection && buyingGuide ? (
           <div className="w-full pt-7.5 md:pt-9">
             <CategoryBuyingGuideAccordion
-              title={buyingGuide?.title ?? enhancedCategoryData.name}
-              imageUrl={data.logo_url ?? buyingGuide?.imageUrl}
-              imageAlt={buyingGuide?.imageAlt ?? enhancedCategoryData.name}
+              title={buyingGuide.title ?? enhancedCategoryData.name}
+              imageUrl={buyingGuide.imageUrl ?? data.logo_url}
+              imageAlt={buyingGuide.imageAlt ?? enhancedCategoryData.name}
             >
-              {buyingGuide ? (
-                <CategoryBuyingGuide
-                  key={`buying-guide-${pageSlug ?? enhancedCategoryData.slug ?? categoryId}`}
-                  embedded
-                  hideHeader
-                  {...buyingGuide}
-                />
-              ) : null}
-              {categoryId ? (
+              <CategoryBuyingGuide
+                key={`buying-guide-${buyingGuideSlug || categoryId}`}
+                embedded
+                hideHeader
+                {...buyingGuide}
+              />
+              {relatedGuides.length > 0 ? (
                 <RelatedGuides
-                  key={`related-guides-${categoryId}`}
+                  key={`related-guides-${buyingGuideSlug || categoryId}`}
                   title="Related Blogs"
                   embedded
-                  currentCategoryId={categoryId}
+                  guides={relatedGuides}
                 />
               ) : null}
             </CategoryBuyingGuideAccordion>
@@ -119,19 +121,6 @@ const CategoryProducts: React.FC<CategoryProps> = ({ data, reviews, dynamicPageS
       {categoryId ? (
         <section className="product-listing-container flex-col scroll-mt-24">
           <FAQSection type="category" id={categoryId} />
-        </section>
-      ) : !showContentPanel ? (
-        <section className="product-listing-container flex-col scroll-mt-24">
-          <div className="text-center py-4">
-            <p className="text-gray-500">FAQ section unavailable - Category ID not found</p>
-            <p className="text-sm text-gray-400">Debug info:</p>
-            <ul className="text-xs text-gray-400 text-left max-w-md mx-auto">
-              <li>data.id = {String(data.id)}</li>
-              <li>data.category_id = {String(data.category_id ?? 'undefined')}</li>
-              <li>data.categoryId = {String(data.categoryId ?? 'undefined')}</li>
-              <li>dynamicPageSlug.entity_id = {String(dynamicPageSlug?.entity_id ?? 'undefined')}</li>
-            </ul>
-          </div>
         </section>
       ) : null}
     </div>

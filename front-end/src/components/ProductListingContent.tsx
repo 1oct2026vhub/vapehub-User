@@ -5,7 +5,7 @@ import { BrandConfig } from '@/lib/config/brand.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 import NoImage from './NoImage';
-import CategoryQuickLinkCards from '@/app/(store)/(product-listing)/_components/CategoryQuickLinkCards';
+import DesignTypeButtons from '@/app/(store)/(product-listing)/_components/DesignTypeButtons';
 
 type CategoryProps = {
     data: Category | BrandConfig;
@@ -55,8 +55,9 @@ const ProductListingContent: React.FC<CategoryProps> = ({
                         Buying Guide &amp; FAQs ↓
                     </Link>
                 )}
-                {showCategoryQuickLinks && categoryQuickLinksSlug ? (
-                    <CategoryQuickLinkCards slug={categoryQuickLinksSlug} />
+                {/* Category-based filter UI: replace related category cards with design-type buttons */}
+                {showBuyingGuideFaqsLink && showCategoryQuickLinks && categoryQuickLinksSlug ? (
+                    <DesignTypeButtons />
                 ) : null}
             </div>
             {validBanners.length > 0 && (

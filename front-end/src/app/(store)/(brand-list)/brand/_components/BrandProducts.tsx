@@ -27,13 +27,13 @@ const BrandProducts = async ({
     brandFaqs = [],
 }: BrandProps): AsyncReactElement => {
     const brandName = data.name || dynamicPageSlug?.name || "";
-    const brandSlug =
-        data.slug?.split("/").filter(Boolean).pop() ||
-        dynamicPageSlug?.slug?.split("/").filter(Boolean).pop() ||
-        "";
+    // Full slug for canonical breadcrumb href (/brand/<slug>/)
+    const brandSlug = data.slug || dynamicPageSlug?.slug || "";
+    // Leaf slug for buying-guide API lookup
+    const buyingGuideSlug = brandSlug.split("/").filter(Boolean).pop() || "";
 
     const { guide: buyingGuide, relatedGuides } = await fetchBrandBuyingGuideSection(
-        brandSlug,
+        buyingGuideSlug,
         brandName,
     );
     const showBuyingGuideSection = Boolean(buyingGuide);
@@ -65,14 +65,14 @@ const BrandProducts = async ({
                                 imageAlt={buyingGuide.imageAlt ?? brandName}
                             >
                                 <CategoryBuyingGuide
-                                    key={`buying-guide-brand-${brandSlug || data.id}`}
+                                    key={`buying-guide-brand-${buyingGuideSlug || data.id}`}
                                     embedded
                                     hideHeader
                                     {...buyingGuide}
                                 />
                                 {relatedGuides.length > 0 ? (
                                     <RelatedGuides
-                                        key={`related-guides-brand-${brandSlug || data.id}`}
+                                        key={`related-guides-brand-${buyingGuideSlug || data.id}`}
                                         title="Related Blogs"
                                         embedded
                                         guides={relatedGuides}

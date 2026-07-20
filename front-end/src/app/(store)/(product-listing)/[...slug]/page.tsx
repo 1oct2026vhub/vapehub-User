@@ -254,6 +254,10 @@ const Page = async ({
     );
   }
 
+  // Brand pages live at /brand/<slug>/; bare /<slug> soft-404s without a handler.
+  if (dynamicPageSlug?.entity_type === "brand" && primarySlug) {
+    redirect(`/brand/${primarySlug}/`);
+  }
 
   const entityTypeHandlers: Record<string, () => Promise<React.ReactNode>> = {
     blog_category: async () => {

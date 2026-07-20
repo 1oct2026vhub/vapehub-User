@@ -41,7 +41,7 @@ const BrandProducts = async ({
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Brands", href: ROUTES.BRANDS },
-        { label: brandName, href: `/${data.slug || dynamicPageSlug?.slug || ""}`, isActive: true },
+        { label: brandName, href: `/brand/${brandSlug}/`, isActive: true },
     ];
     return (
         <div>

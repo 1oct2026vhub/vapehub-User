@@ -21,17 +21,15 @@ export interface SubCategory {
     feature?: string;
 }
 
-/** Public related-categories card item (category page quick links). */
-export interface RelatedCategory {
-    id: number;
-    name: string;
-    slug: string;
-    logo_url: string | null;
-    alt_text: string | null;
+/** Public related-categories link item (category page quick links). */
+export interface RelatedLink {
+    text: string;
+    url: string;
+    sort_order?: number;
 }
 
 export interface RelatedCategoriesApiData {
-    related_categories: RelatedCategory[];
+    related_links: RelatedLink[];
 }
 
 export const defaultNavLinks:SubCategory[] = [

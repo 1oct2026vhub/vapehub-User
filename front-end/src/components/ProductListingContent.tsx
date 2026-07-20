@@ -55,9 +55,8 @@ const ProductListingContent: React.FC<CategoryProps> = ({
                         Buying Guide &amp; FAQs ↓
                     </Link>
                 )}
-                {/* Category-based filter UI: replace related category cards with design-type buttons */}
                 {showBuyingGuideFaqsLink && showCategoryQuickLinks && categoryQuickLinksSlug ? (
-                    <DesignTypeButtons />
+                    <DesignTypeButtons slug={categoryQuickLinksSlug} />
                 ) : null}
             </div>
             {validBanners.length > 0 && (

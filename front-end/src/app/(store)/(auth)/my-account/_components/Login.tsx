@@ -71,7 +71,6 @@ const Login: FunctionComponent = (): ReactElement => {
         const loadRememberedCredentials = async () => {
             const remembered = await getRememberedCredentials();
             if (!isMounted || !remembered) return;
-
             signInFromConfig.reset({
                 email: remembered.email,
                 password: remembered.password,

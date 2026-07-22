@@ -66,9 +66,10 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     session: async ({ session, token }: { session: any; token: JWT }) => {
-
+      // Do NOT put the backend Bearer token on session.user — /api/auth/session
+      // is readable by client JS. Keep the API token only on the encrypted JWT
+      // (token.accessToken / token.sub) and read it server-side via getToken().
       if (session.user) {
-        session.user.accessToken = token.sub as string;
         session.user.id = token.userId;
       }
       return session;
@@ -76,7 +77,10 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     jwt: async ({ token, user }: { token: any; user: any; }) => {
       if (user) {
-        token.userId = user.userId
+        token.userId = user.userId;
+        // Persist backend API token on the encrypted JWT only (never on the client session).
+        // authorize() sets user.id / user.sub to the backend accessToken.
+        token.accessToken = user.sub ?? user.id;
       }
       return token;
     }

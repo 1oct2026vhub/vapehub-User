@@ -9,6 +9,7 @@ import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import CategoryBuyingGuide from './_components/CategoryBuyingGuide';
 import CategoryBuyingGuideAccordion from './_components/CategoryBuyingGuideAccordion';
+import CategoryTypeCards from './_components/CategoryTypeCards';
 import RelatedGuides from './_components/RelatedGuides';
 import { fetchCategoryBuyingGuideSection } from './_components/buying-guide.utils';
 
@@ -118,6 +119,9 @@ const CategoryProducts = async ({
           </div>
         ) : null}
       </ProductList>
+      <CategoryTypeCards
+        html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
+      />
       {categoryId ? (
         <section className="product-listing-container flex-col scroll-mt-24">
           <FAQSection type="category" id={categoryId} />

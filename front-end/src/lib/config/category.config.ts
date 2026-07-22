@@ -11,6 +11,8 @@ export interface Category extends SubCategory {
     deletedAt: string | null;
     name: string;
     description: string;
+    /** CKEditor HTML for category type-card grid; omit/empty hides the section. */
+    type_cards_html?: string | null;
     slug: string;
     feature?: string;
     subCategories: SubCategory[];

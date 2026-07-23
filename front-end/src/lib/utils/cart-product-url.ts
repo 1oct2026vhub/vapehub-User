@@ -142,10 +142,8 @@ export function shouldLinkCartItemToParentProduct(
 }
 
 export function buildCartProductUrl(
-  item: Pick<
-    CartItem,
-    'product_slug' | 'variantAttributes' | 'useParentProductUrl' | 'product_id' | 'variant_id'
-  >,
+  item: Pick<CartItem, 'product_slug' | 'variantAttributes'> &
+    Partial<Pick<CartItem, 'useParentProductUrl' | 'product_id' | 'variant_id'>>,
 ): string {
   const remembered =
     typeof item.product_id === 'number' && typeof item.variant_id === 'number'

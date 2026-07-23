@@ -164,6 +164,28 @@ export function buildCartProductUrl(
   return `/${item.product_slug}/${primaryTermSlug}${queryString ? `?${queryString}` : ''}`;
 }
 
+/**
+ * Order-line attribute rows (e.g. "Tank Size : 2ml") should be hidden when the product
+ * uses the hidden-selector / dummy-variation flow.
+ */
+export function shouldHideOrderLineVariantDetails(options: {
+  hide_variant_selector?: boolean;
+  productId?: number;
+  variantId?: number;
+  attributes?: CartVariantAttribute[] | null;
+}): boolean {
+  if (options.hide_variant_selector === true) {
+    return true;
+  }
+  if (options.productId != null && options.variantId != null) {
+    const remembered = getRememberedCartParentProductUrl(options.productId, options.variantId);
+    if (remembered === true) {
+      return true;
+    }
+  }
+  return shouldLinkCartItemToParentProduct(options.attributes);
+}
+
 /** Cart/checkout line title: omit variant terms when hide_variant_selector / parent-URL mode. */
 export function formatCartLineProductName(
   productName: string,

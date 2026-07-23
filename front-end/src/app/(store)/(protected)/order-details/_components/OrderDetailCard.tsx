@@ -3,18 +3,21 @@ import NoImage from "@/components/NoImage";
 import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
 import Link from "next/link";
 import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
-import { buildCartProductUrl, shouldLinkCartItemToParentProduct } from "@/lib/utils/cart-product-url";
+import { buildCartProductUrl, shouldHideOrderLineVariantDetails } from "@/lib/utils/cart-product-url";
 import type { CartVariantAttribute } from "@/lib/config/cart.config";
 interface OrderDetailCardProps {
     status:string;
     data: ORDER['orderItems'][0];
     isCouponApplied: number | null;
+    /** From product API hide_variant_selector — preferred over attribute heuristics. */
+    hideVariantDetails?: boolean;
 }
 
 const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     status,
     isCouponApplied,
-    data
+    data,
+    hideVariantDetails: hideVariantDetailsProp,
 }) => {
     const attributes = data.variant?.variantAttributes;
 
@@ -30,11 +33,16 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
         variantAttributes,
         product_id: data.product.id,
         variant_id: data.variant?.id,
+        useParentProductUrl: hideVariantDetailsProp === true,
     });
-    // Same hidden-selector / non-page-visible dummy attr case as cart — omit "Tank Size : 2ml" lines.
     const hideVariantDetails =
-        Boolean((data.product as { hide_variant_selector?: boolean }).hide_variant_selector) ||
-        shouldLinkCartItemToParentProduct(variantAttributes);
+        hideVariantDetailsProp === true ||
+        shouldHideOrderLineVariantDetails({
+            hide_variant_selector: (data.product as { hide_variant_selector?: boolean }).hide_variant_selector,
+            productId: data.product.id,
+            variantId: data.variant?.id,
+            attributes: variantAttributes,
+        });
     
     return (
         // 10ml?20=up-to-1500-puffs

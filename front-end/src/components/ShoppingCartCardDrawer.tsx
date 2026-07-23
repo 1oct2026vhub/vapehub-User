@@ -6,7 +6,7 @@ import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
 import Link from 'next/link';
 import QuantitySelector from './QuantitySelector';
-
+import { buildCartProductUrl } from '@/lib/utils/cart-product-url';
 type CartCardProps = {
   item: CartItem;
 };
@@ -25,11 +25,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
     }
   };
 
-  const queryParams = new URLSearchParams();
-  item.variantAttributes.slice(1).forEach(attr => {
-    queryParams.set(attr.attribute_id.toString(), attr.term_slug);
-  });
-  const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
+  const productUrl = buildCartProductUrl(item);
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">

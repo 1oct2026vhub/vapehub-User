@@ -3,7 +3,8 @@ import NoImage from "@/components/NoImage";
 import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
 import Link from "next/link";
 import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
-
+import { buildCartProductUrl } from "@/lib/utils/cart-product-url";
+import type { CartVariantAttribute } from "@/lib/config/cart.config";
 interface OrderDetailCardProps {
     status:string;
     data: ORDER['orderItems'][0];
@@ -16,15 +17,18 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     data
 }) => {
     const attributes = data.variant?.variantAttributes;
-    
-    const queryParams = new URLSearchParams();
-    attributes?.slice(1).forEach(attr => {
-        queryParams.set(attr.attribute_id.toString(), attr.term.slug);
+
+    const variantAttributes: CartVariantAttribute[] = (attributes ?? []).map((attr) => ({
+        attribute_id: attr.attribute_id,
+        term_slug: attr.term.slug,
+        // Order API uses the same pivot visibility flag as cart (`is_visible`).
+        is_visible_page: attr.is_visible,
+        used_in_variation: attr.used_in_variation,
+    }));
+    const productUrl = buildCartProductUrl({
+        product_slug: data.product.slug,
+        variantAttributes,
     });
-    
-    const primaryVariantSlug = attributes?.[0]?.term.slug ?? '';
-    const queryString = queryParams.toString();
-    const productUrl = `/${data.product.slug}/${primaryVariantSlug}${queryString ? `?${queryString}` : ''}`;
     
     return (
         // 10ml?20=up-to-1500-puffs

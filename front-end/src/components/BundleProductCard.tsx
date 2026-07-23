@@ -11,6 +11,10 @@ import { ServerActionStatus } from '@/lib/config/app.config';
 import { Product, ProductVariant, AttributeTerms, ProductResponse } from '@/lib/config/product.config';
 import { PRODUCT_VARIANT_ATTRIBUTE } from '@/lib/api-routes';
 import { toast } from 'sonner';
+import {
+	isHiddenVariationOnlyProduct,
+	mapVariantAttributesForCart,
+} from '@/lib/utils/cart-product-url';
 
 // Global cache to persist fetched product data across component mounts/unmounts
 const productDataCache = new Map<number, {
@@ -340,10 +344,16 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 		setIsAddingToCart(true);
 		try {
 			const variantTermSlug = productVariant.attributes[0]?.term_slug ?? '';
-			const variantAttributes = productVariant.attributes.map(attr => ({ 
-				attribute_id: attr.attribute_id, 
-				term_slug: attr.term_slug 
-			}));
+			const variantAttributes = mapVariantAttributesForCart(
+				productVariant.attributes.map(attr => ({
+					attribute_id: attr.attribute_id,
+					term_slug: attr.term_slug,
+				})),
+				productResponse?.product.attribute_terms,
+			);
+			const useParentProductUrl = isHiddenVariationOnlyProduct(
+				productResponse?.product.attribute_terms,
+			);
 			
 			const productName = `${name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`;
 			
@@ -366,7 +376,8 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 				productVariant,
 				productName,
 				variantTermSlug,
-				variantAttributes
+				variantAttributes,
+				useParentProductUrl,
 			);
 		} catch (err) {
 			console.error("Failed to add to cart:", err);

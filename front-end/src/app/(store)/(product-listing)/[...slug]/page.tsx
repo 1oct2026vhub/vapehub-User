@@ -186,12 +186,20 @@ const Page = async ({
       const newSlug = data?.filtered_attribute_terms.find(term => term.attribute.id === lastPayload.attribute_id)?.terms.find(t => t.id === lastPayload.term_id)?.slug;
       if (newSlug) {
         redirect(`/${data.product.slug}/${newSlug}`, RedirectType.replace);
+      } else if (data.product?.slug) {
+        // Dummy / unresolved variant slug → parent PDP instead of 404
+        redirect(`/${data.product.slug}`, RedirectType.replace);
       } else {
         return <PageNotFound />;
       }
     }
 
-    if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
+    if (!variant) {
+      // Product exists but secondary slug is not a resolvable variation term (e.g. dummy attr URL).
+      redirect(`/${primarySlug}`, RedirectType.replace);
+    }
+
+    if (!data || !data.variants.length || !data.product || !data.product.category) {
       return <PageNotFound />;
     }
 

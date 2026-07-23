@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, UnAvailableItem } from '../config/cart.config';
+import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, CartVariantAttribute, UnAvailableItem } from '../config/cart.config';
 import { APPLY_GUEST_COUPON_PAYLOAD } from '../config/checkout.config';
 import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, applyGuestCoupon, getLoyaltyPointsRedemption, calculateGuestDeals } from '../server.actions';
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
@@ -19,7 +19,7 @@ import {
   evaluateLoyaltyRedemptionForCart,
   getLoyaltyOrderMinimumBlockingMessage,
 } from '../utils/checkout-order.utils';
-
+import { shouldLinkCartItemToParentProduct, getRememberedCartParentProductUrl, rememberCartParentProductUrl } from '../utils/cart-product-url';
 interface CouponDiscount {
   value: number;
   isApplied: boolean;
@@ -64,7 +64,7 @@ interface RemoveItemOptions {
 export interface CartContextType {
   cartItems: CartItem[];
   isLoading: boolean;
-  addItemToCart: (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => Promise<void>;
+  addItemToCart: (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: CartVariantAttribute[], useParentProductUrl?: boolean) => Promise<void>;
   updateItemQuantity: (cartId: number, quantity: number,productName: string) => Promise<void>;
   removeItem: (cartId: number, options?: RemoveItemOptions) => Promise<void>;
   cartTotal: number;
@@ -239,6 +239,47 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return input.filter(isValidGuestCartItem);
   };
 
+  const getPrimaryProductImage = (item: ProductImage[]): string => {
+    return item?.find(image => image.is_primary)?.image_url || item?.[0]?.image_url || '';
+  };
+
+  const bindCartItem = (item: CART_RESPONSE_DATA): CartItem => {
+    const attributesName = item.variant.variantAttributes.map(attr => attr.term.name).join(', ');
+    const variantSlug = item.variant.variantAttributes[0]?.term?.slug ?? '';
+    // Cart API exposes page visibility as `is_visible` on the variant-attribute pivot.
+    const variantAttributes: CartVariantAttribute[] = item.variant.variantAttributes.map(attr => ({
+      attribute_id: attr.attribute_id,
+      term_slug: attr.term.slug,
+      is_visible_page: attr.is_visible,
+      used_in_variation: attr.used_in_variation,
+    }));
+    return {
+      id: item.id,
+      product_id: item.product_id,
+      product_slug: item.product.slug,
+      name: attributesName ? `${item.product.name} - ${attributesName}` : item.product.name,
+      price: item.variant.price || '0',
+      discount_price: item.variant.discount_price || '0',
+      variant_id: item.variant_id,
+      stock: item.variant.stock_status === 'in_stock' ? item.variant.stock : 0,
+      slug: variantSlug,
+      description: item.variant.description,
+      ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      total: item.total,
+      applied_deals: item.applied_deals,
+      show_deal_toast: item.show_deal_toast,
+      deal_required_qty: item.deal_required_qty,
+      deal_qty_needed: item.deal_qty_needed,
+      deals: item.product.deals || [],
+      variantAttributes,
+      useParentProductUrl:
+        getRememberedCartParentProductUrl(item.product_id, item.variant_id) ??
+        shouldLinkCartItemToParentProduct(variantAttributes),
+    };
+  };
+
   const loadCartItems = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -246,32 +287,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const response = await getCartItems();
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartData = response.data;
-          const cartItems: CartItem[] = cartData.items.map((item) => {
-            const attributesName = item.variant.variantAttributes.map(attr => attr.term.name).join(', ');
-            const variantSlug = item.variant.variantAttributes[0]?.term?.slug ?? '';
-            return {
-              id: item.id,
-              product_id: item.product_id,
-              product_slug: item.product.slug,
-              name: attributesName ? `${item.product.name} - ${attributesName}` : item.product.name,
-              price: item.variant.price || '0',
-              discount_price: item.variant.discount_price || '0',
-              variant_id: item.variant_id,
-              stock: item.variant.stock_status === 'in_stock' ? item.variant.stock : 0,
-              slug: variantSlug,
-              description: item.variant.description,
-              ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
-              quantity: item.quantity,
-              subtotal: item.subtotal,
-              total: item.total,
-              applied_deals: item.applied_deals,
-              show_deal_toast: item.show_deal_toast,
-              deal_required_qty: item.deal_required_qty,
-              deal_qty_needed: item.deal_qty_needed,
-              deals: item.product.deals || [],
-              variantAttributes: item.variant.variantAttributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term.slug }))
-            };
-          });
+          const cartItems: CartItem[] = cartData.items.map((item) => bindCartItem(item));
           setCartItems(cartItems);
           if (cartData.summary) {
             setCartTotal(roundCurrency(cartData.summary.total));
@@ -378,36 +394,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     loadCartItems();
   }, [loadCartItems]);
 
-  const bindCartItem = (item: CART_RESPONSE_DATA): CartItem => {
-    const attributesName = item.variant.variantAttributes.map(attr => attr.term.name).join(', ');
-    const variantSlug = item.variant.variantAttributes[0]?.term?.slug ?? '';
-    return {
-      id: item.id,
-      product_id: item.product_id,
-      product_slug: item.product.slug,
-      name: attributesName ? `${item.product.name} - ${attributesName}` : item.product.name,
-      price: item.variant.price || '0',
-      discount_price: item.variant.discount_price || '0',
-      variant_id: item.variant_id,
-      stock: item.variant.stock_status === 'in_stock' ? item.variant.stock : 0,
-      slug: variantSlug,
-      description: item.variant.description,
-      ProductImages: item.variant.variantImages?.[0]?.image_url || getPrimaryProductImage(item.product.ProductImages),
-      quantity: item.quantity,
-      subtotal: item.subtotal,
-      total: item.total,
-      applied_deals: item.applied_deals,
-      show_deal_toast: item.show_deal_toast,
-      deal_required_qty: item.deal_required_qty,
-      deal_qty_needed: item.deal_qty_needed,
-      deals: item.product.deals || [],
-      variantAttributes: item.variant.variantAttributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term.slug }))
-    };
-  };
-  const getPrimaryProductImage = (item: ProductImage[]): string => {
-    return item?.find(image => image.is_primary)?.image_url || item?.[0]?.image_url || '';
-  }
-
   // Helper function to calculate deals for guest users
   // const calculateLocalGuestDeals = (product: Product, quantity: number) => {
   //   if (!product.deals || product.deals.length === 0) {
@@ -474,7 +460,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   //   }
   // };
 
-  const createGuestCartItem = (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]): CartItem => {
+  const createGuestCartItem = (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: CartVariantAttribute[], useParentProductUrl?: boolean): CartItem => {
     const id =
       typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function'
         ? crypto.getRandomValues(new Uint32Array(1))[0]
@@ -508,6 +494,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       deal_qty_needed: null, // API will determine this
       deals: product.deals || [], // Keep product deals for reference
       variantAttributes: variantAttributes,
+      useParentProductUrl:
+        useParentProductUrl ?? shouldLinkCartItemToParentProduct(variantAttributes),
     };
   };
 
@@ -532,9 +520,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
 
-  const addItemToCart = async (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: { attribute_id: number; term_slug: string }[]) => {
+  const addItemToCart = async (product: Product, variantId: number, quantity: number, data: ProductVariant, productName: string, variantSlug: string, variantAttributes: CartVariantAttribute[], useParentProductUrl?: boolean) => {
     setIsLoading(true);
     const productId = product.id;
+    const resolvedUseParent =
+      useParentProductUrl ?? shouldLinkCartItemToParentProduct(variantAttributes);
+    rememberCartParentProductUrl(productId, variantId, resolvedUseParent);
     try {
       // Check if the product with the same product ID and variant ID already exists in the cart
       const existingItem = cartItems.find(item =>
@@ -567,7 +558,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         // Handle as guest cart
-        const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
+        const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes, resolvedUseParent);
         const updatedCart = [...cartItems, newItem];
         setCartItems(updatedCart);
         setGuestCart(updatedCart);
@@ -583,7 +574,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error adding item to cart:', error);
       toast.error('Failed to add item to cart. Please try again.');
       // Handle as guest cart as fallback - still try to use API for deals
-      const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes);
+      const newItem = createGuestCartItem(product, variantId, quantity, data, productName, variantSlug, variantAttributes, resolvedUseParent);
       const updatedCart = [...cartItems, newItem];
       setCartItems(updatedCart);
       setGuestCart(updatedCart);

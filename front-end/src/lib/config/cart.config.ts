@@ -102,6 +102,15 @@ export type CART_GET_PAYLOAD = {
   quantity: number;
 }
 
+/** Attribute payload stored on cart lines for PDP deep links. */
+export type CartVariantAttribute = {
+  attribute_id: number;
+  term_slug: string;
+  /** Mirrors admin "Visible on product page"; false for dummy variation attrs. */
+  is_visible_page?: boolean;
+  used_in_variation?: boolean;
+};
+
 export type CartItem = {
   id: number;
   product_id: number;
@@ -129,7 +138,12 @@ export type CartItem = {
     discount_percent?: number,
     fixed_price?: string
   }[];
-  variantAttributes: { attribute_id: number, term_slug: string }[];
+  variantAttributes: CartVariantAttribute[];
+  /**
+   * When true, cart/order links use /{product_slug} only (dummy hidden-variation products).
+   * Set at add-to-cart from full product attribute_terms; inferred from API for logged-in carts.
+   */
+  useParentProductUrl?: boolean;
 }
   
 export type StockValidationResponse = {

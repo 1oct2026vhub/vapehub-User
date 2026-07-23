@@ -31,6 +31,10 @@ import {
     buildVariantFirstTitle,
     findVariantDescriptionBySelections,
 } from '@/lib/seo-schema'
+import {
+    isHiddenVariationOnlyProduct,
+    mapVariantAttributesForCart,
+} from '@/lib/utils/cart-product-url'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -279,13 +283,17 @@ const ProductDetails: React.FC<ProductViewProps> = ({
         setIsAddingToCart(true);
         try {
             const variantTermSlug = cartEntity.attributes[0]?.term_slug ?? '';
-            const variantAttributes = cartEntity.attributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term_slug }));
+            const variantAttributes = mapVariantAttributesForCart(
+                cartEntity.attributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term_slug })),
+                product?.attribute_terms,
+            );
+            const useParentProductUrl = isHiddenVariationOnlyProduct(product?.attribute_terms);
             const productForCart: Product = {
                 ...product,
                 price: product.primary_image?.url ?? '0',
                 ProductImages: product.all_images.map(img => ({ id: img.id, image_url: img.url, is_primary: img.is_primary }))
             };
-            await addItemToCart(productForCart, cartEntity.id, quantity, cartEntity, productName, variantTermSlug, variantAttributes);
+            await addItemToCart(productForCart, cartEntity.id, quantity, cartEntity, productName, variantTermSlug, variantAttributes, useParentProductUrl);
         } catch (err) {
             console.error("Failed to add to cart:", err);
         } finally {

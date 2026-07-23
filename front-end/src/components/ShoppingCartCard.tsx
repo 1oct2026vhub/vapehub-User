@@ -8,6 +8,7 @@ import { DEFAULT_CURRENCY_SYMBOL, ServerActionResponse, ServerActionStatus } fro
 import QuantitySelector from './QuantitySelector'; 
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { RatingStarEmpty, RatingStarFilled } from './Icons';
+import { buildCartProductUrl } from '@/lib/utils/cart-product-url';
 
 type CartCardProps = {
   item?: CartItem;
@@ -42,12 +43,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({
   const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
   const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
 
-  const queryParams = new URLSearchParams();
-  item.variantAttributes.slice(1).forEach(attr => {
-    queryParams.set(attr.attribute_id.toString(), attr.term_slug);
-  });
-  const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
-
+  const productUrl = buildCartProductUrl(item);
   return (
     <div className="bg-skin-white p-4 rounded-lg shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">

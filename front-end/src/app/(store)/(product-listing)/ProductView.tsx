@@ -8,7 +8,7 @@ import ProductDetails from './_components/ProductDetails';
 import ProductFeatures from './_components/ProductFeatures';
 import RelatedProducts from './_components/RelatedProducts';
 import { ROUTES } from '@/lib/routes';
-import { AttributeProductTerms, AttributeTerms, ProductResponse } from '@/lib/config/product.config';
+import { AttributeProductTerms, ProductResponse } from '@/lib/config/product.config';
 import { FaqResponse } from '@/lib/config/global.config';
 import { ReviewProvider } from '@/lib/context/ReviewContext';
 import { ProductDataProvider } from '@/lib/context/ProductDataContext';
@@ -34,7 +34,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({
     initialReviewData = null,
 }): ReactElement => {
 
-    const productFeatures = data?.product?.attribute_terms.filter((attrTerm: AttributeTerms) => (attrTerm.attribute.is_visible_page && !attrTerm.attribute.used_in_variation));
+    const productFeatures = data?.product?.attribute_terms ?? [];
     const breadcrumbs = [
         { label: "Home", href: ROUTES.WELCOME },
         { label: data?.product?.category?.name || "", href: `/${data?.product?.category?.slug || ""}` },

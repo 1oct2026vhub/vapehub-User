@@ -1,8 +1,13 @@
 import { PRODUCT_DESCRIPTION_QUERY, PRODUCT_VARIANT_ATTRIBUTE } from '@/lib/api-routes';
 import { ProductDescriptionResponse, ProductResponse, ProductVariant } from '@/lib/config/product.config';
+import { resolveDefaultHiddenVariant, shouldHideVariantSelector } from '@/lib/utils/cart-product-url';
 
 /** Resolved variant when all variation attributes are selected (or simple single-variant product). */
 export function getResolvedVariant(productData: ProductResponse): ProductVariant | null {
+  if (shouldHideVariantSelector(productData.product)) {
+    return resolveDefaultHiddenVariant(productData.product, productData.variants);
+  }
+
   const hasFilteredTerms = (productData.filtered_attribute_terms?.length ?? 0) > 0;
   const hasAvailableTerms = (productData.available_terms?.length ?? 0) > 0;
   const isReadyVariant =

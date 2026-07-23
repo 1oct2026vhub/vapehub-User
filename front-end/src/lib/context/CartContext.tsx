@@ -19,7 +19,7 @@ import {
   evaluateLoyaltyRedemptionForCart,
   getLoyaltyOrderMinimumBlockingMessage,
 } from '../utils/checkout-order.utils';
-import { shouldLinkCartItemToParentProduct, getRememberedCartParentProductUrl, rememberCartParentProductUrl } from '../utils/cart-product-url';
+import { shouldLinkCartItemToParentProduct, getRememberedCartParentProductUrl, rememberCartParentProductUrl, enrichCartItemParentUrlFlag, formatCartLineProductName } from '../utils/cart-product-url';
 interface CouponDiscount {
   value: number;
   isApplied: boolean;
@@ -236,7 +236,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const sanitizeGuestCart = (input: unknown): CartItem[] => {
     if (!Array.isArray(input)) return [];
-    return input.filter(isValidGuestCartItem);
+    return input.filter(isValidGuestCartItem).map(enrichCartItemParentUrlFlag);
   };
 
   const getPrimaryProductImage = (item: ProductImage[]): string => {
@@ -253,11 +253,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       is_visible_page: attr.is_visible,
       used_in_variation: attr.used_in_variation,
     }));
+    const rememberedParentUrl = getRememberedCartParentProductUrl(item.product_id, item.variant_id);
+    const useParentProductUrl =
+      rememberedParentUrl ??
+      (shouldLinkCartItemToParentProduct(variantAttributes) ||
+        Boolean((item.product as { hide_variant_selector?: boolean }).hide_variant_selector));
     return {
       id: item.id,
       product_id: item.product_id,
       product_slug: item.product.slug,
-      name: attributesName ? `${item.product.name} - ${attributesName}` : item.product.name,
+      name: formatCartLineProductName(item.product.name, attributesName, useParentProductUrl),
       price: item.variant.price || '0',
       discount_price: item.variant.discount_price || '0',
       variant_id: item.variant_id,
@@ -274,9 +279,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       deal_qty_needed: item.deal_qty_needed,
       deals: item.product.deals || [],
       variantAttributes,
-      useParentProductUrl:
-        getRememberedCartParentProductUrl(item.product_id, item.variant_id) ??
-        shouldLinkCartItemToParentProduct(variantAttributes),
+      useParentProductUrl,
     };
   };
 

@@ -14,6 +14,8 @@ import { toast } from 'sonner';
 import {
 	isHiddenVariationOnlyProduct,
 	mapVariantAttributesForCart,
+	resolveDefaultHiddenVariant,
+	shouldHideVariantSelector,
 } from '@/lib/utils/cart-product-url';
 
 // Global cache to persist fetched product data across component mounts/unmounts
@@ -213,6 +215,14 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 		if (cachedData) {
 			setProductResponse(cachedData.productResponse);
 			setProductData(cachedData.productData);
+			if (shouldHideVariantSelector(cachedData.productResponse.product)) {
+				setProductVariant(
+					resolveDefaultHiddenVariant(
+						cachedData.productResponse.product,
+						cachedData.productResponse.variants,
+					),
+				);
+			}
 			setIsLoading(false);
 			return;
 		}
@@ -237,27 +247,6 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 					setProductResponse(response.data);
 					const fetchedProduct = response.data.product;
 					
-					// if (response.data.variants && response.data.variants.length > 0) {
-					// 	console.log('[BundleProductCard] Variant List:', response.data.variants.map((variant: ProductVariant) => ({
-					// 		id: variant.id,
-					// 		slug: variant.slug,
-					// 		attributes: variant.attributes.map(attr => ({
-					// 			attribute_name: attr.attribute_name,
-					// 			term_name: attr.term_name,
-					// 			term_slug: attr.term_slug
-					// 		})),
-					// 		price: variant.price,
-					// 		regular_price: variant.regular_price,
-					// 		discount_price: variant.discount_price,
-					// 		stock: variant.stock,
-					// 		stock_status: variant.stock_status,
-					// 		is_in_stock: variant.is_in_stock,
-					// 		status: variant.status
-					// 	})));
-					// } else {
-					// 	console.log('[BundleProductCard] No variants found for this product');
-					// }
-					
 					const productForState: Product = {
 						...fetchedProduct,
 						id: fetchedProduct.id,
@@ -274,6 +263,12 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 						Flavors: product.Flavors
 					};
 					setProductData(productForState);
+
+					if (shouldHideVariantSelector(fetchedProduct)) {
+						setProductVariant(
+							resolveDefaultHiddenVariant(fetchedProduct, response.data.variants),
+						);
+					}
 					
 					// Cache the fetched data for future use
 					productDataCache.set(id, {
@@ -351,11 +346,14 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 				})),
 				productResponse?.product.attribute_terms,
 			);
-			const useParentProductUrl = isHiddenVariationOnlyProduct(
-				productResponse?.product.attribute_terms,
-			);
+			const hideSelector = shouldHideVariantSelector(productResponse?.product);
+			const useParentProductUrl =
+				hideSelector ||
+				isHiddenVariationOnlyProduct(productResponse?.product.attribute_terms);
 			
-			const productName = `${name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`;
+			const productName = hideSelector
+				? name
+				: `${name} - ${productVariant.attributes.map(attr => attr.term_name).join(', ')}`;
 			
 			const allImages = (productData as typeof productData & { all_images?: Array<{ id: number; url: string; is_primary: boolean }> }).all_images;
 			
@@ -413,6 +411,12 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 								<div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
 								<div className="h-10 bg-gray-200 rounded animate-pulse"></div>
 							</div>
+						) : productResponse && shouldHideVariantSelector(productResponse.product) ? (
+							productVariant && (productVariant.stock_status !== 'in_stock' || productVariant.stock <= 0) ? (
+								<p className="text-red-500 text-content-1 md:text-title-1 font-semibold !font-oswald">
+									Out of stock
+								</p>
+							) : null
 						) : productResponse && productResponse.product.attribute_terms ? (
 							<>
 								<BundleVariantFilter
@@ -534,6 +538,12 @@ const BundleProductCard: React.FC<BundleProductCardProps> = React.memo(({ produc
 							<div className="h-3 bg-gray-200 rounded animate-pulse w-20"></div>
 							<div className="h-9 bg-gray-200 rounded animate-pulse"></div>
 						</div>
+					) : productResponse && shouldHideVariantSelector(productResponse.product) ? (
+						productVariant && (productVariant.stock_status !== 'in_stock' || productVariant.stock <= 0) ? (
+							<p className="text-red-500 text-content-1 font-semibold !font-oswald">
+								Out of stock
+							</p>
+						) : null
 					) : productResponse && productResponse.product.attribute_terms ? (
 						<>
 							<BundleVariantFilter

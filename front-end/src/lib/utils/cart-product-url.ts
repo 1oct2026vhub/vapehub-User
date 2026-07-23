@@ -1,11 +1,49 @@
 import type { CartItem, CartVariantAttribute } from '@/lib/config/cart.config';
-import type { AttributeTerms } from '@/lib/config/product.config';
+import type { AttributeTerms, ProductVariant, ProductViewDetails } from '@/lib/config/product.config';
 
 const PARENT_URL_PREF_KEY = 'vh_cart_parent_product_urls';
 
 /**
- * Dummy "simple product" workaround: variation attrs exist only so the SKU can be sold,
- * with "Visible on product page" unchecked and typically a single term per attr.
+ * True when API asks FE to hide the picker AND variation attrs are not page-visible
+ * (or attribute_terms are empty, which is typical when hide_variant_selector is true).
+ */
+export function shouldHideVariantSelector(
+  product: Pick<ProductViewDetails, 'hide_variant_selector' | 'attribute_terms'> | null | undefined,
+): boolean {
+  if (!product?.hide_variant_selector) {
+    return false;
+  }
+  const variationAttrs = (product.attribute_terms ?? []).filter(
+    (attrTerm) => attrTerm.attribute.used_in_variation,
+  );
+  // API usually returns empty attribute_terms when the flag is true.
+  if (variationAttrs.length === 0) {
+    return true;
+  }
+  return variationAttrs.every((attrTerm) => attrTerm.attribute.is_visible_page === false);
+}
+
+/** Resolve the default/hidden variant for add-to-cart when the selector is hidden. */
+export function resolveDefaultHiddenVariant(
+  product: Pick<ProductViewDetails, 'default_variant_id' | 'default_variant_slug'> | null | undefined,
+  variants: ProductVariant[] | undefined | null,
+): ProductVariant | null {
+  if (!variants?.length) {
+    return null;
+  }
+  if (product?.default_variant_id != null) {
+    const byId = variants.find((v) => v.id === product.default_variant_id);
+    if (byId) return byId;
+  }
+  if (product?.default_variant_slug) {
+    const bySlug = variants.find((v) => v.slug === product.default_variant_slug);
+    if (bySlug) return bySlug;
+  }
+  return variants[0] ?? null;
+}
+
+/**
+ * @deprecated Prefer shouldHideVariantSelector — kept for callers that only have attribute_terms.
  */
 export function isHiddenVariationOnlyProduct(
   attributeTerms: AttributeTerms[] | undefined | null,
@@ -104,9 +142,18 @@ export function shouldLinkCartItemToParentProduct(
 }
 
 export function buildCartProductUrl(
-  item: Pick<CartItem, 'product_slug' | 'variantAttributes' | 'useParentProductUrl'>,
+  item: Pick<
+    CartItem,
+    'product_slug' | 'variantAttributes' | 'useParentProductUrl' | 'product_id' | 'variant_id'
+  >,
 ): string {
-  if (shouldLinkCartItemToParentProduct(item.variantAttributes, item.useParentProductUrl)) {
+  const remembered =
+    typeof item.product_id === 'number' && typeof item.variant_id === 'number'
+      ? getRememberedCartParentProductUrl(item.product_id, item.variant_id)
+      : undefined;
+  const useParent = item.useParentProductUrl ?? remembered;
+
+  if (shouldLinkCartItemToParentProduct(item.variantAttributes, useParent)) {
     return `/${item.product_slug}`;
   }
 
@@ -117,4 +164,40 @@ export function buildCartProductUrl(
   const primaryTermSlug = item.variantAttributes[0]?.term_slug ?? '';
   const queryString = queryParams.toString();
   return `/${item.product_slug}/${primaryTermSlug}${queryString ? `?${queryString}` : ''}`;
+}
+
+/** Cart/checkout line title: omit variant terms when hide_variant_selector / parent-URL mode. */
+export function formatCartLineProductName(
+  productName: string,
+  attributeLabels: string | null | undefined,
+  omitVariantLabel: boolean,
+): string {
+  if (omitVariantLabel || !attributeLabels?.trim()) {
+    return productName;
+  }
+  return `${productName} - ${attributeLabels.trim()}`;
+}
+
+/**
+ * For persisted guest lines that already stored "Name - term", strip the suffix when
+ * parent-URL / hidden-selector mode applies (single dummy attribute).
+ */
+export function stripCartLineVariantSuffix(name: string, omitVariantLabel: boolean): string {
+  if (!omitVariantLabel) return name;
+  const dashIdx = name.lastIndexOf(' - ');
+  if (dashIdx <= 0) return name;
+  return name.slice(0, dashIdx);
+}
+/** Re-apply parent-URL preference onto persisted guest cart lines. */
+export function enrichCartItemParentUrlFlag(item: CartItem): CartItem {
+  const remembered = getRememberedCartParentProductUrl(item.product_id, item.variant_id);
+  const useParentProductUrl =
+    item.useParentProductUrl ??
+    remembered ??
+    shouldLinkCartItemToParentProduct(item.variantAttributes);
+  const name = stripCartLineVariantSuffix(item.name, useParentProductUrl === true);
+  if (item.useParentProductUrl === useParentProductUrl && item.name === name) {
+    return item;
+  }
+  return { ...item, useParentProductUrl, name };
 }

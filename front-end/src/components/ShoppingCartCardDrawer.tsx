@@ -6,7 +6,7 @@ import NoImage from './NoImage';
 import { CartItem } from '@/lib/config/cart.config';
 import Link from 'next/link';
 import QuantitySelector from './QuantitySelector';
-import { buildCartProductUrl } from '@/lib/utils/cart-product-url';
+import { buildCartProductUrl, stripCartLineVariantSuffix } from '@/lib/utils/cart-product-url';
 type CartCardProps = {
   item: CartItem;
 };
@@ -26,6 +26,10 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
   };
 
   const productUrl = buildCartProductUrl(item);
+  const displayName = stripCartLineVariantSuffix(
+    item.name,
+    item.useParentProductUrl === true,
+  );
   return (
     <div className="bg-skin-white p-4 rounded-14 shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">
@@ -44,7 +48,7 @@ const ShoppingCartCardDrawer: React.FC<CartCardProps> = ({ item }) => {
         <div className="flex flex-col items-start gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 justify-between w-full">
             <Link href={productUrl} className="text-content-2 md:text-title-2 font-semibold font-oswald line-clamp-2 text-skin-neutral-400 md:mr-5">
-              {item.name}
+              {displayName}
             </Link>
 
             {/* Price Section */}

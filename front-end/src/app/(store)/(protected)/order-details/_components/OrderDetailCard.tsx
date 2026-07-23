@@ -3,7 +3,7 @@ import NoImage from "@/components/NoImage";
 import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
 import Link from "next/link";
 import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
-import { buildCartProductUrl } from "@/lib/utils/cart-product-url";
+import { buildCartProductUrl, shouldLinkCartItemToParentProduct } from "@/lib/utils/cart-product-url";
 import type { CartVariantAttribute } from "@/lib/config/cart.config";
 interface OrderDetailCardProps {
     status:string;
@@ -28,7 +28,13 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     const productUrl = buildCartProductUrl({
         product_slug: data.product.slug,
         variantAttributes,
+        product_id: data.product.id,
+        variant_id: data.variant?.id,
     });
+    // Same hidden-selector / non-page-visible dummy attr case as cart — omit "Tank Size : 2ml" lines.
+    const hideVariantDetails =
+        Boolean((data.product as { hide_variant_selector?: boolean }).hide_variant_selector) ||
+        shouldLinkCartItemToParentProduct(variantAttributes);
     
     return (
         // 10ml?20=up-to-1500-puffs
@@ -61,6 +67,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
                         <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Quantity : {data.quantity}</p>
                         {/* <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Flavour : {data.variant?.slug}</p> */}
                         {
+                            !hideVariantDetails &&
                             attributes?.map((attr) => (
                                 <p key={attr.id} className="primary-gradient-100 text-content-3 md:text-content-1 font-bold capitalize">{attr.attribute.name} : {attr.term.name}</p>
                             ))

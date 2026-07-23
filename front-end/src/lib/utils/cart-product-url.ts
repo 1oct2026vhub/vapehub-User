@@ -4,19 +4,21 @@ import type { AttributeTerms, ProductVariant, ProductViewDetails } from '@/lib/c
 const PARENT_URL_PREF_KEY = 'vh_cart_parent_product_urls';
 
 /**
- * True when API asks FE to hide the picker AND variation attrs are not page-visible
- * (or attribute_terms are empty, which is typical when hide_variant_selector is true).
+ * Hide the variant picker when the API flag is set, OR when there are no page-visible
+ * variation attributes (empty used_in_variation list, or all have is_visible_page === false).
  */
 export function shouldHideVariantSelector(
   product: Pick<ProductViewDetails, 'hide_variant_selector' | 'attribute_terms'> | null | undefined,
 ): boolean {
-  if (!product?.hide_variant_selector) {
+  if (!product) {
     return false;
+  }
+  if (product.hide_variant_selector === true) {
+    return true;
   }
   const variationAttrs = (product.attribute_terms ?? []).filter(
     (attrTerm) => attrTerm.attribute.used_in_variation,
   );
-  // API usually returns empty attribute_terms when the flag is true.
   if (variationAttrs.length === 0) {
     return true;
   }

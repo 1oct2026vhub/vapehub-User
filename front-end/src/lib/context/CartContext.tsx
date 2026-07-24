@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { CART_GET_PAYLOAD, CART_RESPONSE_DATA, CartItem, CartVariantAttribute, UnAvailableItem } from '../config/cart.config';
 import { APPLY_GUEST_COUPON_PAYLOAD } from '../config/checkout.config';
-import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, applyGuestCoupon, getLoyaltyPointsRedemption, calculateGuestDeals } from '../server.actions';
+import { addToCart, bulkAddToCart, getCartItems, removeFromCart, updateCartItem, checkStockValidation, applyCoupon, applyGuestCoupon, getLoyaltyPointsRedemption, calculateGuestDeals, getProductVariantByID } from '../server.actions';
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
 import { ServerActionStatus, DEFAULT_CURRENCY_SYMBOL } from '../config/app.config';
 import { getGuestCart, setGuestCart, removeGuestCart } from '../utils/storage';
@@ -19,7 +19,7 @@ import {
   evaluateLoyaltyRedemptionForCart,
   getLoyaltyOrderMinimumBlockingMessage,
 } from '../utils/checkout-order.utils';
-import { shouldLinkCartItemToParentProduct, getRememberedCartParentProductUrl, rememberCartParentProductUrl, enrichCartItemParentUrlFlag, formatCartLineProductName } from '../utils/cart-product-url';
+import { shouldLinkCartItemToParentProduct, getRememberedCartParentProductUrl, rememberCartParentProductUrl, enrichCartItemParentUrlFlag, formatCartLineProductName, shouldHideVariantSelector, stripCartLineVariantSuffix } from '../utils/cart-product-url';
 interface CouponDiscount {
   value: number;
   isApplied: boolean;
@@ -243,7 +243,31 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return item?.find(image => image.is_primary)?.image_url || item?.[0]?.image_url || '';
   };
 
-  const bindCartItem = (item: CART_RESPONSE_DATA): CartItem => {
+  /** Re-read hide_variant_selector from product API so cart names stay correct after session expiry. */
+  const resolveHideVariantFlags = useCallback(async (productIds: number[]): Promise<Record<number, boolean>> => {
+    const uniqueIds = [...new Set(productIds.filter((id) => Number.isFinite(id)))];
+    const flags: Record<number, boolean> = {};
+    await Promise.all(
+      uniqueIds.map(async (productId) => {
+        try {
+          const response = await getProductVariantByID({
+            product_id: productId,
+            attribute_terms: [],
+          });
+          if (response.status === ServerActionStatus.SUCCESS && response.data?.product) {
+            flags[productId] = shouldHideVariantSelector(response.data.product);
+            return;
+          }
+        } catch {
+          // keep false — preserve existing cart name behaviour
+        }
+        flags[productId] = false;
+      }),
+    );
+    return flags;
+  }, []);
+
+  const bindCartItem = (item: CART_RESPONSE_DATA, hideVariantFlags?: Record<number, boolean>): CartItem => {
     const attributesName = item.variant.variantAttributes.map(attr => attr.term.name).join(', ');
     const variantSlug = item.variant.variantAttributes[0]?.term?.slug ?? '';
     // Cart API exposes page visibility as `is_visible` on the variant-attribute pivot.
@@ -254,10 +278,17 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       used_in_variation: attr.used_in_variation,
     }));
     const rememberedParentUrl = getRememberedCartParentProductUrl(item.product_id, item.variant_id);
+    const hideFromProductApi = hideVariantFlags?.[item.product_id] === true;
     const useParentProductUrl =
-      rememberedParentUrl ??
-      (shouldLinkCartItemToParentProduct(variantAttributes) ||
-        Boolean((item.product as { hide_variant_selector?: boolean }).hide_variant_selector));
+      hideFromProductApi ||
+      rememberedParentUrl === true ||
+      shouldLinkCartItemToParentProduct(variantAttributes) ||
+      Boolean((item.product as { hide_variant_selector?: boolean }).hide_variant_selector);
+
+    if (useParentProductUrl) {
+      rememberCartParentProductUrl(item.product_id, item.variant_id, true);
+    }
+
     return {
       id: item.id,
       product_id: item.product_id,
@@ -283,6 +314,23 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     };
   };
 
+  const applyHideFlagsToGuestCart = useCallback(
+    (items: CartItem[], hideVariantFlags: Record<number, boolean>): CartItem[] => {
+      return items.map((item) => {
+        if (hideVariantFlags[item.product_id] !== true) {
+          return enrichCartItemParentUrlFlag(item);
+        }
+        rememberCartParentProductUrl(item.product_id, item.variant_id, true);
+        return {
+          ...item,
+          useParentProductUrl: true,
+          name: stripCartLineVariantSuffix(item.name, true),
+        };
+      });
+    },
+    [],
+  );
+
   const loadCartItems = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -290,7 +338,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         const response = await getCartItems();
         if (response.status === ServerActionStatus.SUCCESS) {
           const cartData = response.data;
-          const cartItems: CartItem[] = cartData.items.map((item) => bindCartItem(item));
+          const hideVariantFlags = await resolveHideVariantFlags(
+            cartData.items.map((item) => item.product_id),
+          );
+          const cartItems: CartItem[] = cartData.items.map((item) =>
+            bindCartItem(item, hideVariantFlags),
+          );
           setCartItems(cartItems);
           if (cartData.summary) {
             setCartTotal(roundCurrency(cartData.summary.total));
@@ -303,8 +356,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         }
              } else {
          // Load from localStorage for guest users
-         const guestCart = sanitizeGuestCart(getGuestCart<unknown>());
+         let guestCart = sanitizeGuestCart(getGuestCart<unknown>());
          if (guestCart.length > 0) {
+           const hideVariantFlags = await resolveHideVariantFlags(
+             guestCart.map((item) => item.product_id),
+           );
+           guestCart = applyHideFlagsToGuestCart(guestCart, hideVariantFlags);
+           setGuestCart(guestCart);
            setCartItems(guestCart);
            // For guest users, immediately calculate deals using API to prevent flicker
            await calculateGuestDealsAndTotals(guestCart);
@@ -313,8 +371,17 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
          } catch (error) {
        console.error('Error loading cart:', error);
        // Load from localStorage as fallback
-      const guestCart = sanitizeGuestCart(getGuestCart<unknown>());
+      let guestCart = sanitizeGuestCart(getGuestCart<unknown>());
       if (guestCart.length > 0) {
+         try {
+           const hideVariantFlags = await resolveHideVariantFlags(
+             guestCart.map((item) => item.product_id),
+           );
+           guestCart = applyHideFlagsToGuestCart(guestCart, hideVariantFlags);
+           setGuestCart(guestCart);
+         } catch {
+           // ignore enrichment errors on fallback path
+         }
          setCartItems(guestCart);
          // For guest users, try API first, fallback to local calculation
          if (!isAuthenticated) {
@@ -331,7 +398,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
      } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, calculateGuestDealsAndTotals, calculateTotals]);
+  }, [isAuthenticated, calculateGuestDealsAndTotals, calculateTotals, resolveHideVariantFlags, applyHideFlagsToGuestCart]);
 
   const refreshLoyaltyPoints = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -913,7 +980,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await getCartItems();
       if (response.status === ServerActionStatus.SUCCESS) {
         const cartData = response.data;
-        const cartItems: CartItem[] = cartData.items.map(bindCartItem);
+        const hideVariantFlags = await resolveHideVariantFlags(
+          cartData.items.map((item) => item.product_id),
+        );
+        const cartItems: CartItem[] = cartData.items.map((item) =>
+          bindCartItem(item, hideVariantFlags),
+        );
         setCartItems(cartItems);
         if (cartData.summary) {
           setCartTotal(roundCurrency(cartData.summary.total));

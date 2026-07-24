@@ -31,6 +31,12 @@ import {
     buildVariantFirstTitle,
     findVariantDescriptionBySelections,
 } from '@/lib/seo-schema'
+import {
+    isHiddenVariationOnlyProduct,
+    mapVariantAttributesForCart,
+    resolveDefaultHiddenVariant,
+    shouldHideVariantSelector,
+} from '@/lib/utils/cart-product-url'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -157,7 +163,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     // A product is simple if it has no attributes to filter by from the start.
     const isSimpleProduct = !hasFilteredTerms && !hasAvailableTerms;
 
-    const canAddToCart = isSimpleProduct || isReadyVariant;
+    // API flag: hide picker when hide_variant_selector && (no variation attrs or all is_visible_page === false)
+    const hideVariantSelector = shouldHideVariantSelector(productData.product);
+
+    const defaultHiddenVariant = hideVariantSelector
+        ? resolveDefaultHiddenVariant(productData.product, productData.variants)
+        : null;
+
+    const canAddToCart = isSimpleProduct || isReadyVariant || Boolean(defaultHiddenVariant);
 
     // If a variant is ready, that's our selected variant.
     const productVariant: ProductVariant | null = isReadyVariant ? productData.variants[0] : null;
@@ -166,7 +179,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     const simpleProductVariant = isSimpleProduct && productData.variants.length > 0 ? productData.variants[0] : null;
 
     // This is the definitive entity (either a selected variant or a simple product's variant) to be used for cart operations.
-    const cartEntity = productVariant ?? simpleProductVariant;
+    const cartEntity = defaultHiddenVariant ?? productVariant ?? simpleProductVariant;
 
     const allImages: productAllImages[] = cartEntity?.all_images ?? product?.all_images ?? [];
     const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
@@ -188,13 +201,16 @@ const ProductDetails: React.FC<ProductViewProps> = ({
         );
     }, [product?.attribute_terms]);
     
-    // Only include attributes that are used in variation when constructing product name
-    const productName = productVariant
-        ? `${product?.name} - ${productVariant.attributes
-            .filter(attr => variationAttributeIds.has(attr.attribute_id))
-            .map(attr => attr.term_name)
-            .join(', ')}`
-        : product?.name;
+    // Only include attributes that are used in variation when constructing product name.
+    // When hide_variant_selector applies, show the base product name only (no " - 2ml").
+    const productName = hideVariantSelector
+        ? product?.name
+        : productVariant
+            ? `${product?.name} - ${productVariant.attributes
+                .filter(attr => variationAttributeIds.has(attr.attribute_id))
+                .map(attr => attr.term_name)
+                .join(', ')}`
+            : product?.name;
     // Keep the last non-empty available_terms so secondary dropdowns stay populated
     // even after a full selection resolves (at which point available_terms becomes empty).
     const [lastKnownAvailableTerms, setLastKnownAvailableTerms] = useState<AttributeTerms[]>([]);
@@ -279,13 +295,19 @@ const ProductDetails: React.FC<ProductViewProps> = ({
         setIsAddingToCart(true);
         try {
             const variantTermSlug = cartEntity.attributes[0]?.term_slug ?? '';
-            const variantAttributes = cartEntity.attributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term_slug }));
+            const variantAttributes = mapVariantAttributesForCart(
+                cartEntity.attributes.map(attr => ({ attribute_id: attr.attribute_id, term_slug: attr.term_slug })),
+                product?.attribute_terms,
+            );
+            // Parent PDP link when API hides selector and attrs are not page-visible.
+            const useParentProductUrl =
+                hideVariantSelector || isHiddenVariationOnlyProduct(product?.attribute_terms);
             const productForCart: Product = {
                 ...product,
                 price: product.primary_image?.url ?? '0',
                 ProductImages: product.all_images.map(img => ({ id: img.id, image_url: img.url, is_primary: img.is_primary }))
             };
-            await addItemToCart(productForCart, cartEntity.id, quantity, cartEntity, productName, variantTermSlug, variantAttributes);
+            await addItemToCart(productForCart, cartEntity.id, quantity, cartEntity, productName, variantTermSlug, variantAttributes, useParentProductUrl);
         } catch (err) {
             console.error("Failed to add to cart:", err);
         } finally {
@@ -718,6 +740,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                         </div>
                     </div>
                     <Divider className='max-lg:hidden' />
+                    {!hideVariantSelector && (
                     <ProductVariantFilter
                         attributeTerms={product?.attribute_terms ?? []}
                         productSlug={product?.slug}
@@ -729,6 +752,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                         selectedAttributeSlugs={selectedAttributeSlugs}
                         primaryAttributeId={primaryAttributeId}
                     />
+                    )}
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
                             cartEntity && (stock > 0 ?

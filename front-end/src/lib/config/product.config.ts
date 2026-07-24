@@ -330,6 +330,13 @@ export interface ProductViewDetails {
     puff_count?: number | string;
     is_discontinued?: boolean;
     review_stats?: ProductReviewStats;
+    /**
+     * When true, FE hides the variant picker and adds the default variant to cart.
+     * Typically paired with non-page-visible variation attributes (is_visible_page === false).
+     */
+    hide_variant_selector?: boolean;
+    default_variant_id?: number | null;
+    default_variant_slug?: string | null;
 };
 
 export interface AppliedFilters {

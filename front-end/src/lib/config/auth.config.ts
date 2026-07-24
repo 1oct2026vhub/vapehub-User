@@ -74,8 +74,12 @@ export interface SocialMediaResponse {
 export const getServerSessionData = async (): Promise<any | null> =>
     await getServerSession(NEXT_AUTH_OPTIONS);
   
+type StringRouteKey = {
+  [K in keyof typeof ROUTES]: (typeof ROUTES)[K] extends string ? K : never;
+}[keyof typeof ROUTES];
+
 export const redirectIfAuthenticated = async (
-  redirectUrl?: keyof typeof ROUTES
+  redirectUrl?: StringRouteKey
 ): Promise<void> => {
   const session = await getServerSessionData();
 

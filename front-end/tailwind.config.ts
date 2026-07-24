@@ -10,6 +10,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        blog: "1180px",
+      },
       fontFamily: {
         oswald: "var(--font-oswald)",
         opensans: "var(--font-opensans)",

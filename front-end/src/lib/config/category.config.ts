@@ -11,6 +11,8 @@ export interface Category extends SubCategory {
     deletedAt: string | null;
     name: string;
     description: string;
+    /** CKEditor HTML for category type-card grid; omit/empty hides the section. */
+    type_cards_html?: string | null;
     slug: string;
     feature?: string;
     subCategories: SubCategory[];
@@ -19,6 +21,17 @@ export interface SubCategory {
     name: string;
     slug: string;
     feature?: string;
+}
+
+/** Public related-categories link item (category page quick links). */
+export interface RelatedLink {
+    text: string;
+    url: string;
+    sort_order?: number;
+}
+
+export interface RelatedCategoriesApiData {
+    related_links: RelatedLink[];
 }
 
 export const defaultNavLinks:SubCategory[] = [

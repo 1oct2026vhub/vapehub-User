@@ -78,16 +78,18 @@ const BrandProducts = async ({
                                         guides={relatedGuides}
                                     />
                                 ) : null}
+                                {brandFaqs.length > 0 ? (
+                                    <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} embedded />
+                                ) : null}
                             </CategoryBuyingGuideAccordion>
                         </div>
+                    ) : brandFaqs.length > 0 ? (
+                        <section className="product-listing-container pt-7.5 md:pt-9">
+                            <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} />
+                        </section>
                     ) : null}
                 </ProductList>
             </section>
-            {brandFaqs.length > 0 && (
-                <section className="product-listing-container">
-                    <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} />
-                </section>
-            )}
         </div>
 
     );

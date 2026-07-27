@@ -20,6 +20,7 @@ const RelatedGuides: React.FC<RelatedGuidesProps> = async ({
   viewAllHref = ROUTES.BLOGS,
   currentProductId,
   currentCategoryId,
+  embedded = false,
   guides: prefetchedGuides,
 }): AsyncReactElement => {
   const guides =
@@ -34,15 +35,22 @@ const RelatedGuides: React.FC<RelatedGuidesProps> = async ({
   }
 
   return (
-    <section className="space-y-4.5 md:space-y-7.5">
-      <div className="flex items-center justify-between gap-4">
-        <SectionHeading title={title} />
-        <ViewAllLink href={viewAllHref} />
-      </div>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {guides.map((guide) => (
-          <BlogCard key={guide.id} blog={guide} />
-        ))}
+    <section className="w-full">
+      {embedded ? (
+        <div className="flex w-full items-center justify-center py-6 md:py-8" aria-hidden>
+          <div className="h-px w-full bg-skin-neutral-200" />
+        </div>
+      ) : null}
+      <div className="space-y-4.5 md:space-y-7.5">
+        <div className="flex items-center justify-between gap-4">
+          <SectionHeading title={title} />
+          <ViewAllLink href={viewAllHref} />
+        </div>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {guides.map((guide) => (
+            <BlogCard key={guide.id} blog={guide} />
+          ))}
+        </div>
       </div>
     </section>
   );

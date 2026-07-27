@@ -1979,219 +1979,71 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Category type cards (slug-relation type_cards_html / vss-related-cards)    */
+/* Category type cards — MOBILE ONLY. Desktop = CKEditor/API styles as-is.    */
+/* Markup variants from API:                                                  */
+/*   .type-cards > .type-card  (grid, often grid-template-columns: repeat(4)) */
+/*   .vss-related-cards > .vss-related-card (flex)                            */
 /* -------------------------------------------------------------------------- */
 
-.type-cards-html .vss-related-cards,
-.vss-related-cards {
-  display: grid !important;
-  grid-template-columns: 1fr;
-  gap: 1rem !important;
-  width: 100% !important;
-  margin: 0 !important;
-  align-items: stretch !important;
-  flex-wrap: unset !important;
-}
-
-@media (min-width: 640px) {
-  .type-cards-html .vss-related-cards,
-  .vss-related-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem !important;
-  }
-}
-
-@media (min-width: 1024px) {
-  .type-cards-html .vss-related-cards,
-  .vss-related-cards {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-.type-cards-html .vss-related-card,
-.vss-related-card {
-  --vss-card-accent: #0d9488;
-  display: flex !important;
-  flex-direction: column !important;
-  flex: unset !important;
-  min-width: 0 !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 1rem !important;
-  background: #fff !important;
-  border: 1px solid #e7e7e7 !important;
-  border-top: 4px solid var(--vss-card-accent) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
-
-.vss-related-card--green {
-  --vss-card-accent: #0d9488;
-}
-
-.vss-related-card--orange {
-  --vss-card-accent: #ea580c;
-}
-
-.vss-related-card--lime {
-  --vss-card-accent: #16a34a;
-}
-
-.vss-related-card--purple {
-  --vss-card-accent: #9333ea;
-}
-
-.type-cards-html .vss-related-card__body,
-.vss-related-card__body {
-  flex: 1 1 auto !important;
-  display: flex;
-  flex-direction: column;
+.type-cards-html {
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
 }
 
-.type-cards-html .vss-related-card figure,
-.vss-related-card figure {
-  display: block;
-  width: 100% !important;
-  height: 140px !important;
-  margin: 0 0 0.75rem !important;
-  padding: 0;
-}
-
-.type-cards-html .vss-related-card img,
-.vss-related-card img {
-  display: block !important;
+.type-cards-html .raw-html-embed {
   width: 100%;
-  height: 100%;
-  max-height: 140px;
-  margin: 0 !important;
-  object-fit: contain !important;
-}
-
-.type-cards-html .vss-related-card__label,
-.vss-related-card__label {
-  margin: 0 0 6px !important;
-  font-size: 11px !important;
-  font-weight: 700;
-  letter-spacing: 0.06em !important;
-  line-height: 1.3;
-  text-transform: uppercase !important;
-  color: var(--vss-card-accent) !important;
-}
-
-.vss-related-card__label--green {
-  color: #0d9488 !important;
-}
-
-.vss-related-card__label--orange {
-  color: #ea580c !important;
-}
-
-.vss-related-card__label--lime {
-  color: #16a34a !important;
-}
-
-.vss-related-card__label--purple {
-  color: #9333ea !important;
-}
-
-.type-cards-html .vss-related-card h3,
-.vss-related-card h3 {
-  margin: 0 0 8px !important;
-  color: #111 !important;
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.25 !important;
-}
-
-.type-cards-html .vss-related-card__badge,
-.vss-related-card__badge {
-  display: inline-flex;
-  align-items: center;
-  width: auto;
   max-width: 100%;
-  margin: 0 0 12px;
-  padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
-  background: #111;
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.3;
+  min-width: 0;
 }
 
-.vss-related-card--green .vss-related-card__badge {
-  background: #0f766e;
-}
+@media (max-width: 1023px) {
+  /* CKEditor grid: force 2 columns instead of inline repeat(4, ...) */
+  .type-cards-html .type-cards,
+  .type-cards-html .raw-html-embed .type-cards {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
 
-.vss-related-card--orange .vss-related-card__badge {
-  background: #c2410c;
-}
+  .type-cards-html .type-card,
+  .type-cards-html .raw-html-embed .type-card {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
 
-.vss-related-card--lime .vss-related-card__badge {
-  background: #15803d;
-}
+  /* Older flex markup variant */
+  .type-cards-html .vss-related-cards {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
 
-.vss-related-card--purple .vss-related-card__badge {
-  background: #7e22ce;
-}
+  .type-cards-html .vss-related-cards > .vss-related-card {
+    flex: 1 1 calc(50% - 8px) !important;
+    flex-basis: calc(50% - 8px) !important;
+    min-width: 0 !important;
+    max-width: calc(50% - 8px) !important;
+    width: calc(50% - 8px) !important;
+    box-sizing: border-box !important;
+  }
 
-.type-cards-html .vss-related-card ul,
-.vss-related-card ul {
-  margin: 0 0 8px !important;
-  padding-left: 1.1rem !important;
-  color: #333 !important;
-  font-size: 14px !important;
-}
-
-.type-cards-html .vss-related-card li,
-.vss-related-card li {
-  margin: 0 0 0.35rem;
-  list-style: disc;
-  color: var(--vss-card-accent);
-}
-
-.type-cards-html .vss-related-card li p,
-.vss-related-card li p {
-  color: #333 !important;
-  margin: 0 !important;
-  line-height: 1.6 !important;
-}
-
-.type-cards-html .vss-related-card__footer,
-.vss-related-card__footer {
-  margin-top: auto !important;
-  width: 100% !important;
-}
-
-.type-cards-html .vss-related-card__btn,
-.vss-related-card__btn {
-  display: block !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  padding: 12px 14px !important;
-  border-radius: 6px !important;
-  background-color: #0d9488 !important;
-  color: #fff !important;
-  text-align: center !important;
-  text-decoration: none !important;
-  font-weight: 600;
-  transition: opacity 0.15s ease;
-}
-
-.type-cards-html .vss-related-card__btn:hover,
-.vss-related-card__btn:hover {
-  opacity: 0.92;
-  color: #fff !important;
-  text-decoration: none !important;
-}
-
-.type-cards-html .vss-related-card__btn strong,
-.vss-related-card__btn strong {
-  color: inherit;
-  font-weight: 600;
+  .type-cards-html .type-card img,
+  .type-cards-html .type-card figure,
+  .type-cards-html .vss-related-card img,
+  .type-cards-html .vss-related-card figure {
+    max-width: 100% !important;
+  }
 }
 
 

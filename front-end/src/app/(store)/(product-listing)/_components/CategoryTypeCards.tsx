@@ -3,8 +3,9 @@ type CategoryTypeCardsProps = {
 };
 
 /**
- * Renders `type_cards_html` from slug-relation (vss-related-cards).
- * Separate from related collections (`related_links`).
+ * Renders `type_cards_html` from slug-relation.
+ * Desktop: exact API/CKEditor HTML + inline styles.
+ * Mobile: `.type-cards` / `.vss-related-cards` layout only (globals.css).
  */
 const CategoryTypeCards = ({ html }: CategoryTypeCardsProps) => {
   const markup = html?.trim();

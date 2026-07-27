@@ -14,6 +14,9 @@ function toHref(url: string): string {
   return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 }
 
+const linkBaseClass =
+  "min-h-[44px] flex items-center justify-center btn primary-btn shadow-button !rounded-10 uppercase font-oswald font-semibold text-skin-white text-title-2 md:text-title-1 !py-3 !px-4 text-center whitespace-nowrap transition-opacity hover:opacity-90";
+
 const DesignTypeButtons = async ({ slug }: DesignTypeButtonsProps) => {
   const categorySlug = slug.trim().split("/").filter(Boolean).pop() ?? "";
   if (!categorySlug) return null;
@@ -27,9 +30,28 @@ const DesignTypeButtons = async ({ slug }: DesignTypeButtonsProps) => {
 
   if (relatedLinks.length === 0) return null;
 
+  const count = relatedLinks.length;
+  /** ≤2: equal full-width buttons. 3–4: scroll on mobile, equal grid on desktop. >4: scroll always. */
+  const fillWidth = count <= 2;
+  const scrollAlways = count > 4;
+
+  const rowClass = fillWidth
+    ? `grid gap-2 md:gap-3 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`
+    : scrollAlways
+      ? "flex flex-nowrap gap-2 md:gap-3 overflow-x-auto scrollbar-none"
+      : `flex flex-nowrap gap-2 overflow-x-auto scrollbar-none sm:overflow-visible sm:grid sm:gap-3 ${
+          count === 3 ? "sm:grid-cols-3" : "sm:grid-cols-4"
+        }`;
+
+  const linkClass = fillWidth
+    ? `w-full ${linkBaseClass}`
+    : scrollAlways
+      ? `shrink-0 ${linkBaseClass}`
+      : `shrink-0 sm:w-full sm:shrink ${linkBaseClass}`;
+
   return (
     <div className="mt-4 rounded-2xl border border-skin-neutral-100 bg-skin-neutral-50 p-3 shadow-card">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
+      <div className={rowClass}>
         {relatedLinks.map((link) => {
           const href = toHref(link.url);
           return (
@@ -37,7 +59,7 @@ const DesignTypeButtons = async ({ slug }: DesignTypeButtonsProps) => {
               key={`${link.text}-${href}`}
               href={href}
               prefetch={false}
-              className="w-full min-h-[44px] flex items-center justify-center btn primary-btn shadow-button !rounded-10 uppercase font-oswald font-semibold text-skin-white text-title-2 md:text-title-1 !py-3 !px-4 text-center transition-opacity hover:opacity-90"
+              className={linkClass}
             >
               {link.text}
             </Link>

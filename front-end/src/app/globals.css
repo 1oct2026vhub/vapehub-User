@@ -954,6 +954,16 @@ input[type="checkbox"] + span {
   }
 }
 
+/* Hide scrollbar but keep scroll / swipe */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Styles for webkit-based browsers */
 ::-webkit-scrollbar {
   width: 5px;

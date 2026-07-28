@@ -7,6 +7,7 @@ import { getFaqs } from "@/lib/server.actions";
 import { FaqResponse } from "@/lib/config/global.config";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { toast } from "sonner";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 // import Link from "next/link";
 // import { ROUTES } from "@/lib/routes";
 
@@ -73,7 +74,7 @@ const FAQSection: React.FC<FAQProps> = ({
                         HeadingComponent="h3"
                         title={faq.question}
                     >
-                        <div className='rich-text' dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                        <div className='rich-text' dangerouslySetInnerHTML={{ __html: sanitizeHtml(faq.answer) }} />
                     </AccordionItem>
                 //     <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">
                 //     {faq.question}

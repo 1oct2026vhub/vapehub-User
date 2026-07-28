@@ -2,6 +2,7 @@ import { getLegalContentByKey } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { Metadata } from 'next';
 import BreadCrumbs from '@/components/BreadCrumbs';
+import { sanitizeHtml } from '@/lib/sanitize-html';
 
 export const metadata: Metadata = {
   title: 'Terms & Conditions | Vape Hub',
@@ -41,7 +42,7 @@ export default async function TermsConditionsPage() {
         <TermsHeading />
         <div 
           className="prose prose-lg max-w-none rich-text"
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
         />
       </div>
     </div>

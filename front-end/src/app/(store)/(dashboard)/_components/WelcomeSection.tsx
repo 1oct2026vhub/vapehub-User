@@ -1,6 +1,7 @@
 
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { getWelcomeContent } from '@/lib/server.actions';
+import { sanitizeHtml } from '@/lib/sanitize-html';
 import Image from 'next/image'
 import React from 'react'
 
@@ -25,7 +26,7 @@ const WelcomeSection = async () => {
                 <h2 className='text-h4 lg:text-h2 font-bold primary-gradient-600 w-fit'>
                     {mainTitle}{' '}{lastWord}
                 </h2>
-                <div className='welcome-text rich-text' dangerouslySetInnerHTML={{ __html: content }} />
+                <div className='welcome-text rich-text' dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }} />
             </div>
 
             {/* Right: image - only render if image_url exists */}

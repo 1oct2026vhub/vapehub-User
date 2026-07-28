@@ -26,6 +26,7 @@ import { useReviews } from '@/lib/context/ReviewContext'
 import { PRODUCT_VARIANT_ATTRIBUTE } from '@/lib/api-routes'
 import { VariantSelectionPayload } from '@/lib/hooks/useVariantFilter'
 import { useProductData } from '@/lib/context/ProductDataContext'
+import { sanitizeHtml } from '@/lib/sanitize-html'
 import {
     buildVariantFirstDescription,
     buildVariantFirstTitle,
@@ -698,7 +699,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             {product?.key_highlights &&
                             <div className='flex gap-1 items-center'>
                                 <DispatchIcon className='min-w-6'/>
-                                <div className='text-content-2 md:text-content-1 font-semibold red-gradient-100' dangerouslySetInnerHTML={{ __html: product?.key_highlights ?? '' }}></div>
+                                <div className='text-content-2 md:text-content-1 font-semibold red-gradient-100' dangerouslySetInnerHTML={{ __html: sanitizeHtml(product?.key_highlights ?? '') }}></div>
                             </div>
                             }
                             {product?.loyaltyPoints?.calculated !== undefined && (

@@ -75,7 +75,7 @@ export interface DynamicPageSlugResponse {
     entity_id: number; 
     seo: SeoData | null;
     description?: string;
-    /** CKEditor HTML for category type-card grid (slug-relation). */
+    /** CKEditor HTML for category/brand type-card grid (slug-relation). */
     type_cards_html?: string | null;
     name?: string;
     deals?: Array<{

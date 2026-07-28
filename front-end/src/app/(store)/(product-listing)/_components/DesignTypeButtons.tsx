@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { ServerActionStatus } from "@/lib/config/app.config";
 import { RelatedLink } from "@/lib/config/category.config";
-import { getCategoryRelatedCategories } from "@/lib/server.actions";
+import {
+  getBrandRelatedBrands,
+  getCategoryRelatedCategories,
+} from "@/lib/server.actions";
+
+export type RelatedQuickLinksEntity = "category" | "brand";
 
 type DesignTypeButtonsProps = {
   slug: string;
+  /** Defaults to category related-categories API. */
+  entity?: RelatedQuickLinksEntity;
 };
 
 function toHref(url: string): string {
@@ -17,11 +24,17 @@ function toHref(url: string): string {
 const linkBaseClass =
   "min-h-[44px] flex items-center justify-center btn primary-btn shadow-button !rounded-10 uppercase font-oswald font-semibold text-skin-white text-title-2 md:text-title-1 !py-3 !px-4 text-center whitespace-nowrap transition-opacity hover:opacity-90";
 
-const DesignTypeButtons = async ({ slug }: DesignTypeButtonsProps) => {
-  const categorySlug = slug.trim().split("/").filter(Boolean).pop() ?? "";
-  if (!categorySlug) return null;
+const DesignTypeButtons = async ({
+  slug,
+  entity = "category",
+}: DesignTypeButtonsProps) => {
+  const leafSlug = slug.trim().split("/").filter(Boolean).pop() ?? "";
+  if (!leafSlug) return null;
 
-  const response = await getCategoryRelatedCategories(categorySlug);
+  const response =
+    entity === "brand"
+      ? await getBrandRelatedBrands(leafSlug)
+      : await getCategoryRelatedCategories(leafSlug);
   if (response.status !== ServerActionStatus.SUCCESS) return null;
 
   const relatedLinks: RelatedLink[] = [...(response.data?.related_links ?? [])].sort(

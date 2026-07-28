@@ -23,13 +23,14 @@ export interface SubCategory {
     feature?: string;
 }
 
-/** Public related-categories link item (category page quick links). */
+/** Public related-links item (category/brand page quick links). */
 export interface RelatedLink {
     text: string;
     url: string;
     sort_order?: number;
 }
 
+/** Shared shape for related-categories and related-brands responses. */
 export interface RelatedCategoriesApiData {
     related_links: RelatedLink[];
 }

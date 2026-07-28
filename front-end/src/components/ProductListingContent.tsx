@@ -5,7 +5,9 @@ import { BrandConfig } from '@/lib/config/brand.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 import NoImage from './NoImage';
-import DesignTypeButtons from '@/app/(store)/(product-listing)/_components/DesignTypeButtons';
+import DesignTypeButtons, {
+    RelatedQuickLinksEntity,
+} from '@/app/(store)/(product-listing)/_components/DesignTypeButtons';
 
 type CategoryProps = {
     data: Category | BrandConfig;
@@ -14,8 +16,10 @@ type CategoryProps = {
     showBuyingGuideFaqsLink?: boolean;
     buyingGuideFaqsHref?: string;
     showCategoryQuickLinks?: boolean;
-    /** Category leaf slug for related-categories API (required when showCategoryQuickLinks). */
+    /** Leaf slug for related-categories / related-brands API (required when showCategoryQuickLinks). */
     categoryQuickLinksSlug?: string;
+    /** Defaults to category. */
+    relatedQuickLinksEntity?: RelatedQuickLinksEntity;
 }
 
 const ProductListingContent: React.FC<CategoryProps> = ({
@@ -26,6 +30,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({
     buyingGuideFaqsHref = '#buying-guide-faqs',
     showCategoryQuickLinks = false,
     categoryQuickLinksSlug = '',
+    relatedQuickLinksEntity = 'category',
 }) => {
     // Only use banners from API - no fallback to deals
     const banners = dynamicPageSlug?.banners || [];
@@ -55,8 +60,11 @@ const ProductListingContent: React.FC<CategoryProps> = ({
                         Buying Guide &amp; FAQs ↓
                     </Link>
                 )}
-                {showBuyingGuideFaqsLink && showCategoryQuickLinks && categoryQuickLinksSlug ? (
-                    <DesignTypeButtons slug={categoryQuickLinksSlug} />
+                {showCategoryQuickLinks && categoryQuickLinksSlug ? (
+                    <DesignTypeButtons
+                        slug={categoryQuickLinksSlug}
+                        entity={relatedQuickLinksEntity}
+                    />
                 ) : null}
             </div>
             {validBanners.length > 0 && (

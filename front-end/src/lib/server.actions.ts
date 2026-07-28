@@ -970,6 +970,22 @@ export const getCategoryRelatedCategories = async (
     });
 };
 
+/** Public related brands by slug — no auth. Empty list = hide the row. */
+export const getBrandRelatedBrands = async (
+    slug: string,
+    canCache: boolean = true,
+): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
+    const endpoint = API_ROUTES.GET_BRAND_RELATED_BRANDS(slug);
+    const response = await handleRequest<RelatedCategoriesApiData, unknown>({
+        endpoint,
+        method: 'GET',
+        canCache,
+        cacheStrategy: canCache ? { revalidate: 300 } : undefined,
+    });
+    console.log("[related-brands]", { slug, endpoint, response });
+    return response;
+};
+
 /** Public brand buying guide by slug — no auth. Null buyingGuide = hide section. */
 export const getBrandBuyingGuide = async (
     slug: string,

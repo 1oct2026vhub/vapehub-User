@@ -107,6 +107,10 @@ const CategoryProducts = async ({
                 hideHeader
                 {...buyingGuide}
               />
+              <CategoryTypeCards
+                html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
+                embedded
+              />
               {relatedGuides.length > 0 ? (
                 <RelatedGuides
                   key={`related-guides-${buyingGuideSlug || categoryId}`}
@@ -120,15 +124,19 @@ const CategoryProducts = async ({
               ) : null}
             </CategoryBuyingGuideAccordion>
           </div>
-        ) : categoryId ? (
-          <section className="product-listing-container flex-col scroll-mt-24 pt-7.5 md:pt-9">
-            <FAQSection type="category" id={categoryId} />
-          </section>
-        ) : null}
+        ) : (
+          <>
+            <CategoryTypeCards
+              html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
+            />
+            {categoryId ? (
+              <section className="product-listing-container flex-col scroll-mt-24 pt-7.5 md:pt-9">
+                <FAQSection type="category" id={categoryId} />
+              </section>
+            ) : null}
+          </>
+        )}
       </ProductList>
-      <CategoryTypeCards
-        html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
-      />
     </div>
 
   );

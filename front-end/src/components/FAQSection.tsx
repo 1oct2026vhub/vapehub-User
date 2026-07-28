@@ -16,7 +16,7 @@ interface FAQProps {
     type: "product" | "brand" | "category" | "variant" | "common" | "blog";
     id: number;
     initialFaqs?: FaqResponse[];
-    /** Adds a top border breaker when placed below another section (e.g. Related Blogs). */
+    /** Adds a centered top divider when placed below another section (e.g. Related Blogs). */
     embedded?: boolean;
 }
 

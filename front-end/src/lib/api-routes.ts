@@ -107,8 +107,7 @@ export const API_ROUTES = {
         buildRequestUrl(`/api/category/slug/${encodeURIComponent(slug)}/buying-guide`),
     GET_CATEGORY_RELATED_CATEGORIES: (slug: string) =>
         buildRequestUrl(`/api/category/slug/${encodeURIComponent(slug)}/related-categories`),
-    GET_BRAND_RELATED_BRANDS: (slug: string) =>
-        buildRequestUrl(`/api/brand/slug/${encodeURIComponent(slug)}/related-brand`),
+    GET_BRAND_RELATED_BRANDS: (slug: string) =>buildRequestUrl(`/api/brand/slug/${encodeURIComponent(slug)}/related-brand`),
     GET_BRAND_BUYING_GUIDE: (slug: string) =>
         buildRequestUrl(`/api/brands/slug/${encodeURIComponent(slug)}/buying-guide`),
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),

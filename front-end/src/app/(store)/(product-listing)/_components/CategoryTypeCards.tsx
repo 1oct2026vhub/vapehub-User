@@ -7,7 +7,7 @@ type CategoryTypeCardsProps = {
 };
 
 /**
- * Renders `type_cards_html` from slug-relation.
+ * Renders `type_cards_html` from slug-relation (category or brand).
  * Desktop (lg+): exact API/CKEditor HTML + inline styles.
  * Mobile: one-card slick carousel with custom arrows + dots.
  */

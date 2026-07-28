@@ -10,6 +10,7 @@ import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { DynamicPageSlugResponse, FaqResponse } from '@/lib/config/global.config';
 import CategoryBuyingGuide from '@/app/(store)/(product-listing)/_components/CategoryBuyingGuide';
 import CategoryBuyingGuideAccordion from '@/app/(store)/(product-listing)/_components/CategoryBuyingGuideAccordion';
+import CategoryTypeCards from '@/app/(store)/(product-listing)/_components/CategoryTypeCards';
 import RelatedGuides from '@/app/(store)/(product-listing)/_components/RelatedGuides';
 import { fetchBrandBuyingGuideSection } from '@/app/(store)/(product-listing)/_components/buying-guide.utils';
 
@@ -52,6 +53,9 @@ const BrandProducts = async ({
                     dynamicPageSlug={dynamicPageSlug}
                     aboutHeading={`About ${brandName} Vapes`}
                     showBuyingGuideFaqsLink={showBuyingGuideSection}
+                    showCategoryQuickLinks
+                    categoryQuickLinksSlug={buyingGuideSlug}
+                    relatedQuickLinksEntity="brand"
                 />
             </section>
             <section aria-label={`Shop ${brandName} products`}>
@@ -70,6 +74,10 @@ const BrandProducts = async ({
                                     hideHeader
                                     {...buyingGuide}
                                 />
+                                <CategoryTypeCards
+                                    html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
+                                    embedded
+                                />
                                 {relatedGuides.length > 0 ? (
                                     <RelatedGuides
                                         key={`related-guides-brand-${buyingGuideSlug || data.id}`}
@@ -83,11 +91,18 @@ const BrandProducts = async ({
                                 ) : null}
                             </CategoryBuyingGuideAccordion>
                         </div>
-                    ) : brandFaqs.length > 0 ? (
-                        <section className="product-listing-container pt-7.5 md:pt-9">
-                            <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} />
-                        </section>
-                    ) : null}
+                    ) : (
+                        <>
+                            <CategoryTypeCards
+                                html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
+                            />
+                            {brandFaqs.length > 0 ? (
+                                <section className="product-listing-container pt-7.5 md:pt-9">
+                                    <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} />
+                                </section>
+                            ) : null}
+                        </>
+                    )}
                 </ProductList>
             </section>
         </div>

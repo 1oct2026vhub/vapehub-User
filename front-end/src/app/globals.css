@@ -954,6 +954,16 @@ input[type="checkbox"] + span {
   }
 }
 
+/* Hide scrollbar but keep scroll / swipe */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Styles for webkit-based browsers */
 ::-webkit-scrollbar {
   width: 5px;
@@ -1979,10 +1989,10 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Category type cards — MOBILE ONLY. Desktop = CKEditor/API styles as-is.    */
-/* Markup variants from API:                                                  */
-/*   .type-cards > .type-card  (grid, often grid-template-columns: repeat(4)) */
-/*   .vss-related-cards > .vss-related-card (flex)                            */
+/* Category type cards                                                        */
+/* Desktop (lg+): CKEditor/API styles as-is (.type-cards-html).               */
+/* Mobile: one-card slick carousel (.type-cards-mobile-carousel).             */
+/* Fallback when cards can't be parsed: CSS scroll snap carousel.             */
 /* -------------------------------------------------------------------------- */
 
 .type-cards-html {
@@ -1997,54 +2007,148 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   min-width: 0;
 }
 
+.type-cards-mobile-carousel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.type-cards-mobile-carousel__viewport {
+  position: relative;
+  width: 100%;
+}
+
+.type-cards-mobile-carousel .slick-list {
+  margin: 0;
+}
+
+.type-cards-mobile-carousel .slick-slide > div {
+  height: 100%;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .type-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide img,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure {
+  max-width: 100% !important;
+}
+
+/* Custom left / right arrows — always visible on mobile */
+.type-cards-mobile-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 2px solid var(--neutral-200);
+  background: var(--neutral-50, #fff);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.type-cards-mobile-arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+.type-cards-mobile-arrow--prev {
+  left: 4px;
+}
+
+.type-cards-mobile-arrow--next {
+  right: 4px;
+}
+
+/* Home-style pagination dots below the cards */
+.type-cards-mobile-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  width: 100%;
+}
+
+.type-cards-mobile-dots li {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.type-cards-mobile-dots button {
+  display: block;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--neutral-200);
+  cursor: pointer;
+}
+
+.type-cards-mobile-dots button.is-active {
+  background: var(--primary-gradient-100);
+}
+
+/* Parse fallback: horizontal one-card scroll on mobile only */
 @media (max-width: 1023px) {
-  /* CKEditor grid: force 2 columns instead of inline repeat(4, ...) */
-  .type-cards-html .type-cards,
-  .type-cards-html .raw-html-embed .type-cards {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 16px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .type-cards-html .type-card,
-  .type-cards-html .raw-html-embed .type-card {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Older flex markup variant */
-  .type-cards-html .vss-related-cards {
+  .type-cards-html--mobile-fallback .type-cards,
+  .type-cards-html--mobile-fallback .raw-html-embed .type-cards,
+  .type-cards-html--mobile-fallback .vss-related-cards {
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     align-items: stretch !important;
     gap: 16px !important;
     width: 100% !important;
     max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     box-sizing: border-box !important;
   }
 
-  .type-cards-html .vss-related-cards > .vss-related-card {
-    flex: 1 1 calc(50% - 8px) !important;
-    flex-basis: calc(50% - 8px) !important;
-    min-width: 0 !important;
-    max-width: calc(50% - 8px) !important;
-    width: calc(50% - 8px) !important;
+  .type-cards-html--mobile-fallback .type-cards::-webkit-scrollbar,
+  .type-cards-html--mobile-fallback .vss-related-cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .type-cards-html--mobile-fallback .type-card,
+  .type-cards-html--mobile-fallback .raw-html-embed .type-card,
+  .type-cards-html--mobile-fallback .vss-related-cards > .vss-related-card {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    scroll-snap-align: start !important;
     box-sizing: border-box !important;
   }
 
-  .type-cards-html .type-card img,
-  .type-cards-html .type-card figure,
-  .type-cards-html .vss-related-card img,
-  .type-cards-html .vss-related-card figure {
+  .type-cards-html--mobile-fallback .type-card img,
+  .type-cards-html--mobile-fallback .type-card figure,
+  .type-cards-html--mobile-fallback .vss-related-card img,
+  .type-cards-html--mobile-fallback .vss-related-card figure {
     max-width: 100% !important;
   }
 }
-
-
 

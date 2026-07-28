@@ -16,6 +16,8 @@ interface FAQProps {
     type: "product" | "brand" | "category" | "variant" | "common" | "blog";
     id: number;
     initialFaqs?: FaqResponse[];
+    /** Adds a centered top divider when placed below another section (e.g. Related Blogs). */
+    embedded?: boolean;
 }
 
 const EMPTY_FAQS: FaqResponse[] = [];
@@ -26,6 +28,7 @@ const FAQSection: React.FC<FAQProps> = ({
     type,
     id,
     initialFaqs = EMPTY_FAQS,
+    embedded = false,
 }) => {
  
     const itemClasses = {
@@ -59,27 +62,34 @@ const FAQSection: React.FC<FAQProps> = ({
     }
 
     return (
-        <div className="w-full space-y-3 md:space-y-5 xl:space-y-7.5">
-            {/* FAQ Heading & View All */}
-            <div className="flex items-center justify-between w-full">
-                <SectionHeading title={title} />
-                {/* <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} /> */}
+        <div className="w-full">
+            {embedded ? (
+                <div className="flex w-full items-center justify-center py-6 md:py-8" aria-hidden>
+                    <div className="h-px w-full bg-skin-neutral-200" />
+                </div>
+            ) : null}
+            <div className="w-full space-y-3 md:space-y-5 xl:space-y-7.5">
+                {/* FAQ Heading & View All */}
+                <div className="flex items-center justify-between w-full">
+                    <SectionHeading title={title} />
+                    {/* <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} /> */}
+                </div>
+                <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
+                    {faqs.map((faq, index) => (
+                        <AccordionItem
+                            key={index}
+                            aria-label={faq.question}
+                            HeadingComponent="h3"
+                            title={faq.question}
+                        >
+                            <div className='rich-text' dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                        </AccordionItem>
+                    //     <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">
+                    //     {faq.question}
+                    // </Link>
+                    ))}
+                </Accordion>
             </div>
-            <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
-                {faqs.map((faq, index) => (
-                    <AccordionItem
-                        key={index}
-                        aria-label={faq.question}
-                        HeadingComponent="h3"
-                        title={faq.question}
-                    >
-                        <div className='rich-text' dangerouslySetInnerHTML={{ __html: faq.answer }} />
-                    </AccordionItem>
-                //     <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">
-                //     {faq.question}
-                // </Link>
-                ))}
-            </Accordion>
         </div>
     );
 };

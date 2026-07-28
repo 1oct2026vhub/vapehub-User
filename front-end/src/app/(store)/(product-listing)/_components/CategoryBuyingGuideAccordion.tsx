@@ -88,7 +88,7 @@ const CategoryBuyingGuideAccordion = ({
       {isOpen ? (
         <div
           id={contentId}
-          className="px-4 pb-5 pt-6 md:px-5 md:pb-7 md:pt-8 xl:px-6 xl:pb-10 xl:pt-10 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-skin-neutral-100 [&>*:not(:first-child)]:pt-8 md:[&>*:not(:first-child)]:pt-10"
+          className="px-4 pb-5 pt-6 md:px-5 md:pb-7 md:pt-8 xl:px-6 xl:pb-10 xl:pt-10"
         >
           {children}
         </div>

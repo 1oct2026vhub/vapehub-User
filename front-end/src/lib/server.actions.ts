@@ -975,15 +975,12 @@ export const getBrandRelatedBrands = async (
     slug: string,
     canCache: boolean = true,
 ): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
-    const endpoint = API_ROUTES.GET_BRAND_RELATED_BRANDS(slug);
-    const response = await handleRequest<RelatedCategoriesApiData, unknown>({
-        endpoint,
+    return await handleRequest<RelatedCategoriesApiData, unknown>({
+        endpoint: API_ROUTES.GET_BRAND_RELATED_BRANDS(slug),
         method: 'GET',
         canCache,
         cacheStrategy: canCache ? { revalidate: 300 } : undefined,
     });
-    console.log("[related-brands]", { slug, endpoint, response });
-    return response;
 };
 
 /** Public brand buying guide by slug — no auth. Null buyingGuide = hide section. */

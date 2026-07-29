@@ -2016,24 +2016,68 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 .type-cards-mobile-carousel__viewport {
   position: relative;
   width: 100%;
+  /* Side gutters so arrows sit beside the card, not over text */
+  padding-inline: 2.75rem;
 }
 
 .type-cards-mobile-carousel .slick-list {
   margin: 0;
+  height: auto !important;
+  overflow: hidden;
+}
+
+/* Keep track from collapsing; JS sets equal min-height on each slide */
+.type-cards-mobile-carousel .slick-track {
+  display: flex !important;
+  align-items: stretch !important;
+  height: auto !important;
+}
+
+.type-cards-mobile-carousel .slick-slide {
+  height: auto !important;
+  display: flex !important;
+  float: none !important;
 }
 
 .type-cards-mobile-carousel .slick-slide > div {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   height: 100%;
 }
 
-.type-cards-mobile-carousel .type-cards-mobile-slide,
-.type-cards-mobile-carousel .type-cards-mobile-slide > .type-card,
-.type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card,
-.type-cards-mobile-carousel .type-cards-mobile-slide > div {
+.type-cards-mobile-carousel .type-cards-mobile-slide {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto;
+  height: 100% !important;
   width: 100% !important;
   max-width: 100% !important;
   min-width: 0 !important;
   box-sizing: border-box !important;
+}
+
+/* Override CKEditor inline flex/width/height so cards fill the equalized slide */
+.type-cards-mobile-carousel .type-cards-mobile-slide > .type-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > div {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Keep CTA anchored to the bottom of equal-height cards */
+.type-cards-mobile-carousel .type-cards-mobile-slide > .type-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > div > :last-child {
+  margin-top: auto !important;
 }
 
 .type-cards-mobile-carousel .type-cards-mobile-slide img,
@@ -2041,7 +2085,7 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   max-width: 100% !important;
 }
 
-/* Custom left / right arrows — always visible on mobile */
+/* Custom left / right arrows — in side gutters, clear of card text */
 .type-cards-mobile-arrow {
   position: absolute;
   top: 50%;
@@ -2066,11 +2110,11 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 }
 
 .type-cards-mobile-arrow--prev {
-  left: 4px;
+  left: 0.25rem;
 }
 
 .type-cards-mobile-arrow--next {
-  right: 4px;
+  right: 0.25rem;
 }
 
 /* Home-style pagination dots below the cards */
@@ -2142,6 +2186,8 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
     min-width: 100% !important;
     scroll-snap-align: start !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .type-cards-html--mobile-fallback .type-card img,

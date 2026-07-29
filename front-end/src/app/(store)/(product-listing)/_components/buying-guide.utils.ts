@@ -98,7 +98,17 @@ export function mapBuyingGuideRelatedBlogs(
       deleted_at: null,
       updated_by: 0,
       author: EMPTY_AUTHOR,
-      categories: [],
+      categories: (blog.categories ?? []).map((category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        description: "",
+        image_url: "",
+        created_at: publishedAt,
+        updated_at: publishedAt,
+        deleted_at: null,
+        updated_by: 0,
+      })),
     };
   });
 }

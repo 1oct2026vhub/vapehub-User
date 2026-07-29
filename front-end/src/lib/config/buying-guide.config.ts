@@ -18,6 +18,11 @@ export interface BuyingGuideRelatedBlog {
   image_url: string | null;
   alt_text: string | null;
   published_at: string;
+  categories?: {
+    id: number;
+    name: string;
+    slug: string;
+  }[];
 }
 
 export interface PublicBuyingGuide {

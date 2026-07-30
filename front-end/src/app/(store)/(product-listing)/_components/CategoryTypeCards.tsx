@@ -1,4 +1,6 @@
 import CategoryTypeCardsMobile from "./CategoryTypeCardsMobile";
+import CategoryTypeCardsDesktop from "./CategoryTypeCardsDesktop";
+import { normalizeTypeCardsHtml } from "./type-cards.utils";
 
 type CategoryTypeCardsProps = {
   html?: string | null;
@@ -15,18 +17,17 @@ const CategoryTypeCards = ({ html, embedded = false }: CategoryTypeCardsProps) =
   const markup = html?.trim();
   if (!markup) return null;
 
+  const normalized = normalizeTypeCardsHtml(markup);
+
   const content = (
     <>
       {embedded ? (
-        <div className="flex w-full items-center justify-center py-6 md:py-8" aria-hidden>
+        <div className="flex w-full items-center justify-center py-3 md:py-4" aria-hidden>
           <div className="h-px w-full bg-skin-neutral-200" />
         </div>
       ) : null}
-      <div
-        className="type-cards-html hidden w-full lg:block"
-        dangerouslySetInnerHTML={{ __html: markup }}
-      />
-      <CategoryTypeCardsMobile html={markup} />
+      <CategoryTypeCardsDesktop html={normalized} />
+      <CategoryTypeCardsMobile html={normalized} />
     </>
   );
 

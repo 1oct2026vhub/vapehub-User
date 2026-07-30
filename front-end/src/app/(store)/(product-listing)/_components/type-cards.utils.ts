@@ -1,3 +1,118 @@
+/** Storefront placeholder for missing / broken type-card images. */
+export const TYPE_CARD_NO_IMAGE_SRC = "/images/type-card-no-image.svg";
+
+const escapeHtmlAttr = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+function buildStorefrontPlaceholderImg(slot: string, alt: string): string {
+  const safeSlot = escapeHtmlAttr(slot);
+  const safeAlt = escapeHtmlAttr(alt || "Category image");
+  return (
+    `<img class="type-card__img-placeholder type-card__img type-card__img--${safeSlot}"` +
+    ` data-type-card-img="${safeSlot}" data-type-card-placeholder="1"` +
+    ` src="${TYPE_CARD_NO_IMAGE_SRC}" alt="${safeAlt}"` +
+    ` style="display:block!important;position:static!important;float:none!important;width:100%!important;height:180px!important;object-fit:contain!important;margin:0 0 14px 0!important;background:#f1f5f9;" />`
+  );
+}
+
+/** Remove empty CKEditor <figure> shells left after an image is deleted. */
+function stripEmptyFigures(html: string): string {
+  return html
+    .replace(/<figure\b[^>]*>\s*<\/figure>/gi, "")
+    .replace(/<figure\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/figure>/gi, "")
+    .replace(/<figure\b[^>]*>(?![\s\S]*?<img\b)[\s\S]*?<\/figure>/gi, "");
+}
+
+/**
+ * When admin removed a card image without leaving a placeholder, inject one
+ * so the row stays aligned with neighboring cards.
+ */
+export function ensureTypeCardPlaceholders(html: string): string {
+  if (!html || !/\btype-card\b/i.test(html)) return html;
+
+  return html.replace(
+    /<(article|div)\b([^>]*\btype-card\b[^>]*)>([\s\S]*?)<\/\1>/gi,
+    (full, tag: string, attrs: string, inner: string) => {
+      let cleaned = stripEmptyFigures(inner);
+
+      if (/<img\b/i.test(cleaned)) {
+        return cleaned === inner ? full : `<${tag}${attrs}>${cleaned}</${tag}>`;
+      }
+
+      const variant =
+        attrs.match(/\btype-card--([a-z0-9_-]+)\b/i)?.[1] ||
+        `card-${Math.random().toString(36).slice(2, 8)}`;
+      const title =
+        cleaned.match(/<h3\b[^>]*>([\s\S]*?)<\/h3>/i)?.[1]?.replace(/<[^>]+>/g, "").trim() ||
+        "Category image";
+      const placeholder = buildStorefrontPlaceholderImg(variant, title);
+
+      const bodyOpen = cleaned.match(/<div\b[^>]*\btype-card__body\b[^>]*>/i);
+      if (bodyOpen && bodyOpen.index != null) {
+        const insertAt = bodyOpen.index + bodyOpen[0].length;
+        cleaned = cleaned.slice(0, insertAt) + placeholder + cleaned.slice(insertAt);
+      } else {
+        cleaned = placeholder + cleaned;
+      }
+
+      return `<${tag}${attrs}>${cleaned}</${tag}>`;
+    },
+  );
+}
+
+/**
+ * Point admin placeholder paths at the storefront asset and attach an onerror
+ * fallback so broken S3/CMS URLs show the "No image" graphic (alt text kept).
+ */
+export function normalizeTypeCardsHtml(html: string): string {
+  let out = stripEmptyFigures(html);
+  out = ensureTypeCardPlaceholders(out);
+
+  out = out.replace(
+    /(?:https?:\/\/[^"'>\s]+)?\/assets\/images\/type-card-no-image\.svg(?:\?[^"'>\s]*)?/gi,
+    TYPE_CARD_NO_IMAGE_SRC,
+  );
+
+  // Normalize inline image heights so CMS 150px and storefront 180px don't fight
+  out = out.replace(
+    /(<img\b[^>]*\bstyle=(["'])[^"'>]*?)height\s*:\s*\d+px([^"'>]*\2)/gi,
+    `$1height:180px$3`,
+  );
+
+  out = out.replace(/<img\b([^>]*?)(\/?)>/gi, (match, attrs: string, slash: string) => {
+    if (/\bonerror\s*=/i.test(attrs)) return match;
+    return `<img${attrs} onerror="this.onerror=null;this.src='${TYPE_CARD_NO_IMAGE_SRC}'"${slash}>`;
+  });
+
+  return out;
+}
+
+/** Client: swap any already-broken images to the placeholder without losing alt. */
+export function bindTypeCardImageFallbacks(root: ParentNode | null): void {
+  if (!root) return;
+
+  root.querySelectorAll("img").forEach((node) => {
+    const img = node as HTMLImageElement;
+    if (img.dataset.noImageBound === "1") return;
+    img.dataset.noImageBound = "1";
+
+    const applyFallback = () => {
+      if (img.getAttribute("src")?.includes("type-card-no-image.svg")) return;
+      img.src = TYPE_CARD_NO_IMAGE_SRC;
+    };
+
+    img.addEventListener("error", applyFallback);
+
+    if (img.complete && img.naturalWidth === 0 && Boolean(img.getAttribute("src"))) {
+      applyFallback();
+    }
+  });
+}
+
 /** Extract card outer HTML from CKEditor type-cards markup. */
 
 export function extractTypeCardHtml(html: string): string[] {

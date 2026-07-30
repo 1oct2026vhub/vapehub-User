@@ -72,11 +72,18 @@ export function buildProductSchema(input: ProductSchemaInput): Record<string, un
   const inStock = firstVariant != null
     ? firstVariant.is_in_stock === true
     : (productResponse.stock_summary?.in_stock ?? 0) > 0;
-  const images = product.all_images?.length
-    ? product.all_images.map((img) => toAbsoluteUrl(baseUrl, img.url))
+  // Primary first — Google often uses the first Product.image URL for thumbnails.
+  const orderedImages = product.all_images?.length
+    ? [
+        ...product.all_images.filter((img) => img.is_primary),
+        ...product.all_images.filter((img) => !img.is_primary),
+      ]
     : product.primary_image?.url
-      ? [toAbsoluteUrl(baseUrl, product.primary_image.url)]
+      ? [product.primary_image]
       : [];
+  const images = orderedImages
+    .map((img) => toAbsoluteUrl(baseUrl, img.url))
+    .filter((url, index, arr) => url && arr.indexOf(url) === index);
   const brandName = product.brand?.name ?? product.product_brands?.[0]?.name ?? "Unknown";
 
   const schema: Record<string, unknown> = {
@@ -84,7 +91,8 @@ export function buildProductSchema(input: ProductSchemaInput): Record<string, un
     "@type": "Product",
     name: nameOverride?.trim() || product.name,
     description: descriptionOverride?.trim() || htmlToPlainText(product.description ?? ""),
-    image: images.length ? images : [toAbsoluteUrl(baseUrl, "/")],
+    // Omit invalid homepage fallback — empty/wrong image hurts Google thumbnails
+    ...(images.length ? { image: images } : {}),
     sku: (product as { sku?: string }).sku ?? String(product.id),
     brand: {
       "@type": "Brand",

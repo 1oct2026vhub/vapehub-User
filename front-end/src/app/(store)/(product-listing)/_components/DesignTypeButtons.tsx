@@ -44,22 +44,23 @@ const DesignTypeButtons = async ({
   if (relatedLinks.length === 0) return null;
 
   const count = relatedLinks.length;
-  /** ≤2: equal full-width buttons. 3–4: scroll on mobile, equal grid on desktop. >4: scroll always. */
+  /** ≤2: equal full-width buttons. 3–4: scroll on mobile, equal grid on desktop. >4: 4 visible + scroll. */
   const fillWidth = count <= 2;
   const scrollAlways = count > 4;
 
   const rowClass = fillWidth
     ? `grid gap-2 md:gap-3 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`
     : scrollAlways
-      ? "flex flex-nowrap gap-2 md:gap-3 overflow-x-auto scrollbar-none"
+      ? "flex flex-nowrap gap-2 overflow-x-auto scrollbar-none snap-x snap-mandatory md:gap-3"
       : `flex flex-nowrap gap-2 overflow-x-auto scrollbar-none sm:overflow-visible sm:grid sm:gap-3 ${
           count === 3 ? "sm:grid-cols-3" : "sm:grid-cols-4"
         }`;
 
+  // >4: each button = 1/4 of track (minus 3 gaps) so exactly 4 fill the viewport
   const linkClass = fillWidth
     ? `w-full ${linkBaseClass}`
     : scrollAlways
-      ? `shrink-0 ${linkBaseClass}`
+      ? `w-[calc((100%-1.5rem)/4)] shrink-0 grow-0 snap-start md:w-[calc((100%-2.25rem)/4)] ${linkBaseClass}`
       : `shrink-0 sm:w-full sm:shrink ${linkBaseClass}`;
 
   return (

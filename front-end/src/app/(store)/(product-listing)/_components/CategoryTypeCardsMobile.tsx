@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Slider, { Settings } from "react-slick";
 import { ArrowLeftIcon, ArrowRightIcon } from "@/components/Icons";
-import { extractTypeCardHtml, extractTypeCardHtmlFromDom } from "./type-cards.utils";
+import { extractTypeCardHtml, extractTypeCardHtmlFromDom, bindTypeCardImageFallbacks } from "./type-cards.utils";
 
 type CategoryTypeCardsMobileProps = {
   html: string;
@@ -30,6 +30,10 @@ const CategoryTypeCardsMobile = ({ html }: CategoryTypeCardsMobileProps) => {
       setUniformMinHeight(null);
     }
   }, [html]);
+
+  useEffect(() => {
+    bindTypeCardImageFallbacks(viewportRef.current);
+  }, [cards, uniformMinHeight]);
 
   const equalizeHeights = useCallback(() => {
     const viewport = viewportRef.current;
@@ -107,6 +111,9 @@ const CategoryTypeCardsMobile = ({ html }: CategoryTypeCardsMobileProps) => {
   if (cards.length === 0) {
     return (
       <div
+        ref={(el) => {
+          if (el) bindTypeCardImageFallbacks(el);
+        }}
         className="type-cards-html type-cards-html--mobile-fallback w-full lg:hidden"
         dangerouslySetInnerHTML={{ __html: html }}
       />

@@ -2007,6 +2007,65 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   min-width: 0;
 }
 
+/*
+ * Uniform image slot across all cards.
+ * Height applies to <img> only — NOT <figure> (CKEditor wraps uploads in
+ * <figure>; giving both height:180px doubled the gap when an empty figure
+ * remained after delete).
+ */
+.type-cards-html .type-card figure,
+.type-cards-html .type-card figure.image,
+.type-cards-html .vss-related-card figure,
+.type-cards-html .vss-related-card figure.image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+  float: none !important;
+}
+
+/* Empty figure shells left after image delete must not reserve space */
+.type-cards-html .type-card figure:empty,
+.type-cards-html .type-card figure:not(:has(img)),
+.type-cards-html .vss-related-card figure:empty,
+.type-cards-html .vss-related-card figure:not(:has(img)) {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.type-cards-html .type-card img,
+.type-cards-html .vss-related-card img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 180px !important;
+  min-height: 180px !important;
+  max-height: 180px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+  background: #f1f5f9 !important;
+  box-sizing: border-box !important;
+  float: none !important;
+}
+
+/* Figure already has bottom margin — avoid stacking with img margin */
+.type-cards-html .type-card figure img,
+.type-cards-html .vss-related-card figure img {
+  margin: 0 !important;
+}
+
 .type-cards-mobile-carousel {
   width: 100%;
   max-width: 100%;
@@ -2082,7 +2141,39 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 
 .type-cards-mobile-carousel .type-cards-mobile-slide img,
 .type-cards-mobile-carousel .type-cards-mobile-slide figure {
+  width: 100% !important;
   max-width: 100% !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure.image {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure:empty,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure:not(:has(img)) {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide img {
+  height: 180px !important;
+  min-height: 180px !important;
+  max-height: 180px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: 0 0 14px 0 !important;
+  background: #f1f5f9 !important;
+  box-sizing: border-box !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure img {
+  margin: 0 !important;
 }
 
 /* Custom left / right arrows — in side gutters, clear of card text */
@@ -2194,7 +2285,41 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   .type-cards-html--mobile-fallback .type-card figure,
   .type-cards-html--mobile-fallback .vss-related-card img,
   .type-cards-html--mobile-fallback .vss-related-card figure {
+    width: 100% !important;
     max-width: 100% !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure,
+  .type-cards-html--mobile-fallback .vss-related-card figure {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 0 14px 0 !important;
+    padding: 0 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure:empty,
+  .type-cards-html--mobile-fallback .type-card figure:not(:has(img)),
+  .type-cards-html--mobile-fallback .vss-related-card figure:empty,
+  .type-cards-html--mobile-fallback .vss-related-card figure:not(:has(img)) {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card img,
+  .type-cards-html--mobile-fallback .vss-related-card img {
+    height: 180px !important;
+    min-height: 180px !important;
+    max-height: 180px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    margin: 0 0 14px 0 !important;
+    background: #f1f5f9 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure img,
+  .type-cards-html--mobile-fallback .vss-related-card figure img {
+    margin: 0 !important;
   }
 }
 

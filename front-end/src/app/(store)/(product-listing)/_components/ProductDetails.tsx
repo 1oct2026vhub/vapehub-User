@@ -492,7 +492,6 @@ const ProductDetails: React.FC<ProductViewProps> = ({
             setVariantSelectionError(null);
         }
     }, [variantSelectionError, canAddToCart]);
-
     const resolvedMainImage = hideVariantSelector
         ? imageWithUrl(mainImage) ??
           allImages[0] ??

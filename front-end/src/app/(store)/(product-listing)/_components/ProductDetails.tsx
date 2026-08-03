@@ -181,7 +181,25 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     // This is the definitive entity (either a selected variant or a simple product's variant) to be used for cart operations.
     const cartEntity = defaultHiddenVariant ?? productVariant ?? simpleProductVariant;
 
-    const allImages: productAllImages[] = cartEntity?.all_images ?? product?.all_images ?? [];
+    // Prefer variant images only when they have real URLs. Empty `all_images: []` on the
+    // default/hidden variant must fall back to parent product images (?? does not treat [] as nullish).
+    // When hide_variant_selector is true, always show parent product images (never variant gallery).
+    const imageWithUrl = (img: productAllImages | null | undefined): productAllImages | null =>
+        img?.url?.trim() ? img : null;
+    const variantGallery = (cartEntity?.all_images ?? []).filter((img) => Boolean(img?.url?.trim()));
+    const productGallery = (product?.all_images ?? []).filter((img) => Boolean(img?.url?.trim()));
+    const allImages: productAllImages[] = hideVariantSelector
+        ? (productGallery.length > 0
+            ? productGallery
+            : [imageWithUrl(product?.primary_image)].filter((img): img is productAllImages => img != null))
+        : variantGallery.length > 0
+            ? variantGallery
+            : productGallery.length > 0
+              ? productGallery
+              : [
+                    imageWithUrl(cartEntity?.primary_image),
+                    imageWithUrl(product?.primary_image),
+                ].filter((img): img is productAllImages => img != null);
     const mixAndMatchDeal = product?.deals?.find(deal => deal.deal_type === 'BUY_N_FOR_FIXED');
     const stock = cartEntity?.stock && cartEntity?.is_in_stock ? cartEntity?.stock : 0;
     const rawPrice = cartEntity?.price ?? (product as { price?: number | string })?.price ?? 0;
@@ -475,11 +493,31 @@ const ProductDetails: React.FC<ProductViewProps> = ({
         }
     }, [variantSelectionError, canAddToCart]);
 
-    const resolvedMainImage = mainImage ?? allImages?.[0] ?? cartEntity?.primary_image ?? product?.primary_image ?? null;
+    const resolvedMainImage = hideVariantSelector
+        ? imageWithUrl(mainImage) ??
+          allImages[0] ??
+          imageWithUrl(product?.primary_image) ??
+          null
+        : imageWithUrl(mainImage) ??
+          allImages[0] ??
+          imageWithUrl(cartEntity?.primary_image) ??
+          imageWithUrl(product?.primary_image) ??
+          null;
 
     useEffect(() => {
-        setMainImage(cartEntity?.primary_image ?? product?.primary_image ?? allImages?.[0] ?? null);
-    }, [cartEntity, product, allImages]);
+        if (hideVariantSelector) {
+            setMainImage(
+                imageWithUrl(product?.primary_image) ?? allImages[0] ?? null,
+            );
+            return;
+        }
+        setMainImage(
+            imageWithUrl(cartEntity?.primary_image) ??
+                imageWithUrl(product?.primary_image) ??
+                allImages[0] ??
+                null,
+        );
+    }, [hideVariantSelector, cartEntity, product, allImages]);
 
     useEffect(() => {
         if (!primaryAttributeId) return;

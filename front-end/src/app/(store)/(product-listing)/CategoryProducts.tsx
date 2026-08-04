@@ -79,6 +79,9 @@ const CategoryProducts = async ({
     enhancedCategoryData.name,
   );
 
+  const typeCardsHtml =
+    dynamicPageSlug?.type_cards_html || data?.type_cards_html || null;
+
   const showBuyingGuideSection = Boolean(buyingGuide);
     
   return (
@@ -108,7 +111,7 @@ const CategoryProducts = async ({
                 {...buyingGuide}
               />
               <CategoryTypeCards
-                html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
+                html={typeCardsHtml}
                 embedded
               />
               {relatedGuides.length > 0 ? (
@@ -127,7 +130,7 @@ const CategoryProducts = async ({
         ) : (
           <>
             <CategoryTypeCards
-              html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
+              html={typeCardsHtml}
             />
             {categoryId ? (
               <section className="product-listing-container flex-col scroll-mt-24 pt-7.5 md:pt-9">

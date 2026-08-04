@@ -224,11 +224,12 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
     const order = searchParams.get("order");
     
     // If no params, return default based on page
-    // New Products page defaults to "Latest" (DESC), others default to "popularity"
+    // New Products / Coming Soon default to "Latest" (DESC), others default to "popularity"
     if (!sortBy && !order) {
-      // Check if we're on the new-products page
-      const isNewProductsPage = pathname?.includes('/new-products') ?? false;
-      return isNewProductsPage ? "DESC" : "popularity";
+      const isLatestDefaultPage =
+        (pathname?.includes('/new-products') ?? false) ||
+        (pathname?.includes('/coming-soon') ?? false);
+      return isLatestDefaultPage ? "DESC" : "popularity";
     }
     
     // Handle price sorting
@@ -353,6 +354,7 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
                       totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
                       isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
                       isDiscontinued={Boolean(product.is_discontinued)}
+                      isComingSoon={Boolean(product.is_coming_soon)}
                       averageRating={averageRating}
                       totalReviews={totalReviews}
                       outOfStock={product.out_of_stock}

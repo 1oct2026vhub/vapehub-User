@@ -102,6 +102,7 @@ export default {
         'new-badge': "url('/images/new-before.svg')",
         'discontinued-badge': "url('/images/discontinued-before.svg')",
         'discontinued-after': "url('/images/discontinued-after.svg')",
+        'coming-soon-after': "url('/images/coming-soon-after.svg')",
       },
       spacing: {
         '4.5': '1.125rem', //18px

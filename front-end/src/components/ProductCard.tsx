@@ -21,6 +21,7 @@ interface ProductCardProps {
   link: string;
   isNew?: string;
   isDiscontinued?: boolean;
+  isComingSoon?: boolean;
   averageRating?: number;
   totalReviews?: number;
   outOfStock?: boolean;
@@ -39,6 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   link,
   isNew,
   isDiscontinued = false,
+  isComingSoon = false,
   averageRating = 0,
   totalReviews = 0,
 }) => {
@@ -162,6 +164,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="discontinued-product">
               <span>Discontinued</span>
             </div>
+          ) : isComingSoon ? (
+            <div className="coming-soon-product">
+              <span>Coming Soon</span>
+            </div>
           ) : (
             isNew && (
               <div className='new-product'>
@@ -210,7 +216,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {flavors ? `${flavors} ${flavors > 1 ? 'Flavours' : 'Flavour'}` : ''}
           </p>
           <div className="min-h-[20px] md:min-h-[24px] flex items-center">
-            {outOfStock && (
+            {!isComingSoon && outOfStock && (
               <p className="text-content-3 md:text-content-2 xl:text-content-1 text-red-500 font-bold">
                 Out of Stock
               </p>

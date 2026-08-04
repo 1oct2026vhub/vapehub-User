@@ -161,6 +161,8 @@ export interface Product {
     createdAt?: string;
     out_of_stock?: boolean;
     is_discontinued?: boolean;
+    is_coming_soon?: boolean;
+    is_new?: boolean;
     reviews?: ProductReview[];
     review_stats?: ProductReviewStats;
 }
@@ -329,6 +331,8 @@ export interface ProductViewDetails {
     loyaltyPoints?: LoyaltyPoints | null;
     puff_count?: number | string;
     is_discontinued?: boolean;
+    is_coming_soon?: boolean;
+    is_new?: boolean;
     review_stats?: ProductReviewStats;
 };
 

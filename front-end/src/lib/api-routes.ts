@@ -165,6 +165,7 @@ export interface PRODUCT_PAYLOAD {
     keyword?: string;
     price_range?: string;
     is_new?: boolean;
+    is_coming_soon?: boolean;
     categories?: string;
     brand?: string;
     deal_id?: number;

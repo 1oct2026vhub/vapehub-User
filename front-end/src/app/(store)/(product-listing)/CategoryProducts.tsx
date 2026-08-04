@@ -17,12 +17,17 @@ import { fetchCategoryBuyingGuideSection } from './_components/buying-guide.util
 type ExtendedCategoryData = CategoryResponseData & {
   category_id?: number;
   categoryId?: number;
+  card_type_html?: string | null;
+  type_card_html?: string | null;
 };
 
 type CategoryProps = {
   data: ExtendedCategoryData;
   reviews: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
-  dynamicPageSlug?: DynamicPageSlugResponse;
+  dynamicPageSlug?: DynamicPageSlugResponse & {
+    card_type_html?: string | null;
+    type_card_html?: string | null;
+  };
   pageSlug?: string;
 }
 
@@ -79,8 +84,15 @@ const CategoryProducts = async ({
     enhancedCategoryData.name,
   );
 
+  // Related collections / type cards — accept alternate API field names.
   const typeCardsHtml =
-    dynamicPageSlug?.type_cards_html || data?.type_cards_html || null;
+    dynamicPageSlug?.type_cards_html ||
+    dynamicPageSlug?.card_type_html ||
+    dynamicPageSlug?.type_card_html ||
+    data?.type_cards_html ||
+    data?.card_type_html ||
+    data?.type_card_html ||
+    null;
 
   const showBuyingGuideSection = Boolean(buyingGuide);
     
@@ -110,10 +122,7 @@ const CategoryProducts = async ({
                 hideHeader
                 {...buyingGuide}
               />
-              <CategoryTypeCards
-                html={typeCardsHtml}
-                embedded
-              />
+              <CategoryTypeCards html={typeCardsHtml} embedded />
               {relatedGuides.length > 0 ? (
                 <RelatedGuides
                   key={`related-guides-${buyingGuideSlug || categoryId}`}
@@ -129,9 +138,7 @@ const CategoryProducts = async ({
           </div>
         ) : (
           <>
-            <CategoryTypeCards
-              html={typeCardsHtml}
-            />
+            <CategoryTypeCards html={typeCardsHtml} />
             {categoryId ? (
               <section className="product-listing-container flex-col scroll-mt-24 pt-7.5 md:pt-9">
                 <FAQSection type="category" id={categoryId} />

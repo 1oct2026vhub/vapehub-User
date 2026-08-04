@@ -789,6 +789,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                         onVariantChange={handleVariantSelectionChange}
                         selectedAttributeSlugs={selectedAttributeSlugs}
                         primaryAttributeId={primaryAttributeId}
+                        isDiscontinued={isDiscontinued}
                     />
                     )}
                     <div className='space-y-2 lg:space-y-3.5'>

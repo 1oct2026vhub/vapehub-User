@@ -33,6 +33,10 @@ export interface RelatedLink {
 /** Shared shape for related-categories and related-brands responses. */
 export interface RelatedCategoriesApiData {
     related_links: RelatedLink[];
+    /** When present, related links UI should only render if `is_enabled === true`. */
+    buyingGuide?: {
+        is_enabled?: boolean;
+    } | null;
 }
 
 export const defaultNavLinks:SubCategory[] = [

@@ -14,7 +14,7 @@ interface CategoryBuyingGuideProps extends CategoryBuyingGuideData {
 }
 
 const BuyingGuideHighlight = ({ label }: { label: string }) => (
-  <div className="flex min-h-[52px] items-stretch overflow-hidden rounded-lg bg-skin-white shadow-card">
+  <div className="flex min-h-[52px] items-stretch overflow-hidden rounded-lg bg-skin-white shadow-card mt-3">
     <div className="w-1 shrink-0 bg-skin-primary-500 sm:w-1.5" aria-hidden />
     <p className="flex flex-1 items-center px-3.5 py-3 font-oswald text-content-1 font-semibold text-skin-neutral-500 sm:px-4 sm:text-title-2">
       {label}
@@ -64,7 +64,7 @@ const CategoryBuyingGuide = ({
         >
           {hasIntro ? (
             <div
-              className="category-buying-guide-content product-content rich-text min-w-0 flex-1 text-content-1 font-normal leading-relaxed text-skin-neutral-500"
+              className="category-buying-guide-content product-content rich-text min-w-0 flex-1 text-content-1 font-normal leading-relaxed"
               dangerouslySetInnerHTML={{ __html: contentHtml }}
             />
           ) : null}

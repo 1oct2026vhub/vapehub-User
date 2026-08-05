@@ -37,6 +37,9 @@ const DesignTypeButtons = async ({
       : await getCategoryRelatedCategories(leafSlug);
   if (response.status !== ServerActionStatus.SUCCESS) return null;
 
+  // Hide related links unless buyingGuide.is_enabled is explicitly true
+  if (response.data?.buyingGuide?.is_enabled !== true) return null;
+
   const relatedLinks: RelatedLink[] = [...(response.data?.related_links ?? [])].sort(
     (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
   );

@@ -116,20 +116,24 @@ export function mapBuyingGuideRelatedBlogs(
 export type ResolvedBuyingGuideSection = {
   guide: CategoryBuyingGuideData | null;
   relatedGuides: BlogList[];
+  /** Raw API flag — related collections / type cards should respect this. */
+  isEnabled: boolean;
 };
 
 function resolveFromApiData(
   data: BuyingGuideApiData | undefined,
   fallbackTitle?: string,
 ): ResolvedBuyingGuideSection {
+  const isEnabled = data?.buyingGuide?.is_enabled === true;
   const guide = mapPublicBuyingGuide(data?.buyingGuide, fallbackTitle);
-  if (!guide) {
-    return { guide: null, relatedGuides: [] };
+  if (!guide || !isEnabled) {
+    return { guide: null, relatedGuides: [], isEnabled };
   }
 
   return {
     guide,
     relatedGuides: mapBuyingGuideRelatedBlogs(data?.buyingGuide?.related_guides),
+    isEnabled,
   };
 }
 
@@ -138,12 +142,12 @@ export async function fetchCategoryBuyingGuideSection(
   fallbackTitle?: string,
 ): Promise<ResolvedBuyingGuideSection> {
   if (!slug.trim()) {
-    return { guide: null, relatedGuides: [] };
+    return { guide: null, relatedGuides: [], isEnabled: false };
   }
 
   const response = await getCategoryBuyingGuide(slug);
   if (response.status !== ServerActionStatus.SUCCESS) {
-    return { guide: null, relatedGuides: [] };
+    return { guide: null, relatedGuides: [], isEnabled: false };
   }
 
   return resolveFromApiData(response.data, fallbackTitle);
@@ -154,12 +158,12 @@ export async function fetchBrandBuyingGuideSection(
   fallbackTitle?: string,
 ): Promise<ResolvedBuyingGuideSection> {
   if (!slug.trim()) {
-    return { guide: null, relatedGuides: [] };
+    return { guide: null, relatedGuides: [], isEnabled: false };
   }
 
   const response = await getBrandBuyingGuide(slug);
   if (response.status !== ServerActionStatus.SUCCESS) {
-    return { guide: null, relatedGuides: [] };
+    return { guide: null, relatedGuides: [], isEnabled: false };
   }
 
   return resolveFromApiData(response.data, fallbackTitle);

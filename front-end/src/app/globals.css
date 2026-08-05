@@ -941,6 +941,12 @@ input[type="checkbox"] + span {
   @apply text-skin-neutral-400 !text-title-2;
 }
 
+/* Buying guide CKEditor HTML: match admin editor default (black), not listing grey */
+.product-listing-container .category-buying-guide-content.product-content,
+.product-listing-container .category-buying-guide-tab-content.product-content {
+  color: #000000;
+}
+
 .category-buying-guide-tabs-scroll {
   display: flex;
   align-items: center;

@@ -100,10 +100,8 @@ export function buildProductSocialMetadata({
 }
 
 const fetchDynamicPageSlug = cache(async (slug: string): Promise<DynamicPageSlugResponse | null> => {
-  // Bypass fetch cache while debugging type_cards_html / related collections.
   const response = await getDynamicPageSlug(slug, false);
   if (response.status === ServerActionStatus.ERROR) {
-    console.log("[category-filter] slug-relation API error", { slug, response });
     return null;
   }
 
@@ -113,21 +111,6 @@ const fetchDynamicPageSlug = cache(async (slug: string): Promise<DynamicPageSlug
     data?.card_type_html ??
     data?.type_card_html ??
     null;
-
-  console.log("[category-filter] slug-relation API response", {
-    slug,
-    entity_type: data?.entity_type,
-    entity_id: data?.entity_id,
-    name: data?.name,
-    keys: data ? Object.keys(data) : [],
-    type_cards_html: data?.type_cards_html ?? null,
-    card_type_html: data?.card_type_html ?? null,
-    type_card_html: data?.type_card_html ?? null,
-    type_cards_html_length:
-      typeof typeCardsHtml === "string" ? typeCardsHtml.length : 0,
-    type_cards_html_preview:
-      typeof typeCardsHtml === "string" ? typeCardsHtml.slice(0, 300) : typeCardsHtml,
-  });
 
   // Normalize alternate API field names onto type_cards_html for the storefront.
   if (!data?.type_cards_html && typeof typeCardsHtml === "string" && typeCardsHtml.trim()) {

@@ -18,7 +18,7 @@ import {
   NON_VARIANT_FILTERS 
 } from '@/lib/config/product.config';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FunctionComponent, ReactElement, useState } from "react";
+import { FunctionComponent, ReactElement, ReactNode, useState } from "react";
 import { useProductFilters } from "@/lib/hooks/useProductFilters";
 import { setScrollToTopOnNextNavigation } from "@/components/HistoryProvider";
 import { PRODUCT_LISTING_START_ID } from "@/lib/utils/scrollToTop";
@@ -52,7 +52,11 @@ type DealOption = {
   product_count: number;
 };
 
-const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[]}> = ({ data, reviews = [] }): ReactElement => { 
+const ProductList: FunctionComponent<{
+  data: ProductListData;
+  reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
+  children?: ReactNode;
+}> = ({ data, reviews = [], children }): ReactElement => { 
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -224,11 +228,12 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
     const order = searchParams.get("order");
     
     // If no params, return default based on page
-    // New Products page defaults to "Latest" (DESC), others default to "popularity"
+    // New Products / Coming Soon default to "Latest" (DESC), others default to "popularity"
     if (!sortBy && !order) {
-      // Check if we're on the new-products page
-      const isNewProductsPage = pathname?.includes('/new-products') ?? false;
-      return isNewProductsPage ? "DESC" : "popularity";
+      const isLatestDefaultPage =
+        (pathname?.includes('/new-products') ?? false) ||
+        (pathname?.includes('/coming-soon') ?? false);
+      return isLatestDefaultPage ? "DESC" : "popularity";
     }
     
     // Handle price sorting
@@ -287,89 +292,86 @@ const ProductList: FunctionComponent<{data: ProductListData, reviews?: ServerAct
   return (
 
     <>
-      <section className="product-listing-container border-t border-skin-neutral-200 flex flex-row items-start !gap-5 xl:!gap-12">
-
-        {/* <motion.div
-        initial={{ width: 0 }}
-        animate={{ width: isFilterVisible ? "auto" : 0, opacity: isFilterVisible ? 1 : 0 }}
-        transition={{ duration: 0.3 }} 
-        
-      > */}
-        {
-          isFilterVisible &&
-          <FilterSidebar appliedFilters={appliedFilters} 
-          onRemoveFilter={handleRemoveFilter} 
-          filterOptions={filterOptions} 
-          onClearAllFilters={() => {
-            setScrollToTopOnNextNavigation();
-            clearAllFilters();
-          }}
-          />
-
-        }
-
-        <div id={PRODUCT_LISTING_START_ID} className="flex flex-col gap-7.5 md:gap-9 w-full">
-          <ProductListingActionsWeb
-            onSortChange={handleSortChange}
-            initialValue={getSortValueFromParams()}
-            isFilterVisible={isFilterVisible}
-            onFilterToggle={() => setIsFilterVisible(!isFilterVisible)}
-            
-          />
-          <ProductListingActionsMob
-            onSortChange={handleSortChange}
-            initialValue={getSortValueFromParams()}
-            appliedFilters={appliedFilters}
+      <section className="product-listing-container border-t border-skin-neutral-200 flex flex-col !gap-0">
+        <div className="flex w-full flex-row items-start gap-5 xl:gap-12">
+          {
+            isFilterVisible &&
+            <FilterSidebar appliedFilters={appliedFilters}
             onRemoveFilter={handleRemoveFilter}
             filterOptions={filterOptions}
-          onClearAllFilters={() => {
-            setScrollToTopOnNextNavigation();
-            clearAllFilters();
-          }}
-          />
-          {products.length === 0 ? (
-            <EmptyPlaceholder title='Uh, oh!' description='No products found.' />
-          ) :
-            <>
-              <div className={`grid grid-cols-2  ${isFilterVisible ? 'md:grid-cols-3 xl:grid-cols-4' : 'md:grid-cols-4 xl:grid-cols-5'} transition-all duration-600 ease-in-out gap-4.5 md:gap-5 xl:gap-10 products-slider`}>
-                {products.map((product) => {
-                  const review = reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews.find(review => review.product_id === product.id));
-                  const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
-                  const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
-
-                  const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
-                  return (
-                    <ProductCard
-                      key={product.id}
-                      title={product.name}
-                      imageSrc={primaryImage?.image_url || ''}
-                      altText={primaryImage?.alt_text ?? product.name}
-                      price={product.price}
-                      buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
-                      // flavors={product?.Flavors?.length}
-                      flavors={product.flavor_count ? Number(product.flavor_count) : 0}
-                      productId={product.id}
-                      link={`/${product.slug}`}
-                      totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
-                      isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
-                      isDiscontinued={Boolean(product.is_discontinued)}
-                      averageRating={averageRating}
-                      totalReviews={totalReviews}
-                      outOfStock={product.out_of_stock}
-                    />
-                  )
-                })}
-              </div>
-
-              <div className="flex items-center gap-3 justify-between pl-5 flex-wrap">
-                <p className="text-content-1 text-skin-neutral-300 font-bold">Showing {activePage}-{products.length} of {totalCount} results</p>
-                {totalPage > 1 && (
-                  <Pagination total={totalPage} onPageChange={handlePagination} currentPage={activePage} />
-                )}
-              </div>
-            </>
+            onClearAllFilters={() => {
+              setScrollToTopOnNextNavigation();
+              clearAllFilters();
+            }}
+            />
           }
+
+          <div id={PRODUCT_LISTING_START_ID} className="flex flex-col gap-7.5 md:gap-9 w-full">
+            <ProductListingActionsWeb
+              onSortChange={handleSortChange}
+              initialValue={getSortValueFromParams()}
+              isFilterVisible={isFilterVisible}
+              onFilterToggle={() => setIsFilterVisible(!isFilterVisible)}
+
+            />
+            <ProductListingActionsMob
+              onSortChange={handleSortChange}
+              initialValue={getSortValueFromParams()}
+              appliedFilters={appliedFilters}
+              onRemoveFilter={handleRemoveFilter}
+              filterOptions={filterOptions}
+            onClearAllFilters={() => {
+              setScrollToTopOnNextNavigation();
+              clearAllFilters();
+            }}
+            />
+            {products.length === 0 ? (
+              <EmptyPlaceholder title='Uh, oh!' description='No products found.' />
+            ) :
+              <>
+                <div className={`grid grid-cols-2  ${isFilterVisible ? 'md:grid-cols-3 xl:grid-cols-4' : 'md:grid-cols-4 xl:grid-cols-5'} transition-all duration-600 ease-in-out gap-4.5 md:gap-5 xl:gap-10 products-slider`}>
+                  {products.map((product) => {
+                    const review = reviews.find(r => r.status === ServerActionStatus.SUCCESS && r.data?.reviews.find(review => review.product_id === product.id));
+                    const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
+                    const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
+
+                    const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
+                    return (
+                      <ProductCard
+                        key={product.id}
+                        title={product.name}
+                        imageSrc={primaryImage?.image_url || ''}
+                        altText={primaryImage?.alt_text ?? product.name}
+                        price={product.price}
+                        buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
+                        // flavors={product?.Flavors?.length}
+                        flavors={product.flavor_count ? Number(product.flavor_count) : 0}
+                        productId={product.id}
+                        link={`/${product.slug}`}
+                        totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
+                        isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
+                        isDiscontinued={Boolean(product.is_discontinued)}
+                        averageRating={averageRating}
+                        totalReviews={totalReviews}
+                        outOfStock={product.out_of_stock}
+                        isComingSoon={Boolean(product.is_coming_soon)}
+                      />
+                    )
+                  })}
+                </div>
+
+                <div className="flex items-center gap-3 justify-between pl-5 flex-wrap">
+                  <p className="text-content-1 text-skin-neutral-300 font-bold">Showing {activePage}-{products.length} of {totalCount} results</p>
+                  {totalPage > 1 && (
+                    <Pagination total={totalPage} onPageChange={handlePagination} currentPage={activePage} />
+                  )}
+                </div>
+              </>
+            }
+          </div>
         </div>
+
+        {children ? <div className="w-full">{children}</div> : null}
       </section>
 
     </>

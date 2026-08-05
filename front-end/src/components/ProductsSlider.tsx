@@ -61,6 +61,7 @@ function renderProductCard(
         totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
         isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
         isDiscontinued={Boolean(product.is_discontinued)}
+        isComingSoon={Boolean(product.is_coming_soon)}
         averageRating={averageRating}
         totalReviews={totalReviews}
         outOfStock={product.out_of_stock}

@@ -148,7 +148,7 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                         </div>
                     </DrawerHeader>
                     <DrawerBody className='py-4 px-4'>
-                        {/* Static NEW IN menu item */}
+                        {/* Static NEW IN / COMING SOON menu items */}
                         <Button 
                             as={Link} 
                             href={ROUTES.NEW_PRODUCTS} 
@@ -157,6 +157,15 @@ const MobileMenu = ({ megaMenuData = [] }: Props) => {
                             onPress={handleMenuClose}
                         >
                             NEW IN
+                        </Button>
+                        <Button 
+                            as={Link} 
+                            href={ROUTES.COMING_SOON} 
+                            variant='light' 
+                            className='w-full justify-start text-title-2 font-bold uppercase font-oswald rounded-lg shadow-input border border-skin-neutral-100 p-4 py-5.5 mt-2'
+                            onPress={handleMenuClose}
+                        >
+                            COMING SOON
                         </Button>
                         
                         {/* Menu items */}

@@ -60,6 +60,8 @@
 
     --footer-gradient: linear-gradient(90deg, #083122 0%, #035335 50%, #083122 100%);
     --header-gradient: linear-gradient(90deg, #083122 0%, #035335 50%, #083122 100%);
+    --gradient-start: #035335;
+    --gradient-end: #083122;
 
     --border: rgba(242, 242, 242, 1);
   }
@@ -442,7 +444,149 @@ input[type='search'] {
   @apply focus-visible:!outline-none focus-visible:!border-none;
 }
 
-/* blog details */
+.trust-strip {
+  background: linear-gradient(90deg, var(--gradient-end) 0%, var(--gradient-start) 100%);
+}
+
+/* Contextual overflow: page stays fixed width; wide tables scroll in-place */
+.blog-post-main {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Sticky side rails — avoid overflow:hidden on .blog-post-grid or its ancestors */
+.blog-post-grid {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.blog-post-rail {
+  position: sticky;
+  top: 6rem;
+  align-self: start;
+  z-index: 1;
+}
+
+/* TOC: one left green indicator only — native scrollbar fully hidden */
+.blog-post-toc-scroll-clip {
+  overflow: hidden;
+}
+
+.blog-post-toc-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  margin-right: -20px;
+  padding-right: 20px;
+}
+
+.blog-post-toc-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+.blog-post-toc-scroll::-webkit-scrollbar-thumb,
+.blog-post-toc-scroll::-webkit-scrollbar-track,
+.blog-post-toc-scroll::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.blog-details {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.blog-details .ck-content,
+.blog-intro.ck-content,
+.blog-intro.rich-text {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* Global .ck-content sets width:100% on blocks; that stops wrapping inside flex/grid columns */
+.blog-details .ck-content :where(p, div:not(.blog-table-scroll), span, a, strong, em, h1, h2, h3, h4, h5, h6, li, blockquote),
+.blog-intro :where(p, div, span, a, strong, em, h1, h2, h3, h4, h5, h6, li, blockquote) {
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  box-sizing: border-box;
+}
+
+.blog-details .blog-table-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  margin: 1em 0;
+  /* Prevent scrollport from clipping the table's left/right outer border */
+  padding: 1px;
+  box-sizing: border-box;
+}
+
+/* Tables outside scroll wrapper (fallback) stay within the column */
+.blog-details .ck-content figure.table {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Inside scroll shell, preserve CKEditor natural table width */
+.blog-details .blog-table-scroll figure.table {
+  max-width: none;
+  overflow: visible;
+}
+
+.blog-details .ck-content table {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  /* Fallback when CKEditor omits inline border — inline styles take precedence */
+  border: 1px solid #000;
+}
+
+.blog-details .ck-content table th,
+.blog-details .ck-content table td {
+  border: 1px solid #000;
+}
+
+.blog-details .blog-table-scroll > figure.table,
+.blog-details .blog-table-scroll > table {
+  margin: 0;
+}
+
+.blog-details .ck-content img,
+.blog-details .ck-content video,
+.blog-details .ck-content iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+.blog-details .ck-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .blog-details ol {
   @apply !list-decimal mt-4 pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
 }
@@ -453,6 +597,12 @@ input[type='search'] {
 
 
 /* Let .rich-text control heading scale; avoid revert which matches body on Tailwind preflight. */
+.blog-details .rich-text h1,
+.blog-details .rich-text h2,
+.blog-details .rich-text h3,
+.blog-details .rich-text h4,
+.blog-details .rich-text h5,
+.blog-details .rich-text h6,
 .blog-details.rich-text h1,
 .blog-details.rich-text h2,
 .blog-details.rich-text h3,
@@ -525,13 +675,119 @@ input[type="checkbox"] + span {
   margin-bottom: 1rem;
 }
 
+.blog-details .rich-text,
 .blog-details.rich-text {
+  max-width: 100%;
+  min-width: 0;
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.blog-details.rich-text figure:has(table),
-.blog-details.rich-text table {
+.blog-details .rich-text h2,
+.blog-details.rich-text h2 {
+  @apply text-h5 md:text-h4;
+  scroll-margin-top: 7rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.blog-details .rich-text h3,
+.blog-details.rich-text h3 {
+  @apply text-title-1 md:text-h5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.blog-intro {
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  contain: inline-size;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.blog-intro p {
+  margin-bottom: 0;
+}
+
+.blog-intro p,
+.blog-details p {
+  @apply text-skin-neutral-400 text-title-2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* Optional blog blocks — override .blog-details p defaults */
+.blog-details .blog-industry-quote__text,
+.blog-details .blog-promo-banner__title {
+  color: #083122 !important;
+  font-size: 13.5px !important;
+  line-height: 150% !important;
+}
+
+.blog-details .blog-industry-quote__attribution,
+.blog-details .blog-promo-banner__description {
+  color: #4a5e54 !important;
+  font-size: 13.5px !important;
+  line-height: 150% !important;
+}
+
+.blog-details .blog-industry-quote__attribution {
+  font-size: 13px !important;
+}
+
+.blog-warehouse-callout-body {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.blog-warehouse-callout-body p {
+  margin-bottom: 0;
+}
+
+.blog-warehouse-callout-body a {
+  color: var(--primary-500) !important;
+  text-decoration: underline !important;
+  font-weight: 500;
+}
+
+.blog-intro.rich-text a,
+.blog-details .rich-text a,
+.blog-details.rich-text a {
+  color: var(--primary-500) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+}
+
+.blog-intro.rich-text a:hover,
+.blog-details .rich-text a:hover,
+.blog-details.rich-text a:hover {
+  color: var(--primary-500) !important;
+  background-color: #f0f9f9;
+  text-decoration: underline !important;
+}
+
+.blog-details .rich-text sup a,
+.blog-details.rich-text sup a {
+  color: var(--primary-500) !important;
+  text-decoration: none !important;
+  font-weight: 600;
+  font-size: 0.75em;
+}
+
+.blog-details .rich-text sup a:hover,
+.blog-details.rich-text sup a:hover {
+  background-color: transparent;
+  text-decoration: underline !important;
 }
 
 .product-content ul {
@@ -683,6 +939,48 @@ input[type="checkbox"] + span {
 
 .product-listing-container .product-content {
   @apply text-skin-neutral-400 !text-title-2;
+}
+
+.category-buying-guide-tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.category-buying-guide-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.category-buying-guide-tabs-scroll > button {
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .category-buying-guide-tabs-scroll {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.625rem;
+    overflow-x: visible;
+    overscroll-behavior-x: auto;
+    scroll-snap-type: none;
+  }
+}
+
+/* Hide scrollbar but keep scroll / swipe */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 /* Styles for webkit-based browsers */
@@ -1706,6 +2004,341 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   .deals-pagination-ui-host {
     display: flex;
     justify-content: center;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Category type cards                                                        */
+/* Desktop (lg+): CKEditor/API styles as-is (.type-cards-html).               */
+/* Mobile: one-card slick carousel (.type-cards-mobile-carousel).             */
+/* Fallback when cards can't be parsed: CSS scroll snap carousel.             */
+/* -------------------------------------------------------------------------- */
+
+.type-cards-html {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.type-cards-html .raw-html-embed {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/*
+ * Uniform image slot across all cards.
+ * Height applies to <img> only — NOT <figure> (CKEditor wraps uploads in
+ * <figure>; giving both height:180px doubled the gap when an empty figure
+ * remained after delete).
+ */
+.type-cards-html .type-card figure,
+.type-cards-html .type-card figure.image,
+.type-cards-html .vss-related-card figure,
+.type-cards-html .vss-related-card figure.image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+  float: none !important;
+}
+
+/* Empty figure shells left after image delete must not reserve space */
+.type-cards-html .type-card figure:empty,
+.type-cards-html .type-card figure:not(:has(img)),
+.type-cards-html .vss-related-card figure:empty,
+.type-cards-html .vss-related-card figure:not(:has(img)) {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.type-cards-html .type-card img,
+.type-cards-html .vss-related-card img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 180px !important;
+  min-height: 180px !important;
+  max-height: 180px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+  background: #f1f5f9 !important;
+  box-sizing: border-box !important;
+  float: none !important;
+}
+
+/* Figure already has bottom margin — avoid stacking with img margin */
+.type-cards-html .type-card figure img,
+.type-cards-html .vss-related-card figure img {
+  margin: 0 !important;
+}
+
+.type-cards-mobile-carousel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.type-cards-mobile-carousel__viewport {
+  position: relative;
+  width: 100%;
+  /* Side gutters so arrows sit beside the card, not over text */
+  padding-inline: 2.75rem;
+}
+
+.type-cards-mobile-carousel .slick-list {
+  margin: 0;
+  height: auto !important;
+  overflow: hidden;
+}
+
+/* Keep track from collapsing; JS sets equal min-height on each slide */
+.type-cards-mobile-carousel .slick-track {
+  display: flex !important;
+  align-items: stretch !important;
+  height: auto !important;
+}
+
+.type-cards-mobile-carousel .slick-slide {
+  height: auto !important;
+  display: flex !important;
+  float: none !important;
+}
+
+.type-cards-mobile-carousel .slick-slide > div {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto;
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Override CKEditor inline flex/width/height so cards fill the equalized slide */
+.type-cards-mobile-carousel .type-cards-mobile-slide > .type-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > div {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Keep CTA anchored to the bottom of equal-height cards */
+.type-cards-mobile-carousel .type-cards-mobile-slide > .type-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > div > :last-child {
+  margin-top: auto !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide img,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure.image {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure:empty,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure:not(:has(img)) {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide img {
+  height: 180px !important;
+  min-height: 180px !important;
+  max-height: 180px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: 0 0 14px 0 !important;
+  background: #f1f5f9 !important;
+  box-sizing: border-box !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure img {
+  margin: 0 !important;
+}
+
+/* Custom left / right arrows — in side gutters, clear of card text */
+.type-cards-mobile-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 2px solid var(--neutral-200);
+  background: var(--neutral-50, #fff);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.type-cards-mobile-arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+.type-cards-mobile-arrow--prev {
+  left: 0.25rem;
+}
+
+.type-cards-mobile-arrow--next {
+  right: 0.25rem;
+}
+
+/* Home-style pagination dots below the cards */
+.type-cards-mobile-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  width: 100%;
+}
+
+.type-cards-mobile-dots li {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.type-cards-mobile-dots button {
+  display: block;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--neutral-200);
+  cursor: pointer;
+}
+
+.type-cards-mobile-dots button.is-active {
+  background: var(--primary-gradient-100);
+}
+
+/* Parse fallback: horizontal one-card scroll on mobile only */
+@media (max-width: 1023px) {
+  .type-cards-html--mobile-fallback .type-cards,
+  .type-cards-html--mobile-fallback .raw-html-embed .type-cards,
+  .type-cards-html--mobile-fallback .vss-related-cards {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    box-sizing: border-box !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-cards::-webkit-scrollbar,
+  .type-cards-html--mobile-fallback .vss-related-cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .type-cards-html--mobile-fallback .type-card,
+  .type-cards-html--mobile-fallback .raw-html-embed .type-card,
+  .type-cards-html--mobile-fallback .vss-related-cards > .vss-related-card {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    scroll-snap-align: start !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card img,
+  .type-cards-html--mobile-fallback .type-card figure,
+  .type-cards-html--mobile-fallback .vss-related-card img,
+  .type-cards-html--mobile-fallback .vss-related-card figure {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure,
+  .type-cards-html--mobile-fallback .vss-related-card figure {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 0 14px 0 !important;
+    padding: 0 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure:empty,
+  .type-cards-html--mobile-fallback .type-card figure:not(:has(img)),
+  .type-cards-html--mobile-fallback .vss-related-card figure:empty,
+  .type-cards-html--mobile-fallback .vss-related-card figure:not(:has(img)) {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card img,
+  .type-cards-html--mobile-fallback .vss-related-card img {
+    height: 180px !important;
+    min-height: 180px !important;
+    max-height: 180px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    margin: 0 0 14px 0 !important;
+    background: #f1f5f9 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure img,
+  .type-cards-html--mobile-fallback .vss-related-card figure img {
+    margin: 0 !important;
   }
 }
 

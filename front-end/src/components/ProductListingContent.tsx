@@ -5,14 +5,33 @@ import { BrandConfig } from '@/lib/config/brand.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 import NoImage from './NoImage';
+import DesignTypeButtons, {
+    RelatedQuickLinksEntity,
+} from '@/app/(store)/(product-listing)/_components/DesignTypeButtons';
 
 type CategoryProps = {
     data: Category | BrandConfig;
     dynamicPageSlug?: DynamicPageSlugResponse & { latest_deals?: DynamicPageSlugResponse['deals'] };
     aboutHeading?: string;
+    showBuyingGuideFaqsLink?: boolean;
+    buyingGuideFaqsHref?: string;
+    showCategoryQuickLinks?: boolean;
+    /** Leaf slug for related-categories / related-brands API (required when showCategoryQuickLinks). */
+    categoryQuickLinksSlug?: string;
+    /** Defaults to category. */
+    relatedQuickLinksEntity?: RelatedQuickLinksEntity;
 }
 
-const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug, aboutHeading}) => {
+const ProductListingContent: React.FC<CategoryProps> = ({
+    data,
+    dynamicPageSlug,
+    aboutHeading,
+    showBuyingGuideFaqsLink = false,
+    buyingGuideFaqsHref = '#buying-guide-faqs',
+    showCategoryQuickLinks = false,
+    categoryQuickLinksSlug = '',
+    relatedQuickLinksEntity = 'category',
+}) => {
     // Only use banners from API - no fallback to deals
     const banners = dynamicPageSlug?.banners || [];
     
@@ -33,6 +52,20 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug, 
                         dangerouslySetInnerHTML={{ __html: dynamicPageSlug?.description || data?.description || "" }}
                     />
                 )}
+                {showBuyingGuideFaqsLink && (
+                    <Link
+                        href={buyingGuideFaqsHref}
+                        className="w-fit font-oswald text-title-1 font-semibold text-skin-primary-500 underline underline-offset-4 hover:opacity-80 transition-opacity"
+                    >
+                        Buying Guide &amp; FAQs ↓
+                    </Link>
+                )}
+                {showCategoryQuickLinks && categoryQuickLinksSlug ? (
+                    <DesignTypeButtons
+                        slug={categoryQuickLinksSlug}
+                        entity={relatedQuickLinksEntity}
+                    />
+                ) : null}
             </div>
             {validBanners.length > 0 && (
                 <div className={`grid gap-3.5 ${

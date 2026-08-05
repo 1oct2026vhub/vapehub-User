@@ -3,28 +3,46 @@ import NoImage from "@/components/NoImage";
 import { DEFAULT_CURRENCY_SYMBOL } from "@/lib/config/app.config";
 import Link from "next/link";
 import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
-
+import { buildCartProductUrl, shouldHideOrderLineVariantDetails } from "@/lib/utils/cart-product-url";
+import type { CartVariantAttribute } from "@/lib/config/cart.config";
 interface OrderDetailCardProps {
     status:string;
     data: ORDER['orderItems'][0];
     isCouponApplied: number | null;
+    /** From product API hide_variant_selector — preferred over attribute heuristics. */
+    hideVariantDetails?: boolean;
 }
 
 const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
     status,
     isCouponApplied,
-    data
+    data,
+    hideVariantDetails: hideVariantDetailsProp,
 }) => {
     const attributes = data.variant?.variantAttributes;
-    
-    const queryParams = new URLSearchParams();
-    attributes?.slice(1).forEach(attr => {
-        queryParams.set(attr.attribute_id.toString(), attr.term.slug);
+
+    const variantAttributes: CartVariantAttribute[] = (attributes ?? []).map((attr) => ({
+        attribute_id: attr.attribute_id,
+        term_slug: attr.term.slug,
+        // Order API uses the same pivot visibility flag as cart (`is_visible`).
+        is_visible_page: attr.is_visible,
+        used_in_variation: attr.used_in_variation,
+    }));
+    const productUrl = buildCartProductUrl({
+        product_slug: data.product.slug,
+        variantAttributes,
+        product_id: data.product.id,
+        variant_id: data.variant?.id,
+        useParentProductUrl: hideVariantDetailsProp === true,
     });
-    
-    const primaryVariantSlug = attributes?.[0]?.term.slug ?? '';
-    const queryString = queryParams.toString();
-    const productUrl = `/${data.product.slug}/${primaryVariantSlug}${queryString ? `?${queryString}` : ''}`;
+    const hideVariantDetails =
+        hideVariantDetailsProp === true ||
+        shouldHideOrderLineVariantDetails({
+            hide_variant_selector: (data.product as { hide_variant_selector?: boolean }).hide_variant_selector,
+            productId: data.product.id,
+            variantId: data.variant?.id,
+            attributes: variantAttributes,
+        });
     
     return (
         // 10ml?20=up-to-1500-puffs
@@ -57,6 +75,7 @@ const OrderDetailCard: React.FC<OrderDetailCardProps> = ({
                         <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Quantity : {data.quantity}</p>
                         {/* <p className="primary-gradient-100 text-content-3 md:text-content-1 font-bold">Flavour : {data.variant?.slug}</p> */}
                         {
+                            !hideVariantDetails &&
                             attributes?.map((attr) => (
                                 <p key={attr.id} className="primary-gradient-100 text-content-3 md:text-content-1 font-bold capitalize">{attr.attribute.name} : {attr.term.name}</p>
                             ))

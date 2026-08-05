@@ -41,10 +41,7 @@ function logPdpReview(
   payload?: Record<string, unknown>,
 ): void {
   if (!isReviewDebugEnabled()) return;
-  console.log(
-    `[PDP Reviews] productId=${productId}${productSlug ? ` slug=${productSlug}` : ''} — ${message}`,
-    payload ?? '',
-  );
+  void [productId, productSlug, message, payload];
 }
 
 function ratingFromProductStats(

@@ -8,7 +8,7 @@ import { DEFAULT_CURRENCY_SYMBOL, ServerActionResponse, ServerActionStatus } fro
 import QuantitySelector from './QuantitySelector'; 
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { RatingStarEmpty, RatingStarFilled } from './Icons';
-
+import { buildCartProductUrl, stripCartLineVariantSuffix } from '@/lib/utils/cart-product-url';
 type CartCardProps = {
   item?: CartItem;
   reviews?: ServerActionResponse<REVIEW_ORDER_RESPONSE>[];
@@ -42,12 +42,11 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({
   const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
   const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
 
-  const queryParams = new URLSearchParams();
-  item.variantAttributes.slice(1).forEach(attr => {
-    queryParams.set(attr.attribute_id.toString(), attr.term_slug);
-  });
-  const productUrl = `/${item.product_slug}/${item.variantAttributes[0]?.term_slug ?? ''}?${queryParams.toString()}`;
-
+  const productUrl = buildCartProductUrl(item);
+  const displayName = stripCartLineVariantSuffix(
+    item.name,
+    item.useParentProductUrl === true,
+  );
   return (
     <div className="bg-skin-white p-4 rounded-lg shadow-card space-y-2 md:space-y-4.5 w-full">
       <div className="flex items-start gap-3 md:gap-6 w-full">
@@ -68,7 +67,7 @@ const ShoppingCartCard: React.FC<CartCardProps> = ({
         <div className="flex flex-col gap-2.5 md:gap-5 w-full">
           <div className="flex items-start gap-4 w-full justify-between shrink">
             <Link href={productUrl} className="cursor-pointer text-wrap text-content-2 md:text-xl font-semibold !font-oswald text-skin-neutral-400">
-              {item.name}
+              {displayName}
             </Link>
 
             {/* Price Section */}

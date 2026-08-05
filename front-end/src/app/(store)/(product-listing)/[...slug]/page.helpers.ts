@@ -100,11 +100,41 @@ export function buildProductSocialMetadata({
 }
 
 const fetchDynamicPageSlug = cache(async (slug: string): Promise<DynamicPageSlugResponse | null> => {
-  const response = await getDynamicPageSlug(slug);
+  // Bypass fetch cache while debugging type_cards_html / related collections.
+  const response = await getDynamicPageSlug(slug, false);
   if (response.status === ServerActionStatus.ERROR) {
+    console.log("[category-filter] slug-relation API error", { slug, response });
     return null;
   }
-  return response.data;
+
+  const data = response.data as DynamicPageSlugResponse & Record<string, unknown>;
+  const typeCardsHtml =
+    data?.type_cards_html ??
+    data?.card_type_html ??
+    data?.type_card_html ??
+    null;
+
+  console.log("[category-filter] slug-relation API response", {
+    slug,
+    entity_type: data?.entity_type,
+    entity_id: data?.entity_id,
+    name: data?.name,
+    keys: data ? Object.keys(data) : [],
+    type_cards_html: data?.type_cards_html ?? null,
+    card_type_html: data?.card_type_html ?? null,
+    type_card_html: data?.type_card_html ?? null,
+    type_cards_html_length:
+      typeof typeCardsHtml === "string" ? typeCardsHtml.length : 0,
+    type_cards_html_preview:
+      typeof typeCardsHtml === "string" ? typeCardsHtml.slice(0, 300) : typeCardsHtml,
+  });
+
+  // Normalize alternate API field names onto type_cards_html for the storefront.
+  if (!data?.type_cards_html && typeof typeCardsHtml === "string" && typeCardsHtml.trim()) {
+    return { ...data, type_cards_html: typeCardsHtml };
+  }
+
+  return data;
 });
 
 export const fetchDynamicPageSlugWithFallback = cache(
@@ -140,9 +170,38 @@ export const fetchCategory = async (
 ): Promise<CategoryResponseData | null> => {
   const response = await getProductByCategory(slug, params, canCache);
   if (response.status === ServerActionStatus.ERROR) {
+    console.log("[category-filter] category products API error", { slug, params, response });
     return null;
   }
-  return response.data;
+
+  const data = response.data as CategoryResponseData & Record<string, unknown>;
+  const typeCardsHtml =
+    data?.type_cards_html ??
+    data?.card_type_html ??
+    data?.type_card_html ??
+    null;
+
+  console.log("[category-filter] category products API response", {
+    slug,
+    params,
+    id: data?.id,
+    name: data?.name,
+    keys: data ? Object.keys(data) : [],
+    type_cards_html: data?.type_cards_html ?? null,
+    card_type_html: data?.card_type_html ?? null,
+    type_card_html: data?.type_card_html ?? null,
+    type_cards_html_length:
+      typeof typeCardsHtml === "string" ? typeCardsHtml.length : 0,
+    type_cards_html_preview:
+      typeof typeCardsHtml === "string" ? typeCardsHtml.slice(0, 300) : typeCardsHtml,
+    product_count: data?.products?.length ?? 0,
+  });
+
+  if (!data?.type_cards_html && typeof typeCardsHtml === "string" && typeCardsHtml.trim()) {
+    return { ...data, type_cards_html: typeCardsHtml };
+  }
+
+  return data;
 };
 
 export const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Promise<ProductResponse | null> => {

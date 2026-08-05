@@ -1,5 +1,6 @@
 import { BrandConfig } from "./brand.config";
 import { Category } from "./category.config";
+import { DynamicPageSlugResponse } from "./global.config";
 
 export interface ProductFilters {
     brand?: string;
@@ -195,7 +196,7 @@ export interface CategoryResponseData extends Category {
     price_ranges: PriceRange[],
     brand: BRAND[],
     category?: CATEGORY[]
-  
+    buying_guide?: DynamicPageSlugResponse["buying_guide"];
 }
 interface BRAND {
     id: number;
@@ -334,6 +335,13 @@ export interface ProductViewDetails {
     is_coming_soon?: boolean;
     is_new?: boolean;
     review_stats?: ProductReviewStats;
+    /**
+     * When true, FE hides the variant picker and adds the default variant to cart.
+     * Typically paired with non-page-visible variation attributes (is_visible_page === false).
+     */
+    hide_variant_selector?: boolean;
+    default_variant_id?: number | null;
+    default_variant_slug?: string | null;
 };
 
 export interface AppliedFilters {

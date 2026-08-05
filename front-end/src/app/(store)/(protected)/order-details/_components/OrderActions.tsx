@@ -13,6 +13,7 @@ import NoImage from '@/components/NoImage'
 // import { useSession } from 'next-auth/react'
 // import { User } from 'next-auth'
 import SuspenseLoader from '@/components/ui/SuspenseLoader'
+import { shouldHideOrderLineVariantDetails } from '@/lib/utils/cart-product-url'
 const itemClasses = {
     base: "w-full rounded-lg shadow-input border border-skin-neutral-100",
     title: "text-title-2 font-bold",
@@ -21,7 +22,12 @@ const itemClasses = {
     content: "font-bold text-skin-neutral-300 !text-content-1 !py-0 !pb-4",
 };
 
-const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status: string }> = ({ orderId, orderItems, status }) => {
+const OrderActions: React.FC<{
+    orderId: number;
+    orderItems: OrderItems[];
+    status: string;
+    hideVariantFlags?: Record<number, boolean>;
+}> = ({ orderId, orderItems, status, hideVariantFlags }) => {
 
     const [isReviewSubmitted, setIsReviewSubmitted] = useState(false)
     const [isEditReview, setIsEditReview] = useState(false)
@@ -182,7 +188,24 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
                                     defaultExpandedKeys={["0"]}
 
                                 >
-                                    {orderItems.map((item, index) => (
+                                    {orderItems.map((item, index) => {
+                                        const hideVariantDetails =
+                                            hideVariantFlags?.[item.product.id] === true ||
+                                            shouldHideOrderLineVariantDetails({
+                                                hide_variant_selector: (item.product as { hide_variant_selector?: boolean }).hide_variant_selector,
+                                                productId: item.product.id,
+                                                variantId: item.variant?.id,
+                                                attributes: (item.variant?.variantAttributes ?? []).map((attr) => ({
+                                                    attribute_id: attr.attribute_id,
+                                                    term_slug: attr.term.slug,
+                                                    is_visible_page: attr.is_visible,
+                                                    used_in_variation: attr.used_in_variation,
+                                                })),
+                                            });
+                                        const attributeLabels = item.variant.variantAttributes
+                                            .map((attr) => attr.term.name)
+                                            .join(', ');
+                                        return (
                                         <AccordionItem
                                             key={index}
                                             aria-label={item.product.name}
@@ -198,7 +221,9 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
                                                     />
                                                     <div className='flex flex-col gap-1'>
                                                         <p className="text-title-2 font-bold">{item.product.name}</p>
-                                                        <p className="text-content-2 text-skin-neutral-300">Flavour : {item.variant.variantAttributes.map((attr) => attr.term.name).join(', ')}</p>
+                                                        {!hideVariantDetails && attributeLabels && (
+                                                            <p className="text-content-2 text-skin-neutral-300">Flavour : {attributeLabels}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             }
@@ -256,7 +281,8 @@ const OrderActions: React.FC<{ orderId: number, orderItems: OrderItems[], status
                                                 </>
                                             )}
                                         </AccordionItem>
-                                    ))}
+                                        );
+                                    })}
                                 </Accordion>
                             )}
                         </>

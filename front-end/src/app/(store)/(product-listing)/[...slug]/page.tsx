@@ -38,6 +38,7 @@ import {
   resolveBaseUrl,
   resolveProductSocialImageUrl,
 } from "./page.helpers";
+import { fetchProductRelatedGuides } from "../_components/related-guides.utils";
 
 type PageProps = {
   slug: string[];
@@ -171,13 +172,14 @@ const Page = async ({
       });
     }
 
-    // Parallel fetch: Product (required), FAQ, Rating, Description (optional, non-blocking for page shell)
+    // Parallel fetch: Product (required), FAQ, Rating, Description, Related blogs
     const entityId = dynamicPageSlug?.entity_id ?? 0;
     const [productRes, , ratingRes, descriptionRes] = await Promise.allSettled([
       fetchProduct(entityId, payload),
       getFaqs("product", entityId),
       getReviewOrderByProductId(entityId, 1, 1),
       fetchProductDescription(entityId, payload),
+      fetchProductRelatedGuides(entityId),
     ]);
 
     const data = productRes.status === "fulfilled" ? productRes.value : null;
@@ -188,12 +190,20 @@ const Page = async ({
       const newSlug = data?.filtered_attribute_terms.find(term => term.attribute.id === lastPayload.attribute_id)?.terms.find(t => t.id === lastPayload.term_id)?.slug;
       if (newSlug) {
         redirect(`/${data.product.slug}/${newSlug}`, RedirectType.replace);
+      } else if (data.product?.slug) {
+        // Dummy / unresolved variant slug → parent PDP instead of 404
+        redirect(`/${data.product.slug}`, RedirectType.replace);
       } else {
         return <PageNotFound />;
       }
     }
 
-    if (!variant || !data || !data.variants.length || !data.product || !data.product.category) {
+    if (!variant) {
+      // Product exists but secondary slug is not a resolvable variation term (e.g. dummy attr URL).
+      redirect(`/${primarySlug}`, RedirectType.replace);
+    }
+
+    if (!data || !data.variants.length || !data.product || !data.product.category) {
       return <PageNotFound />;
     }
 
@@ -366,7 +376,12 @@ const Page = async ({
         })) : [];
         return (
           <>
-            <CategoryProducts data={category} reviews={reviews} dynamicPageSlug={dynamicPageSlug} />
+            <CategoryProducts
+              data={category}
+              reviews={reviews}
+              dynamicPageSlug={dynamicPageSlug}
+              pageSlug={primarySlug ?? undefined}
+            />
           </>
         );
       }
@@ -379,6 +394,7 @@ const Page = async ({
         getFaqs("product", entityId),
         getReviewOrderByProductId(entityId, 1, 1),
         fetchProductDescription(entityId, []),
+        fetchProductRelatedGuides(entityId),
       ]);
 
       const data = productRes.status === "fulfilled" ? productRes.value : null;

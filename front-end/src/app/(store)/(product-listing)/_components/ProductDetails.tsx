@@ -178,6 +178,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     // When sale price is zero, fall back to regular price for display only
     const effectivePrice = price > 0 ? price : (regularPrice > 0 ? regularPrice : 0);
     const isDiscontinued = Boolean(product?.is_discontinued || cartEntity?.is_discontinued);
+    const isComingSoon = Boolean(product?.is_coming_soon);
     
     // Create a set of attribute IDs that are used in variation for filtering
     const variationAttributeIds = useMemo(() => {
@@ -269,7 +270,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     };
 
     const handleAddToCart = async () => {
-        if (!canAddToCart || !cartEntity || isDiscontinued) {
+        if (!canAddToCart || !cartEntity || isDiscontinued || isComingSoon) {
             // This is a safeguard; the button should be disabled if this is the case.
             return;
         }
@@ -577,6 +578,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             This product has been discontinued
                         </p>
                     )}
+                    {!isDiscontinued && isComingSoon && (
+                        <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
+                            This product is coming soon
+                        </p>
+                    )}
                 </div>
                 {/* Title section mobile ends */}
 
@@ -602,6 +608,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                         {isDiscontinued ? (
                             <div className="discontinued-product">
                                 <span>Discontinued</span>
+                            </div>
+                        ) : isComingSoon ? (
+                            <div className="coming-soon-product">
+                                <span>Coming Soon</span>
                             </div>
                         ) : (
                             product?.created_at && isLessThanOneMonth(product?.created_at) && (
@@ -671,6 +681,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                         {isDiscontinued && (
                             <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
                                 This product has been discontinued
+                            </p>
+                        )}
+                        {!isDiscontinued && isComingSoon && (
+                            <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
+                                This product is coming soon
                             </p>
                         )}
                     </div>
@@ -789,9 +804,9 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             radius="md"
                             color="primary"
                             isLoading={isAddingToCart}
-                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || isDiscontinued || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || isDiscontinued || isComingSoon || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
-                            disabled={isAddingToCart || !canAddToCart || isDiscontinued || quantity <= 0 || quantity > stock}
+                            disabled={isAddingToCart || !canAddToCart || isDiscontinued || isComingSoon || quantity <= 0 || quantity > stock}
                         >
                             Add to Cart
                         </Button>

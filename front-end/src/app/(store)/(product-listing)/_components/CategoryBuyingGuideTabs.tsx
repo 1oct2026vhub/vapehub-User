@@ -49,9 +49,9 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
       </div>
 
       <div className="space-y-2">
-        <h3 className="font-oswald text-title-1 font-semibold text-skin-neutral-500 md:text-h5">
-          {activeTab.heading}
-        </h3>
+        <div className="product-content [&>h3]:!mt-0 [&>h3]:!mb-0">
+          <h3 className="text-skin-neutral-500">{activeTab.heading}</h3>
+        </div>
         <div
           className="category-buying-guide-tab-content product-content rich-text text-content-1 font-normal leading-relaxed text-skin-neutral-500"
           dangerouslySetInnerHTML={{ __html: activeTab.contentHtml }}

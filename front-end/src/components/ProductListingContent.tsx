@@ -8,6 +8,7 @@ import NoImage from './NoImage';
 import DesignTypeButtons, {
     RelatedQuickLinksEntity,
 } from '@/app/(store)/(product-listing)/_components/DesignTypeButtons';
+import { ArrowRightIcon, BuyingGuideBookIcon } from './Icons';
 
 type CategoryProps = {
     data: Category | BrandConfig;
@@ -40,25 +41,47 @@ const ProductListingContent: React.FC<CategoryProps> = ({
         .filter(banner => banner.image && banner.image.trim() !== '')
         .sort((a, b) => a.order - b.order)
         .slice(0, 3);
+
+    const listingName = (data.name || dynamicPageSlug?.name || '').trim();
+    const listingNameLower = listingName.toLowerCase();
+    const descriptionHtml = dynamicPageSlug?.description || data?.description || '';
+    const hasDescription = Boolean(descriptionHtml.trim());
     
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
-                <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{data.name || dynamicPageSlug?.name}</h1>
+                <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{listingName || data.name || dynamicPageSlug?.name}</h1>
                 {aboutHeading && <h2 className='sr-only'>{aboutHeading}</h2>}
-                {(dynamicPageSlug?.description || data?.description) && (
-                    <div 
-                        className="product-content rich-text text-content-1 md:text-content-1 font-normal text-skin-neutral-500 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: dynamicPageSlug?.description || data?.description || "" }}
-                    />
-                )}
-                {showBuyingGuideFaqsLink && (
-                    <Link
-                        href={buyingGuideFaqsHref}
-                        className="w-fit font-oswald text-title-1 font-semibold text-skin-primary-500 underline underline-offset-4 hover:opacity-80 transition-opacity"
-                    >
-                        Buying Guide &amp; FAQs ↓
-                    </Link>
+                {(hasDescription || showBuyingGuideFaqsLink) && (
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6 xl:gap-8">
+                        {hasDescription ? (
+                            <div
+                                className="product-content rich-text min-w-0 flex-1 text-content-1 md:text-content-1 font-normal text-skin-neutral-500 leading-relaxed"
+                                dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                            />
+                        ) : null}
+                        {showBuyingGuideFaqsLink ? (
+                            <Link
+                                href={buyingGuideFaqsHref}
+                                className="group flex w-full shrink-0 items-center gap-3 rounded-lg border border-skin-primary-300 bg-[#f0f9f9] px-3.5 py-3 transition-opacity hover:opacity-90 sm:gap-3.5 sm:px-4 sm:py-3.5 lg:w-[min(100%,22rem)]"
+                            >
+                                <BuyingGuideBookIcon className="h-6 w-6 shrink-0 text-skin-primary-500" />
+                                <span className="min-w-0 flex-1 space-y-0.5">
+                                    <span className="block text-content-3 font-normal text-skin-neutral-300 sm:text-content-2">
+                                        {listingNameLower
+                                            ? `Not sure which ${listingNameLower} to choose?`
+                                            : 'Not sure which to choose?'}
+                                    </span>
+                                    <span className="block text-content-2 font-semibold text-skin-primary-500 sm:text-content-1">
+                                        {listingNameLower
+                                            ? `Read our ${listingNameLower} buying guide`
+                                            : 'Read our buying guide'}
+                                    </span>
+                                </span>
+                                <ArrowRightIcon className="h-4 w-4 shrink-0 text-skin-primary-500 [&_path]:stroke-current" />
+                            </Link>
+                        ) : null}
+                    </div>
                 )}
                 {showCategoryQuickLinks && categoryQuickLinksSlug ? (
                     <DesignTypeButtons

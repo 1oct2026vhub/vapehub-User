@@ -21,7 +21,7 @@ const CategoryBuyingGuideAccordion = ({
   imageAlt,
   children,
 }: CategoryBuyingGuideAccordionProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const contentId = useId();
 
   useEffect(() => {

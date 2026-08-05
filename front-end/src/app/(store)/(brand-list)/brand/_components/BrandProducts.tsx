@@ -33,11 +33,13 @@ const BrandProducts = async ({
     // Leaf slug for buying-guide API lookup
     const buyingGuideSlug = brandSlug.split("/").filter(Boolean).pop() || "";
 
-    const { guide: buyingGuide, relatedGuides } = await fetchBrandBuyingGuideSection(
+    const { guide: buyingGuide, relatedGuides, isEnabled } = await fetchBrandBuyingGuideSection(
         buyingGuideSlug,
         brandName,
     );
     const showBuyingGuideSection = Boolean(buyingGuide);
+    const typeCardsHtml = dynamicPageSlug?.type_cards_html || data?.type_cards_html || null;
+    const showRelatedCollections = isEnabled && Boolean(typeCardsHtml?.trim());
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
@@ -74,10 +76,9 @@ const BrandProducts = async ({
                                     hideHeader
                                     {...buyingGuide}
                                 />
-                                <CategoryTypeCards
-                                    html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
-                                    embedded
-                                />
+                                {showRelatedCollections ? (
+                                    <CategoryTypeCards html={typeCardsHtml} embedded />
+                                ) : null}
                                 {relatedGuides.length > 0 ? (
                                     <RelatedGuides
                                         key={`related-guides-brand-${buyingGuideSlug || data.id}`}
@@ -93,9 +94,9 @@ const BrandProducts = async ({
                         </div>
                     ) : (
                         <>
-                            <CategoryTypeCards
-                                html={dynamicPageSlug?.type_cards_html || data?.type_cards_html}
-                            />
+                            {showRelatedCollections ? (
+                                <CategoryTypeCards html={typeCardsHtml} />
+                            ) : null}
                             {brandFaqs.length > 0 ? (
                                 <section className="product-listing-container pt-7.5 md:pt-9">
                                     <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} />

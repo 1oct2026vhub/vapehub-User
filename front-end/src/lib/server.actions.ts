@@ -391,6 +391,16 @@ export const getDynamicPageSlug = async (slug: string, canCache: boolean = true)
     method: 'GET',
     canCache,
   });
+  const data = response.status === ServerActionStatus.SUCCESS ? response.data : null;
+  console.log("[slug-relation] API response", {
+    slug,
+    status: response.status,
+    entity_type: data?.entity_type ?? null,
+    entity_id: data?.entity_id ?? null,
+    name: data?.name ?? null,
+    data,
+    error: response.status === ServerActionStatus.ERROR ? response : undefined,
+  });
   return response;
 };
 
@@ -962,12 +972,22 @@ export const getCategoryRelatedCategories = async (
     slug: string,
     canCache: boolean = true,
 ): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
-    return await handleRequest<RelatedCategoriesApiData, unknown>({
+    const response = await handleRequest<RelatedCategoriesApiData, unknown>({
         endpoint: API_ROUTES.GET_CATEGORY_RELATED_CATEGORIES(slug),
         method: 'GET',
         canCache,
         cacheStrategy: canCache ? { revalidate: 300 } : undefined,
     });
+    const data = response.status === ServerActionStatus.SUCCESS ? response.data : null;
+    console.log("[related-links] category API response", {
+        slug,
+        status: response.status,
+        related_links: data?.related_links ?? null,
+        related_links_count: data?.related_links?.length ?? 0,
+        data,
+        error: response.status === ServerActionStatus.ERROR ? response : undefined,
+    });
+    return response;
 };
 
 /** Public related brands by slug — no auth. Empty list = hide the row. */
@@ -975,12 +995,22 @@ export const getBrandRelatedBrands = async (
     slug: string,
     canCache: boolean = true,
 ): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
-    return await handleRequest<RelatedCategoriesApiData, unknown>({
+    const response = await handleRequest<RelatedCategoriesApiData, unknown>({
         endpoint: API_ROUTES.GET_BRAND_RELATED_BRANDS(slug),
         method: 'GET',
         canCache,
         cacheStrategy: canCache ? { revalidate: 300 } : undefined,
     });
+    const data = response.status === ServerActionStatus.SUCCESS ? response.data : null;
+    console.log("[related-links] brand API response", {
+        slug,
+        status: response.status,
+        related_links: data?.related_links ?? null,
+        related_links_count: data?.related_links?.length ?? 0,
+        data,
+        error: response.status === ServerActionStatus.ERROR ? response : undefined,
+    });
+    return response;
 };
 
 /** Public brand buying guide by slug — no auth. Null buyingGuide = hide section. */

@@ -79,7 +79,7 @@ const CategoryProducts = async ({
     enhancedCategoryData.slug?.split("/").filter(Boolean).pop() ||
     "";
 
-  const { guide: buyingGuide, relatedGuides } = await fetchCategoryBuyingGuideSection(
+  const { guide: buyingGuide, relatedGuides, isEnabled } = await fetchCategoryBuyingGuideSection(
     buyingGuideSlug,
     enhancedCategoryData.name,
   );
@@ -95,6 +95,7 @@ const CategoryProducts = async ({
     null;
 
   const showBuyingGuideSection = Boolean(buyingGuide);
+  const showRelatedCollections = isEnabled && Boolean(typeCardsHtml?.trim());
     
   return (
     <div className='w-full max-w-[1520px] mx-auto'>
@@ -122,7 +123,9 @@ const CategoryProducts = async ({
                 hideHeader
                 {...buyingGuide}
               />
-              <CategoryTypeCards html={typeCardsHtml} embedded />
+              {showRelatedCollections ? (
+                <CategoryTypeCards html={typeCardsHtml} embedded />
+              ) : null}
               {relatedGuides.length > 0 ? (
                 <RelatedGuides
                   key={`related-guides-${buyingGuideSlug || categoryId}`}
@@ -138,7 +141,9 @@ const CategoryProducts = async ({
           </div>
         ) : (
           <>
-            <CategoryTypeCards html={typeCardsHtml} />
+            {showRelatedCollections ? (
+              <CategoryTypeCards html={typeCardsHtml} />
+            ) : null}
             {categoryId ? (
               <section className="product-listing-container flex-col scroll-mt-24 pt-7.5 md:pt-9">
                 <FAQSection type="category" id={categoryId} />

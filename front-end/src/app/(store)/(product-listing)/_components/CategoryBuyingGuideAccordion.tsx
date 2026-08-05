@@ -58,7 +58,9 @@ const CategoryBuyingGuideAccordion = ({
         aria-expanded={isOpen}
         aria-controls={contentId}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full items-center gap-3.5 p-4 text-left md:gap-5 md:p-5 xl:p-6"
+        className={`flex w-full items-center gap-3.5 px-4 pt-4 text-left md:gap-5 md:px-5 md:pt-5 xl:px-6 xl:pt-6 ${
+          isOpen ? "pb-0" : "pb-4 md:pb-5 xl:pb-6"
+        }`}
       >
         {imageUrl ? (
           <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg md:h-16 md:w-16">
@@ -71,7 +73,7 @@ const CategoryBuyingGuideAccordion = ({
             />
           </div>
         ) : null}
-        <div className="min-w-0 flex-1 space-y-1.5">
+        <div className="min-w-0 flex-1 space-y-1">
           <p className="text-content-2 font-semibold text-skin-neutral-300">
             {ACCORDION_LABEL}
           </p>
@@ -88,7 +90,7 @@ const CategoryBuyingGuideAccordion = ({
       {isOpen ? (
         <div
           id={contentId}
-          className="px-4 pb-5 pt-1 md:px-5 md:pb-7 md:pt-2 xl:px-6 xl:pb-10 xl:pt-2"
+          className="px-4 pb-5 pt-0 -mt-0.5 md:px-5 md:pb-7 xl:px-6 xl:pb-10"
         >
           {children}
         </div>

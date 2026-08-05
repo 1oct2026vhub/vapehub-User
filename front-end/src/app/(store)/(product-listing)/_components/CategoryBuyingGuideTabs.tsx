@@ -20,7 +20,7 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
   }
 
   return (
-    <div>
+    <div className="space-y-4 md:space-y-4">
       <div className="relative mx-auto w-fit max-w-full overflow-hidden rounded-lg border border-skin-neutral-100 bg-skin-white">
         <div
           aria-hidden

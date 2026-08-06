@@ -153,7 +153,8 @@ const BrandPage: NextPage<Props> = async ({
 export default BrandPage;
  
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
-  const response = await getDynamicPageSlug(slug);
+  // Bypass Data Cache so type_cards_html / description from admin show promptly.
+  const response = await getDynamicPageSlug(slug, false);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -169,7 +170,7 @@ const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
 };
 
 const fetchBrandFaqs = async (brandId: number): Promise<FaqResponse[]> => {
-  const response = await getFaqs("brand", brandId);
+  const response = await getFaqs("brand", brandId, false);
   if (response.status === ServerActionStatus.ERROR) {
     return [];
   }

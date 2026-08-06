@@ -944,55 +944,59 @@ export const getCategoryRelatedGuides = async (
     });
 };
 
-/** Public category buying guide by slug — no auth. Null buyingGuide = hide section. */
+/** Public category buying guide by slug — no auth. Null buyingGuide = hide section.
+ * CMS content: default no-store so admin updates show without a 5-minute Data Cache lag.
+ */
 export const getCategoryBuyingGuide = async (
     slug: string,
-    canCache: boolean = true,
+    canCache: boolean = false,
 ): Promise<ServerActionResponse<BuyingGuideApiData>> => {
     return await handleRequest<BuyingGuideApiData, unknown>({
         endpoint: API_ROUTES.GET_CATEGORY_BUYING_GUIDE(slug),
         method: 'GET',
         canCache,
-        cacheStrategy: canCache ? { revalidate: 300 } : undefined,
     });
 };
 
-/** Public related categories by slug — no auth. Empty list = hide the row. */
+/** Public related categories by slug — no auth. Empty list = hide the row.
+ * CMS content: default no-store (same freshness as buying guide).
+ */
 export const getCategoryRelatedCategories = async (
     slug: string,
-    canCache: boolean = true,
+    canCache: boolean = false,
 ): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
     return await handleRequest<RelatedCategoriesApiData, unknown>({
         endpoint: API_ROUTES.GET_CATEGORY_RELATED_CATEGORIES(slug),
         method: 'GET',
         canCache,
-        cacheStrategy: canCache ? { revalidate: 300 } : undefined,
     });
 };
 
-/** Public related brands by slug — no auth. Empty list = hide the row. */
+/** Public related brands by slug — no auth. Empty list = hide the row.
+ * CMS content: default no-store (same freshness as buying guide).
+ */
 export const getBrandRelatedBrands = async (
     slug: string,
-    canCache: boolean = true,
+    canCache: boolean = false,
 ): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
     return await handleRequest<RelatedCategoriesApiData, unknown>({
         endpoint: API_ROUTES.GET_BRAND_RELATED_BRANDS(slug),
         method: 'GET',
         canCache,
-        cacheStrategy: canCache ? { revalidate: 300 } : undefined,
     });
 };
 
-/** Public brand buying guide by slug — no auth. Null buyingGuide = hide section. */
+/** Public brand buying guide by slug — no auth. Null buyingGuide = hide section.
+ * CMS content: default no-store so admin updates show without a 5-minute Data Cache lag.
+ */
 export const getBrandBuyingGuide = async (
     slug: string,
-    canCache: boolean = true,
+    canCache: boolean = false,
 ): Promise<ServerActionResponse<BuyingGuideApiData>> => {
     return await handleRequest<BuyingGuideApiData, unknown>({
         endpoint: API_ROUTES.GET_BRAND_BUYING_GUIDE(slug),
         method: 'GET',
         canCache,
-        cacheStrategy: canCache ? { revalidate: 300 } : undefined,
     });
 };
 

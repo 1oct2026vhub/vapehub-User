@@ -10,6 +10,7 @@ import WelcomeSection from './_components/WelcomeSection';
 import ShopByCategory from './_components/ShopByCategory';
 import HottestCollections from './_components/HottestCollections';
 import NewProducts from './_components/NewProducts';
+import ComingSoonProducts from './_components/ComingSoonProducts';
 import ShopByDeals from './_components/ShopByDeals';
 import PopularCategories from './_components/PopularCategories';
 import PromotionalBanners from './_components/PromotionalBanners';
@@ -36,6 +37,12 @@ const Dashboard: NextPage = async () => {
 
       <Suspense fallback={<SuspenseLoader />}>
         <WelcomeSection />
+      </Suspense>
+
+      <Suspense fallback={<SuspenseLoader />}>
+        <ComingSoonProducts
+          viewAllHref={ROUTES.COMING_SOON}
+        />
       </Suspense>
 
       <Suspense fallback={<SuspenseLoader />}>

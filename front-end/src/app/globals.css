@@ -928,6 +928,27 @@ input[type="checkbox"] + span {
   color: #000000;
 }
 
+/*
+ * Uniform buying-guide rhythm:
+ * - consistent paragraph spacing inside rich text
+ * - no stacked end margins that inflate gaps before the next section
+ */
+.product-listing-container .category-buying-guide-content.product-content.rich-text > *,
+.product-listing-container .category-buying-guide-tab-content.product-content.rich-text > * {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.product-listing-container .category-buying-guide-content.product-content.rich-text > :last-child,
+.product-listing-container .category-buying-guide-tab-content.product-content.rich-text > :last-child {
+  margin-bottom: 0;
+}
+
+.product-listing-container .category-buying-guide-content.product-content.rich-text > :empty,
+.product-listing-container .category-buying-guide-tab-content.product-content.rich-text > :empty {
+  display: none;
+}
+
 .category-buying-guide-tabs-scroll {
   display: flex;
   align-items: center;

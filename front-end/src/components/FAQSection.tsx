@@ -62,13 +62,11 @@ const FAQSection: React.FC<FAQProps> = ({
     }
 
     return (
-        <div className="w-full">
+        <div className={embedded ? "w-full pt-4 md:pt-5" : "w-full"}>
             {embedded ? (
-                <div className="flex w-full items-center justify-center py-6 md:py-8" aria-hidden>
-                    <div className="h-px w-full bg-skin-neutral-200" />
-                </div>
+                <div className="mb-4 h-px w-full bg-skin-neutral-200 md:mb-5" aria-hidden />
             ) : null}
-            <div className="w-full space-y-3 md:space-y-5 xl:space-y-7.5">
+            <div className="w-full flex flex-col gap-4 md:gap-5">
                 {/* FAQ Heading & View All */}
                 <div className="flex items-center justify-between w-full">
                     <SectionHeading title={title} />

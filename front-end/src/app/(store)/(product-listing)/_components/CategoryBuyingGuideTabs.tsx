@@ -20,7 +20,7 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
   }
 
   return (
-    <div className="space-y-4 md:space-y-4">
+    <div className="flex w-full flex-col gap-4 md:gap-5">
       <div className="relative mx-auto w-fit max-w-full overflow-hidden rounded-lg border border-skin-neutral-100 bg-skin-white">
         <div
           aria-hidden
@@ -48,7 +48,7 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="flex flex-col gap-4 md:gap-5">
         <div className="product-content [&>h3]:!mt-0 [&>h3]:!mb-0">
           <h3 className="text-skin-neutral-500">{activeTab.heading}</h3>
         </div>

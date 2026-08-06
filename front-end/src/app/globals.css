@@ -381,11 +381,17 @@ input[type='search'] {
 }
 
 .new-product::after {
-  @apply content-new-badge relative block -right-[6.5px] -bottom-[12px] md:-right-[10.5px] md:-bottom-[14px];
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -7px;
+  width: 6px;
+  height: 7px;
+  background: url('/images/new-before.svg') no-repeat center / 100% 100%;
 }
 
 .section-slider .new-product::after {
-  @apply -bottom-[12px] md:-bottom-[13.5px];
+  bottom: -7px;
 }
 
 .discontinued-product {
@@ -408,7 +414,7 @@ input[type='search'] {
 }
 
 .coming-soon-product {
-  @apply w-24 h-5 md:w-28 md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-center items-center pl-2;
+  @apply h-4 w-fit md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-end items-center p-1 pl-2 md:px-2;
   flex-shrink: 0;
   border-radius: 10px 10px 0px 10px;
   background: #083122;
@@ -419,11 +425,11 @@ input[type='search'] {
 }
 
 .coming-soon-product::after {
-  @apply content-coming-soon-after relative block -right-[11px] -bottom-[12px] md:-right-[12.5px] md:-bottom-[13px];
+  @apply content-coming-soon-after relative block -right-1 -bottom-[10px] md:-right-2 md:-bottom-[13.5px];
 }
 
 .section-slider .coming-soon-product::after {
-  @apply -bottom-[12px] md:-bottom-[13.5px];
+  @apply -bottom-[10px] md:-bottom-[13.5px];
 }
 
 .product-listing-container {

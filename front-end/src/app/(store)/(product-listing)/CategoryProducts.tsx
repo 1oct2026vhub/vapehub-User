@@ -1,5 +1,6 @@
 import ProductList from '@/app/(store)/(product-listing)/_components/ProductList';
 import React from 'react';
+import { unstable_noStore as noStore } from 'next/cache';
 import ProductListingContent from "@/components/ProductListingContent";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import { CategoryResponseData } from '@/lib/config/product.config';
@@ -38,6 +39,10 @@ const CategoryProducts = async ({
   dynamicPageSlug,
   pageSlug,
 }: CategoryProps): AsyncReactElement => {
+  // Opt category CMS sections (buying guide, type cards, FAQs) out of Full Route Cache
+  // without changing product/deal handlers on the shared [...slug] route.
+  noStore();
+
   const formatSlugToTitle = (slug?: string | null) => {
     if (!slug) return "";
     return slug

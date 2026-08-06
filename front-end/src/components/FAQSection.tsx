@@ -46,7 +46,10 @@ const FAQSection: React.FC<FAQProps> = ({
           return;
         }
         const fetchFaqs = async () => {
-          const faqs = await getFaqs(type, id);
+          // Category/brand FAQs are CMS-edited; skip Data Cache so admin updates show promptly.
+          // Product/variant/common/blog keep the default cached fetch.
+          const bypassCache = type === "category" || type === "brand";
+          const faqs = await getFaqs(type, id, !bypassCache);
           if (faqs.status === ServerActionStatus.SUCCESS) {
             setFaqs(faqs.data);
           } else {

@@ -2102,8 +2102,8 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 .type-cards-mobile-carousel__viewport {
   position: relative;
   width: 100%;
-  /* Side gutters so arrows sit beside the card, not over text */
-  padding-inline: 2.75rem;
+  /* No side gutters — arrows overlay card edges like Trustpilot */
+  padding-inline: 0;
 }
 
 .type-cards-mobile-carousel .slick-list {
@@ -2203,7 +2203,7 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   margin: 0 !important;
 }
 
-/* Custom left / right arrows — in side gutters, clear of card text */
+/* Custom left / right arrows — overlap card edges like Trustpilot */
 .type-cards-mobile-arrow {
   position: absolute;
   top: 50%;
@@ -2211,12 +2211,11 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 9999px;
   border: 2px solid var(--neutral-200);
   background: var(--neutral-50, #fff);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   transform: translateY(-50%);
   cursor: pointer;
 }
@@ -2228,11 +2227,11 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 }
 
 .type-cards-mobile-arrow--prev {
-  left: 0.25rem;
+  left: -10px;
 }
 
 .type-cards-mobile-arrow--next {
-  right: 0.25rem;
+  right: -10px;
 }
 
 /* Home-style pagination dots below the cards */

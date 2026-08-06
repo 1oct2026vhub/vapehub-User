@@ -35,13 +35,11 @@ const RelatedGuides: React.FC<RelatedGuidesProps> = async ({
   }
 
   return (
-    <section className="w-full">
+    <section className={embedded ? "w-full pt-4 md:pt-5" : "w-full"}>
       {embedded ? (
-        <div className="flex w-full items-center justify-center py-6 md:py-8" aria-hidden>
-          <div className="h-px w-full bg-skin-neutral-200" />
-        </div>
+        <div className="mb-4 h-px w-full bg-skin-neutral-200 md:mb-5" aria-hidden />
       ) : null}
-      <div className="space-y-4.5 md:space-y-7.5">
+      <div className="flex flex-col gap-4 md:gap-5">
         <div className="flex items-center justify-between gap-4">
           <SectionHeading title={title} />
           <ViewAllLink href={viewAllHref} />

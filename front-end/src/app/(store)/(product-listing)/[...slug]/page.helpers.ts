@@ -153,7 +153,6 @@ export const fetchCategory = async (
 ): Promise<CategoryResponseData | null> => {
   const response = await getProductByCategory(slug, params, canCache);
   if (response.status === ServerActionStatus.ERROR) {
-    console.log("[category-filter] category products API error", { slug, params, response });
     return null;
   }
 
@@ -163,22 +162,6 @@ export const fetchCategory = async (
     data?.card_type_html ??
     data?.type_card_html ??
     null;
-
-  console.log("[category-filter] category products API response", {
-    slug,
-    params,
-    id: data?.id,
-    name: data?.name,
-    keys: data ? Object.keys(data) : [],
-    type_cards_html: data?.type_cards_html ?? null,
-    card_type_html: data?.card_type_html ?? null,
-    type_card_html: data?.type_card_html ?? null,
-    type_cards_html_length:
-      typeof typeCardsHtml === "string" ? typeCardsHtml.length : 0,
-    type_cards_html_preview:
-      typeof typeCardsHtml === "string" ? typeCardsHtml.slice(0, 300) : typeCardsHtml,
-    product_count: data?.products?.length ?? 0,
-  });
 
   if (!data?.type_cards_html && typeof typeCardsHtml === "string" && typeCardsHtml.trim()) {
     return { ...data, type_cards_html: typeCardsHtml };

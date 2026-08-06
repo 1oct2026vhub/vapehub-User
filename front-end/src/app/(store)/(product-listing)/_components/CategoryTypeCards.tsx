@@ -21,18 +21,18 @@ const CategoryTypeCards = ({ html, embedded = false }: CategoryTypeCardsProps) =
 
   const content = (
     <>
-      {embedded ? (
-        <div className="flex w-full items-center justify-center py-3 md:py-4" aria-hidden>
-          <div className="h-px w-full bg-skin-neutral-200" />
-        </div>
-      ) : null}
       <CategoryTypeCardsDesktop html={normalized} />
       <CategoryTypeCardsMobile html={normalized} />
     </>
   );
 
   if (embedded) {
-    return <section className="w-full">{content}</section>;
+    return (
+      <section className="w-full pt-4 md:pt-5">
+        <div className="mb-4 h-px w-full bg-skin-neutral-200 md:mb-5" aria-hidden />
+        {content}
+      </section>
+    );
   }
 
   return <section className="product-listing-container flex-col">{content}</section>;

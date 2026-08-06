@@ -63,22 +63,22 @@ const ProductListingContent: React.FC<CategoryProps> = ({
                         {showBuyingGuideFaqsLink ? (
                             <Link
                                 href={buyingGuideFaqsHref}
-                                className="group flex w-full shrink-0 items-center gap-3 rounded-lg border border-skin-primary-300 bg-[#f0f9f9] px-3.5 py-3 transition-opacity hover:opacity-90 sm:gap-3.5 sm:px-4 sm:py-3.5 lg:w-[min(100%,22rem)]"
+                                className="group flex w-full shrink-0 items-center gap-2.5 rounded-md border border-[#035335] bg-[#f0f9f9] px-3 py-2 transition-opacity hover:opacity-90 lg:w-[min(100%,22rem)]"
                             >
-                                <BuyingGuideBookIcon className="h-6 w-6 shrink-0 text-skin-primary-500" />
-                                <span className="min-w-0 flex-1 space-y-0.5">
-                                    <span className="block text-content-3 font-normal text-skin-neutral-300 sm:text-content-2">
+                                <BuyingGuideBookIcon className="h-[22px] w-[22px] shrink-0 text-[#035335]" />
+                                <span className="min-w-0 flex-1">
+                                    <span className="block text-[12px] font-normal leading-[1.2] text-skin-neutral-300">
                                         {listingNameLower
                                             ? `Not sure which ${listingNameLower} to choose?`
                                             : 'Not sure which to choose?'}
                                     </span>
-                                    <span className="block text-content-2 font-semibold text-skin-primary-500 sm:text-content-1">
+                                    <span className="primary-gradient-600 mt-0.5 block text-[13px] font-semibold leading-[1.25]">
                                         {listingNameLower
                                             ? `Read our ${listingNameLower} buying guide`
                                             : 'Read our buying guide'}
                                     </span>
                                 </span>
-                                <ArrowRightIcon className="h-4 w-4 shrink-0 text-skin-primary-500 [&_path]:stroke-current" />
+                                <ArrowRightIcon className="h-3.5 w-3.5 shrink-0 text-[#035335] [&_path]:stroke-current" />
                             </Link>
                         ) : null}
                     </div>

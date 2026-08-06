@@ -1570,8 +1570,8 @@ export const BuyingGuideBookIcon = (
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
+      width="22"
+      height="22"
       fill="none"
       viewBox="0 0 24 24"
       aria-hidden
@@ -1581,15 +1581,15 @@ export const BuyingGuideBookIcon = (
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1.5"
-        d="M4.5 5.25A2.25 2.25 0 0 1 6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75a2.25 2.25 0 0 1-2.25-2.25V5.25Z"
+        strokeWidth="1.9"
+        d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
       />
       <path
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1.5"
-        d="M8.25 7.5h7.5M8.25 11.25h7.5M8.25 15h4.5"
+        strokeWidth="1.9"
+        d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
       />
     </svg>
   );

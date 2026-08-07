@@ -13,7 +13,10 @@ import CategoryBuyingGuideAccordion from './_components/CategoryBuyingGuideAccor
 import CategoryTypeCards from './_components/CategoryTypeCards';
 import CategoryAdditionalTextBox from './_components/CategoryAdditionalTextBox';
 import RelatedGuides from './_components/RelatedGuides';
-import { fetchCategoryBuyingGuideSection } from './_components/buying-guide.utils';
+import {
+  fetchCategoryBuyingGuideSection,
+  resolveBuyingGuideCta,
+} from './_components/buying-guide.utils';
 
 // Extended type for category data that might have additional ID fields
 type ExtendedCategoryData = CategoryResponseData & {
@@ -85,10 +88,15 @@ const CategoryProducts = async ({
     enhancedCategoryData.slug?.split("/").filter(Boolean).pop() ||
     "";
 
-  const { guide: buyingGuide, relatedGuides, isEnabled } = await fetchCategoryBuyingGuideSection(
+  const buyingGuideSection = await fetchCategoryBuyingGuideSection(
     buyingGuideSlug,
     enhancedCategoryData.name,
   );
+  const { guide: buyingGuide, relatedGuides, isEnabled } = buyingGuideSection;
+  const buyingGuideCta = resolveBuyingGuideCta({
+    slugRelationCta: dynamicPageSlug?.buyingGuide,
+    section: buyingGuideSection,
+  });
 
   // Related collections / type cards — accept alternate API field names.
   const typeCardsHtml =
@@ -107,7 +115,7 @@ const CategoryProducts = async ({
 
   const showBuyingGuideSection = Boolean(buyingGuide);
   const showRelatedCollections = isEnabled && Boolean(typeCardsHtml?.trim());
-  const showAdditionalTextBox = Boolean(additionalTextBoxHtml?.trim());
+  const showAdditionalTextBox = isEnabled && Boolean(additionalTextBoxHtml?.trim());
     
   return (
     <div className='w-full max-w-[1520px] mx-auto'>
@@ -116,7 +124,9 @@ const CategoryProducts = async ({
         <ProductListingContent
           data={enhancedCategoryData}
           dynamicPageSlug={dynamicPageSlug}
-          showBuyingGuideFaqsLink={showBuyingGuideSection}
+          showBuyingGuideCta={buyingGuideCta.show}
+          buyingGuideCtaPrompt={buyingGuideCta.prompt}
+          buyingGuideCtaLabel={buyingGuideCta.label}
           showCategoryQuickLinks
           categoryQuickLinksSlug={buyingGuideSlug}
         />

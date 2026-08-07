@@ -14,7 +14,10 @@ import CategoryBuyingGuideAccordion from '@/app/(store)/(product-listing)/_compo
 import CategoryTypeCards from '@/app/(store)/(product-listing)/_components/CategoryTypeCards';
 import CategoryAdditionalTextBox from '@/app/(store)/(product-listing)/_components/CategoryAdditionalTextBox';
 import RelatedGuides from '@/app/(store)/(product-listing)/_components/RelatedGuides';
-import { fetchBrandBuyingGuideSection } from '@/app/(store)/(product-listing)/_components/buying-guide.utils';
+import {
+    fetchBrandBuyingGuideSection,
+    resolveBuyingGuideCta,
+} from '@/app/(store)/(product-listing)/_components/buying-guide.utils';
 
 type BrandProps = {
     data: BrandByProductResponse;
@@ -38,16 +41,21 @@ const BrandProducts = async ({
     // Leaf slug for buying-guide API lookup
     const buyingGuideSlug = brandSlug.split("/").filter(Boolean).pop() || "";
 
-    const { guide: buyingGuide, relatedGuides, isEnabled } = await fetchBrandBuyingGuideSection(
+    const buyingGuideSection = await fetchBrandBuyingGuideSection(
         buyingGuideSlug,
         brandName,
     );
+    const { guide: buyingGuide, relatedGuides, isEnabled } = buyingGuideSection;
+    const buyingGuideCta = resolveBuyingGuideCta({
+        slugRelationCta: dynamicPageSlug?.buyingGuide,
+        section: buyingGuideSection,
+    });
     const showBuyingGuideSection = Boolean(buyingGuide);
     const typeCardsHtml = dynamicPageSlug?.type_cards_html || data?.type_cards_html || null;
     const additionalTextBoxHtml =
       dynamicPageSlug?.additional_text_box || data?.additional_text_box || null;
     const showRelatedCollections = isEnabled && Boolean(typeCardsHtml?.trim());
-    const showAdditionalTextBox = Boolean(additionalTextBoxHtml?.trim());
+    const showAdditionalTextBox = isEnabled && Boolean(additionalTextBoxHtml?.trim());
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
@@ -62,7 +70,9 @@ const BrandProducts = async ({
                     data={data}
                     dynamicPageSlug={dynamicPageSlug}
                     aboutHeading={`About ${brandName} Vapes`}
-                    showBuyingGuideFaqsLink={showBuyingGuideSection}
+                    showBuyingGuideCta={buyingGuideCta.show}
+                    buyingGuideCtaPrompt={buyingGuideCta.prompt}
+                    buyingGuideCtaLabel={buyingGuideCta.label}
                     showCategoryQuickLinks
                     categoryQuickLinksSlug={buyingGuideSlug}
                     relatedQuickLinksEntity="brand"

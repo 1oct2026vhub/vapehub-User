@@ -25,8 +25,20 @@ export interface BuyingGuideRelatedBlog {
   }[];
 }
 
+/**
+ * CTA flag shape from slug-relation / related-links APIs.
+ * Disabled/missing → is_enabled: false with empty CTA strings.
+ */
+export interface BuyingGuideCta {
+  is_enabled: boolean;
+  cta_prompt: string;
+  cta_label: string;
+}
+
 export interface PublicBuyingGuide {
   is_enabled: boolean;
+  cta_prompt?: string;
+  cta_label?: string;
   guide_label: string;
   title: string;
   intro_content?: string | null;
@@ -38,5 +50,6 @@ export interface PublicBuyingGuide {
 }
 
 export interface BuyingGuideApiData {
+  /** Null when disabled/missing on the full buying-guide endpoint. */
   buyingGuide: PublicBuyingGuide | null;
 }

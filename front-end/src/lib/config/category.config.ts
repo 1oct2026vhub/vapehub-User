@@ -35,9 +35,14 @@ export interface RelatedLink {
 /** Shared shape for related-categories and related-brands responses. */
 export interface RelatedCategoriesApiData {
     related_links: RelatedLink[];
-    /** When present, related links UI should only render if `is_enabled === true`. */
+    /**
+     * CTA flag from related-links APIs.
+     * Related links UI should only render if `is_enabled === true`.
+     */
     buyingGuide?: {
         is_enabled?: boolean;
+        cta_prompt?: string;
+        cta_label?: string;
     } | null;
 }
 

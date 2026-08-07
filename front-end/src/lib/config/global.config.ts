@@ -104,6 +104,17 @@ export interface DynamicPageSlugResponse {
         url: string;
         order: number;
     }>;
+    /**
+     * Buying guide CTA from slug-relation (category/brand only).
+     * Missing/disabled → is_enabled: false, empty CTA strings.
+     * Not present on product/deal/blog.
+     */
+    buyingGuide?: {
+        is_enabled?: boolean;
+        cta_prompt?: string;
+        cta_label?: string;
+    } | null;
+    /** Legacy nested guide payload (prefer dedicated buying-guide API). */
     buying_guide?: {
         label?: string;
         title?: string;

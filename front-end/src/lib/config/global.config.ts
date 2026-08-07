@@ -77,6 +77,8 @@ export interface DynamicPageSlugResponse {
     description?: string;
     /** CKEditor HTML for category/brand type-card grid (slug-relation). */
     type_cards_html?: string | null;
+    /** CKEditor HTML for additional rich content (tables/grids); omit/empty hides the section. */
+    additional_text_box?: string | null;
     name?: string;
     deals?: Array<{
         id: number;

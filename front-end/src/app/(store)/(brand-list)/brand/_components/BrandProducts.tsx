@@ -12,6 +12,7 @@ import { DynamicPageSlugResponse, FaqResponse } from '@/lib/config/global.config
 import CategoryBuyingGuide from '@/app/(store)/(product-listing)/_components/CategoryBuyingGuide';
 import CategoryBuyingGuideAccordion from '@/app/(store)/(product-listing)/_components/CategoryBuyingGuideAccordion';
 import CategoryTypeCards from '@/app/(store)/(product-listing)/_components/CategoryTypeCards';
+import CategoryAdditionalTextBox from '@/app/(store)/(product-listing)/_components/CategoryAdditionalTextBox';
 import RelatedGuides from '@/app/(store)/(product-listing)/_components/RelatedGuides';
 import { fetchBrandBuyingGuideSection } from '@/app/(store)/(product-listing)/_components/buying-guide.utils';
 
@@ -43,7 +44,10 @@ const BrandProducts = async ({
     );
     const showBuyingGuideSection = Boolean(buyingGuide);
     const typeCardsHtml = dynamicPageSlug?.type_cards_html || data?.type_cards_html || null;
+    const additionalTextBoxHtml =
+      dynamicPageSlug?.additional_text_box || data?.additional_text_box || null;
     const showRelatedCollections = isEnabled && Boolean(typeCardsHtml?.trim());
+    const showAdditionalTextBox = Boolean(additionalTextBoxHtml?.trim());
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
@@ -83,6 +87,12 @@ const BrandProducts = async ({
                                 {showRelatedCollections ? (
                                     <CategoryTypeCards html={typeCardsHtml} embedded />
                                 ) : null}
+                                {showAdditionalTextBox ? (
+                                    <CategoryAdditionalTextBox
+                                      html={additionalTextBoxHtml}
+                                      embedded
+                                    />
+                                ) : null}
                                 {relatedGuides.length > 0 ? (
                                     <RelatedGuides
                                         key={`related-guides-brand-${buyingGuideSlug || data.id}`}
@@ -100,6 +110,9 @@ const BrandProducts = async ({
                         <>
                             {showRelatedCollections ? (
                                 <CategoryTypeCards html={typeCardsHtml} />
+                            ) : null}
+                            {showAdditionalTextBox ? (
+                                <CategoryAdditionalTextBox html={additionalTextBoxHtml} />
                             ) : null}
                             {brandFaqs.length > 0 ? (
                                 <section className="product-listing-container pt-7.5 md:pt-9">

@@ -11,6 +11,7 @@ import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import CategoryBuyingGuide from './_components/CategoryBuyingGuide';
 import CategoryBuyingGuideAccordion from './_components/CategoryBuyingGuideAccordion';
 import CategoryTypeCards from './_components/CategoryTypeCards';
+import CategoryAdditionalTextBox from './_components/CategoryAdditionalTextBox';
 import RelatedGuides from './_components/RelatedGuides';
 import { fetchCategoryBuyingGuideSection } from './_components/buying-guide.utils';
 
@@ -99,8 +100,14 @@ const CategoryProducts = async ({
     data?.type_card_html ||
     null;
 
+  const additionalTextBoxHtml =
+    dynamicPageSlug?.additional_text_box ||
+    data?.additional_text_box ||
+    null;
+
   const showBuyingGuideSection = Boolean(buyingGuide);
   const showRelatedCollections = isEnabled && Boolean(typeCardsHtml?.trim());
+  const showAdditionalTextBox = Boolean(additionalTextBoxHtml?.trim());
     
   return (
     <div className='w-full max-w-[1520px] mx-auto'>
@@ -131,6 +138,9 @@ const CategoryProducts = async ({
               {showRelatedCollections ? (
                 <CategoryTypeCards html={typeCardsHtml} embedded />
               ) : null}
+              {showAdditionalTextBox ? (
+                <CategoryAdditionalTextBox html={additionalTextBoxHtml} embedded />
+              ) : null}
               {relatedGuides.length > 0 ? (
                 <RelatedGuides
                   key={`related-guides-${buyingGuideSlug || categoryId}`}
@@ -148,6 +158,9 @@ const CategoryProducts = async ({
           <>
             {showRelatedCollections ? (
               <CategoryTypeCards html={typeCardsHtml} />
+            ) : null}
+            {showAdditionalTextBox ? (
+              <CategoryAdditionalTextBox html={additionalTextBoxHtml} />
             ) : null}
             {categoryId ? (
               <section className="product-listing-container flex-col scroll-mt-24 pt-7.5 md:pt-9">

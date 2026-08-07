@@ -13,6 +13,8 @@ export interface Category extends SubCategory {
     description: string;
     /** CKEditor HTML for category type-card grid; omit/empty hides the section. */
     type_cards_html?: string | null;
+    /** CKEditor HTML for additional rich content (tables/grids); omit/empty hides the section. */
+    additional_text_box?: string | null;
     slug: string;
     feature?: string;
     subCategories: SubCategory[];

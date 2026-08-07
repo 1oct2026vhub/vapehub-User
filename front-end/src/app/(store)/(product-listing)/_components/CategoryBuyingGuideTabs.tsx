@@ -21,7 +21,7 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
 
   return (
     <div className="flex w-full flex-col gap-4 md:gap-5">
-      <div className="relative mx-auto w-fit max-w-full overflow-hidden rounded-lg border border-skin-neutral-100 bg-skin-white p-2 md:p-2.5">
+      <div className="relative mx-auto w-fit max-w-full overflow-hidden rounded-lg border border-skin-neutral-100 bg-skin-white p-2 md:mx-0 md:p-2.5">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-skin-white to-transparent md:hidden"

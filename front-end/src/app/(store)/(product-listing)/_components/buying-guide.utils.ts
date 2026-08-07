@@ -116,24 +116,70 @@ export function mapBuyingGuideRelatedBlogs(
 export type ResolvedBuyingGuideSection = {
   guide: CategoryBuyingGuideData | null;
   relatedGuides: BlogList[];
-  /** Raw API flag — related collections / type cards should respect this. */
+  /** Raw API flag — CTA / related collections / type cards should respect this. */
   isEnabled: boolean;
+  ctaPrompt: string;
+  ctaLabel: string;
+};
+
+const EMPTY_BUYING_GUIDE_SECTION: ResolvedBuyingGuideSection = {
+  guide: null,
+  relatedGuides: [],
+  isEnabled: false,
+  ctaPrompt: "",
+  ctaLabel: "",
 };
 
 function resolveFromApiData(
   data: BuyingGuideApiData | undefined,
   fallbackTitle?: string,
 ): ResolvedBuyingGuideSection {
-  const isEnabled = data?.buyingGuide?.is_enabled === true;
-  const guide = mapPublicBuyingGuide(data?.buyingGuide, fallbackTitle);
+  const apiGuide = data?.buyingGuide;
+  const isEnabled = apiGuide?.is_enabled === true;
+  const ctaPrompt = apiGuide?.cta_prompt?.trim() ?? "";
+  const ctaLabel = apiGuide?.cta_label?.trim() ?? "";
+  const guide = mapPublicBuyingGuide(apiGuide, fallbackTitle);
+
   if (!guide || !isEnabled) {
-    return { guide: null, relatedGuides: [], isEnabled };
+    return { ...EMPTY_BUYING_GUIDE_SECTION, isEnabled, ctaPrompt, ctaLabel };
   }
 
   return {
     guide,
-    relatedGuides: mapBuyingGuideRelatedBlogs(data?.buyingGuide?.related_guides),
+    relatedGuides: mapBuyingGuideRelatedBlogs(apiGuide?.related_guides),
     isEnabled,
+    ctaPrompt,
+    ctaLabel,
+  };
+}
+
+/**
+ * Prefer slug-relation CTA; fall back to full buying-guide API fields.
+ * Show the green card only when is_enabled === true.
+ */
+export function resolveBuyingGuideCta(options: {
+  slugRelationCta?: {
+    is_enabled?: boolean;
+    cta_prompt?: string;
+    cta_label?: string;
+  } | null;
+  section?: Pick<ResolvedBuyingGuideSection, "isEnabled" | "ctaPrompt" | "ctaLabel">;
+}): { show: boolean; prompt: string; label: string } {
+  const fromSlug = options.slugRelationCta;
+  const fromSection = options.section;
+
+  const isEnabled =
+    fromSlug?.is_enabled === true || fromSection?.isEnabled === true;
+
+  const prompt =
+    fromSlug?.cta_prompt?.trim() || fromSection?.ctaPrompt?.trim() || "";
+  const label =
+    fromSlug?.cta_label?.trim() || fromSection?.ctaLabel?.trim() || "";
+
+  return {
+    show: isEnabled,
+    prompt,
+    label,
   };
 }
 
@@ -142,12 +188,12 @@ export async function fetchCategoryBuyingGuideSection(
   fallbackTitle?: string,
 ): Promise<ResolvedBuyingGuideSection> {
   if (!slug.trim()) {
-    return { guide: null, relatedGuides: [], isEnabled: false };
+    return { ...EMPTY_BUYING_GUIDE_SECTION };
   }
 
   const response = await getCategoryBuyingGuide(slug);
   if (response.status !== ServerActionStatus.SUCCESS) {
-    return { guide: null, relatedGuides: [], isEnabled: false };
+    return { ...EMPTY_BUYING_GUIDE_SECTION };
   }
 
   return resolveFromApiData(response.data, fallbackTitle);
@@ -158,12 +204,12 @@ export async function fetchBrandBuyingGuideSection(
   fallbackTitle?: string,
 ): Promise<ResolvedBuyingGuideSection> {
   if (!slug.trim()) {
-    return { guide: null, relatedGuides: [], isEnabled: false };
+    return { ...EMPTY_BUYING_GUIDE_SECTION };
   }
 
   const response = await getBrandBuyingGuide(slug);
   if (response.status !== ServerActionStatus.SUCCESS) {
-    return { guide: null, relatedGuides: [], isEnabled: false };
+    return { ...EMPTY_BUYING_GUIDE_SECTION };
   }
 
   return resolveFromApiData(response.data, fallbackTitle);

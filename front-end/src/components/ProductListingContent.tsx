@@ -14,8 +14,11 @@ type CategoryProps = {
     data: Category | BrandConfig;
     dynamicPageSlug?: DynamicPageSlugResponse & { latest_deals?: DynamicPageSlugResponse['deals'] };
     aboutHeading?: string;
-    showBuyingGuideFaqsLink?: boolean;
-    buyingGuideFaqsHref?: string;
+    /** Green CTA card — show when buyingGuide.is_enabled === true. */
+    showBuyingGuideCta?: boolean;
+    buyingGuideCtaPrompt?: string;
+    buyingGuideCtaLabel?: string;
+    buyingGuideCtaHref?: string;
     showCategoryQuickLinks?: boolean;
     /** Leaf slug for related-categories / related-brands API (required when showCategoryQuickLinks). */
     categoryQuickLinksSlug?: string;
@@ -27,8 +30,10 @@ const ProductListingContent: React.FC<CategoryProps> = ({
     data,
     dynamicPageSlug,
     aboutHeading,
-    showBuyingGuideFaqsLink = false,
-    buyingGuideFaqsHref = '#buying-guide-faqs',
+    showBuyingGuideCta = false,
+    buyingGuideCtaPrompt = '',
+    buyingGuideCtaLabel = '',
+    buyingGuideCtaHref = '#buying-guide-faqs',
     showCategoryQuickLinks = false,
     categoryQuickLinksSlug = '',
     relatedQuickLinksEntity = 'category',
@@ -43,16 +48,18 @@ const ProductListingContent: React.FC<CategoryProps> = ({
         .slice(0, 3);
 
     const listingName = (data.name || dynamicPageSlug?.name || '').trim();
-    const listingNameLower = listingName.toLowerCase();
     const descriptionHtml = dynamicPageSlug?.description || data?.description || '';
     const hasDescription = Boolean(descriptionHtml.trim());
+    const ctaPrompt = buyingGuideCtaPrompt.trim();
+    const ctaLabel = buyingGuideCtaLabel.trim();
+    const showCta = showBuyingGuideCta && Boolean(ctaPrompt || ctaLabel);
     
     return (
         <div className="space-y-6">
             <div className='space-y-4'>
                 <h1 className='primary-gradient-600 text-h5 md:text-h2 font-semibold w-fit'>{listingName || data.name || dynamicPageSlug?.name}</h1>
                 {aboutHeading && <h2 className='sr-only'>{aboutHeading}</h2>}
-                {(hasDescription || showBuyingGuideFaqsLink) && (
+                {(hasDescription || showCta) && (
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6 xl:gap-8">
                         {hasDescription ? (
                             <div
@@ -60,23 +67,23 @@ const ProductListingContent: React.FC<CategoryProps> = ({
                                 dangerouslySetInnerHTML={{ __html: descriptionHtml }}
                             />
                         ) : null}
-                        {showBuyingGuideFaqsLink ? (
+                        {showCta ? (
                             <Link
-                                href={buyingGuideFaqsHref}
+                                href={buyingGuideCtaHref}
                                 className="group flex w-full shrink-0 items-center gap-2.5 rounded-md border border-[#035335] bg-[#f0f9f9] px-3 py-3 transition-opacity hover:opacity-90 lg:w-[min(100%,22rem)]"
                             >
                                 <BuyingGuideBookIcon className="h-[22px] w-[22px] shrink-0 text-[#035335]" />
                                 <span className="min-w-0 flex-1">
-                                    <span className="block text-[12px] font-normal leading-[1.2] text-skin-neutral-300">
-                                        {listingNameLower
-                                            ? `Not sure which ${listingNameLower} to choose?`
-                                            : 'Not sure which to choose?'}
-                                    </span>
-                                    <span className="primary-gradient-600 mt-0.5 block text-[13px] font-semibold leading-[1.25]">
-                                        {listingNameLower
-                                            ? `Read our ${listingNameLower} buying guide`
-                                            : 'Read our buying guide'}
-                                    </span>
+                                    {ctaPrompt ? (
+                                        <span className="block text-[12px] font-normal leading-[1.2] text-skin-neutral-300">
+                                            {ctaPrompt}
+                                        </span>
+                                    ) : null}
+                                    {ctaLabel ? (
+                                        <span className="primary-gradient-600 mt-0.5 block text-[13px] font-semibold leading-[1.25]">
+                                            {ctaLabel}
+                                        </span>
+                                    ) : null}
                                 </span>
                                 <ArrowRightIcon className="h-3.5 w-3.5 shrink-0 text-[#035335] [&_path]:stroke-current" />
                             </Link>

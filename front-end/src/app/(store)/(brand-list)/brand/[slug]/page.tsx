@@ -153,7 +153,7 @@ const BrandPage: NextPage<Props> = async ({
 export default BrandPage;
  
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
-  // Bypass Data Cache so type_cards_html / description from admin show promptly.
+  // Bypass Data Cache so type_cards_html / additional_text_box / description from admin show promptly.
   const response = await getDynamicPageSlug(slug, false);
   if (response.status === ServerActionStatus.ERROR) {
     return null;

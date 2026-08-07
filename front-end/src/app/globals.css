@@ -2146,6 +2146,9 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 /* Override CKEditor inline flex/width/height so cards fill the equalized slide */
 .type-cards-mobile-carousel .type-cards-mobile-slide > .type-card,
 .type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .atb-nic-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .atb-flavour-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > article,
 .type-cards-mobile-carousel .type-cards-mobile-slide > div {
   display: flex !important;
   flex-direction: column !important;
@@ -2162,6 +2165,9 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 /* Keep CTA anchored to the bottom of equal-height cards */
 .type-cards-mobile-carousel .type-cards-mobile-slide > .type-card > :last-child,
 .type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .atb-nic-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .atb-flavour-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > article > :last-child,
 .type-cards-mobile-carousel .type-cards-mobile-slide > div > :last-child {
   margin-top: auto !important;
 }
@@ -2170,6 +2176,48 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 .type-cards-mobile-carousel .type-cards-mobile-slide figure {
   width: 100% !important;
   max-width: 100% !important;
+}
+
+/* ATB nicotine / flavour: fill media edge-to-edge (no Related Collections letterbox) */
+.type-cards-mobile-carousel .atb-nic-card__media,
+.type-cards-mobile-carousel .atb-flavour-card__media {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.type-cards-mobile-carousel .atb-nic-card__img,
+.type-cards-mobile-carousel .atb-nic-card__media img,
+.type-cards-mobile-carousel .atb-nic-card__media figure,
+.type-cards-mobile-carousel .atb-nic-card__media figure.image,
+.type-cards-mobile-carousel .atb-flavour-card__img,
+.type-cards-mobile-carousel .atb-flavour-card__media img,
+.type-cards-mobile-carousel .atb-flavour-card__media figure,
+.type-cards-mobile-carousel .atb-flavour-card__media figure.image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.type-cards-mobile-carousel .atb-nic-card__media figure img,
+.type-cards-mobile-carousel .atb-flavour-card__media figure img {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  object-fit: cover !important;
+  margin: 0 !important;
+  background: transparent !important;
 }
 
 .type-cards-mobile-carousel .type-cards-mobile-slide figure,
@@ -2197,6 +2245,21 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   margin: 0 0 14px 0 !important;
   background: #f1f5f9 !important;
   box-sizing: border-box !important;
+}
+
+/* Re-assert after the generic 180px rule so ATB images actually fill */
+.type-cards-mobile-carousel .atb-nic-card img,
+.type-cards-mobile-carousel .atb-flavour-card img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  margin: 0 !important;
+  background: transparent !important;
 }
 
 .type-cards-mobile-carousel .type-cards-mobile-slide figure img {
@@ -2347,5 +2410,71 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   .type-cards-html--mobile-fallback .vss-related-card figure img {
     margin: 0 !important;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Additional text box (category/brand CMS HTML — tables / ATB card grids)    */
+/* -------------------------------------------------------------------------- */
+
+.additional-text-box-html {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.additional-text-box-html .raw-html-embed {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.additional-text-box-html table {
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+.additional-text-box-html img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fill ATB media slots (no gray letterbox from contain + fixed aspect) */
+.additional-text-box-html .atb-nic-card__media,
+.additional-text-box-html .atb-flavour-card__media {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #fff !important;
+}
+
+.additional-text-box-html .atb-nic-card__img,
+.additional-text-box-html .atb-nic-card__media img,
+.additional-text-box-html .atb-nic-card__media figure,
+.additional-text-box-html .atb-flavour-card__img,
+.additional-text-box-html .atb-flavour-card__media img,
+.additional-text-box-html .atb-flavour-card__media figure {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+.additional-text-box-html .atb-nic-card__media figure img,
+.additional-text-box-html .atb-flavour-card__media figure img {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  object-fit: cover !important;
+  margin: 0 !important;
+}
+
+.additional-text-box-mobile {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 

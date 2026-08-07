@@ -998,7 +998,7 @@ input[type="checkbox"] + span {
 @media (min-width: 768px) {
   .category-buying-guide-tabs-scroll {
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 0.625rem;
     overflow-x: visible;
     overscroll-behavior-x: auto;

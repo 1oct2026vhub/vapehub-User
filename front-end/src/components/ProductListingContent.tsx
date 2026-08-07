@@ -63,7 +63,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({
                         {showBuyingGuideFaqsLink ? (
                             <Link
                                 href={buyingGuideFaqsHref}
-                                className="group flex w-full shrink-0 items-center gap-2.5 rounded-md border border-[#035335] bg-[#f0f9f9] px-3 py-2 transition-opacity hover:opacity-90 lg:w-[min(100%,22rem)]"
+                                className="group flex w-full shrink-0 items-center gap-2.5 rounded-md border border-[#035335] bg-[#f0f9f9] px-3 py-3 transition-opacity hover:opacity-90 lg:w-[min(100%,22rem)]"
                             >
                                 <BuyingGuideBookIcon className="h-[22px] w-[22px] shrink-0 text-[#035335]" />
                                 <span className="min-w-0 flex-1">

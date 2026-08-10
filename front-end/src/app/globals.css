@@ -2189,6 +2189,63 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   margin: 0 !important;
 }
 
+/*
+ * Related collections UX: slight card lift + CTA opacity on hover
+ * (matches site primary buttons / VapeSuperstore-style cards).
+ * Overrides embedded CMS `transform:none` / missing button :hover.
+ */
+.type-cards-html .type-card,
+.type-cards-html .vss-related-card,
+.type-cards-mobile-carousel .type-card,
+.type-cards-mobile-carousel .vss-related-card {
+  overflow: visible !important;
+  transform: translateY(0) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.type-cards-html .type-card__btn,
+.type-cards-html .type-card a.type-card__btn,
+.type-cards-html .vss-related-card a,
+.type-cards-mobile-carousel .type-card__btn,
+.type-cards-mobile-carousel .type-card a.type-card__btn,
+.type-cards-mobile-carousel .vss-related-card a {
+  cursor: pointer !important;
+  opacity: 1 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+@media (hover: hover) {
+  .type-cards-html .type-card:hover,
+  .type-cards-html .vss-related-card:hover,
+  .type-cards-mobile-carousel .type-card:hover,
+  .type-cards-mobile-carousel .vss-related-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14) !important;
+  }
+
+  .type-cards-html .type-card__btn:hover,
+  .type-cards-html .type-card a.type-card__btn:hover,
+  .type-cards-html .vss-related-card a:hover,
+  .type-cards-mobile-carousel .type-card__btn:hover,
+  .type-cards-mobile-carousel .type-card a.type-card__btn:hover,
+  .type-cards-mobile-carousel .vss-related-card a:hover {
+    opacity: 0.9 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .type-cards-html .type-card,
+  .type-cards-html .vss-related-card,
+  .type-cards-mobile-carousel .type-card,
+  .type-cards-mobile-carousel .vss-related-card,
+  .type-cards-html .type-card__btn,
+  .type-cards-html .type-card a.type-card__btn,
+  .type-cards-mobile-carousel .type-card__btn,
+  .type-cards-mobile-carousel .type-card a.type-card__btn {
+    transition: none !important;
+  }
+}
+
 .type-cards-mobile-carousel {
   width: 100%;
   max-width: 100%;
@@ -2668,6 +2725,104 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   aspect-ratio: auto !important;
   object-fit: cover !important;
   margin: 0 !important;
+}
+
+/*
+ * ATB nicotine / flavour cards: slight lift + CTA hover
+ * (same UX refinement as Related Collections / site buttons).
+ */
+.additional-text-box-html .atb-nic-card,
+.additional-text-box-html .atb-flavour-card,
+.type-cards-mobile-carousel .atb-nic-card,
+.type-cards-mobile-carousel .atb-flavour-card {
+  transform: translateY(0) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.additional-text-box-html .atb-nic-card__btn-row,
+.type-cards-mobile-carousel .atb-nic-card__btn-row {
+  transition: background 0.2s ease, border-color 0.2s ease !important;
+}
+
+.additional-text-box-html .atb-nic-card__btn,
+.additional-text-box-html .atb-nic-card a.atb-nic-card__btn,
+.additional-text-box-html .atb-nic-card__btn-row a,
+.type-cards-mobile-carousel .atb-nic-card__btn,
+.type-cards-mobile-carousel .atb-nic-card a.atb-nic-card__btn,
+.type-cards-mobile-carousel .atb-nic-card__btn-row a {
+  cursor: pointer !important;
+  transition: background 0.2s ease, opacity 0.2s ease !important;
+}
+
+.additional-text-box-html .atb-nic-card__btn-arrow,
+.type-cards-mobile-carousel .atb-nic-card__btn-arrow {
+  transition: color 0.2s ease !important;
+}
+
+.additional-text-box-html .atb-flavour-card__link,
+.additional-text-box-html .atb-flavour-card a.atb-flavour-card__link,
+.type-cards-mobile-carousel .atb-flavour-card__link,
+.type-cards-mobile-carousel .atb-flavour-card a.atb-flavour-card__link {
+  cursor: pointer !important;
+  opacity: 1 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+@media (hover: hover) {
+  .additional-text-box-html .atb-nic-card:hover,
+  .additional-text-box-html .atb-flavour-card:hover,
+  .type-cards-mobile-carousel .atb-nic-card:hover,
+  .type-cards-mobile-carousel .atb-flavour-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14) !important;
+    z-index: 1 !important;
+  }
+
+  .additional-text-box-html .atb-nic-card__btn-row:hover,
+  .type-cards-mobile-carousel .atb-nic-card__btn-row:hover {
+    background: #f0f9f9 !important;
+    border-color: #005434 !important;
+  }
+
+  .additional-text-box-html .atb-nic-card__btn:hover,
+  .additional-text-box-html .atb-nic-card a.atb-nic-card__btn:hover,
+  .additional-text-box-html .atb-nic-card__btn-row a:hover,
+  .type-cards-mobile-carousel .atb-nic-card__btn:hover,
+  .type-cards-mobile-carousel .atb-nic-card a.atb-nic-card__btn:hover,
+  .type-cards-mobile-carousel .atb-nic-card__btn-row a:hover {
+    background: #f0f9f9 !important;
+    opacity: 0.9 !important;
+  }
+
+  .additional-text-box-html .atb-nic-card__btn-row:hover .atb-nic-card__btn-arrow,
+  .additional-text-box-html .atb-nic-card__btn:hover .atb-nic-card__btn-arrow,
+  .type-cards-mobile-carousel .atb-nic-card__btn-row:hover .atb-nic-card__btn-arrow,
+  .type-cards-mobile-carousel .atb-nic-card__btn:hover .atb-nic-card__btn-arrow {
+    color: #005434 !important;
+  }
+
+  .additional-text-box-html .atb-flavour-card__link:hover,
+  .additional-text-box-html .atb-flavour-card a.atb-flavour-card__link:hover,
+  .type-cards-mobile-carousel .atb-flavour-card__link:hover,
+  .type-cards-mobile-carousel .atb-flavour-card a.atb-flavour-card__link:hover {
+    opacity: 0.9 !important;
+    text-decoration: underline !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .additional-text-box-html .atb-nic-card,
+  .additional-text-box-html .atb-flavour-card,
+  .type-cards-mobile-carousel .atb-nic-card,
+  .type-cards-mobile-carousel .atb-flavour-card,
+  .additional-text-box-html .atb-nic-card__btn-row,
+  .additional-text-box-html .atb-nic-card__btn,
+  .additional-text-box-html .atb-flavour-card__link,
+  .type-cards-mobile-carousel .atb-nic-card__btn-row,
+  .type-cards-mobile-carousel .atb-nic-card__btn,
+  .type-cards-mobile-carousel .atb-flavour-card__link {
+    transition: none !important;
+  }
 }
 
 .additional-text-box-mobile {

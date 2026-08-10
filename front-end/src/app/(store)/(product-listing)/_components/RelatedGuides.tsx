@@ -5,6 +5,7 @@ import ViewAllLink from "@/components/ui/ViewAllLink";
 import { AsyncReactElement } from "@/lib/config/app.config";
 import { BlogList } from "@/lib/config/blog.config";
 import { ROUTES } from "@/lib/routes";
+import { BUYING_GUIDE_EMBEDDED_SECTION } from "./buying-guide-layout";
 import {
   RelatedGuidesRenderProps,
   resolveRelatedGuidesGuides,
@@ -35,10 +36,7 @@ const RelatedGuides: React.FC<RelatedGuidesProps> = async ({
   }
 
   return (
-    <section className={embedded ? "w-full pt-4 md:pt-5" : "w-full"}>
-      {embedded ? (
-        <div className="mb-4 h-px w-full bg-skin-neutral-200 md:mb-5" aria-hidden />
-      ) : null}
+    <section className={embedded ? BUYING_GUIDE_EMBEDDED_SECTION : "w-full"}>
       <div className="flex flex-col gap-4 md:gap-5">
         <div className="flex items-center justify-between gap-4">
           <SectionHeading title={title} />

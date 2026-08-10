@@ -28,6 +28,14 @@ function stripEmptyFigures(html: string): string {
 }
 
 /**
+ * Remove CKEditor spacer paragraphs (`<p>&nbsp;</p>`, `<p><br></p>`, etc.).
+ * Leading ones inflate the gap between the section border and the card row.
+ */
+function stripEmptyParagraphs(html: string): string {
+  return html.replace(/<p\b[^>]*>(?:\s|&nbsp;|&#160;|<br\s*\/?>)*<\/p>/gi, "");
+}
+
+/**
  * When admin removed a card image without leaving a placeholder, inject one
  * so the row stays aligned with neighboring cards.
  */
@@ -70,6 +78,7 @@ export function ensureTypeCardPlaceholders(html: string): string {
  */
 export function normalizeTypeCardsHtml(html: string): string {
   let out = stripEmptyFigures(html);
+  out = stripEmptyParagraphs(out);
   out = ensureTypeCardPlaceholders(out);
 
   out = out.replace(

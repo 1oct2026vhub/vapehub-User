@@ -23,7 +23,7 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
     return (
         <Link
             href={blog?.slug?.startsWith('/') ? blog.slug : `/${blog?.slug ?? ''}`}
-            className="flex min-w-0 h-full flex-col items-stretch bg-skin-white p-4 shadow-card hover:shadow-blog-card rounded-lg w-full no-underline"
+            className="group flex min-w-0 h-full flex-col items-stretch bg-skin-white p-4 shadow-card hover:shadow-blog-card rounded-lg w-full no-underline transition-transform duration-200 ease-out hover:-translate-y-1.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         >
             <div className="relative flex justify-center items-center w-full rounded-lg mb-4.5 bg-skin-neutral-100 overflow-hidden">
                 {blog.image_url ? (
@@ -54,8 +54,8 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
                     {blog?.title}
                 </div>
                 <RightArrowIcon
-                    stroke="#091410"
-                    className="-rotate-45 w-6 h-6 min-w-5 md:min-w-6 shrink-0"
+                    stroke="currentColor"
+                    className="-rotate-45 w-6 h-6 min-w-5 md:min-w-6 shrink-0 text-skin-neutral-500 transition-colors duration-200 group-hover:text-skin-primary-500"
                 />
             </div>
             <div className="min-w-0 flex-1 flex flex-col">
@@ -64,7 +64,7 @@ const BlogCard: React.FC<Props> = ({ blog }) => {
                         {excerpt}
                     </p>
                 ) : null}
-                <span className="text-skin-primary-300 text-content-3 md:text-content-1 font-semibold mt-2 inline-block">
+                <span className="text-skin-primary-300 text-content-3 md:text-content-1 font-semibold mt-2 inline-block transition-opacity duration-200 group-hover:opacity-90 group-hover:underline">
                     Read more...
                 </span>
             </div>

@@ -2464,6 +2464,20 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   overflow-x: auto;
 }
 
+/*
+ * Tailwind preflight zeroes <p> margins. Restore CKEditor-like block rhythm so
+ * spacer paragraphs (`<p>&nbsp;</p>`) between copy and ATB card grids show up.
+ */
+.additional-text-box-html > p,
+.additional-text-box-html > .raw-html-embed > p {
+  margin: 0 0 1em;
+}
+
+.additional-text-box-html > p:last-child,
+.additional-text-box-html > .raw-html-embed > p:last-child {
+  margin-bottom: 0;
+}
+
 .additional-text-box-html .raw-html-embed {
   width: 100%;
   max-width: 100%;

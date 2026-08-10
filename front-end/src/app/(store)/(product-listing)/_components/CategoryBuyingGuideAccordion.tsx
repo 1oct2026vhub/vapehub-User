@@ -51,7 +51,7 @@ const CategoryBuyingGuideAccordion = ({
   return (
     <div
       id="buying-guide-faqs"
-      className="scroll-mt-24 w-full rounded-2xl bg-skin-white shadow-card"
+      className="scroll-mt-24 w-full min-w-0 max-w-full overflow-x-clip rounded-2xl bg-skin-white shadow-card"
     >
       <button
         type="button"

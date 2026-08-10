@@ -7,6 +7,7 @@ import {
   PREFILLED_POD_KITS_GUIDE_TEMPLATE,
 } from "@/lib/config/category-buying-guide.config";
 import { DynamicPageSlugResponse } from "@/lib/config/global.config";
+import { sanitizeBuyingGuideHtml } from "./buying-guide.utils";
 
 type BuyingGuideApi = NonNullable<DynamicPageSlugResponse["buying_guide"]>;
 
@@ -64,7 +65,9 @@ function mapApiTabs(tabs?: BuyingGuideApi["tabs"]): CategoryBuyingGuideTab[] | u
 
   const mapped = tabs
     .map((tab, index) => {
-      const contentHtml = tab.contentHtml?.trim() ?? tab.content?.trim() ?? "";
+      const contentHtml = sanitizeBuyingGuideHtml(
+        tab.contentHtml?.trim() ?? tab.content?.trim() ?? "",
+      );
       const label = tab.label?.trim();
       if (!label || !contentHtml) return null;
 
@@ -84,7 +87,9 @@ function buildGuideFromApi(
   apiGuide: BuyingGuideApi,
   categoryName: string,
 ): CategoryBuyingGuideData | null {
-  const contentHtml = apiGuide.contentHtml?.trim() ?? apiGuide.content?.trim() ?? "";
+  const contentHtml = sanitizeBuyingGuideHtml(
+    apiGuide.contentHtml?.trim() ?? apiGuide.content?.trim() ?? "",
+  );
   const highlights = (apiGuide.highlights ?? [])
     .map((item) => (typeof item === "string" ? item : item.label).trim())
     .filter(Boolean);

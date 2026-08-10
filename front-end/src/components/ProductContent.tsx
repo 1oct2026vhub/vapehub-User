@@ -133,7 +133,7 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
                                                 <span className='text-content-2 font-semibold'>Loading description...</span>
                                             </div>
                                         ) : description ? (
-                                            <div className='product-content' dangerouslySetInnerHTML={{ __html: description }} />
+                                            <div className='product-content rich-text' dangerouslySetInnerHTML={{ __html: description }} />
                                         ) : (
                                             <p className='text-content-2 text-skin-neutral-500'>No description available.</p>
                                         )}

@@ -1409,8 +1409,16 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
   height: auto;
 }
 
+/*
+ * CKEditor tables: Tailwind Preflight zeroes borders, and saved HTML often has
+ * no inline border styles. Admin editor injects borders via .ck-content; restore
+ * the same look on every storefront CMS HTML host.
+ */
 .ck-content table,
-.rich-text table {
+.rich-text table,
+.product-content table,
+.additional-text-box-html table,
+.welcome-text table {
   border-collapse: collapse;
   border-spacing: 0;
   width: 100%;
@@ -1419,10 +1427,36 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
   border: 1px solid #ddd;
 }
 
+.ck-content figure.table,
+.rich-text figure.table,
+.product-content figure.table,
+.additional-text-box-html figure.table,
+.welcome-text figure.table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.ck-content figure.table > table,
+.rich-text figure.table > table,
+.product-content figure.table > table,
+.additional-text-box-html figure.table > table,
+.welcome-text figure.table > table {
+  margin: 0;
+}
+
 .ck-content table td,
 .rich-text table td,
+.product-content table td,
+.additional-text-box-html table td,
+.welcome-text table td,
 .ck-content table th,
-.rich-text table th {
+.rich-text table th,
+.product-content table th,
+.additional-text-box-html table th,
+.welcome-text table th {
   border: 1px solid #ddd;
   padding: 8px 12px;
   text-align: left;
@@ -1431,38 +1465,59 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
 }
 
 .ck-content table th,
-.rich-text table th {
+.rich-text table th,
+.product-content table th,
+.additional-text-box-html table th,
+.welcome-text table th {
   background-color: #f5f5f5;
   font-weight: bold;
 }
 
 .ck-content table tbody tr,
-.rich-text table tbody tr {
+.rich-text table tbody tr,
+.product-content table tbody tr,
+.additional-text-box-html table tbody tr,
+.welcome-text table tbody tr {
   display: table-row !important;
 }
 
 .ck-content table tbody tr:nth-child(even),
-.rich-text table tbody tr:nth-child(even) {
+.rich-text table tbody tr:nth-child(even),
+.product-content table tbody tr:nth-child(even),
+.additional-text-box-html table tbody tr:nth-child(even),
+.welcome-text table tbody tr:nth-child(even) {
   background-color: #f9f9f9;
 }
 
 .ck-content table tbody tr:hover,
-.rich-text table tbody tr:hover {
+.rich-text table tbody tr:hover,
+.product-content table tbody tr:hover,
+.additional-text-box-html table tbody tr:hover,
+.welcome-text table tbody tr:hover {
   background-color: #f5f5f5;
 }
 
 .ck-content table thead,
-.rich-text table thead {
+.rich-text table thead,
+.product-content table thead,
+.additional-text-box-html table thead,
+.welcome-text table thead {
   display: table-header-group !important;
 }
 
 .ck-content table tbody,
-.rich-text table tbody {
+.rich-text table tbody,
+.product-content table tbody,
+.additional-text-box-html table tbody,
+.welcome-text table tbody {
   display: table-row-group !important;
 }
 
 .ck-content table tfoot,
-.rich-text table tfoot {
+.rich-text table tfoot,
+.product-content table tfoot,
+.additional-text-box-html table tfoot,
+.welcome-text table tfoot {
   display: table-footer-group !important;
 }
 
@@ -2489,15 +2544,117 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   overflow-x: auto;
 }
 
+/*
+ * Tailwind preflight resets h1–h6 to body size. Restore storefront heading scale
+ * for Additional Text Box CMS copy (matches .product-content). Exclude ATB card
+ * titles (`atb-*`) so nicotine/flavour template inline styles stay intact.
+ */
+.additional-text-box-html :is(h1, h2, h3, h4, h5, h6):not([class*="atb-"]) {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  @apply !font-oswald;
+  font-weight: 600 !important;
+}
+
+.additional-text-box-html :is(h1, h2, h3, h4, h5, h6):not([class*="atb-"]):first-child {
+  margin-top: 0;
+}
+
+.additional-text-box-html h1:not([class*="atb-"]) {
+  font-size: 28px !important;
+}
+
+.additional-text-box-html h2:not([class*="atb-"]) {
+  font-size: 24px !important;
+}
+
+.additional-text-box-html h3:not([class*="atb-"]) {
+  font-size: 20px !important;
+  line-height: 100% !important;
+}
+
+.additional-text-box-html h4:not([class*="atb-"]) {
+  font-size: 18px !important;
+}
+
+.additional-text-box-html h5:not([class*="atb-"]) {
+  font-size: 16px !important;
+}
+
+.additional-text-box-html h6:not([class*="atb-"]) {
+  font-size: 14px !important;
+}
+
+@media (min-width: 768px) {
+  .additional-text-box-html h1:not([class*="atb-"]) {
+    font-size: 36px !important;
+  }
+
+  .additional-text-box-html h2:not([class*="atb-"]) {
+    font-size: 30px !important;
+  }
+
+  .additional-text-box-html h3:not([class*="atb-"]) {
+    font-size: 24px !important;
+  }
+
+  .additional-text-box-html h4:not([class*="atb-"]) {
+    font-size: 20px !important;
+  }
+
+  .additional-text-box-html h5:not([class*="atb-"]) {
+    font-size: 17px !important;
+  }
+
+  .additional-text-box-html h6:not([class*="atb-"]) {
+    font-size: 15px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .additional-text-box-html h1:not([class*="atb-"]) {
+    font-size: 44px !important;
+  }
+
+  .additional-text-box-html h2:not([class*="atb-"]) {
+    font-size: 36px !important;
+  }
+
+  .additional-text-box-html h3:not([class*="atb-"]) {
+    font-size: 28px !important;
+  }
+
+  .additional-text-box-html h4:not([class*="atb-"]) {
+    font-size: 22px !important;
+  }
+
+  .additional-text-box-html h5:not([class*="atb-"]) {
+    font-size: 18px !important;
+  }
+
+  .additional-text-box-html h6:not([class*="atb-"]) {
+    font-size: 16px !important;
+  }
+}
+
+/*
+ * Tailwind preflight zeroes <p> margins. Restore CKEditor-like block rhythm so
+ * spacer paragraphs (`<p>&nbsp;</p>`) between copy and ATB card grids show up.
+ */
+.additional-text-box-html > p,
+.additional-text-box-html > .raw-html-embed > p {
+  margin: 0 0 1em;
+}
+
+.additional-text-box-html > p:last-child,
+.additional-text-box-html > .raw-html-embed > p:last-child {
+  margin-bottom: 0;
+}
+
 .additional-text-box-html .raw-html-embed {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-}
-
-.additional-text-box-html table {
-  max-width: 100%;
-  border-collapse: collapse;
 }
 
 .additional-text-box-html img {

@@ -27,12 +27,31 @@ function stripEmptyFigures(html: string): string {
     .replace(/<figure\b[^>]*>(?![\s\S]*?<img\b)[\s\S]*?<\/figure>/gi, "");
 }
 
+const EMPTY_PARAGRAPH_OPEN_RE =
+  /<p\b[^>]*>(?:\s|&nbsp;|&#160;|<br\s*\/?>)*<\/p>/i;
+
 /**
- * Remove CKEditor spacer paragraphs (`<p>&nbsp;</p>`, `<p><br></p>`, etc.).
- * Leading ones inflate the gap between the section border and the card row.
+ * Remove only leading/trailing CKEditor spacer paragraphs (`<p>&nbsp;</p>`,
+ * `<p><br></p>`, etc.). Keep mid-content spacers so Additional Text Box
+ * gaps editors insert between copy and card grids survive on the storefront.
  */
 function stripEmptyParagraphs(html: string): string {
-  return html.replace(/<p\b[^>]*>(?:\s|&nbsp;|&#160;|<br\s*\/?>)*<\/p>/gi, "");
+  let out = html.trim();
+  if (!out) return out;
+
+  // Leading spacers inflate the gap between the section border and content.
+  const leading = new RegExp(`^${EMPTY_PARAGRAPH_OPEN_RE.source}`, "i");
+  while (leading.test(out)) {
+    out = out.replace(leading, "").trimStart();
+  }
+
+  // Trailing spacers are often editor caret targets, not intentional layout.
+  const trailing = new RegExp(`${EMPTY_PARAGRAPH_OPEN_RE.source}\\s*$`, "i");
+  while (trailing.test(out)) {
+    out = out.replace(trailing, "").trimEnd();
+  }
+
+  return out;
 }
 
 /**

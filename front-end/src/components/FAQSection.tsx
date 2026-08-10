@@ -6,6 +6,7 @@ import SectionHeading from "./ui/SectionHeading";
 import { getFaqs } from "@/lib/server.actions";
 import { FaqResponse } from "@/lib/config/global.config";
 import { ServerActionStatus } from "@/lib/config/app.config";
+import { BUYING_GUIDE_EMBEDDED_SECTION } from "@/app/(store)/(product-listing)/_components/buying-guide-layout";
 import { toast } from "sonner";
 // import Link from "next/link";
 // import { ROUTES } from "@/lib/routes";
@@ -65,10 +66,7 @@ const FAQSection: React.FC<FAQProps> = ({
     }
 
     return (
-        <div className={embedded ? "w-full pt-4 md:pt-5" : "w-full"}>
-            {embedded ? (
-                <div className="mb-4 h-px w-full bg-skin-neutral-200 md:mb-5" aria-hidden />
-            ) : null}
+        <div className={embedded ? BUYING_GUIDE_EMBEDDED_SECTION : "w-full"}>
             <div className="w-full flex flex-col gap-4 md:gap-5">
                 {/* FAQ Heading & View All */}
                 <div className="flex items-center justify-between w-full">

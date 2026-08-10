@@ -7,14 +7,12 @@ import {
 } from "@/lib/config/category-buying-guide.config";
 import CategoryBuyingGuideTabs from "./CategoryBuyingGuideTabs";
 import SectionHeading from "@/components/ui/SectionHeading";
+import { BUYING_GUIDE_SECTION_GAP } from "./buying-guide-layout";
 
 interface CategoryBuyingGuideProps extends CategoryBuyingGuideData {
   embedded?: boolean;
   hideHeader?: boolean;
 }
-
-/** Shared section rhythm: balanced on mobile, slightly roomier on desktop */
-const SECTION_STACK = "flex w-full flex-col gap-4 md:gap-5";
 
 const BuyingGuideHighlight = ({ label }: { label: string }) => (
   <div className="flex min-h-[52px] items-stretch overflow-hidden rounded-lg bg-skin-white shadow-card">
@@ -66,8 +64,8 @@ const CategoryBuyingGuide = ({
     <section
       className={
         embedded
-          ? SECTION_STACK
-          : `${SECTION_STACK} rounded-2xl bg-skin-white p-5 shadow-card md:p-7 xl:p-10`
+          ? BUYING_GUIDE_SECTION_GAP
+          : `${BUYING_GUIDE_SECTION_GAP} rounded-2xl bg-skin-white p-5 shadow-card md:p-7 xl:p-10`
       }
       aria-label={label}
     >

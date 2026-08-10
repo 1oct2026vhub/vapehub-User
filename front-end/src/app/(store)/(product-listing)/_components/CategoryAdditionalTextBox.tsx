@@ -1,5 +1,6 @@
 import CategoryAdditionalTextBoxDesktop from "./CategoryAdditionalTextBoxDesktop";
 import CategoryAdditionalTextBoxMobile from "./CategoryAdditionalTextBoxMobile";
+import { BUYING_GUIDE_EMBEDDED_SECTION } from "./buying-guide-layout";
 import { normalizeTypeCardsHtml } from "./type-cards.utils";
 
 type CategoryAdditionalTextBoxProps = {
@@ -31,12 +32,7 @@ const CategoryAdditionalTextBox = ({
   );
 
   if (embedded) {
-    return (
-      <section className="w-full pt-4 md:pt-5">
-        <div className="mb-4 h-px w-full bg-skin-neutral-200 md:mb-5" aria-hidden />
-        {content}
-      </section>
-    );
+    return <section className={BUYING_GUIDE_EMBEDDED_SECTION}>{content}</section>;
   }
 
   return (

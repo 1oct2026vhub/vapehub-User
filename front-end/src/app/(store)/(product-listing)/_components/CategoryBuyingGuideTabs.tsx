@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CategoryBuyingGuideTab } from "@/lib/config/category-buying-guide.config";
+import { BUYING_GUIDE_EMBEDDED_SECTION } from "./buying-guide-layout";
 
 interface CategoryBuyingGuideTabsProps {
   tabs: CategoryBuyingGuideTab[];
@@ -20,7 +21,7 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
   }
 
   return (
-    <div className="flex w-full flex-col gap-4 md:gap-5 md:border-t md:border-skin-neutral-100 md:pt-5">
+    <div className={`${BUYING_GUIDE_EMBEDDED_SECTION} flex flex-col gap-4 md:gap-5`}>
       <div className="relative mx-auto w-fit max-w-full overflow-hidden rounded-lg border border-skin-neutral-100 bg-skin-white p-2 md:mx-0 md:w-full md:p-2.5">
         <div
           aria-hidden

@@ -2068,6 +2068,16 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   min-width: 0;
 }
 
+/* CKEditor often leaves spacer <p>&nbsp;</p> above/below the card grid */
+.type-cards-html > p:empty,
+.type-cards-html > p:has(> br:only-child) {
+  display: none;
+  margin: 0;
+  padding: 0;
+  height: 0;
+  overflow: hidden;
+}
+
 .type-cards-html .raw-html-embed {
   width: 100%;
   max-width: 100%;

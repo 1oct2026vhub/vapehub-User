@@ -131,7 +131,9 @@ const BrandPage: NextPage<Props> = async ({
       })),
     });
 
-    const brandFaqs = await fetchBrandFaqs(brandProduct.id);
+    const brandFaqs = await fetchBrandFaqs(
+      dynamicPageSlug.entity_id ?? brandProduct.id
+    );
 
     return (
       <>

@@ -948,9 +948,25 @@ input[type="checkbox"] + span {
 }
 
 /* Buying guide CKEditor HTML: match admin editor default (black), not listing grey */
-.product-listing-container .category-buying-guide-content.product-content,
-.product-listing-container .category-buying-guide-tab-content.product-content {
+.category-buying-guide-content.product-content,
+.category-buying-guide-tab-content.product-content {
   color: #000000;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/*
+ * CMS paste/computed styles sometimes bake desktop widths (e.g. width:1372px)
+ * into paragraph/inline styles, which expands the whole listing page on mobile.
+ */
+.category-buying-guide-content.product-content.rich-text :is(p, li, h1, h2, h3, h4, h5, h6, a, strong, em, span, div):not([class*="type-card"]):not([class*="atb-"]),
+.category-buying-guide-tab-content.product-content.rich-text :is(p, li, h1, h2, h3, h4, h5, h6, a, strong, em, span, div):not([class*="type-card"]):not([class*="atb-"]) {
+  width: auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
 }
 
 /*

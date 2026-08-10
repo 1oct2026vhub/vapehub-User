@@ -19,6 +19,27 @@ const EMPTY_AUTHOR = {
   email: "",
 };
 
+/**
+ * CMS / paste-from-browser HTML often bakes desktop computed widths into
+ * inline styles (e.g. `width:1372px`), which forces horizontal page overflow
+ * on mobile. Strip fixed px width/min-width and dumped `--tw-*` vars.
+ */
+export function sanitizeBuyingGuideHtml(html: string): string {
+  if (!html || !/style\s*=/i.test(html)) return html;
+
+  return html.replace(/style\s*=\s*(["'])([\s\S]*?)\1/gi, (_full, quote: string, style: string) => {
+    const cleaned = style
+      .replace(/(?:^|;)\s*width\s*:\s*[\d.]+px\s*(?=;|$)/gi, ";")
+      .replace(/(?:^|;)\s*min-width\s*:\s*[\d.]+px\s*(?=;|$)/gi, ";")
+      .replace(/(?:^|;)\s*--tw-[a-z0-9-]+\s*:\s*[^;]*\s*(?=;|$)/gi, ";")
+      .replace(/;{2,}/g, ";")
+      .replace(/^;\s*|\s*;$/g, "")
+      .trim();
+
+    return cleaned ? `style=${quote}${cleaned}${quote}` : "";
+  });
+}
+
 function mapTabs(tabs?: PublicBuyingGuide["tabs"]): CategoryBuyingGuideTab[] | undefined {
   if (!tabs?.length) return undefined;
 
@@ -27,7 +48,7 @@ function mapTabs(tabs?: PublicBuyingGuide["tabs"]): CategoryBuyingGuideTab[] | u
     .map((tab, index) => {
       const label = tab.tab_title?.trim();
       const heading = tab.section_heading?.trim();
-      const contentHtml = tab.section_body?.trim() ?? "";
+      const contentHtml = sanitizeBuyingGuideHtml(tab.section_body?.trim() ?? "");
       if (!label || !heading || !contentHtml) return null;
 
       return {
@@ -57,7 +78,7 @@ export function mapPublicBuyingGuide(
     .filter((text): text is string => Boolean(text))
     .slice(0, 3);
 
-  const contentHtml = guide.intro_content?.trim() ?? "";
+  const contentHtml = sanitizeBuyingGuideHtml(guide.intro_content?.trim() ?? "");
   const title = guide.title?.trim() || fallbackTitle?.trim() || "";
   const imageUrl = guide.banner_image?.trim() || undefined;
 

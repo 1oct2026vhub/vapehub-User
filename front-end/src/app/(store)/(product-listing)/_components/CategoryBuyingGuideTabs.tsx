@@ -54,7 +54,7 @@ const CategoryBuyingGuideTabs = ({ tabs, defaultTabId }: CategoryBuyingGuideTabs
           <h3 className="text-skin-neutral-500">{activeTab.heading}</h3>
         </div>
         <div
-          className="category-buying-guide-tab-content product-content rich-text text-content-1 font-normal leading-relaxed"
+          className="category-buying-guide-tab-content product-content rich-text min-w-0 w-full max-w-full text-content-1 font-normal leading-relaxed"
           dangerouslySetInnerHTML={{ __html: activeTab.contentHtml }}
         />
       </div>

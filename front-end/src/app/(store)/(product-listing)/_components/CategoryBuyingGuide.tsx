@@ -41,7 +41,7 @@ const CategoryBuyingGuide = ({
 
   const intro = hasIntro ? (
     <div
-      className="category-buying-guide-content product-content rich-text min-w-0 flex-1 text-content-1 font-normal leading-relaxed"
+      className="category-buying-guide-content product-content rich-text min-w-0 w-full max-w-full flex-1 text-content-1 font-normal leading-relaxed"
       dangerouslySetInnerHTML={{ __html: contentHtml }}
     />
   ) : null;

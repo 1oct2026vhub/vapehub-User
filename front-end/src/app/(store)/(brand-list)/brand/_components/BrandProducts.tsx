@@ -35,11 +35,14 @@ const BrandProducts = async ({
     // Opt brand CMS sections out of Full Route Cache so admin updates show promptly.
     noStore();
 
-    const brandName = data.name || dynamicPageSlug?.name || "";
-    // Full slug for canonical breadcrumb href (/brand/<slug>/)
-    const brandSlug = data.slug || dynamicPageSlug?.slug || "";
-    // Leaf slug for buying-guide API lookup
-    const buyingGuideSlug = brandSlug.split("/").filter(Boolean).pop() || "";
+    // Prefer slug-relation / URL identity. Products-by-slug can return a different
+    // brand (e.g. zyn → oxva); buying guide + breadcrumbs must stay on the page brand.
+    const pageSlug =
+        dynamicPageSlug?.slug?.split("/").filter(Boolean).pop() || "";
+    const productsSlug = data.slug?.split("/").filter(Boolean).pop() || "";
+    const buyingGuideSlug = pageSlug || productsSlug;
+    const brandSlug = pageSlug || productsSlug || data.slug || dynamicPageSlug?.slug || "";
+    const brandName = dynamicPageSlug?.name || data.name || "";
 
     const buyingGuideSection = await fetchBrandBuyingGuideSection(
         buyingGuideSlug,
@@ -57,6 +60,14 @@ const BrandProducts = async ({
     const showRelatedCollections = isEnabled && Boolean(typeCardsHtml?.trim());
     const showAdditionalTextBox = isEnabled && Boolean(additionalTextBoxHtml?.trim());
 
+    const faqBrandId = dynamicPageSlug?.entity_id ?? data.id;
+
+    const listingData = {
+        ...data,
+        name: brandName,
+        slug: brandSlug,
+    };
+
     const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Brands", href: ROUTES.BRANDS },
@@ -67,7 +78,7 @@ const BrandProducts = async ({
             <section className="product-listing-container flex-col">
                 <BreadCrumbs items={breadcrumbs} />
                 <ProductListingContent
-                    data={data}
+                    data={listingData}
                     dynamicPageSlug={dynamicPageSlug}
                     aboutHeading={`About ${brandName} Vapes`}
                     showBuyingGuideCta={buyingGuideCta.show}
@@ -112,7 +123,7 @@ const BrandProducts = async ({
                                     />
                                 ) : null}
                                 {brandFaqs.length > 0 ? (
-                                    <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} embedded />
+                                    <FAQSection type="brand" id={faqBrandId} title="FAQs" initialFaqs={brandFaqs} embedded />
                                 ) : null}
                             </CategoryBuyingGuideAccordion>
                         </div>
@@ -126,7 +137,7 @@ const BrandProducts = async ({
                             ) : null}
                             {brandFaqs.length > 0 ? (
                                 <section className="product-listing-container pt-7.5 md:pt-9">
-                                    <FAQSection type="brand" id={data.id} title="FAQs" initialFaqs={brandFaqs} />
+                                    <FAQSection type="brand" id={faqBrandId} title="FAQs" initialFaqs={brandFaqs} />
                                 </section>
                             ) : null}
                         </>

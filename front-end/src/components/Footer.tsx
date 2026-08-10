@@ -52,18 +52,18 @@ const Footer = async (): AsyncReactElement => {
       <Suspense fallback={<SuspenseLoader />}>
         <Subscription />
       </Suspense>
-      <div className="px-4 lg:px-10 py-7 md:py-10 flex flex-col md:flex-row items-start justify-between gap-x-7 gap-y-6 md:gap-y-0 max-w-[1520px] mx-auto">
-        {/* Left Sections */}
-        <div className="hidden md:flex flex-1 gap-5 lg:gap-8 justify-start">
+      <div className="px-4 md:px-6 lg:px-10 py-7 md:py-10 flex flex-col lg:flex-row items-start justify-between gap-x-7 gap-y-8 lg:gap-y-0 max-w-[1520px] mx-auto">
+        {/* Left Sections — grid on tablet, row on desktop */}
+        <div className="hidden md:grid md:grid-cols-3 xl:grid-cols-5 flex-1 gap-x-5 gap-y-6 lg:gap-8 w-full min-w-0 lg:max-w-none">
           {sortedFooterMenu.map((section) => (
-            <div key={section.id} className={`space-y-4 text-skin-white flex flex-col flex-1 min-w-0`}>
+            <div key={section.id} className={`space-y-4 text-skin-white flex flex-col min-w-0`}>
               <div className="!font-oswald text-title-2 lg:text-h5 font-semibold !capitalize">{section.title}</div>
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.id}>
                     <Link
                       href={link.url}
-                      className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 hover:underline transition-all duration-100 !capitalize"
+                      className="text-content-1 lg:text-title-2 font-normal opacity-90 hover:opacity-100 hover:underline transition-all duration-100 !capitalize break-words"
                     >
                       {link.label}
                     </Link>
@@ -80,9 +80,9 @@ const Footer = async (): AsyncReactElement => {
         </div>
 
         {/* Right Section */}
-        <div className="flex flex-col md:items-end items-center max-md:mx-auto md:min-h-[270px]">
+        <div className="flex flex-col lg:items-end items-center max-md:mx-auto md:w-full lg:w-auto lg:shrink-0 lg:min-h-[270px]">
           <Logo className="max-w-56 max-h-9" />
-          <div className="text-skin-white text-center md:text-right mt-2 md:mt-auto">
+          <div className="text-skin-white text-center lg:text-right mt-2 lg:mt-auto">
             <div className="!font-oswald text-xl font-bold">Customer Services</div>
             <div className='text-content-2 font-semibold text-skin-neutral-100'>
               Email us: 
@@ -100,7 +100,7 @@ const Footer = async (): AsyncReactElement => {
                   <p className='text-content-2 font-semibold text-skin-neutral-100'>Unit 6 Peaks Place Business Park BL1 8AS</p>
                 </div>
             </div>
-            <div className="flex items-center gap-4.5 justify-center md:justify-end mt-4 xl:mt-5.5">
+            <div className="flex items-center gap-4.5 justify-center lg:justify-end mt-4 xl:mt-5.5">
               {socialMediaLinks.map((link, idx) => (
                 <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer">
                   {link.icon}

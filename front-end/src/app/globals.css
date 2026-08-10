@@ -971,13 +971,28 @@ input[type="checkbox"] + span {
 }
 
 @media (min-width: 768px) {
+  /*
+   * Desktop/tablet: share full width equally when labels fit;
+   * otherwise keep label min-width and scroll horizontally (no wrap).
+   */
   .category-buying-guide-tabs-scroll {
-    flex-wrap: wrap;
+    width: 100%;
+    flex-wrap: nowrap;
     justify-content: flex-start;
     gap: 0.625rem;
-    overflow-x: visible;
-    overscroll-behavior-x: auto;
-    scroll-snap-type: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+  }
+
+  .category-buying-guide-tabs-scroll > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0%;
+    min-width: max-content;
+    white-space: nowrap;
   }
 }
 

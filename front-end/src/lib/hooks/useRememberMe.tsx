@@ -3,10 +3,15 @@
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { Undefined } from '@/lib/config/app.config';
 
+/** Legacy password cookie — never written; always cleared on load. */
 const PASSWORD_COOKIE_NAME = 'psw-vape-client';
 const EMAIL_COOKIE_NAME = 'eml-vape-client';
 
-/** App-scoped secret used only to obfuscate remember-me cookie values (never sent to the server). */
+/**
+ * Obfuscates the remembered email in the cookie so it is not stored as plain text.
+ * This is not a security boundary (key ships in the client); it only reduces casual exposure.
+ * Passwords must never be stored client-side.
+ */
 const CREDENTIAL_SECRET = 'vape-hub-remember-me-v1';
 
 const HEX_PATTERN = /^[0-9a-f]+$/i;
@@ -48,7 +53,7 @@ const getCryptoKey = async (): Promise<CryptoKey> => {
   );
 };
 
-/** Encrypts a value into a hex string (hash-like) so cookies never store plain text. */
+/** Encrypts a value into a hex string so the email cookie is not plain text. */
 const toHashFormat = async (value: string): Promise<string> => {
   const key = await getCryptoKey();
   const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -61,7 +66,7 @@ const toHashFormat = async (value: string): Promise<string> => {
   return `${toHex(iv)}${toHex(cipherBuffer)}`;
 };
 
-/** Decrypts a hash-format cookie value back to the original string. */
+/** Decrypts a hash-format email cookie value back to the original string. */
 const fromHashFormat = async (hashedValue: string): Promise<string | undefined> => {
   if (!hashedValue || !HEX_PATTERN.test(hashedValue) || hashedValue.length < 32) {
     return undefined;
@@ -84,56 +89,54 @@ const fromHashFormat = async (hashedValue: string): Promise<string | undefined> 
   }
 };
 
+/** Removes any leftover password cookie (plaintext or encrypted) from prior builds. */
+const clearLegacyPasswordCookie = (): void => {
+  deleteCookie(PASSWORD_COOKIE_NAME);
+};
+
 export const useRememberMe = (): {
-  rememberMe: (email: string, password: string) => Promise<void>;
+  rememberMe: (email: string) => Promise<void>;
   forgetMe: () => void;
   getRememberedCredentials: () => Promise<
     Undefined<{
       email: string;
-      password: string;
     }>
   >;
 } => {
-  const rememberMe = async (userEmail: string, userPassword: string): Promise<void> => {
-    const [hashedEmail, hashedPassword] = await Promise.all([
-      toHashFormat(userEmail),
-      toHashFormat(userPassword),
-    ]);
-
+  const rememberMe = async (userEmail: string): Promise<void> => {
+    clearLegacyPasswordCookie();
+    const hashedEmail = await toHashFormat(userEmail);
     setCookie(EMAIL_COOKIE_NAME, hashedEmail);
-    setCookie(PASSWORD_COOKIE_NAME, hashedPassword);
   };
 
   const forgetMe = (): void => {
     deleteCookie(EMAIL_COOKIE_NAME);
-    deleteCookie(PASSWORD_COOKIE_NAME);
+    clearLegacyPasswordCookie();
   };
 
   const getRememberedCredentials = async (): Promise<
     Undefined<{
       email: string;
-      password: string;
     }>
   > => {
-    const storedEmail = getCookie(EMAIL_COOKIE_NAME) as string | undefined;
-    const storedPassword = getCookie(PASSWORD_COOKIE_NAME) as string | undefined;
+    // Always purge password cookies from older builds (plaintext or encrypted).
+    clearLegacyPasswordCookie();
 
-    if (!storedEmail || !storedPassword) {
+    const storedEmail = getCookie(EMAIL_COOKIE_NAME) as string | undefined;
+
+    if (!storedEmail) {
       return undefined;
     }
 
-    const [email, password] = await Promise.all([
-      fromHashFormat(storedEmail),
-      fromHashFormat(storedPassword),
-    ]);
+    const email = await fromHashFormat(storedEmail);
 
-    // Legacy plain-text cookies (or tampered values) cannot be used safely — clear them.
-    if (!email || !password) {
+    // Legacy plain-text email cookies (or tampered values) cannot be used safely — clear them.
+    if (!email) {
       forgetMe();
       return undefined;
     }
 
-    return { email, password };
+    return { email };
   };
 
   return {

@@ -53,7 +53,8 @@ const Login: FunctionComponent = (): ReactElement => {
         }
         
         if (rememberMeValue) {
-            await rememberMe(email, password);
+            // Persist email only — never store the password client-side.
+            await rememberMe(email);
         } else {
             forgetMe();
         }
@@ -73,7 +74,7 @@ const Login: FunctionComponent = (): ReactElement => {
             if (!isMounted || !remembered) return;
             signInFromConfig.reset({
                 email: remembered.email,
-                password: remembered.password,
+                password: '',
             });
             setRememberMe(true);
         };

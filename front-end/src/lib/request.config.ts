@@ -1,10 +1,34 @@
+'use server';
 import {  
   ServerActionResponse,
   ServerActionStatus,
   UNAUTHORIZED_RESPONSE_NAME,
 } from '@/lib/config/app.config';
-import { getServerSessionData } from '@/lib/config/auth.config';
 import { handleUnauthorizedSession } from '@/lib/auth.actions';
+import { getToken } from 'next-auth/jwt';
+import { cookies } from 'next/headers';
+
+/**
+ * Reads the backend API Bearer token from the encrypted NextAuth JWT cookie.
+ * Private to this module — never expose via session / client-reachable actions.
+ */
+const getBackendAccessToken = async (): Promise<string | undefined> => {
+  const cookieStore = await cookies();
+  const token = await getToken({
+    // SessionStore accepts Next.js cookies() (has getAll).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    req: { cookies: cookieStore } as any,
+  });
+
+  if (!token) return undefined;
+
+  const accessToken =
+    (typeof token.accessToken === 'string' && token.accessToken) ||
+    (typeof token.sub === 'string' && token.sub) ||
+    undefined;
+
+  return accessToken || undefined;
+};
 
 // * Types
 type HandleRequest<G> =
@@ -150,12 +174,14 @@ const buildHeaders = async <G>(
   ): Promise<HeadersInit> => {
     const headers = new Headers();
   
-    // Only fetch session and add Authorization header for non-cached (protected) APIs
+    // Only attach Authorization for non-cached (protected) APIs.
+    // Read the Bearer token from the encrypted JWT (server-only) — never from session.user,
+    // which is exposed to client JS via /api/auth/session.
     if (!canCache) {
-      const session = await getServerSessionData();
-      
-      if (session?.user) {
-        headers.append('Authorization', `Bearer ${session.user.accessToken}`);
+      const accessToken = await getBackendAccessToken();
+
+      if (accessToken) {
+        headers.append('Authorization', `Bearer ${accessToken}`);
       }
     }
   

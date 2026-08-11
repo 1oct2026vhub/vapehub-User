@@ -14,7 +14,6 @@ import { SHIPPING_METHOD_DISPLAY } from '@/lib/config/order.config';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { useProductData } from '@/lib/context/ProductDataContext';
 import { useProductDescription } from '@/lib/hooks/useProductDescription';
-import { sanitizeHtml } from '@/lib/sanitize-html';
 
 type ProductContentProps = {
     data: ProductResponse;
@@ -134,7 +133,7 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
                                                 <span className='text-content-2 font-semibold'>Loading description...</span>
                                             </div>
                                         ) : description ? (
-                                            <div className='product-content' dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
+                                            <div className='product-content' dangerouslySetInnerHTML={{ __html: description }} />
                                         ) : (
                                             <p className='text-content-2 text-skin-neutral-500'>No description available.</p>
                                         )}
@@ -335,7 +334,7 @@ const ProductContent: React.FC<ProductContentProps> = ({data}): ReactElement => 
                                                         const uniqueKey = `shipping-method-${method.id}-${method.display_text.replace(/\s+/g, '-')}-${index}`;
                                                         return (
                                                             <li key={uniqueKey}>
-                                                              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(method.display_text) }} /> 
+                                                              <div dangerouslySetInnerHTML={{ __html: method.display_text }} /> 
                                                             </li>
                                                         );
                                                     })}

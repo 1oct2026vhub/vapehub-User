@@ -1,17 +1,12 @@
 /**
  * Normalizes blog HTML from the API so headings, lists, and tables render with `.rich-text` styles.
  * Handles escaped HTML and content pasted as plain lines (often one <p> per line).
- *
- * Entity-decoding is private and only runs inside prepareBlogHtml, which always
- * sanitizes afterward so decode cannot re-enable script/event-handler markup.
  */
-
-import { sanitizeHtml } from '@/lib/sanitize-html';
 
 const BLOCK_TAG_RE = /<(p|div|h[1-6]|ul|ol|li|table|figure|blockquote)\b/i;
 
-/** Decode entity-escaped HTML when tags were stored as text. Not exported — always followed by sanitize. */
-function decodeBlogHtmlIfEscaped(html: string): string {
+/** Decode entity-escaped HTML when tags were stored as text. */
+export function decodeBlogHtmlIfEscaped(html: string): string {
   const trimmed = html.trim();
   if (!trimmed || BLOCK_TAG_RE.test(trimmed)) return html;
   if (!/&lt;\s*\/?\s*(p|div|h[1-6]|ul|ol|table|br)\b/i.test(trimmed)) return html;
@@ -188,5 +183,5 @@ export function prepareBlogHtml(content: string): string {
     html = convertParagraphTablesToHtml(html);
   }
 
-  return sanitizeHtml(html);
+  return html;
 }

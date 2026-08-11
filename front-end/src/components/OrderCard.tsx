@@ -1,7 +1,6 @@
 import React from 'react'
 import { getDispatchNotice } from '@/lib/server.actions'
 import { ServerActionStatus } from '@/lib/config/app.config'
-import { sanitizeHtml } from '@/lib/sanitize-html'
 
 const OrderCard: React.FC = async () => {
   const dispatchNoticeResponse = await getDispatchNotice()
@@ -21,7 +20,7 @@ const OrderCard: React.FC = async () => {
     <div className='w-full bg-red-gradient-200 py-4.5 px-7.5 rounded-10 shadow-blog-card text-center'>
       <div 
         className='text-skin-white text-content-1 md:text-title-1 font-semibold !font-oswald mx-auto rich-text'
-        dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
+        dangerouslySetInnerHTML={{ __html: content }}
       />
     </div>
   )

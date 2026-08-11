@@ -7,7 +7,6 @@ import Image from "next/image";
 import { Suspense } from "react";
 import SuspenseLoader from "@/components/ui/SuspenseLoader";
 import { prepareBlogHtml } from "@/lib/blog-content.utils";
-import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface CategoryBlogsProps {
   data: BlogByCategoryAndSlugResponse;
@@ -42,8 +41,7 @@ const CategoryBlogs = ({ data }: CategoryBlogsProps) => {
     { label: data.title, href: data.slug.startsWith('/') ? data.slug : `/${data.slug}`, isActive: true },
   ];
 
-  // Sanitize after link rewriting so href fixes cannot reintroduce unsafe markup.
-  const processedContent = sanitizeHtml(processBlogContent(prepareBlogHtml(data.content)));
+  const processedContent = processBlogContent(prepareBlogHtml(data.content));
 
   return (
     <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>

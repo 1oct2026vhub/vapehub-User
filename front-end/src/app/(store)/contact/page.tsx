@@ -3,7 +3,6 @@ import { getContactUs } from '@/lib/server.actions'
 import { ServerActionStatus } from '@/lib/config/app.config'
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { sanitizeHtml } from '@/lib/sanitize-html';
 // import parse from 'html-react-parser';
 
 export const metadata: Metadata = {
@@ -35,11 +34,11 @@ const ContactUs = async () => {
                 <div className="flex flex-col gap-8 text-title-2 text-skin-neutral-500 mt-8">
                     <div className='space-y-2'>
                         <h2 className='text-h4 font-bold'>SEND US A MESSAGE</h2>
-                        <div className='rich-text' dangerouslySetInnerHTML={{ __html: sanitizeHtml(contactInfo?.send_us_a_message || '') }} />
+                        <div className='rich-text' dangerouslySetInnerHTML={{ __html: contactInfo?.send_us_a_message || '' }} />
                     </div>
                     <div className='space-y-2'>
                         <h2 className='text-h4 font-bold'>CALL US</h2>
-                        <div className='rich-text' dangerouslySetInnerHTML={{ __html: sanitizeHtml(contactInfo?.call_us || '') }} />
+                        <div className='rich-text' dangerouslySetInnerHTML={{ __html: contactInfo?.call_us || '' }} />
                     </div>
                     <div className='flex flex-col gap-2 text-skin-neutral-500'>
                         <h2 className='text-h4 font-bold'>YOU MAY HAVE YOUR QUESTIONS ANSWERED BY CLICKING ANY OF THE LINKS BELOW:</h2>

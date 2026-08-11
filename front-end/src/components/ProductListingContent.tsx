@@ -5,7 +5,6 @@ import { BrandConfig } from '@/lib/config/brand.config';
 import { DynamicPageSlugResponse } from '@/lib/config/global.config';
 import Link from 'next/link';
 import NoImage from './NoImage';
-import { sanitizeHtml } from '@/lib/sanitize-html';
 
 type CategoryProps = {
     data: Category | BrandConfig;
@@ -31,7 +30,7 @@ const ProductListingContent: React.FC<CategoryProps> = ({data, dynamicPageSlug, 
                 {(dynamicPageSlug?.description || data?.description) && (
                     <div 
                         className="product-content rich-text text-content-1 md:text-content-1 font-normal text-skin-neutral-500 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(dynamicPageSlug?.description || data?.description || "") }}
+                        dangerouslySetInnerHTML={{ __html: dynamicPageSlug?.description || data?.description || "" }}
                     />
                 )}
             </div>

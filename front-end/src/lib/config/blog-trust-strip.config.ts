@@ -1,6 +1,14 @@
+export type TrustBadgeIcon =
+  | "regulator"
+  | "industry"
+  | "reviews"
+  | "compliance"
+  | "age";
+
 export interface SitewideTrustBadge {
   category: string;
   value: string;
+  icon: TrustBadgeIcon;
 }
 
 export const SITEWIDE_TRUST_STRIP = {
@@ -10,9 +18,9 @@ export const SITEWIDE_TRUST_STRIP = {
 } as const;
 
 export const SITEWIDE_TRUST_BADGES: SitewideTrustBadge[] = [
-  { category: "REGULATOR", value: "MHRA Notified" },
-  { category: "INDUSTRY BODY", value: "UKVIA Member" },
-  { category: "REVIEWS", value: "Trustpilot" },
-  { category: "COMPLIANCE", value: "TPD & TRPR" },
-  { category: "AGE", value: "Challenge 25" },
+  { category: "REGULATOR", value: "MHRA Notified", icon: "regulator" },
+  { category: "INDUSTRY BODY", value: "UKVIA", icon: "industry" },
+  { category: "REVIEWS", value: "Trustpilot", icon: "reviews" },
+  { category: "COMPLIANCE", value: "TPD & TRPR", icon: "compliance" },
+  { category: "AGE", value: "Challenge 25", icon: "age" },
 ];

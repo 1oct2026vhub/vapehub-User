@@ -27,6 +27,8 @@ const RelatedProducts: React.FC<RelatedProductsProps> = async ({
     products: response.data.similar_products.map((p: SimilarProduct) => ({
       ...p,
       price: p.price ?? "0.00",
+      regular_price: p.regular_price,
+      Category: p.Category ?? (p as { category?: Product["Category"] }).category ?? undefined,
       ProductImages: p.primary_image ? [{
         id: p.primary_image.id,
         image_url: p.primary_image.url,

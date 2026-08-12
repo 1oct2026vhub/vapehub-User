@@ -2856,3 +2856,22 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   min-width: 0;
 }
 
+/* Diagonal strikethrough for sale "was" price on product cards */
+.price-diagonal-strike {
+  position: relative;
+  display: inline-block;
+}
+
+.price-diagonal-strike::after {
+  content: '';
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 50%;
+  height: 1.5px;
+  background-color: currentColor;
+  transform: rotate(-18deg);
+  transform-origin: center;
+  pointer-events: none;
+}
+

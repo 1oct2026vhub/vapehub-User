@@ -233,7 +233,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex flex-col justify-center gap-0.5 min-w-0 flex-1 md:flex-none md:flex-row md:items-baseline md:gap-1.5">
               <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold leading-tight">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
               {isOnSale && (
-                <p className="text-content-3 md:text-content-2 text-skin-neutral-500 line-through opacity-60 font-bold leading-tight">{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
+                <p className="price-diagonal-strike text-content-1 md:text-title-2 text-skin-neutral-500 opacity-60 font-bold leading-tight w-fit">
+                  {DEFAULT_CURRENCY_SYMBOL}{regularPrice}
+                </p>
               )}
             </div>
             {buttonText && (

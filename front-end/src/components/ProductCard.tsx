@@ -223,15 +223,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
         </div>
-          <div className="flex items-center justify-between gap-2 min-h-8 self-stretch mt-2.5">
-            <div className="flex items-baseline gap-1.5 min-w-0">
-              <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
+          <div className="flex items-center justify-between gap-2 min-h-[40px] md:min-h-8 self-stretch mt-2.5">
+            <div className="flex flex-col justify-center gap-0.5 min-w-0 flex-1 md:flex-none md:flex-row md:items-baseline md:gap-1.5">
+              <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold leading-tight">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
               {isOnSale && (
-                <p className="text-content-3 md:text-content-2 text-skin-neutral-500 line-through opacity-60 font-bold">{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
+                <p className="text-content-3 md:text-content-2 text-skin-neutral-500 line-through opacity-60 font-bold leading-tight">{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
               )}
             </div>
             {buttonText && (
-              <div className="relative">
+              <div className="relative shrink-0">
                 <Button
                   size="md"
                   radius="md"

@@ -3,6 +3,7 @@ import { Checkbox, Select, SelectItem } from '@nextui-org/react';
 import React, { useState } from 'react'
 import { isLessThanOneMonth } from "@/lib/config/app.config";
 import ProductCard from '@/components/ProductCard';
+import { resolveProductCardPrices } from '@/lib/product-card-prices';
 import Slider, { Settings } from 'react-slick';
 
 const products = [
@@ -192,12 +193,15 @@ const ShortFills: React.FC = () => {
             </Select>
             <div className="slider-container section-slider products-slider">
                 <Slider {...settings}>
-                    {products.map((product, index) => (
+                    {products.map((product, index) => {
+                        const { price, regularPrice } = resolveProductCardPrices(product);
+                        return (
                         <div key={index} className="px-1 md:px-2 xl:px-5 py-4 first:pl-0">
                             <ProductCard
                                 title={product.name}
                                 imageSrc={product.imageSrc}
-                                price={product.price}
+                                price={price}
+                                regularPrice={regularPrice}
                                 buttonText={"3 for £30"}
                                 productId={product.id}
                                 flavors={product.Flavors}
@@ -206,7 +210,8 @@ const ShortFills: React.FC = () => {
                                 isNew={isLessThanOneMonth(product.createdAt) ? "New" : ""}
                             />
                         </div>
-                    ))}
+                        );
+                    })}
                 </Slider>
             </div>
         </div>

@@ -14,6 +14,7 @@ interface ProductCardProps {
   altText?: string;
   imageSrc: string;
   price: string;
+  regularPrice?: string;
   buttonText: string;
   productId: number;
   flavors?: number;
@@ -32,6 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   altText,
   imageSrc,
   price,
+  regularPrice,
   buttonText,
   outOfStock,
   // productId,
@@ -142,6 +144,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
       window.removeEventListener('resize', checkTruncation);
     };
   }, [title]);
+
+  const currentPrice = Number(price) || 0;
+  const previousPrice = Number(regularPrice) || 0;
+  const isOnSale = previousPrice > 0 && currentPrice > 0 && previousPrice > currentPrice;
   
   return (
     <Link prefetch={false} href={link} className="block h-full">
@@ -224,7 +230,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
           <div className="flex items-center justify-between gap-2 min-h-8 self-stretch mt-2.5">
-            <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
+            <div className="flex items-baseline gap-1.5 min-w-0">
+              <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
+              {isOnSale && (
+                <p className="text-content-3 md:text-content-2 text-skin-neutral-500 line-through opacity-60 font-bold">{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
+              )}
+            </div>
             {buttonText && (
               <div className="relative">
                 <Button

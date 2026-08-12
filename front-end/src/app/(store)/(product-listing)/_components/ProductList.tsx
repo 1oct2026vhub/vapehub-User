@@ -8,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import { isLessThanOneMonth } from "@/lib/config/app.config";
+import { resolveProductCardPrices } from "@/lib/product-card-prices";
 import { 
   ProductResponseData, 
   CategoryResponseData, 
@@ -336,13 +337,15 @@ const ProductList: FunctionComponent<{
                     const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
 
                     const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
+                    const { price, regularPrice } = resolveProductCardPrices(product);
                     return (
                       <ProductCard
                         key={product.id}
                         title={product.name}
                         imageSrc={primaryImage?.image_url || ''}
                         altText={primaryImage?.alt_text ?? product.name}
-                        price={product.price}
+                        price={price}
+                        regularPrice={regularPrice}
                         buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
                         // flavors={product?.Flavors?.length}
                         flavors={product.flavor_count ? Number(product.flavor_count) : 0}

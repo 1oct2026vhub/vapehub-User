@@ -606,9 +606,11 @@ input[type='search'] {
   margin-bottom: -0.25rem;
 }
 
-.trust-strip-slider .slick-track {
+.trust-strip-slider .slick-track,
+.trust-strip-slider .slick-slider .slick-list .slick-track {
   display: flex !important;
   align-items: stretch !important;
+  transition: transform 100ms linear !important;
 }
 
 .trust-strip-slider .slick-slide {

@@ -530,7 +530,7 @@ input[type='search'] {
 .trust-strip-static-fallback .trust-strip-badge {
   flex: 0 0 auto;
   width: min(100%, 252px);
-  min-width: calc(100vw - 5.5rem);
+  min-width: calc(100vw - 8.5rem);
   max-width: 20rem;
   scroll-snap-align: start;
 }
@@ -590,11 +590,12 @@ input[type='search'] {
 }
 
 .trust-strip-slider:has(.trust-strip-carousel--active) {
-  padding-inline: 2.5rem;
+  padding-inline: 0;
 }
 
-.trust-strip-slider:has(.trust-strip-carousel--mobile) {
-  padding-inline: 2.25rem;
+.trust-strip-slider:has(.trust-strip-carousel--mobile),
+.trust-strip-slider:has(.trust-strip-carousel--tablet) {
+  padding-inline: 0;
 }
 
 .trust-strip-slider .slick-list {
@@ -640,6 +641,16 @@ input[type='search'] {
 
 .trust-strip-slider .slick-next {
   right: 0;
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-next,
+.trust-strip-slider:has(.trust-strip-carousel--tablet) .slick-next {
+  right: 0.35rem;
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-prev,
+.trust-strip-slider:has(.trust-strip-carousel--tablet) .slick-prev {
+  left: 0.35rem;
 }
 
 .trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-prev,

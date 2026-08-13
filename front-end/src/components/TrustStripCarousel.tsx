@@ -110,7 +110,7 @@ const TrustBadgeCard = ({
 );
 
 function getMode(width: number): BreakpointMode {
-  if (width < 640) return "mobile";
+  if (width < 768) return "mobile";
   if (width < 1024) return "tablet";
   if (width < 1280) return "desktop";
   return "wide";
@@ -118,9 +118,9 @@ function getMode(width: number): BreakpointMode {
 
 function getSlidesToShow(mode: BreakpointMode, badgeCount: number) {
   const byMode: Record<BreakpointMode, number> = {
-    mobile: 1,
-    tablet: 2,
-    desktop: 3,
+    mobile: 1.4,
+    tablet: 2.2,
+    desktop: 4,
     wide: 4,
   };
   return Math.max(1, Math.min(badgeCount, byMode[mode]));
@@ -173,6 +173,7 @@ const TrustStripCarousel = ({ badges }: TrustStripCarouselProps) => {
       speed: 400,
       slidesToShow,
       slidesToScroll: 1,
+      swipeToSlide: true,
     }),
     [slidesToShow],
   );

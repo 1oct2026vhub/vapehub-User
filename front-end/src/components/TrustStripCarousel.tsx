@@ -119,9 +119,9 @@ function getMode(width: number): BreakpointMode {
 function getSlidesToShow(mode: BreakpointMode, badgeCount: number) {
   const byMode: Record<BreakpointMode, number> = {
     mobile: 1.4,
-    tablet: 2.2,
-    desktop: 4,
-    wide: 4,
+    tablet: 2.35,
+    desktop: 4.35,
+    wide: 4.35,
   };
   return Math.max(1, Math.min(badgeCount, byMode[mode]));
 }
@@ -170,10 +170,12 @@ const TrustStripCarousel = ({ badges }: TrustStripCarouselProps) => {
       dots: false,
       arrows: true,
       infinite: false,
-      speed: 400,
+      speed: 300,
+      cssEase: "ease-in-out",
       slidesToShow,
       slidesToScroll: 1,
       swipeToSlide: true,
+      waitForAnimate: false,
     }),
     [slidesToShow],
   );

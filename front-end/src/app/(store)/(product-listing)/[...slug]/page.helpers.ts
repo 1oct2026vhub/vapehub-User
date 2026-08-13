@@ -32,10 +32,72 @@ import {
   SCHEMA_CONTEXT,
 } from "@/lib/seo-schema";
 import { resolveSiteUrl } from "@/lib/site-url";
+import { resolveMediaImageUrl } from "@/lib/media-image-url";
+import type { Metadata } from "next";
 
 export const resolveBaseUrl = (): string => {
   return resolveSiteUrl();
 };
+
+/**
+ * Prefer CMS ogImage, then variant/product primary, then gallery.
+ * Always returns an absolute URL suitable for og:image / twitter:image, or undefined.
+ */
+export function resolveProductSocialImageUrl({
+  baseUrl,
+  ogImage,
+  variantPrimaryUrl,
+  productPrimaryUrl,
+  allImages,
+}: {
+  baseUrl: string;
+  ogImage?: string | null;
+  variantPrimaryUrl?: string | null;
+  productPrimaryUrl?: string | null;
+  allImages?: Array<{ url: string; is_primary?: boolean }> | null;
+}): string | undefined {
+  const primaryFromGallery =
+    allImages?.find((img) => img.is_primary)?.url ?? allImages?.[0]?.url;
+
+  const candidates = [ogImage, variantPrimaryUrl, productPrimaryUrl, primaryFromGallery];
+  for (const candidate of candidates) {
+    const trimmed = candidate?.trim();
+    if (!trimmed) continue;
+    const mediaResolved = resolveMediaImageUrl(trimmed) ?? trimmed;
+    if (/^https?:\/\//i.test(mediaResolved)) return mediaResolved;
+    return toAbsoluteUrl(baseUrl, mediaResolved);
+  }
+  return undefined;
+}
+
+/** Open Graph + Twitter large-image card metadata for product pages. */
+export function buildProductSocialMetadata({
+  title,
+  description,
+  imageUrl,
+}: {
+  title: string;
+  description: string;
+  imageUrl?: string;
+}): Pick<Metadata, "openGraph" | "twitter"> {
+  const images = imageUrl
+    ? [{ url: imageUrl, width: 1200, height: 630 }]
+    : undefined;
+
+  return {
+    openGraph: {
+      title,
+      description,
+      images,
+    },
+    twitter: {
+      card: imageUrl ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
+  };
+}
 
 const fetchDynamicPageSlug = cache(async (slug: string): Promise<DynamicPageSlugResponse | null> => {
   const response = await getDynamicPageSlug(slug);

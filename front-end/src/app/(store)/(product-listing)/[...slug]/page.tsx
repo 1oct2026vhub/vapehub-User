@@ -24,6 +24,7 @@ import {
 import { resolvePdpReviewSummaryForProduct } from "@/lib/product-review-summary";
 import {
   buildProductJsonLdData,
+  buildProductSocialMetadata,
   buildVariantParams,
   fetchBlogByCategoryAndSlug,
   fetchBlogBySlug,
@@ -35,6 +36,7 @@ import {
   getCategoryPaginationLinks,
   normalizeRedirectUrl,
   resolveBaseUrl,
+  resolveProductSocialImageUrl,
 } from "./page.helpers";
 
 type PageProps = {
@@ -252,6 +254,10 @@ const Page = async ({
     );
   }
 
+  // Brand pages live at /brand/<slug>/; bare /<slug> soft-404s without a handler.
+  if (dynamicPageSlug?.entity_type === "brand" && primarySlug) {
+    redirect(`/brand/${primarySlug}/`);
+  }
 
   const entityTypeHandlers: Record<string, () => Promise<React.ReactNode>> = {
     blog_category: async () => {
@@ -543,13 +549,16 @@ export async function generateMetadata({ params, searchParams }: {
             variantRecordDescription,
           )
         : productMetaDescription || htmlToPlainText(resolveDisplayDescription(variantHtml, productDescriptionHtml));
+      const socialImageUrl = resolveProductSocialImageUrl({
+        baseUrl: BASE_URL,
+        ogImage: dynamicPageSlug.seo?.ogImage || parentPage?.seo?.ogImage,
+        productPrimaryUrl: data.product.primary_image?.url,
+        allImages: data.product.all_images,
+      });
       return {
         title,
         description,
-        openGraph: {
-          title,
-          description,
-        },
+        ...buildProductSocialMetadata({ title, description, imageUrl: socialImageUrl }),
       };
     }
 
@@ -571,6 +580,13 @@ export async function generateMetadata({ params, searchParams }: {
       variantRecordDescription,
     );
     const variantCanonicalUrl = toAbsoluteUrl(BASE_URL, `/${primarySlug}/${secondarySlug}`);
+    const socialImageUrl = resolveProductSocialImageUrl({
+      baseUrl: BASE_URL,
+      ogImage: dynamicPageSlug.seo?.ogImage || parentPage?.seo?.ogImage,
+      variantPrimaryUrl: data.variants[0].primary_image?.url,
+      productPrimaryUrl: data.product.primary_image?.url,
+      allImages: data.product.all_images,
+    });
 
     return {
       title,
@@ -578,15 +594,7 @@ export async function generateMetadata({ params, searchParams }: {
       alternates: {
         canonical: variantCanonicalUrl,
       },
-      openGraph: {
-        title,
-        description,
-        images: data.variants[0].primary_image?.url ? [{
-          url: data.variants[0].primary_image?.url,
-          width: 1200,
-          height: 630
-        }] : undefined
-      }
+      ...buildProductSocialMetadata({ title, description, imageUrl: socialImageUrl }),
     };
 
   } else if (primarySlug && secondarySlug) {
@@ -703,22 +711,22 @@ export async function generateMetadata({ params, searchParams }: {
     },
 
     product: async () => {
+      const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
+      const socialImageUrl = resolveProductSocialImageUrl({
+        baseUrl: BASE_URL,
+        ogImage: dynamicPageSlug.seo?.ogImage,
+        productPrimaryUrl: data?.product?.primary_image?.url,
+        allImages: data?.product?.all_images,
+      });
+
       if (dynamicPageSlug.seo) {
+        const { title, description } = dynamicPageSlug.seo;
         return {
-          title: dynamicPageSlug.seo.title,
-          description: dynamicPageSlug.seo.description,
-          openGraph: {
-            title: dynamicPageSlug.seo.title,
-            description: dynamicPageSlug.seo.description,
-            images: dynamicPageSlug.seo.ogImage ? [{
-              url: dynamicPageSlug.seo.ogImage,
-              width: 1200,
-              height: 630
-            }] : undefined
-          }
+          title,
+          description,
+          ...buildProductSocialMetadata({ title, description, imageUrl: socialImageUrl }),
         };
       }
-      const data = await fetchProduct(dynamicPageSlug?.entity_id ?? 0, []);
       if (!data?.product || !data.product.category) return null;
       const productDescriptionHtml = await fetchProductDescription(dynamicPageSlug?.entity_id ?? 0, []);
       const variantHtml = getVariantDescriptionFromProductData(data);
@@ -726,19 +734,12 @@ export async function generateMetadata({ params, searchParams }: {
         resolveDisplayDescription(variantHtml, productDescriptionHtml),
         0,
       ).trim();
+      const title = data.product.name;
 
-        return {
-          title: data.product.name,
+      return {
+        title,
         description,
-        openGraph: {
-          title: data.product.name,
-          description,
-          images: data.product.primary_image?.url ? [{
-            url: data.product.primary_image?.url,
-            width: 1200,
-            height: 630
-          }] : undefined
-        }
+        ...buildProductSocialMetadata({ title, description, imageUrl: socialImageUrl }),
       };
     },
 

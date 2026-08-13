@@ -21,7 +21,6 @@ const Login: FunctionComponent = (): ReactElement => {
     const [pwdVisibility, setPwdVisibility] = useState(false);
     const [isPasswordResetModalOpen, setIsPasswordResetModalOpen] = useState(false);
     const router = useRouter();
-    const rememberRef = getRememberedCredentials();
     const searchParams = new URLSearchParams(window.location.search);
 
     const callbackUrl = searchParams.get('callbackUrl') || '/my-account';
@@ -54,7 +53,7 @@ const Login: FunctionComponent = (): ReactElement => {
         }
         
         if (rememberMeValue) {
-            rememberMe(email, password);
+            await rememberMe(email, password);
         } else {
             forgetMe();
         }
@@ -67,14 +66,23 @@ const Login: FunctionComponent = (): ReactElement => {
 
 
     useEffect(() => {
-        
-        if (!rememberRef) return;
-        signInFromConfig.reset({
-            email: rememberRef?.email,
-            password: rememberRef?.password,
-        });
-        setRememberMe(true)
+        let isMounted = true;
 
+        const loadRememberedCredentials = async () => {
+            const remembered = await getRememberedCredentials();
+            if (!isMounted || !remembered) return;
+            signInFromConfig.reset({
+                email: remembered.email,
+                password: remembered.password,
+            });
+            setRememberMe(true);
+        };
+
+        loadRememberedCredentials();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
 

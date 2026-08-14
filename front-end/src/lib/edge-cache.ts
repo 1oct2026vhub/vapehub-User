@@ -1,8 +1,12 @@
 import type { NextRequest, NextResponse } from 'next/server';
 
-/** Searchflex recommendation: s-maxage=60, stale-while-revalidate=600 */
-export const LISTING_EDGE_S_MAXAGE = 60;
-export const LISTING_EDGE_STALE_WHILE_REVALIDATE = 600;
+/**
+ * Category/brand listing edge cache.
+ * Keep a short fresh window; do not serve long stale HTML after CMS updates
+ * (previous SWR=600 could hide admin content for ~10 more minutes).
+ */
+export const LISTING_EDGE_S_MAXAGE = 30;
+export const LISTING_EDGE_STALE_WHILE_REVALIDATE = 0;
 
 const CACHEABLE_LISTING_ENTITY_TYPES = new Set(['category', 'brand']);
 

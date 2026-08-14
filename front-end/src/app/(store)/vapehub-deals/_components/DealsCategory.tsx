@@ -9,6 +9,7 @@ import { getDealsByCategory, getReviewOrderByProductId } from '@/lib/server.acti
 import { ServerActionResponse, ServerActionStatus } from '@/lib/config/app.config';
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { useRouter } from 'next/navigation';
+import { resolveProductCardPrices } from '@/lib/product-card-prices';
 
 interface DealsCategoryProps {
     category: CategoryWithDeals;
@@ -213,12 +214,14 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                             const averageRating = review?.status === ServerActionStatus.SUCCESS ? parseFloat(review.data.average_rating) : 0;
                             const totalReviews = review?.status === ServerActionStatus.SUCCESS ? review.data.total_reviews : 0;
                             
+                            const { price, regularPrice } = resolveProductCardPrices(product);
                             return (
                                 <div key={index} className="px-1 md:px-2 xl:px-5 py-4 first:pl-0">
                                     <ProductCard
                                         title={product.name}
                                         imageSrc={product.primary_image?.url ?? product.ProductImages?.[0]?.image_url ?? '/images/disposable-1.png'}
-                                        price={product.price}
+                                        price={price}
+                                        regularPrice={regularPrice}
                                         buttonText={product.deals?.[0]?.name ?? "View Details"}
                                         productId={product.id}
                                         // flavors={product?.Flavors?.length || 0}

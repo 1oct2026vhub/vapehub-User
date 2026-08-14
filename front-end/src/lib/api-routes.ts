@@ -101,6 +101,16 @@ export const API_ROUTES = {
     REVIEWS: (payload: { page?: number, limit?: number, product_id?: number, user_id?: number, is_visible?: boolean, testimonial?: boolean }) => buildRequestUrl(`/api/review?${toQueryString(payload)}`),
     GET_ALL_DEALS: (payload?: { limit?: number; offset?: number; deal_type?: string, search?: string, show_home_page?: boolean }) => buildRequestUrl(`/api/product/deals${payload ? `?${toQueryString(payload)}` : ''}`),
     GET_MORE_LIKE_THIS: (payload: { product_id: number; limit?: number; offset?: number }) => buildRequestUrl(`/api/product/more-like-this?${toQueryString(payload)}`),
+    GET_RELATED_GUIDES: (payload: { product_id: number; limit?: number }) => buildRequestUrl(`/api/product/related-guides?${toQueryString(payload)}`),
+    GET_CATEGORY_RELATED_GUIDES: (payload: { category_id: number; limit?: number }) => buildRequestUrl(`/api/category/related-guides?${toQueryString(payload)}`),
+    GET_CATEGORY_BUYING_GUIDE: (slug: string) =>
+        buildRequestUrl(`/api/category/slug/${encodeURIComponent(slug)}/buying-guide`),
+    GET_CATEGORY_RELATED_CATEGORIES: (slug: string) =>
+        buildRequestUrl(`/api/category/slug/${encodeURIComponent(slug)}/related-categories`),
+    GET_BRAND_RELATED_BRANDS: (slug: string) =>
+        buildRequestUrl(`/api/brands/slug/${encodeURIComponent(slug)}/related-brand`),
+    GET_BRAND_BUYING_GUIDE: (slug: string) =>
+        buildRequestUrl(`/api/brands/slug/${encodeURIComponent(slug)}/buying-guide`),
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
@@ -142,6 +152,8 @@ export const API_ROUTES = {
         const queryString = searchParams.toString();
         return buildRequestUrl(`/api/product/${productId}/description${queryString ? `?${queryString}` : ''}`);
     },
+    GET_PRODUCT_RELATED_BLOGS: (productId: number) =>
+        buildRequestUrl(`/api/product/${productId}/related-blogs`),
     GET_MAIL_SUBSCRIPTION_SETTINGS: buildRequestUrl('/api/mailSubscription/settings'),
     GET_TRUSTPILOT_REVIEWS: (payload?: { page?: number; per_page?: number; stars?: number }) => buildRequestUrl(`/api/home/trustpilot-reviews${payload ? `?${toQueryString(payload)}` : ''}`),
     GET_WELCOME_CONTENT: buildRequestUrl('/api/home/welcome-content'),
@@ -178,6 +190,7 @@ export interface PRODUCT_PAYLOAD {
 }
 export interface BLOG_PAYLOAD {
     categoryId?: string;
+    userId?: string | number;
     limit: number;
     page: number;
 }

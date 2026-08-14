@@ -60,6 +60,8 @@
 
     --footer-gradient: linear-gradient(90deg, #083122 0%, #035335 50%, #083122 100%);
     --header-gradient: linear-gradient(90deg, #083122 0%, #035335 50%, #083122 100%);
+    --gradient-start: #035335;
+    --gradient-end: #083122;
 
     --border: rgba(242, 242, 242, 1);
   }
@@ -423,7 +425,414 @@ input[type='search'] {
   @apply focus-visible:!outline-none focus-visible:!border-none;
 }
 
-/* blog details */
+.trust-strip {
+  background: var(--gradient-start);
+}
+
+.trust-strip-badge {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-height: 132px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: var(--gradient-end);
+  padding: 1rem 1.125rem;
+  text-align: center;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .trust-strip-badge:hover {
+    transform: translateY(-3px);
+    border-color: rgb(97 178 120 / 0.55);
+    background-color: #0a3a2a;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.28);
+  }
+
+  .trust-strip-badge:hover .trust-strip-badge__icon {
+    color: #7bc98f;
+    transform: scale(1.08);
+  }
+}
+
+.trust-strip-badge__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.625rem;
+  color: #61b278;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.trust-strip-badge__icon svg {
+  width: 2rem;
+  height: 2rem;
+  stroke-width: 2;
+}
+
+@media (min-width: 768px) {
+  .trust-strip-badge__icon svg {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+.trust-strip-badge__title {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: var(--neutral-50);
+}
+
+.trust-strip-badge__subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgb(255 255 255 / 0.72);
+}
+
+@media (min-width: 768px) {
+  .trust-strip-badge__title {
+    font-size: 1rem;
+  }
+
+  .trust-strip-badge__subtitle {
+    font-size: 0.8125rem;
+  }
+}
+
+.trust-strip-static-fallback {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.trust-strip-static-fallback::-webkit-scrollbar {
+  display: none;
+}
+
+.trust-strip-static-fallback .trust-strip-badge {
+  flex: 0 0 auto;
+  width: min(100%, 252px);
+  min-width: calc(100vw - 8.5rem);
+  max-width: 20rem;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 1280px) {
+  .trust-strip-static-fallback {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}
+
+.trust-strip-carousel {
+  display: none;
+}
+
+.trust-strip-row {
+  display: flex;
+  gap: 0.75rem;
+  padding-block: 0.375rem 0.5rem;
+}
+
+.trust-strip-row .trust-strip-slide--static {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.trust-strip-slide {
+  box-sizing: border-box;
+  height: 100%;
+  padding-top: 0.375rem;
+  padding-right: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
+.trust-strip-slide--static {
+  padding-right: 0;
+}
+
+.trust-strip-slide .trust-strip-badge,
+.trust-strip-slide--static .trust-strip-badge {
+  width: 100%;
+  max-width: none;
+}
+
+@media (scripting: enabled) {
+  .trust-strip-static-fallback {
+    display: none !important;
+  }
+
+  .trust-strip-carousel {
+    display: block;
+  }
+}
+
+.trust-strip-slider {
+  position: relative;
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--active) {
+  padding-inline: 0;
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--tablet) {
+  padding-inline: 0;
+}
+
+.trust-strip-slider .slick-list {
+  overflow: hidden;
+  margin-inline: 0;
+  padding-top: 0.375rem;
+  padding-bottom: 0.75rem;
+  margin-top: -0.375rem;
+  margin-bottom: -0.25rem;
+}
+
+.trust-strip-slider .slick-track,
+.trust-strip-slider .slick-slider .slick-list .slick-track {
+  display: flex !important;
+  align-items: stretch !important;
+  transition: transform 100ms linear !important;
+}
+
+.trust-strip-slider .slick-slide {
+  height: auto !important;
+}
+
+.trust-strip-slider .slick-slide > div {
+  height: 100% !important;
+}
+
+.trust-strip-slider .slick-prev,
+.trust-strip-slider .slick-next {
+  display: flex !important;
+  top: 50%;
+  width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 2px solid var(--neutral-200);
+  background: var(--neutral-50);
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.trust-strip-slider .slick-prev {
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.trust-strip-slider .slick-next {
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .trust-strip-slide {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-prev,
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-next {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 2px;
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-prev {
+  left: -10px;
+  transform: translateY(-50%);
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-next {
+  right: -10px;
+  transform: translateY(-50%);
+}
+
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-prev::before,
+.trust-strip-slider:has(.trust-strip-carousel--mobile) .slick-next::before {
+  font-size: 18px;
+}
+
+.trust-strip-slider .slick-prev.slick-disabled,
+.trust-strip-slider .slick-next.slick-disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.trust-strip-slider .slick-prev::before,
+.trust-strip-slider .slick-next::before {
+  opacity: 1;
+  color: var(--neutral-400);
+}
+
+@media (min-width: 768px) {
+  .trust-strip-slider .slick-prev,
+  .trust-strip-slider .slick-next {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 3px;
+  }
+}
+
+/* Contextual overflow: page stays fixed width; wide tables scroll in-place */
+.blog-post-main {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Sticky side rails — avoid overflow:hidden on .blog-post-grid or its ancestors */
+.blog-post-grid {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.blog-post-rail {
+  position: sticky;
+  top: 6rem;
+  align-self: start;
+  z-index: 1;
+}
+
+/* TOC: one left green indicator only — native scrollbar fully hidden */
+.blog-post-toc-scroll-clip {
+  overflow: hidden;
+}
+
+.blog-post-toc-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  margin-right: -20px;
+  padding-right: 20px;
+}
+
+.blog-post-toc-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+.blog-post-toc-scroll::-webkit-scrollbar-thumb,
+.blog-post-toc-scroll::-webkit-scrollbar-track,
+.blog-post-toc-scroll::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.blog-details {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.blog-details .ck-content,
+.blog-intro.ck-content,
+.blog-intro.rich-text {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* Global .ck-content sets width:100% on blocks; that stops wrapping inside flex/grid columns */
+.blog-details .ck-content :where(p, div:not(.blog-table-scroll), span, a, strong, em, h1, h2, h3, h4, h5, h6, li, blockquote),
+.blog-intro :where(p, div, span, a, strong, em, h1, h2, h3, h4, h5, h6, li, blockquote) {
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  box-sizing: border-box;
+}
+
+.blog-details .blog-table-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  margin: 1em 0;
+  /* Prevent scrollport from clipping the table's left/right outer border */
+  padding: 1px;
+  box-sizing: border-box;
+}
+
+/* Tables outside scroll wrapper (fallback) stay within the column */
+.blog-details .ck-content figure.table {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Inside scroll shell, preserve CKEditor natural table width */
+.blog-details .blog-table-scroll figure.table {
+  max-width: none;
+  overflow: visible;
+}
+
+.blog-details .ck-content table {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  /* Fallback when CKEditor omits inline border — inline styles take precedence */
+  border: 1px solid #000;
+}
+
+.blog-details .ck-content table th,
+.blog-details .ck-content table td {
+  border: 1px solid #000;
+}
+
+.blog-details .blog-table-scroll > figure.table,
+.blog-details .blog-table-scroll > table {
+  margin: 0;
+}
+
+.blog-details .ck-content img,
+.blog-details .ck-content video,
+.blog-details .ck-content iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+.blog-details .ck-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .blog-details ol {
   @apply !list-decimal mt-4 pl-6 text-skin-neutral-400 font-bold text-content-2 md:text-content-1;
 }
@@ -434,6 +843,12 @@ input[type='search'] {
 
 
 /* Let .rich-text control heading scale; avoid revert which matches body on Tailwind preflight. */
+.blog-details .rich-text h1,
+.blog-details .rich-text h2,
+.blog-details .rich-text h3,
+.blog-details .rich-text h4,
+.blog-details .rich-text h5,
+.blog-details .rich-text h6,
 .blog-details.rich-text h1,
 .blog-details.rich-text h2,
 .blog-details.rich-text h3,
@@ -506,13 +921,119 @@ input[type="checkbox"] + span {
   margin-bottom: 1rem;
 }
 
+.blog-details .rich-text,
 .blog-details.rich-text {
+  max-width: 100%;
+  min-width: 0;
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.blog-details.rich-text figure:has(table),
-.blog-details.rich-text table {
+.blog-details .rich-text h2,
+.blog-details.rich-text h2 {
+  @apply text-h5 md:text-h4;
+  scroll-margin-top: 7rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.blog-details .rich-text h3,
+.blog-details.rich-text h3 {
+  @apply text-title-1 md:text-h5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.blog-intro {
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  contain: inline-size;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.blog-intro p {
+  margin-bottom: 0;
+}
+
+.blog-intro p,
+.blog-details p {
+  @apply text-skin-neutral-400 text-title-2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* Optional blog blocks — override .blog-details p defaults */
+.blog-details .blog-industry-quote__text,
+.blog-details .blog-promo-banner__title {
+  color: #083122 !important;
+  font-size: 13.5px !important;
+  line-height: 150% !important;
+}
+
+.blog-details .blog-industry-quote__attribution,
+.blog-details .blog-promo-banner__description {
+  color: #4a5e54 !important;
+  font-size: 13.5px !important;
+  line-height: 150% !important;
+}
+
+.blog-details .blog-industry-quote__attribution {
+  font-size: 13px !important;
+}
+
+.blog-warehouse-callout-body {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.blog-warehouse-callout-body p {
+  margin-bottom: 0;
+}
+
+.blog-warehouse-callout-body a {
+  color: var(--primary-500) !important;
+  text-decoration: underline !important;
+  font-weight: 500;
+}
+
+.blog-intro.rich-text a,
+.blog-details .rich-text a,
+.blog-details.rich-text a {
+  color: var(--primary-500) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+}
+
+.blog-intro.rich-text a:hover,
+.blog-details .rich-text a:hover,
+.blog-details.rich-text a:hover {
+  color: var(--primary-500) !important;
+  background-color: #f0f9f9;
+  text-decoration: underline !important;
+}
+
+.blog-details .rich-text sup a,
+.blog-details.rich-text sup a {
+  color: var(--primary-500) !important;
+  text-decoration: none !important;
+  font-weight: 600;
+  font-size: 0.75em;
+}
+
+.blog-details .rich-text sup a:hover,
+.blog-details.rich-text sup a:hover {
+  background-color: transparent;
+  text-decoration: underline !important;
 }
 
 .product-content ul {
@@ -664,6 +1185,106 @@ input[type="checkbox"] + span {
 
 .product-listing-container .product-content {
   @apply text-skin-neutral-400 !text-title-2;
+}
+
+/* Buying guide CKEditor HTML: match admin editor default (black), not listing grey */
+.category-buying-guide-content.product-content,
+.category-buying-guide-tab-content.product-content {
+  color: #000000;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/*
+ * CMS paste/computed styles sometimes bake desktop widths (e.g. width:1372px)
+ * into paragraph/inline styles, which expands the whole listing page on mobile.
+ */
+.category-buying-guide-content.product-content.rich-text :is(p, li, h1, h2, h3, h4, h5, h6, a, strong, em, span, div):not([class*="type-card"]):not([class*="atb-"]),
+.category-buying-guide-tab-content.product-content.rich-text :is(p, li, h1, h2, h3, h4, h5, h6, a, strong, em, span, div):not([class*="type-card"]):not([class*="atb-"]) {
+  width: auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+
+/*
+ * Uniform buying-guide rhythm:
+ * - consistent paragraph spacing inside rich text
+ * - no stacked end margins that inflate gaps before the next section
+ */
+.product-listing-container .category-buying-guide-content.product-content.rich-text > *,
+.product-listing-container .category-buying-guide-tab-content.product-content.rich-text > * {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.product-listing-container .category-buying-guide-content.product-content.rich-text > :last-child,
+.product-listing-container .category-buying-guide-tab-content.product-content.rich-text > :last-child {
+  margin-bottom: 0;
+}
+
+.product-listing-container .category-buying-guide-content.product-content.rich-text > :empty,
+.product-listing-container .category-buying-guide-tab-content.product-content.rich-text > :empty {
+  display: none;
+}
+
+.category-buying-guide-tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.category-buying-guide-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.category-buying-guide-tabs-scroll > button {
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  /*
+   * Desktop/tablet: share full width equally when labels fit;
+   * otherwise keep label min-width and scroll horizontally (no wrap).
+   */
+  .category-buying-guide-tabs-scroll {
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 0.625rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+  }
+
+  .category-buying-guide-tabs-scroll > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0%;
+    min-width: max-content;
+    white-space: nowrap;
+  }
+}
+
+/* Hide scrollbar but keep scroll / swipe */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 /* Styles for webkit-based browsers */
@@ -1028,8 +1649,16 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
   height: auto;
 }
 
+/*
+ * CKEditor tables: Tailwind Preflight zeroes borders, and saved HTML often has
+ * no inline border styles. Admin editor injects borders via .ck-content; restore
+ * the same look on every storefront CMS HTML host.
+ */
 .ck-content table,
-.rich-text table {
+.rich-text table,
+.product-content table,
+.additional-text-box-html table,
+.welcome-text table {
   border-collapse: collapse;
   border-spacing: 0;
   width: 100%;
@@ -1038,10 +1667,36 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
   border: 1px solid #ddd;
 }
 
+.ck-content figure.table,
+.rich-text figure.table,
+.product-content figure.table,
+.additional-text-box-html figure.table,
+.welcome-text figure.table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.ck-content figure.table > table,
+.rich-text figure.table > table,
+.product-content figure.table > table,
+.additional-text-box-html figure.table > table,
+.welcome-text figure.table > table {
+  margin: 0;
+}
+
 .ck-content table td,
 .rich-text table td,
+.product-content table td,
+.additional-text-box-html table td,
+.welcome-text table td,
 .ck-content table th,
-.rich-text table th {
+.rich-text table th,
+.product-content table th,
+.additional-text-box-html table th,
+.welcome-text table th {
   border: 1px solid #ddd;
   padding: 8px 12px;
   text-align: left;
@@ -1050,38 +1705,59 @@ ul[role="listbox"]::-webkit-scrollbar-thumb,
 }
 
 .ck-content table th,
-.rich-text table th {
+.rich-text table th,
+.product-content table th,
+.additional-text-box-html table th,
+.welcome-text table th {
   background-color: #f5f5f5;
   font-weight: bold;
 }
 
 .ck-content table tbody tr,
-.rich-text table tbody tr {
+.rich-text table tbody tr,
+.product-content table tbody tr,
+.additional-text-box-html table tbody tr,
+.welcome-text table tbody tr {
   display: table-row !important;
 }
 
 .ck-content table tbody tr:nth-child(even),
-.rich-text table tbody tr:nth-child(even) {
+.rich-text table tbody tr:nth-child(even),
+.product-content table tbody tr:nth-child(even),
+.additional-text-box-html table tbody tr:nth-child(even),
+.welcome-text table tbody tr:nth-child(even) {
   background-color: #f9f9f9;
 }
 
 .ck-content table tbody tr:hover,
-.rich-text table tbody tr:hover {
+.rich-text table tbody tr:hover,
+.product-content table tbody tr:hover,
+.additional-text-box-html table tbody tr:hover,
+.welcome-text table tbody tr:hover {
   background-color: #f5f5f5;
 }
 
 .ck-content table thead,
-.rich-text table thead {
+.rich-text table thead,
+.product-content table thead,
+.additional-text-box-html table thead,
+.welcome-text table thead {
   display: table-header-group !important;
 }
 
 .ck-content table tbody,
-.rich-text table tbody {
+.rich-text table tbody,
+.product-content table tbody,
+.additional-text-box-html table tbody,
+.welcome-text table tbody {
   display: table-row-group !important;
 }
 
 .ck-content table tfoot,
-.rich-text table tfoot {
+.rich-text table tfoot,
+.product-content table tfoot,
+.additional-text-box-html table tfoot,
+.welcome-text table tfoot {
   display: table-footer-group !important;
 }
 
@@ -1690,3 +2366,751 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* Category type cards                                                        */
+/* Desktop (lg+): CKEditor/API styles as-is (.type-cards-html).               */
+/* Mobile: one-card slick carousel (.type-cards-mobile-carousel).             */
+/* Fallback when cards can't be parsed: CSS scroll snap carousel.             */
+/* -------------------------------------------------------------------------- */
+
+.type-cards-html {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* CKEditor often leaves spacer <p>&nbsp;</p> above/below the card grid */
+.type-cards-html > p:empty,
+.type-cards-html > p:has(> br:only-child) {
+  display: none;
+  margin: 0;
+  padding: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.type-cards-html .raw-html-embed {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/*
+ * Uniform image slot across all cards.
+ * Height applies to <img> only — NOT <figure> (CKEditor wraps uploads in
+ * <figure>; giving both height:180px doubled the gap when an empty figure
+ * remained after delete).
+ */
+.type-cards-html .type-card figure,
+.type-cards-html .type-card figure.image,
+.type-cards-html .vss-related-card figure,
+.type-cards-html .vss-related-card figure.image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+  float: none !important;
+}
+
+/* Empty figure shells left after image delete must not reserve space */
+.type-cards-html .type-card figure:empty,
+.type-cards-html .type-card figure:not(:has(img)),
+.type-cards-html .vss-related-card figure:empty,
+.type-cards-html .vss-related-card figure:not(:has(img)) {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.type-cards-html .type-card img,
+.type-cards-html .vss-related-card img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 180px !important;
+  min-height: 180px !important;
+  max-height: 180px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+  background: #f1f5f9 !important;
+  box-sizing: border-box !important;
+  float: none !important;
+}
+
+/* Figure already has bottom margin — avoid stacking with img margin */
+.type-cards-html .type-card figure img,
+.type-cards-html .vss-related-card figure img {
+  margin: 0 !important;
+}
+
+/*
+ * Related collections UX: slight card lift + CTA opacity on hover
+ * (matches site primary buttons / VapeSuperstore-style cards).
+ * Overrides embedded CMS `transform:none` / missing button :hover.
+ */
+.type-cards-html .type-card,
+.type-cards-html .vss-related-card,
+.type-cards-mobile-carousel .type-card,
+.type-cards-mobile-carousel .vss-related-card {
+  overflow: visible !important;
+  transform: translateY(0) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.type-cards-html .type-card__btn,
+.type-cards-html .type-card a.type-card__btn,
+.type-cards-html .vss-related-card a,
+.type-cards-mobile-carousel .type-card__btn,
+.type-cards-mobile-carousel .type-card a.type-card__btn,
+.type-cards-mobile-carousel .vss-related-card a {
+  cursor: pointer !important;
+  opacity: 1 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+@media (hover: hover) {
+  .type-cards-html .type-card:hover,
+  .type-cards-html .vss-related-card:hover,
+  .type-cards-mobile-carousel .type-card:hover,
+  .type-cards-mobile-carousel .vss-related-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14) !important;
+  }
+
+  .type-cards-html .type-card__btn:hover,
+  .type-cards-html .type-card a.type-card__btn:hover,
+  .type-cards-html .vss-related-card a:hover,
+  .type-cards-mobile-carousel .type-card__btn:hover,
+  .type-cards-mobile-carousel .type-card a.type-card__btn:hover,
+  .type-cards-mobile-carousel .vss-related-card a:hover {
+    opacity: 0.9 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .type-cards-html .type-card,
+  .type-cards-html .vss-related-card,
+  .type-cards-mobile-carousel .type-card,
+  .type-cards-mobile-carousel .vss-related-card,
+  .type-cards-html .type-card__btn,
+  .type-cards-html .type-card a.type-card__btn,
+  .type-cards-mobile-carousel .type-card__btn,
+  .type-cards-mobile-carousel .type-card a.type-card__btn {
+    transition: none !important;
+  }
+}
+
+.type-cards-mobile-carousel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.type-cards-mobile-carousel__viewport {
+  position: relative;
+  width: 100%;
+  /* No side gutters — arrows overlay card edges like Trustpilot */
+  padding-inline: 0;
+}
+
+.type-cards-mobile-carousel .slick-list {
+  margin: 0;
+  height: auto !important;
+  overflow: hidden;
+}
+
+/* Keep track from collapsing; JS sets equal min-height on each slide */
+.type-cards-mobile-carousel .slick-track {
+  display: flex !important;
+  align-items: stretch !important;
+  height: auto !important;
+}
+
+.type-cards-mobile-carousel .slick-slide {
+  height: auto !important;
+  display: flex !important;
+  float: none !important;
+}
+
+.type-cards-mobile-carousel .slick-slide > div {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto;
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Override CKEditor inline flex/width/height so cards fill the equalized slide */
+.type-cards-mobile-carousel .type-cards-mobile-slide > .type-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .atb-nic-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .atb-flavour-card,
+.type-cards-mobile-carousel .type-cards-mobile-slide > article,
+.type-cards-mobile-carousel .type-cards-mobile-slide > div {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Keep CTA anchored to the bottom of equal-height cards */
+.type-cards-mobile-carousel .type-cards-mobile-slide > .type-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .vss-related-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .atb-nic-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > .atb-flavour-card > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > article > :last-child,
+.type-cards-mobile-carousel .type-cards-mobile-slide > div > :last-child {
+  margin-top: auto !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide img,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ATB nicotine / flavour: fill media edge-to-edge (no Related Collections letterbox) */
+.type-cards-mobile-carousel .atb-nic-card__media,
+.type-cards-mobile-carousel .atb-flavour-card__media {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.type-cards-mobile-carousel .atb-nic-card__img,
+.type-cards-mobile-carousel .atb-nic-card__media img,
+.type-cards-mobile-carousel .atb-nic-card__media figure,
+.type-cards-mobile-carousel .atb-nic-card__media figure.image,
+.type-cards-mobile-carousel .atb-flavour-card__img,
+.type-cards-mobile-carousel .atb-flavour-card__media img,
+.type-cards-mobile-carousel .atb-flavour-card__media figure,
+.type-cards-mobile-carousel .atb-flavour-card__media figure.image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.type-cards-mobile-carousel .atb-nic-card__media figure img,
+.type-cards-mobile-carousel .atb-flavour-card__media figure img {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  object-fit: cover !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure.image {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 14px 0 !important;
+  padding: 0 !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure:empty,
+.type-cards-mobile-carousel .type-cards-mobile-slide figure:not(:has(img)) {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide img {
+  height: 180px !important;
+  min-height: 180px !important;
+  max-height: 180px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: 0 0 14px 0 !important;
+  background: #f1f5f9 !important;
+  box-sizing: border-box !important;
+}
+
+/* Re-assert after the generic 180px rule so ATB images actually fill */
+.type-cards-mobile-carousel .atb-nic-card img,
+.type-cards-mobile-carousel .atb-flavour-card img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+.type-cards-mobile-carousel .type-cards-mobile-slide figure img {
+  margin: 0 !important;
+}
+
+/* Custom left / right arrows — overlap card edges like Trustpilot */
+.type-cards-mobile-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  border: 2px solid var(--neutral-200);
+  background: var(--neutral-50, #fff);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.type-cards-mobile-arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+.type-cards-mobile-arrow--prev {
+  left: -10px;
+}
+
+.type-cards-mobile-arrow--next {
+  right: -10px;
+}
+
+/* Home-style pagination dots below the cards */
+.type-cards-mobile-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  width: 100%;
+}
+
+.type-cards-mobile-dots li {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.type-cards-mobile-dots button {
+  display: block;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--neutral-200);
+  cursor: pointer;
+}
+
+.type-cards-mobile-dots button.is-active {
+  background: var(--primary-gradient-100);
+}
+
+/* Parse fallback: horizontal one-card scroll on mobile only */
+@media (max-width: 1023px) {
+  .type-cards-html--mobile-fallback .type-cards,
+  .type-cards-html--mobile-fallback .raw-html-embed .type-cards,
+  .type-cards-html--mobile-fallback .vss-related-cards {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    box-sizing: border-box !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-cards::-webkit-scrollbar,
+  .type-cards-html--mobile-fallback .vss-related-cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .type-cards-html--mobile-fallback .type-card,
+  .type-cards-html--mobile-fallback .raw-html-embed .type-card,
+  .type-cards-html--mobile-fallback .vss-related-cards > .vss-related-card {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    scroll-snap-align: start !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card img,
+  .type-cards-html--mobile-fallback .type-card figure,
+  .type-cards-html--mobile-fallback .vss-related-card img,
+  .type-cards-html--mobile-fallback .vss-related-card figure {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure,
+  .type-cards-html--mobile-fallback .vss-related-card figure {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 0 14px 0 !important;
+    padding: 0 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure:empty,
+  .type-cards-html--mobile-fallback .type-card figure:not(:has(img)),
+  .type-cards-html--mobile-fallback .vss-related-card figure:empty,
+  .type-cards-html--mobile-fallback .vss-related-card figure:not(:has(img)) {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card img,
+  .type-cards-html--mobile-fallback .vss-related-card img {
+    height: 180px !important;
+    min-height: 180px !important;
+    max-height: 180px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    margin: 0 0 14px 0 !important;
+    background: #f1f5f9 !important;
+  }
+
+  .type-cards-html--mobile-fallback .type-card figure img,
+  .type-cards-html--mobile-fallback .vss-related-card figure img {
+    margin: 0 !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Additional text box (category/brand CMS HTML — tables / ATB card grids)    */
+/* -------------------------------------------------------------------------- */
+
+.additional-text-box-html {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/*
+ * Tailwind preflight resets h1–h6 to body size. Restore storefront heading scale
+ * for Additional Text Box CMS copy (matches .product-content). Exclude ATB card
+ * titles (`atb-*`) so nicotine/flavour template inline styles stay intact.
+ */
+.additional-text-box-html :is(h1, h2, h3, h4, h5, h6):not([class*="atb-"]) {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  @apply !font-oswald;
+  font-weight: 600 !important;
+}
+
+.additional-text-box-html :is(h1, h2, h3, h4, h5, h6):not([class*="atb-"]):first-child {
+  margin-top: 0;
+}
+
+.additional-text-box-html h1:not([class*="atb-"]) {
+  font-size: 28px !important;
+}
+
+.additional-text-box-html h2:not([class*="atb-"]) {
+  font-size: 24px !important;
+}
+
+.additional-text-box-html h3:not([class*="atb-"]) {
+  font-size: 20px !important;
+  line-height: 100% !important;
+}
+
+.additional-text-box-html h4:not([class*="atb-"]) {
+  font-size: 18px !important;
+}
+
+.additional-text-box-html h5:not([class*="atb-"]) {
+  font-size: 16px !important;
+}
+
+.additional-text-box-html h6:not([class*="atb-"]) {
+  font-size: 14px !important;
+}
+
+@media (min-width: 768px) {
+  .additional-text-box-html h1:not([class*="atb-"]) {
+    font-size: 36px !important;
+  }
+
+  .additional-text-box-html h2:not([class*="atb-"]) {
+    font-size: 30px !important;
+  }
+
+  .additional-text-box-html h3:not([class*="atb-"]) {
+    font-size: 24px !important;
+  }
+
+  .additional-text-box-html h4:not([class*="atb-"]) {
+    font-size: 20px !important;
+  }
+
+  .additional-text-box-html h5:not([class*="atb-"]) {
+    font-size: 17px !important;
+  }
+
+  .additional-text-box-html h6:not([class*="atb-"]) {
+    font-size: 15px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .additional-text-box-html h1:not([class*="atb-"]) {
+    font-size: 44px !important;
+  }
+
+  .additional-text-box-html h2:not([class*="atb-"]) {
+    font-size: 36px !important;
+  }
+
+  .additional-text-box-html h3:not([class*="atb-"]) {
+    font-size: 28px !important;
+  }
+
+  .additional-text-box-html h4:not([class*="atb-"]) {
+    font-size: 22px !important;
+  }
+
+  .additional-text-box-html h5:not([class*="atb-"]) {
+    font-size: 18px !important;
+  }
+
+  .additional-text-box-html h6:not([class*="atb-"]) {
+    font-size: 16px !important;
+  }
+}
+
+/*
+ * Tailwind preflight zeroes <p> margins. Restore CKEditor-like block rhythm so
+ * spacer paragraphs (`<p>&nbsp;</p>`) between copy and ATB card grids show up.
+ */
+.additional-text-box-html > p,
+.additional-text-box-html > .raw-html-embed > p {
+  margin: 0 0 1em;
+}
+
+.additional-text-box-html > p:last-child,
+.additional-text-box-html > .raw-html-embed > p:last-child {
+  margin-bottom: 0;
+}
+
+.additional-text-box-html .raw-html-embed {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.additional-text-box-html img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fill ATB media slots (no gray letterbox from contain + fixed aspect) */
+.additional-text-box-html .atb-nic-card__media,
+.additional-text-box-html .atb-flavour-card__media {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #fff !important;
+}
+
+.additional-text-box-html .atb-nic-card__img,
+.additional-text-box-html .atb-nic-card__media img,
+.additional-text-box-html .atb-nic-card__media figure,
+.additional-text-box-html .atb-flavour-card__img,
+.additional-text-box-html .atb-flavour-card__media img,
+.additional-text-box-html .atb-flavour-card__media figure {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+.additional-text-box-html .atb-nic-card__media figure img,
+.additional-text-box-html .atb-flavour-card__media figure img {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  object-fit: cover !important;
+  margin: 0 !important;
+}
+
+/*
+ * ATB nicotine / flavour cards: slight lift + CTA hover
+ * (same UX refinement as Related Collections / site buttons).
+ */
+.additional-text-box-html .atb-nic-card,
+.additional-text-box-html .atb-flavour-card,
+.type-cards-mobile-carousel .atb-nic-card,
+.type-cards-mobile-carousel .atb-flavour-card {
+  transform: translateY(0) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.additional-text-box-html .atb-nic-card__btn-row,
+.type-cards-mobile-carousel .atb-nic-card__btn-row {
+  transition: background 0.2s ease, border-color 0.2s ease !important;
+}
+
+.additional-text-box-html .atb-nic-card__btn,
+.additional-text-box-html .atb-nic-card a.atb-nic-card__btn,
+.additional-text-box-html .atb-nic-card__btn-row a,
+.type-cards-mobile-carousel .atb-nic-card__btn,
+.type-cards-mobile-carousel .atb-nic-card a.atb-nic-card__btn,
+.type-cards-mobile-carousel .atb-nic-card__btn-row a {
+  cursor: pointer !important;
+  transition: background 0.2s ease, opacity 0.2s ease !important;
+}
+
+.additional-text-box-html .atb-nic-card__btn-arrow,
+.type-cards-mobile-carousel .atb-nic-card__btn-arrow {
+  transition: color 0.2s ease !important;
+}
+
+.additional-text-box-html .atb-flavour-card__link,
+.additional-text-box-html .atb-flavour-card a.atb-flavour-card__link,
+.type-cards-mobile-carousel .atb-flavour-card__link,
+.type-cards-mobile-carousel .atb-flavour-card a.atb-flavour-card__link {
+  cursor: pointer !important;
+  opacity: 1 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+@media (hover: hover) {
+  .additional-text-box-html .atb-nic-card:hover,
+  .additional-text-box-html .atb-flavour-card:hover,
+  .type-cards-mobile-carousel .atb-nic-card:hover,
+  .type-cards-mobile-carousel .atb-flavour-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14) !important;
+    z-index: 1 !important;
+  }
+
+  .additional-text-box-html .atb-nic-card__btn-row:hover,
+  .type-cards-mobile-carousel .atb-nic-card__btn-row:hover {
+    background: #f0f9f9 !important;
+    border-color: #005434 !important;
+  }
+
+  .additional-text-box-html .atb-nic-card__btn:hover,
+  .additional-text-box-html .atb-nic-card a.atb-nic-card__btn:hover,
+  .additional-text-box-html .atb-nic-card__btn-row a:hover,
+  .type-cards-mobile-carousel .atb-nic-card__btn:hover,
+  .type-cards-mobile-carousel .atb-nic-card a.atb-nic-card__btn:hover,
+  .type-cards-mobile-carousel .atb-nic-card__btn-row a:hover {
+    background: #f0f9f9 !important;
+    opacity: 0.9 !important;
+  }
+
+  .additional-text-box-html .atb-nic-card__btn-row:hover .atb-nic-card__btn-arrow,
+  .additional-text-box-html .atb-nic-card__btn:hover .atb-nic-card__btn-arrow,
+  .type-cards-mobile-carousel .atb-nic-card__btn-row:hover .atb-nic-card__btn-arrow,
+  .type-cards-mobile-carousel .atb-nic-card__btn:hover .atb-nic-card__btn-arrow {
+    color: #005434 !important;
+  }
+
+  .additional-text-box-html .atb-flavour-card__link:hover,
+  .additional-text-box-html .atb-flavour-card a.atb-flavour-card__link:hover,
+  .type-cards-mobile-carousel .atb-flavour-card__link:hover,
+  .type-cards-mobile-carousel .atb-flavour-card a.atb-flavour-card__link:hover {
+    opacity: 0.9 !important;
+    text-decoration: underline !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .additional-text-box-html .atb-nic-card,
+  .additional-text-box-html .atb-flavour-card,
+  .type-cards-mobile-carousel .atb-nic-card,
+  .type-cards-mobile-carousel .atb-flavour-card,
+  .additional-text-box-html .atb-nic-card__btn-row,
+  .additional-text-box-html .atb-nic-card__btn,
+  .additional-text-box-html .atb-flavour-card__link,
+  .type-cards-mobile-carousel .atb-nic-card__btn-row,
+  .type-cards-mobile-carousel .atb-nic-card__btn,
+  .type-cards-mobile-carousel .atb-flavour-card__link {
+    transition: none !important;
+  }
+}
+
+.additional-text-box-mobile {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Diagonal strikethrough for sale "was" price on product cards */
+.price-diagonal-strike {
+  position: relative;
+  display: inline-block;
+}
+
+.price-diagonal-strike::after {
+  content: '';
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 50%;
+  height: 1.5px;
+  background-color: currentColor;
+  transform: rotate(-18deg);
+  transform-origin: center;
+  pointer-events: none;
+}

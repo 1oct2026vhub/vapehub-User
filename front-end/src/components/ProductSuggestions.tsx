@@ -5,6 +5,7 @@ import { Button, Spinner } from '@nextui-org/react';
 import { Product } from '@/lib/config/product.config';
 // import { ROUTES } from '@/lib/routes';
 import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config';
+import { resolveProductCardPrices } from '@/lib/product-card-prices';
 
 interface ProductSuggestionsProps {
     suggestions: Product[];
@@ -32,17 +33,28 @@ const ProductSuggestions: React.FC<ProductSuggestionsProps> = ({ suggestions, is
                 </div>
             ) : suggestions.length > 0 ? (
                 <ul className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-                    {suggestions.map(product => (
+                    {suggestions.map(product => {
+                        const { price, regularPrice } = resolveProductCardPrices(product);
+                        const currentPrice = Number(price) || 0;
+                        const previousPrice = Number(regularPrice) || 0;
+                        const isOnSale = previousPrice > 0 && currentPrice > 0 && previousPrice > currentPrice;
+                        return (
                         <li key={product.id} className="p-2 hover:bg-gray-100">
                             <Link href={`/${product.slug}`} className="flex items-center gap-4" onClick={onClose}>
                                 <Image src={getImageUrl(product.ProductImages[0]?.image_url)} alt={product?.ProductImages[0]?.alt_text?? product?.name} width={40} height={40} className="object-cover rounded" />
                                 <div className="flex-1">
                                     <p className="font-semibold text-sm">{product.name}</p>
-                                    <p className="text-xs text-gray-500">{DEFAULT_CURRENCY_SYMBOL}{product.price}</p>
+                                    <p className="text-xs text-gray-500 flex items-baseline gap-1">
+                                        <span>{DEFAULT_CURRENCY_SYMBOL}{price}</span>
+                                        {isOnSale && (
+                                            <span className="line-through opacity-60">{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</span>
+                                        )}
+                                    </p>
                                 </div>
                             </Link>
                         </li>
-                    ))}
+                        );
+                    })}
                 </ul>
             ) : (
                 <div className="p-4 text-center text-gray-500">

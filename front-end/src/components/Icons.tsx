@@ -1563,3 +1563,34 @@ export const CategoryIcon = (
  
   );
 }
+
+export const BuyingGuideBookIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="22"
+      height="22"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.9"
+        d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
+      />
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.9"
+        d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+      />
+    </svg>
+  );
+};

@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import SitewideTrustStrip from "@/components/SitewideTrustStrip";
 // import { PropsWithChildren, ReactElement } from "react"
 import { PropsWithChildren, ReactElement, Suspense } from "react"
 import { headers } from "next/headers";
@@ -66,6 +67,9 @@ const StoreRootLayout = async ({
             {children}
           </div>
         </HistoryProvider>
+      </Suspense>
+      <Suspense fallback={null}>
+        <SitewideTrustStrip />
       </Suspense>
       <Suspense fallback={<div className="w-full max-w-[1520px] mx-auto" />}>
         <Footer />

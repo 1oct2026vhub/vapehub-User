@@ -1,5 +1,6 @@
 import { BrandConfig } from "./brand.config";
 import { Category } from "./category.config";
+import { DynamicPageSlugResponse } from "./global.config";
 
 export interface ProductFilters {
     brand?: string;
@@ -142,6 +143,20 @@ export interface Product {
     name: string;
     slug: string;
     price: string;
+    regular_price?: string;
+    discount_price?: string;
+    min_price_variant?: {
+        id?: number;
+        price?: string;
+        regular_price?: string;
+        discount_price?: string | null;
+    } | null;
+    variants?: {
+        id?: number;
+        price?: string;
+        regular_price?: string;
+        discount_price?: string | null;
+    }[];
     primary_image?: { url: string };
     deleted_at?: string | null;
     flavor_count?: number | string;
@@ -193,7 +208,7 @@ export interface CategoryResponseData extends Category {
     price_ranges: PriceRange[],
     brand: BRAND[],
     category?: CATEGORY[]
-  
+    buying_guide?: DynamicPageSlugResponse["buying_guide"];
 }
 interface BRAND {
     id: number;

@@ -1,7 +1,7 @@
 "use client";
 import { usePathname, useSearchParams } from 'next/navigation';
 import type { ReadonlyURLSearchParams } from 'next/navigation';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { PRODUCT_LISTING_START_ID, scrollToProductListingStart } from '@/lib/utils/scrollToTop';
 
 /** Key used to skip scroll restore when user explicitly changed page/filter/sort (e.g. pagination). */
@@ -35,7 +35,7 @@ export function setScrollToTopOnNextNavigation(): void {
   }
 }
 
-function HistoryProvider({ children }: { children: React.ReactNode }) {
+function HistoryScrollManager() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isRestoringRef = useRef(false);
@@ -203,7 +203,18 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
     };
   }, [pageKey, pathname]);
 
-  return <>{children}</>;
+  return null;
+}
+
+function HistoryProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <Suspense fallback={null}>
+        <HistoryScrollManager />
+      </Suspense>
+      {children}
+    </>
+  );
 }
 
 export default HistoryProvider;

@@ -1281,6 +1281,96 @@ export function wrapBlogTablesForScroll(html: string): string {
   );
 }
 
+const VOID_HTML_TAGS = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+]);
+
+const RAW_CONTENT_HTML_TAGS = new Set(['script', 'style', 'textarea', 'title']);
+
+const DOCUMENT_LEVEL_HTML_TAG_RE =
+  /<\/?(?:html|head|body|main|footer|header|nav)\b[^>]*>/gi;
+
+/** Close unclosed tags so streamed SSR HTML cannot break page structure. */
+export function balanceBlogHtmlTags(html: string): string {
+  if (!html?.trim()) return '';
+
+  const tagPattern = /<\/?([a-zA-Z][\w:-]*)\b[^>]*?\/?>/g;
+  const stack: string[] = [];
+  let result = '';
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = tagPattern.exec(html)) !== null) {
+    const [fullTag, rawName] = match;
+    const tagName = rawName.toLowerCase();
+    const start = match.index;
+
+    if (RAW_CONTENT_HTML_TAGS.has(tagName)) {
+      if (fullTag.startsWith('</')) {
+        result += html.slice(lastIndex, start + fullTag.length);
+        lastIndex = start + fullTag.length;
+        continue;
+      }
+
+      const close = new RegExp(`</${tagName}\\s*>`, 'i');
+      const closeMatch = close.exec(html.slice(start + fullTag.length));
+      if (closeMatch) {
+        const end = start + fullTag.length + closeMatch.index + closeMatch[0].length;
+        result += html.slice(lastIndex, end);
+        lastIndex = end;
+        tagPattern.lastIndex = end;
+        continue;
+      }
+    }
+
+    result += html.slice(lastIndex, start);
+    const selfClosing = /\/>\s*$/.test(fullTag) || VOID_HTML_TAGS.has(tagName);
+
+    if (fullTag.startsWith('</')) {
+      if (stack.length > 0 && stack[stack.length - 1] === tagName) {
+        stack.pop();
+        result += fullTag;
+      }
+    } else if (selfClosing) {
+      result += fullTag;
+    } else {
+      stack.push(tagName);
+      result += fullTag;
+    }
+
+    lastIndex = start + fullTag.length;
+  }
+
+  result += html.slice(lastIndex);
+
+  while (stack.length > 0) {
+    result += `</${stack.pop()}>`;
+  }
+
+  return result;
+}
+
+/** Strip document-level tags and balance CMS markup before dangerouslySetInnerHTML. */
+export function sanitizeBlogHtmlForRender(html: string): string {
+  if (!html?.trim()) return '';
+
+  const withoutDocumentTags = html.replace(DOCUMENT_LEVEL_HTML_TAG_RE, '');
+  return balanceBlogHtmlTags(withoutDocumentTags);
+}
+
 /** Main entry: normalize blog body HTML before dangerouslySetInnerHTML. */
 export function prepareBlogHtml(content: string): string {
   if (!content?.trim()) return '';
@@ -1298,5 +1388,5 @@ export function prepareBlogHtml(content: string): string {
 
   html = wrapBlogTablesForScroll(html);
 
-  return html;
+  return sanitizeBlogHtmlForRender(html);
 }

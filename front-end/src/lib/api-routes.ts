@@ -125,6 +125,7 @@ export const API_ROUTES = {
     READ_ALL_NOTIFICATIONS: buildRequestUrl('/api/notifications/read-all'),
     DELETE_NOTIFICATION: (id: number) => buildRequestUrl(`/api/notifications/${id}`),
     GET_FOOTER_MENU: buildRequestUrl('/api/footer'),
+    GET_HOME_FOOTER_MENU: buildRequestUrl('/api/home/footer'),
     GET_HEADER_MEGA_MENU: buildRequestUrl('/api/menu'),
     REVIEW_ORDER: buildRequestUrl('/api/review'),
     GET_REVIEW_ORDER: (productId: number, userId: number) => buildRequestUrl(`/api/review?product_id=${productId}&user_id=${userId}&is_visible=true`),

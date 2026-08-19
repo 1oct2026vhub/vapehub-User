@@ -1,5 +1,5 @@
 interface BlogTrustSidebarProps {
-  stars: number;
+  trustScore: number;
   totalReviews: number;
   idPrefix?: string;
 }
@@ -67,11 +67,11 @@ const GoldStar = ({
 );
 
 const BlogTrustSidebar = ({
-  stars,
+  trustScore,
   totalReviews,
   idPrefix = "blog-trust",
 }: BlogTrustSidebarProps) => {
-  const starFills = getStarFills(stars);
+  const starFills = getStarFills(trustScore);
 
   return (
   <aside className="w-full max-w-full min-w-0 rounded-xl border border-skin-neutral-100 bg-skin-white p-4 text-left sm:p-5">
@@ -84,7 +84,7 @@ const BlogTrustSidebar = ({
         <div
           className="flex shrink-0 gap-[1px]"
           role="img"
-          aria-label={`${stars.toFixed(1)} out of 5 stars on Trustpilot`}
+          aria-label={`${trustScore.toFixed(1)} out of 5 TrustScore on Trustpilot`}
         >
           {starFills.map((fill, index) => (
             <GoldStar
@@ -95,7 +95,7 @@ const BlogTrustSidebar = ({
           ))}
         </div>
         <p className="text-[13.5px] leading-[140%] text-skin-neutral-400">
-          {stars.toFixed(1)} / 5 across {totalReviews.toLocaleString("en-GB")}+
+          {trustScore.toFixed(1)} / 5 across {totalReviews.toLocaleString("en-GB")}+
         </p>
       </div>
       <p className="mt-0.5 text-[13.5px] leading-[140%] text-skin-neutral-400">Trustpilot reviews</p>

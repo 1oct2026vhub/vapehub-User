@@ -1,8 +1,8 @@
-// import Link from "next/link";
+import Link from "next/link";
 import Image from "next/image";
 import { Author } from "@/lib/config/blog.config";
 import { DEFAULT_AUTHOR_BIO } from "@/lib/config/blog-author-bio.config";
-// import { ROUTES } from "@/lib/routes";
+import { ROUTES } from "@/lib/routes";
 
 interface BlogAuthorBioCardProps {
   author: Author;
@@ -14,7 +14,9 @@ interface BlogAuthorBioCardProps {
 
 const BlogAuthorBioCard = ({
   author,
+  authorId,
   bio,
+  articlesHref,
 }: BlogAuthorBioCardProps) => {
   const authorName =
     [author.first_name, author.last_name].filter(Boolean).join(" ").trim() || "VapeHub";
@@ -26,14 +28,12 @@ const BlogAuthorBioCard = ({
     .toUpperCase();
   const avatarUrl = author.avatar_url?.trim();
   const resolvedBio = bio?.trim() || author.bio?.trim() || DEFAULT_AUTHOR_BIO.bio;
-  // Hidden with the author bio links — keep for future use
-  // const resolvedAuthorId = author.id || authorId;
-  // const resolvedArticlesHref =
-  //   articlesHref ||
-  //   (resolvedAuthorId
-  //     ? ROUTES.BLOGS_BY_AUTHOR(resolvedAuthorId)
-  //     : DEFAULT_AUTHOR_BIO.articlesHref);
-  // const resolvedTeamHref = teamHref || DEFAULT_AUTHOR_BIO.teamHref;
+  const resolvedAuthorId = author.id || authorId;
+  const resolvedArticlesHref =
+    articlesHref ||
+    (resolvedAuthorId
+      ? ROUTES.BLOGS_BY_AUTHOR(resolvedAuthorId)
+      : DEFAULT_AUTHOR_BIO.articlesHref);
 
   return (
     <aside className="blog-author-bio rounded-xl border border-skin-neutral-100 bg-skin-white p-4 sm:p-5 md:p-6">
@@ -64,7 +64,6 @@ const BlogAuthorBioCard = ({
           </p>
           <p className="mt-2 text-[13.5px] leading-[150%] text-skin-neutral-400">{resolvedBio}</p>
 
-          {/* Hidden for now — keep for future use
           <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-1">
             <Link
               href={resolvedArticlesHref}
@@ -72,14 +71,7 @@ const BlogAuthorBioCard = ({
             >
               {DEFAULT_AUTHOR_BIO.articlesLabel} {authorName} &rarr;
             </Link>
-            <Link
-              href={resolvedTeamHref}
-              className="text-[13.5px] font-medium text-skin-primary-500 underline"
-            >
-              {DEFAULT_AUTHOR_BIO.teamLabel} &rarr;
-            </Link>
           </div>
-          */}
         </div>
       </div>
     </aside>

@@ -19,7 +19,7 @@ type BlogListViewProps = {
     selectedId: string;
     page?: number;
     categoryId?: string;
-    userId?: string;
+    authorId?: string;
     pathnameBase?: string;
     lockCategory?: boolean;
     initialTabs?: BlogResponse[];
@@ -32,7 +32,7 @@ const BlogListView: React.FC<BlogListViewProps> = ({
     selectedId,
     page,
     categoryId,
-    userId,
+    authorId,
     pathnameBase = ROUTES.BLOGS,
     lockCategory,
     initialTabs = [],
@@ -69,7 +69,7 @@ const BlogListView: React.FC<BlogListViewProps> = ({
     const buildFallbackHref = (category: string, pageNumber: number) => {
         const hrefPath = isLockedCategory ? pathnameBase : ROUTES.BLOGS;
         const params = new URLSearchParams();
-        if (userId) params.set("userId", userId);
+        if (authorId) params.set("authorId", authorId);
         if (!isLockedCategory && category !== "0") params.set("category", category);
         if (pageNumber > 1) params.set("page", String(pageNumber));
         const query = params.toString();
@@ -79,7 +79,7 @@ const BlogListView: React.FC<BlogListViewProps> = ({
     const buildBlogListPayload = (pageNumber: number, category: string) => ({
         limit: BLOGS_PER_PAGE,
         page: pageNumber,
-        ...(userId ? { userId } : {}),
+        ...(authorId ? { authorId } : {}),
         ...(category && category !== "0" && category !== "" ? { categoryId: category } : {}),
     });
 
@@ -124,7 +124,7 @@ const BlogListView: React.FC<BlogListViewProps> = ({
             setLoading(false);
         };
         fetchBlogsPost();
-    }, [selectedTab, offset, resolvedSelectedId, resolvedInitialPage, userId]);
+    }, [selectedTab, offset, resolvedSelectedId, resolvedInitialPage, authorId]);
 
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>

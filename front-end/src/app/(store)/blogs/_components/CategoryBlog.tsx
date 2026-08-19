@@ -32,7 +32,7 @@ import BlogTrustSidebar from "./BlogTrustSidebar";
 import { resolveContinueReadingArticles } from "./blog-continue-reading.utils";
 
 export interface CategoryBlogPageData {
-  trustStars: number;
+  trustScore: number;
   trustTotalReviews: number;
   continueReadingArticles: ContinueReadingArticle[];
 }
@@ -55,7 +55,12 @@ export async function prepareCategoryBlogPageData(
       : null;
 
   return {
-    trustStars: trustStats?.scoreBreakdown?.stars ?? trustStats?.averageRating ?? 4.8,
+    trustScore:
+      trustStats?.scoreBreakdown?.trustScore ??
+      trustStats?.trustScore ??
+      trustStats?.scoreBreakdown?.stars ??
+      trustStats?.averageRating ??
+      4.8,
     trustTotalReviews: trustStats?.totalReviews ?? 12000,
     continueReadingArticles,
   };
@@ -72,7 +77,7 @@ const processBlogContent = (html: string): string => {
 
 const CategoryBlogs = ({
   data,
-  trustStars,
+  trustScore,
   trustTotalReviews,
   continueReadingArticles,
 }: CategoryBlogsProps) => {
@@ -205,7 +210,7 @@ const CategoryBlogs = ({
 
           <aside className="blog:hidden">
             <BlogTrustSidebar
-              stars={trustStars}
+              trustScore={trustScore}
               totalReviews={trustTotalReviews}
               idPrefix="blog-trust-inline"
             />
@@ -214,7 +219,7 @@ const CategoryBlogs = ({
 
         <aside className="blog-post-rail hidden min-w-0 blog:block">
           <BlogTrustSidebar
-            stars={trustStars}
+            trustScore={trustScore}
             totalReviews={trustTotalReviews}
             idPrefix="blog-trust-rail"
           />

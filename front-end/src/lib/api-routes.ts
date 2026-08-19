@@ -192,7 +192,7 @@ export interface PRODUCT_PAYLOAD {
 }
 export interface BLOG_PAYLOAD {
     categoryId?: string;
-    userId?: string | number;
+    authorId?: string | number;
     limit: number;
     page: number;
 }

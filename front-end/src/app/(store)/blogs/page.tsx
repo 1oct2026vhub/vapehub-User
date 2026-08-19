@@ -24,15 +24,15 @@ const BlogsListingPage: NextPage<BlogsListingPageProps> = async ({ searchParams 
         : Array.isArray(rawPage) ? rawPage[0] : "1";
     const pageFromQuery = Number.parseInt(pageParam ?? "1", 10);
     const page = Number.isNaN(pageFromQuery) || pageFromQuery < 1 ? 1 : pageFromQuery;
-    const rawUserId = params.userId;
-    const userId = typeof rawUserId === "string"
-        ? rawUserId
-        : Array.isArray(rawUserId) ? rawUserId[0] : undefined;
+    const rawAuthorId = params.authorId;
+    const authorId = typeof rawAuthorId === "string"
+        ? rawAuthorId
+        : Array.isArray(rawAuthorId) ? rawAuthorId[0] : undefined;
     const blogListPayload = {
         limit: 9,
         page,
         ...(categoryId !== "0" ? { categoryId } : {}),
-        ...(userId ? { userId } : {}),
+        ...(authorId ? { authorId } : {}),
     };
     const [categoriesResponse, blogsResponse] = await Promise.all([
         getBlogList(),
@@ -57,7 +57,7 @@ const BlogsListingPage: NextPage<BlogsListingPageProps> = async ({ searchParams 
     return (
         <BlogListView
             selectedId={categoryId}
-            userId={userId}
+            authorId={authorId}
             initialTabs={initialTabs}
             initialBlogs={initialBlogs}
             initialPage={page}

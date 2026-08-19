@@ -14,13 +14,14 @@ const BlogContinueReadingCard = ({
   imageAlt,
 }: BlogContinueReadingCardProps) => (
   <article className="flex h-full flex-col overflow-hidden rounded-xl bg-skin-white shadow-card">
-    <div className="relative h-44 w-full bg-skin-neutral-50">
+    <div className="relative w-full bg-skin-neutral-50">
       <Image
         src={imageUrl}
         alt={imageAlt}
-        fill
+        width={0}
+        height={0}
         sizes="(max-width: 768px) 100vw, 33vw"
-        className="object-cover"
+        className="h-auto w-full"
       />
     </div>
 

@@ -666,13 +666,15 @@ const normalizeFooterMenu = (payload: FooterMenuResponse): FooterMenuResponse =>
 
 export const getFooterMenu = async (): Promise<FooterMenuResponse> => {
   try {
+    // CMS-managed footer — skip Data Cache so admin edits show immediately.
+    // Fallback path and response shape stay the same.
     let response = await fetch(API_ROUTES.GET_FOOTER_MENU, {
-      next: { revalidate: 3600 },
+      cache: 'no-store',
     });
 
     if (!response.ok) {
       response = await fetch(API_ROUTES.GET_HOME_FOOTER_MENU, {
-        next: { revalidate: 3600 },
+        cache: 'no-store',
       });
     }
 

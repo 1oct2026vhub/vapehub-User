@@ -1,6 +1,6 @@
 "use client"
 import { Key } from '@react-types/shared';
-import type { BlogList, BlogResponse } from '@/lib/config/blog.config';
+import type { Author, BlogList, BlogResponse } from '@/lib/config/blog.config';
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { Card, CardBody, Tab, Tabs } from '@nextui-org/react';
 import { getBlogList, getBlogPostList } from '@/lib/server.actions';
@@ -12,7 +12,8 @@ import Pagination from "@/components/Pagination";
 import PreLoader from '@/components/common/PreLoader';
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import Link from 'next/link';
-import { getAuthorArticlesHeading, getAuthorDisplayName } from '@/lib/config/blog-author-bio.config';
+import { DEFAULT_AUTHOR_BIO, getAuthorArticlesHeading, getAuthorDisplayName } from '@/lib/config/blog-author-bio.config';
+import BlogAuthorBioCard from './BlogAuthorBioCard';
 
 const BLOGS_PER_PAGE = 9;
 
@@ -22,6 +23,7 @@ type BlogListViewProps = {
     categoryId?: string;
     authorId?: string;
     authorName?: string;
+    author?: Author;
     pathnameBase?: string;
     lockCategory?: boolean;
     initialTabs?: BlogResponse[];
@@ -36,6 +38,7 @@ const BlogListView: React.FC<BlogListViewProps> = ({
     categoryId,
     authorId,
     authorName,
+    author,
     pathnameBase = ROUTES.BLOGS,
     lockCategory,
     initialTabs = [],
@@ -55,7 +58,8 @@ const BlogListView: React.FC<BlogListViewProps> = ({
     const [offset, setOffset] = useState(resolvedInitialPage);
     const skippedInitialFetch = useRef(initialBlogs.length > 0);
 
-    const resolvedAuthorName = authorName || (authorId ? getAuthorDisplayName(blogs[0]?.author) : undefined);
+    const resolvedAuthor = author || (authorId ? blogs[0]?.author : undefined);
+    const resolvedAuthorName = authorName || (authorId ? getAuthorDisplayName(resolvedAuthor) : undefined);
     const pageHeading = authorId
         ? getAuthorArticlesHeading(resolvedAuthorName || "author")
         : "Blogs";
@@ -63,7 +67,11 @@ const BlogListView: React.FC<BlogListViewProps> = ({
         ? [
             { label: "Home", href: ROUTES.WELCOME },
             { label: "Blogs", href: ROUTES.BLOGS },
-            { label: pageHeading, href: ROUTES.BLOGS_BY_AUTHOR(authorId), isActive: true },
+            {
+                label: resolvedAuthorName || pageHeading,
+                href: ROUTES.BLOGS_BY_AUTHOR(authorId),
+                isActive: true,
+            },
         ]
         : [
             { label: "Home", href: ROUTES.WELCOME },
@@ -143,9 +151,19 @@ const BlogListView: React.FC<BlogListViewProps> = ({
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
             <section className="w-full">
-                <h1 className={`primary-gradient-600 text-h4 md:text-h2 font-semibold ${authorId ? 'max-w-3xl' : 'w-fit'}`}>{pageHeading}</h1>
-                <div className={`w-full mt-2.5 ${authorId ? 'lg:mt-6' : 'lg:-mt-16'}`}>
-                    {/* No-JS fallback */}
+                {authorId && resolvedAuthor ? (
+                    <BlogAuthorBioCard
+                        author={resolvedAuthor}
+                        authorId={Number(authorId)}
+                        showArticlesLink={false}
+                        eyebrow={DEFAULT_AUTHOR_BIO.articlesLabel}
+                        variant="page"
+                    />
+                ) : (
+                    <h1 className='primary-gradient-600 text-h4 md:text-h2 font-semibold w-fit'>{pageHeading}</h1>
+                )}
+
+                <div className={`w-full ${authorId ? 'mt-6' : 'mt-2.5 lg:-mt-16'}`}>
                     <div className="blogs-list-static-fallback">
                         <div className="ml-auto flex max-w-full gap-3 overflow-x-auto whitespace-nowrap rounded-md border border-skin-neutral-100 bg-skin-base px-3.5 py-2.5 md:px-5 md:py-4 lg:max-w-3xl xl:max-w-5xl">
                             {tabs.map((tab) => {
@@ -185,7 +203,10 @@ const BlogListView: React.FC<BlogListViewProps> = ({
                     </div>
 
                     <div className="blogs-list-ui-host">
-                        <Tabs aria-label="Options" selectedKey={selectedTab} onSelectionChange={(e) => handleTabChange(e)}
+                        <Tabs
+                            aria-label="Options"
+                            selectedKey={selectedTab}
+                            onSelectionChange={(e) => handleTabChange(e)}
                             variant='bordered'
                             color='primary'
                             classNames={{
@@ -197,17 +218,15 @@ const BlogListView: React.FC<BlogListViewProps> = ({
                                 panel: "!px-0"
                             }}
                         >
-
                             {tabs.map((tab) => (
-                                <Tab key={tab.id} title={tab.name} >
+                                <Tab key={tab.id} title={tab.name}>
                                     {
                                         loading ? <PreLoader /> : !blogs.length ? <EmptyPlaceholder title='Uh, oh!' description='No blogs available' /> :
                                             <Card classNames={{
                                                 base: "!bg-transparent border-none shadow-none p-0 w-full",
                                                 body: "px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden"
                                             }}>
-
-                                                <CardBody >
+                                                <CardBody>
                                                     {
                                                         blogs.map((blog: BlogList, idx: number) => (
                                                             <BlogCard key={idx} blog={blog} />
@@ -225,7 +244,7 @@ const BlogListView: React.FC<BlogListViewProps> = ({
 
             <div className="blogs-list-ui-host">
                 {totalPages > 1 && (
-                    <div className='w-full  flex justify-end'>
+                    <div className='w-full flex justify-end'>
                         <Pagination
                             total={totalPages}
                             onPageChange={handlePagination}
@@ -236,21 +255,6 @@ const BlogListView: React.FC<BlogListViewProps> = ({
             </div>
         </main>
     )
-
 }
 
 export default BlogListView
-
-// return  <Card classNames={{
-//     base: "!bg-transparent border-none shadow-none p-0 mt-12"
-// }}>
-//     <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
-//         {
-//            blogs.map((blog: BlogResponse, idx: number) => (
-//                 <BlogCard key={idx} blog={blog} />
-//             ))
-//         }
-
-
-//     </CardBody>
-// </Card>;

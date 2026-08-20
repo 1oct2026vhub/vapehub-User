@@ -2,7 +2,7 @@ import { AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
 import { Metadata, NextPage } from 'next'
 import BlogListView from './_components/BlogList';
 import { getBlogList, getBlogPostList } from '@/lib/server.actions';
-import type { BlogResponse } from '@/lib/config/blog.config';
+import type { Author, BlogResponse } from '@/lib/config/blog.config';
 import { getAuthorArticlesHeading, getAuthorDisplayName } from '@/lib/config/blog-author-bio.config';
 
 type BlogsListingPageProps = {
@@ -66,13 +66,15 @@ const BlogsListingPage: NextPage<BlogsListingPageProps> = async ({ searchParams 
         : [allTab];
     const initialBlogs = blogsResponse.status === ServerActionStatus.SUCCESS ? blogsResponse.data.blogs : [];
     const initialTotalPages = blogsResponse.status === ServerActionStatus.SUCCESS ? blogsResponse.data.pagination.totalPages : 1;
-    const authorName = authorId ? getAuthorDisplayName(initialBlogs[0]?.author) : undefined;
+    const author: Author | undefined = authorId ? initialBlogs[0]?.author : undefined;
+    const authorName = authorId ? getAuthorDisplayName(author) : undefined;
 
     return (
         <BlogListView
             selectedId={categoryId}
             authorId={authorId}
             authorName={authorName}
+            author={author}
             initialTabs={initialTabs}
             initialBlogs={initialBlogs}
             initialPage={page}

@@ -10,6 +10,12 @@ interface BlogAuthorBioCardProps {
   bio?: string;
   articlesHref?: string;
   teamHref?: string;
+  /** When false, hides the “All articles by …” link (e.g. on the author listing page). */
+  showArticlesLink?: boolean;
+  /** Override the small label above the name (default: “Written by”). */
+  eyebrow?: string;
+  /** `page` = compact author-archive header; `card` = post footer bio card. */
+  variant?: "card" | "page";
 }
 
 const BlogAuthorBioCard = ({
@@ -17,9 +23,13 @@ const BlogAuthorBioCard = ({
   authorId,
   bio,
   articlesHref,
+  showArticlesLink = true,
+  eyebrow = "Written by",
+  variant = "card",
 }: BlogAuthorBioCardProps) => {
   const authorName =
     [author.first_name, author.last_name].filter(Boolean).join(" ").trim() || "VapeHub";
+  const authorRole = author.role?.trim();
   const initials = authorName
     .split(" ")
     .map((part) => part[0])
@@ -34,6 +44,44 @@ const BlogAuthorBioCard = ({
     (resolvedAuthorId
       ? ROUTES.BLOGS_BY_AUTHOR(resolvedAuthorId)
       : DEFAULT_AUTHOR_BIO.articlesHref);
+
+  if (variant === "page") {
+    return (
+      <header className="blog-author-bio flex flex-col gap-4 border-b border-skin-neutral-100 pb-6 sm:flex-row sm:items-start sm:gap-5 sm:pb-7">
+        {avatarUrl ? (
+          <Image
+            src={avatarUrl}
+            alt={authorName}
+            width={72}
+            height={72}
+            className="h-[72px] w-[72px] shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <div
+            aria-hidden
+            className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full bg-skin-neutral-100 text-title-1 font-semibold text-skin-neutral-400"
+          >
+            {initials}
+          </div>
+        )}
+
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-skin-neutral-300">
+            {eyebrow}
+          </p>
+          <h1 className="!font-opensans mt-1 text-h4 font-bold primary-gradient-600 md:text-h2">
+            {authorName}
+          </h1>
+          {authorRole ? (
+            <p className="mt-1 text-content-1 text-skin-neutral-300">{authorRole}</p>
+          ) : null}
+          <p className="mt-2.5 w-full text-[14px] leading-[160%] text-skin-neutral-400">
+            {resolvedBio}
+          </p>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <aside className="blog-author-bio rounded-xl border border-skin-neutral-100 bg-skin-white p-4 sm:p-5 md:p-6">
@@ -57,21 +105,23 @@ const BlogAuthorBioCard = ({
 
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-bold uppercase tracking-wide text-skin-neutral-300">
-            Written by
+            {eyebrow}
           </p>
           <p className="!font-opensans mt-1 text-title-2 font-bold primary-gradient-600">
             {authorName}
           </p>
           <p className="mt-2 text-[13.5px] leading-[150%] text-skin-neutral-400">{resolvedBio}</p>
 
-          <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-1">
-            <Link
-              href={resolvedArticlesHref}
-              className="text-[13.5px] font-medium text-skin-primary-500 underline"
-            >
-              {DEFAULT_AUTHOR_BIO.articlesLabel} {authorName} &rarr;
-            </Link>
-          </div>
+          {showArticlesLink ? (
+            <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-1">
+              <Link
+                href={resolvedArticlesHref}
+                className="text-[13.5px] font-medium text-skin-primary-500 underline"
+              >
+                {DEFAULT_AUTHOR_BIO.articlesLabel} {authorName} &rarr;
+              </Link>
+            </div>
+          ) : null}
         </div>
       </div>
     </aside>

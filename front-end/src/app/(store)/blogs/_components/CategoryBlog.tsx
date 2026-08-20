@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from "next/cache";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import FAQSection from "@/components/FAQSection";
@@ -44,6 +45,7 @@ interface CategoryBlogsProps extends CategoryBlogPageData {
 export async function prepareCategoryBlogPageData(
   data: BlogByCategoryAndSlugResponse,
 ): Promise<CategoryBlogPageData> {
+  noStore();
   const [trustResponse, continueReadingArticles] = await Promise.all([
     getTrustpilotReviews(),
     resolveContinueReadingArticles(data),
@@ -81,6 +83,8 @@ const CategoryBlogs = ({
   trustTotalReviews,
   continueReadingArticles,
 }: CategoryBlogsProps) => {
+  noStore();
+
   if (!data) {
     return <EmptyPlaceholder title="Uh, oh!" description="No blogs found" />;
   }

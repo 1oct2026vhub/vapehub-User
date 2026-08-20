@@ -12,6 +12,7 @@ import Pagination from "@/components/Pagination";
 import PreLoader from '@/components/common/PreLoader';
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import Link from 'next/link';
+import { getAuthorArticlesHeading, getAuthorDisplayName } from '@/lib/config/blog-author-bio.config';
 
 const BLOGS_PER_PAGE = 9;
 
@@ -20,6 +21,7 @@ type BlogListViewProps = {
     page?: number;
     categoryId?: string;
     authorId?: string;
+    authorName?: string;
     pathnameBase?: string;
     lockCategory?: boolean;
     initialTabs?: BlogResponse[];
@@ -33,6 +35,7 @@ const BlogListView: React.FC<BlogListViewProps> = ({
     page,
     categoryId,
     authorId,
+    authorName,
     pathnameBase = ROUTES.BLOGS,
     lockCategory,
     initialTabs = [],
@@ -52,10 +55,20 @@ const BlogListView: React.FC<BlogListViewProps> = ({
     const [offset, setOffset] = useState(resolvedInitialPage);
     const skippedInitialFetch = useRef(initialBlogs.length > 0);
 
-    const breadcrumbs = [
-        { label: "Home", href: ROUTES.WELCOME },
-        { label: "Blogs", href: ROUTES.BLOGS, isActive: true },
-    ];
+    const resolvedAuthorName = authorName || (authorId ? getAuthorDisplayName(blogs[0]?.author) : undefined);
+    const pageHeading = authorId
+        ? getAuthorArticlesHeading(resolvedAuthorName || "author")
+        : "Blogs";
+    const breadcrumbs = authorId
+        ? [
+            { label: "Home", href: ROUTES.WELCOME },
+            { label: "Blogs", href: ROUTES.BLOGS },
+            { label: pageHeading, href: ROUTES.BLOGS_BY_AUTHOR(authorId), isActive: true },
+        ]
+        : [
+            { label: "Home", href: ROUTES.WELCOME },
+            { label: "Blogs", href: ROUTES.BLOGS, isActive: true },
+        ];
 
     const handlePagination = (page: number) => {
         setOffset(page);
@@ -130,8 +143,8 @@ const BlogListView: React.FC<BlogListViewProps> = ({
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
             <section className="w-full">
-                <h1 className='primary-gradient-600 text-h4 md:text-h2 font-semibold w-fit'>Blogs</h1>
-                <div className='w-full mt-2.5 lg:-mt-16'>
+                <h1 className={`primary-gradient-600 text-h4 md:text-h2 font-semibold ${authorId ? 'max-w-3xl' : 'w-fit'}`}>{pageHeading}</h1>
+                <div className={`w-full mt-2.5 ${authorId ? 'lg:mt-6' : 'lg:-mt-16'}`}>
                     {/* No-JS fallback */}
                     <div className="blogs-list-static-fallback">
                         <div className="ml-auto flex max-w-full gap-3 overflow-x-auto whitespace-nowrap rounded-md border border-skin-neutral-100 bg-skin-base px-3.5 py-2.5 md:px-5 md:py-4 lg:max-w-3xl xl:max-w-5xl">

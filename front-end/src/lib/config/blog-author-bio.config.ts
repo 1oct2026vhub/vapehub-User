@@ -7,3 +7,11 @@ export const DEFAULT_AUTHOR_BIO = {
   articlesLabel: "All articles by",
   teamLabel: "Meet the team",
 } as const;
+
+export const getAuthorDisplayName = (
+  author?: { first_name?: string | null; last_name?: string | null } | null,
+  fallback = "VapeHub",
+) => [author?.first_name, author?.last_name].filter(Boolean).join(" ").trim() || fallback;
+
+export const getAuthorArticlesHeading = (authorName: string) =>
+  `${DEFAULT_AUTHOR_BIO.articlesLabel} ${authorName}`;

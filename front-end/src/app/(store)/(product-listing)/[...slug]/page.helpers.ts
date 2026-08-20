@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 import {
   getBlogByCategoryAndSlug,
   getBlogBySlug,
@@ -222,7 +223,9 @@ export const fetchProductDescriptionData = cache(async (
 });
 
 export const fetchBlogByCategoryAndSlug = async (categorySlug: string): Promise<BlogByCategoryAndSlugResponse | null> => {
-  const response = await getBlogByCategoryAndSlug(categorySlug);
+  // Blog post content is CMS-managed — bypass Data Cache and Full Route Cache so admin edits show immediately.
+  noStore();
+  const response = await getBlogByCategoryAndSlug(categorySlug, false);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -230,7 +233,8 @@ export const fetchBlogByCategoryAndSlug = async (categorySlug: string): Promise<
 };
 
 export const fetchBlogBySlug = async (slug: string): Promise<BlogBySlugResponse | null> => {
-  const response = await getBlogBySlug(slug);
+  noStore();
+  const response = await getBlogBySlug(slug, false);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }

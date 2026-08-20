@@ -276,10 +276,10 @@ const Page = async ({
       const page = Number.isNaN(pageFromQuery) || pageFromQuery < 1 ? 1 : pageFromQuery;
       const selectedCategoryId = blogs?.id?.toString() ?? "0";
       const [categoriesResponse, blogsResponse] = await Promise.all([
-        getBlogList(),
+        getBlogList(undefined, undefined, false),
         selectedCategoryId === "0"
-          ? getBlogPostList({ limit: 9, page })
-          : getBlogPostList({ categoryId: selectedCategoryId, limit: 9, page }),
+          ? getBlogPostList({ limit: 9, page }, false)
+          : getBlogPostList({ categoryId: selectedCategoryId, limit: 9, page }, false),
       ]);
 
       const allTab = {

@@ -57,6 +57,23 @@ function HistoryScrollManager() {
     }
   }, [pageKey, pathname, searchParams]);
 
+  // Before paint: honor explicit “scroll to top” navigations (e.g. author articles link).
+  // With history.scrollRestoration = 'manual', client navigations keep the previous scrollY.
+  // From a deep article scroll that lands on a shorter page, that looks like the footer.
+  useLayoutEffect(() => {
+    if (isFilterContextRef.current) return;
+    try {
+      const skipHome = pathname === '/' && sessionStorage.getItem('skipScrollRestore_/');
+      const skipPage = sessionStorage.getItem(`skipScrollRestore_${pageKey}`);
+      if (!skipHome && !skipPage) return;
+      isRestoringRef.current = true;
+      sessionStorage.removeItem(`scrollPos_${pageKey}`);
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    } catch {
+      // Ignore storage errors
+    }
+  }, [pageKey, pathname]);
+
   // Save scroll position to sessionStorage (throttled) – skip on product filter pages (new-products, shop, brand, category, deal)
   useEffect(() => {
     const saveScrollPosition = () => {
@@ -156,6 +173,16 @@ function HistoryScrollManager() {
           return;
         }
 
+        // Explicit “scroll to top” navigations (e.g. author articles link). Do not restore a saved
+        // position, and do not keep the previous page’s scrollY (manual restoration leaves it in place).
+        // Keep the flag until delayed restore attempts finish so they cannot re-apply a saved offset.
+        const skipRestorePage = sessionStorage.getItem(`skipScrollRestore_${pageKey}`);
+        if (skipRestorePage) {
+          sessionStorage.removeItem(`scrollPos_${pageKey}`);
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+          return;
+        }
+
         const savedPosition = sessionStorage.getItem(`scrollPos_${pageKey}`);
         if (savedPosition) {
           const position = parseInt(savedPosition, 10);
@@ -194,6 +221,11 @@ function HistoryScrollManager() {
       setTimeout(() => restoreScroll(), 300),
       setTimeout(() => {
         restoreScroll();
+        try {
+          sessionStorage.removeItem(`skipScrollRestore_${pageKey}`);
+        } catch {
+          // Ignore storage errors
+        }
         isRestoringRef.current = false;
       }, 500)
     ];

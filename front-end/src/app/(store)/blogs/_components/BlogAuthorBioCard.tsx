@@ -18,6 +18,17 @@ interface BlogAuthorBioCardProps {
   eyebrow?: string;
 }
 
+/** Keys HistoryProvider may use (trailingSlash serves `/blogs/?…`). */
+function authorListingStorageKeys(href: string): string[] {
+  const keys = [href];
+  if (href.includes("/blogs?")) {
+    keys.push(href.replace("/blogs?", "/blogs/?"));
+  } else if (href.includes("/blogs/?")) {
+    keys.push(href.replace("/blogs/?", "/blogs?"));
+  }
+  return Array.from(new Set(keys));
+}
+
 const BlogAuthorBioCard = ({
   author,
   authorId,
@@ -45,8 +56,10 @@ const BlogAuthorBioCard = ({
 
   const handleArticlesClick = () => {
     try {
-      sessionStorage.removeItem(`scrollPos_${resolvedArticlesHref}`);
-      sessionStorage.setItem(`skipScrollRestore_${resolvedArticlesHref}`, "true");
+      authorListingStorageKeys(resolvedArticlesHref).forEach((key) => {
+        sessionStorage.removeItem(`scrollPos_${key}`);
+        sessionStorage.setItem(`skipScrollRestore_${key}`, "true");
+      });
     } catch {
       // Ignore storage errors
     }

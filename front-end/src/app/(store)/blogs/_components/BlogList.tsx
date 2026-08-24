@@ -12,7 +12,7 @@ import Pagination from "@/components/Pagination";
 import PreLoader from '@/components/common/PreLoader';
 import EmptyPlaceholder from '@/components/ui/EmptyPlaceholder';
 import Link from 'next/link';
-import { DEFAULT_AUTHOR_BIO, getAuthorArticlesHeading, getAuthorDisplayName } from '@/lib/config/blog-author-bio.config';
+import { getAuthorArticlesHeading, getAuthorDisplayName } from '@/lib/config/blog-author-bio.config';
 import BlogAuthorBioCard from './BlogAuthorBioCard';
 
 const BLOGS_PER_PAGE = 9;
@@ -57,9 +57,11 @@ const BlogListView: React.FC<BlogListViewProps> = ({
     const [totalPages, setTotalPages] = useState(initialTotalPages);
     const [offset, setOffset] = useState(resolvedInitialPage);
     const skippedInitialFetch = useRef(initialBlogs.length > 0);
+    const [resolvedAuthor, setResolvedAuthor] = useState<Author | undefined>(
+        author || (authorId ? initialBlogs[0]?.author : undefined),
+    );
 
-    const resolvedAuthor = author || (authorId ? blogs[0]?.author : undefined);
-    const resolvedAuthorName = authorName || (authorId ? getAuthorDisplayName(resolvedAuthor) : undefined);
+    const resolvedAuthorName = authorName || getAuthorDisplayName(resolvedAuthor || blogs[0]?.author);
     const pageHeading = authorId
         ? getAuthorArticlesHeading(resolvedAuthorName || "author")
         : "Blogs";
@@ -67,11 +69,7 @@ const BlogListView: React.FC<BlogListViewProps> = ({
         ? [
             { label: "Home", href: ROUTES.WELCOME },
             { label: "Blogs", href: ROUTES.BLOGS },
-            {
-                label: resolvedAuthorName || pageHeading,
-                href: ROUTES.BLOGS_BY_AUTHOR(authorId),
-                isActive: true,
-            },
+            { label: pageHeading, href: ROUTES.BLOGS_BY_AUTHOR(authorId), isActive: true },
         ]
         : [
             { label: "Home", href: ROUTES.WELCOME },
@@ -141,46 +139,102 @@ const BlogListView: React.FC<BlogListViewProps> = ({
                 setBlogs(response.data.blogs);
                 setCurrentPage(response.data.pagination.currentPage);
                 setTotalPages(response.data.pagination.totalPages);
+                if (authorId && response.data.blogs[0]?.author) {
+                    setResolvedAuthor(response.data.blogs[0].author);
+                }
             }
             setLoading(false);
         };
         fetchBlogsPost();
     }, [selectedTab, offset, resolvedSelectedId, resolvedInitialPage, authorId]);
 
+    const authorBio = authorId && resolvedAuthor ? (
+        <div className="mt-5 mb-2 w-full">
+            <BlogAuthorBioCard
+                author={resolvedAuthor}
+                authorId={Number(authorId)}
+                showArticlesLink={false}
+                eyebrow="Author"
+            />
+        </div>
+    ) : null;
     return (
         <main className='px-4 lg:px-9 xl:px-12.5 py-7 xl:py-10 flex flex-col gap-7 xl:gap-10'>
             <BreadCrumbs items={breadcrumbs} />
             <section className="w-full">
-                {authorId && resolvedAuthor ? (
-                    <BlogAuthorBioCard
-                        author={resolvedAuthor}
-                        authorId={Number(authorId)}
-                        showArticlesLink={false}
-                        eyebrow={DEFAULT_AUTHOR_BIO.articlesLabel}
-                        variant="page"
-                    />
+                {authorId ? (
+                    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
+                        <h1 className="primary-gradient-600 shrink-0 text-h4 font-semibold md:text-h2">
+                            {pageHeading}
+                        </h1>
+                        <div className="min-w-0 flex-1">
+                            <div className="blogs-list-static-fallback">
+                                <div className="flex max-w-full gap-3 overflow-x-auto whitespace-nowrap rounded-md border border-skin-neutral-100 bg-skin-base px-3.5 py-2.5 md:px-5 md:py-4">
+                                    {tabs.map((tab) => {
+                                        const tabId = String(tab.id);
+                                        const isActive = tabId === resolvedSelectedId;
+                                        return (
+                                            <Link
+                                                key={`fallback-tab-${tab.id}`}
+                                                prefetch={false}
+                                                href={isLockedCategory && tabId !== resolvedSelectedId ? ROUTES.BLOGS : buildFallbackHref(tabId, 1)}
+                                                className={`rounded max-sm:px-5 flex h-10 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] items-center justify-center border border-[#035335] text-content-2 md:text-title-2 font-semibold leading-none ${isActive ? 'bg-primary-gradient-100 text-skin-white border-none shadow-md' : 'text-[#035335]'}`}
+                                            >
+                                                {tab.name}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div className="blogs-list-ui-host">
+                                <Tabs
+                                    aria-label="Options"
+                                    selectedKey={selectedTab}
+                                    onSelectionChange={(e) => handleTabChange(e)}
+                                    variant="bordered"
+                                    color="primary"
+                                    classNames={{
+                                        base: "w-full min-w-0",
+                                        tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 w-full max-w-full overflow-x-auto border border-skin-neutral-100 rounded-md !bg-skin-base flex whitespace-nowrap",
+                                        cursor: "bg-primary-gradient-100 border-none text-skin-white rounded shadow-md",
+                                        tab: "rounded max-sm:px-5 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] h-10 border border-[#035335] text-skin-[#035335] group-data-[selected=true]:!border-none",
+                                        tabContent: "group-data-[selected=true]:!text-skin-white text-content-2 md:text-title-2 font-semibold leading-none",
+                                        panel: "!hidden",
+                                    }}
+                                >
+                                    {tabs.map((tab) => (
+                                        <Tab key={tab.id} title={tab.name} />
+                                    ))}
+                                </Tabs>
+                            </div>
+                        </div>
+                    </div>
                 ) : (
-                    <h1 className='primary-gradient-600 text-h4 md:text-h2 font-semibold w-fit'>{pageHeading}</h1>
+                    <h1 className="primary-gradient-600 w-fit text-h4 font-semibold md:text-h2">{pageHeading}</h1>
                 )}
 
-                <div className={`w-full ${authorId ? 'mt-6' : 'mt-2.5 lg:-mt-16'}`}>
+                <div className={`w-full ${authorId ? 'mt-2.5' : 'mt-2.5 lg:-mt-16'}`}>
+                    {authorBio}
+                    {/* No-JS fallback */}
                     <div className="blogs-list-static-fallback">
-                        <div className="ml-auto flex max-w-full gap-3 overflow-x-auto whitespace-nowrap rounded-md border border-skin-neutral-100 bg-skin-base px-3.5 py-2.5 md:px-5 md:py-4 lg:max-w-3xl xl:max-w-5xl">
-                            {tabs.map((tab) => {
-                                const tabId = String(tab.id);
-                                const isActive = tabId === resolvedSelectedId;
-                                return (
-                                    <Link
-                                        key={`fallback-tab-${tab.id}`}
-                                        prefetch={false}
-                                        href={isLockedCategory && tabId !== resolvedSelectedId ? ROUTES.BLOGS : buildFallbackHref(tabId, 1)}
-                                        className={`rounded max-sm:px-5 flex h-10 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] items-center justify-center border border-[#035335] text-content-2 md:text-title-2 font-semibold leading-none ${isActive ? 'bg-primary-gradient-100 text-skin-white border-none shadow-md' : 'text-[#035335]'}`}
-                                    >
-                                        {tab.name}
-                                    </Link>
-                                );
-                            })}
-                        </div>
+                        {!authorId ? (
+                            <div className="ml-auto flex max-w-full gap-3 overflow-x-auto whitespace-nowrap rounded-md border border-skin-neutral-100 bg-skin-base px-3.5 py-2.5 md:px-5 md:py-4 lg:max-w-3xl xl:max-w-5xl">
+                                {tabs.map((tab) => {
+                                    const tabId = String(tab.id);
+                                    const isActive = tabId === resolvedSelectedId;
+                                    return (
+                                        <Link
+                                            key={`fallback-tab-${tab.id}`}
+                                            prefetch={false}
+                                            href={isLockedCategory && tabId !== resolvedSelectedId ? ROUTES.BLOGS : buildFallbackHref(tabId, 1)}
+                                            className={`rounded max-sm:px-5 flex h-10 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] items-center justify-center border border-[#035335] text-content-2 md:text-title-2 font-semibold leading-none ${isActive ? 'bg-primary-gradient-100 text-skin-white border-none shadow-md' : 'text-[#035335]'}`}
+                                        >
+                                            {tab.name}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        ) : null}
                         <div className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5'>
                             {initialBlogs.map((blog, idx) => (
                                 <BlogCard key={`fallback-blog-${blog.id ?? idx}`} blog={blog} />
@@ -203,48 +257,59 @@ const BlogListView: React.FC<BlogListViewProps> = ({
                     </div>
 
                     <div className="blogs-list-ui-host">
-                        <Tabs
-                            aria-label="Options"
-                            selectedKey={selectedTab}
-                            onSelectionChange={(e) => handleTabChange(e)}
-                            variant='bordered'
-                            color='primary'
-                            classNames={{
-                                base: "w-full",
-                                tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 lg:ml-auto lg:max-w-3xl xl:max-w-5xl ml-auto border border-skin-neutral-100 rounded-md !bg-skin-base flex whitespace-nowrap",
-                                cursor: "bg-primary-gradient-100 border-none text-skin-white rounded shadow-md",
-                                tab: "rounded max-sm:px-5 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] h-10 border border-[#035335] text-skin-[#035335] group-data-[selected=true]:!border-none",
-                                tabContent: "group-data-[selected=true]:!text-skin-white text-content-2 md:text-title-2 font-semibold leading-none",
-                                panel: "!px-0"
-                            }}
-                        >
-                            {tabs.map((tab) => (
-                                <Tab key={tab.id} title={tab.name}>
-                                    {
-                                        loading ? <PreLoader /> : !blogs.length ? <EmptyPlaceholder title='Uh, oh!' description='No blogs available' /> :
-                                            <Card classNames={{
-                                                base: "!bg-transparent border-none shadow-none p-0 w-full",
-                                                body: "px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden"
-                                            }}>
-                                                <CardBody>
-                                                    {
-                                                        blogs.map((blog: BlogList, idx: number) => (
-                                                            <BlogCard key={idx} blog={blog} />
-                                                        ))
-                                                    }
-                                                </CardBody>
-                                            </Card>
-                                    }
-                                </Tab>
-                            ))}
-                        </Tabs>
+                        {authorId ? (
+                            loading ? <PreLoader /> : !blogs.length ? <EmptyPlaceholder title='Uh, oh!' description='No blogs available' /> :
+                                <Card classNames={{
+                                    base: "!bg-transparent border-none shadow-none p-0 w-full",
+                                    body: "px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden"
+                                }}>
+                                    <CardBody>
+                                        {blogs.map((blog: BlogList, idx: number) => (
+                                            <BlogCard key={idx} blog={blog} />
+                                        ))}
+                                    </CardBody>
+                                </Card>
+                        ) : (
+                            <Tabs aria-label="Options" selectedKey={selectedTab} onSelectionChange={(e) => handleTabChange(e)}
+                                variant='bordered'
+                                color='primary'
+                                classNames={{
+                                    base: "w-full",
+                                    tabList: "gap-3 px-3.5 md:px-5 py-2.5 md:py-4 lg:ml-auto lg:max-w-3xl xl:max-w-5xl ml-auto border border-skin-neutral-100 rounded-md !bg-skin-base flex whitespace-nowrap",
+                                    cursor: "bg-primary-gradient-100 border-none text-skin-white rounded shadow-md",
+                                    tab: "rounded max-sm:px-5 flex-shrink-0 min-w-fit first:min-w-[60px] !w-[124px] h-10 border border-[#035335] text-skin-[#035335] group-data-[selected=true]:!border-none",
+                                    tabContent: "group-data-[selected=true]:!text-skin-white text-content-2 md:text-title-2 font-semibold leading-none",
+                                    panel: "!px-0"
+                                }}
+                            >
+                                {tabs.map((tab) => (
+                                    <Tab key={tab.id} title={tab.name} >
+                                        {
+                                            loading ? <PreLoader /> : !blogs.length ? <EmptyPlaceholder title='Uh, oh!' description='No blogs available' /> :
+                                                <Card classNames={{
+                                                    base: "!bg-transparent border-none shadow-none p-0 w-full",
+                                                    body: "px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden"
+                                                }}>
+                                                    <CardBody >
+                                                        {
+                                                            blogs.map((blog: BlogList, idx: number) => (
+                                                                <BlogCard key={idx} blog={blog} />
+                                                            ))
+                                                        }
+                                                    </CardBody>
+                                                </Card>
+                                        }
+                                    </Tab>
+                                ))}
+                            </Tabs>
+                        )}
                     </div>
                 </div>
             </section>
 
             <div className="blogs-list-ui-host">
                 {totalPages > 1 && (
-                    <div className='w-full flex justify-end'>
+                    <div className='w-full  flex justify-end'>
                         <Pagination
                             total={totalPages}
                             onPageChange={handlePagination}
@@ -255,6 +320,21 @@ const BlogListView: React.FC<BlogListViewProps> = ({
             </div>
         </main>
     )
+
 }
 
 export default BlogListView
+
+// return  <Card classNames={{
+//     base: "!bg-transparent border-none shadow-none p-0 mt-12"
+// }}>
+//     <CardBody className='px-1 py-3 sm:py-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5.5 overflow-hidden'>
+//         {
+//            blogs.map((blog: BlogResponse, idx: number) => (
+//                 <BlogCard key={idx} blog={blog} />
+//             ))
+//         }
+
+
+//     </CardBody>
+// </Card>;

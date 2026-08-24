@@ -47,9 +47,11 @@ const BlogsListingPage: NextPage<BlogsListingPageProps> = async ({ searchParams 
         ...(categoryId !== "0" ? { categoryId } : {}),
         ...(authorId ? { authorId } : {}),
     };
-    const [categoriesResponse, blogsResponse] = await Promise.all([
+    const authorListPayload = authorId ? { limit: 1, page: 1, authorId } : null;
+    const [categoriesResponse, blogsResponse, authorResponse] = await Promise.all([
         getBlogList(),
         getBlogPostList(blogListPayload),
+        authorListPayload ? getBlogPostList(authorListPayload) : Promise.resolve(null),
     ]);
 
     const allTab: BlogResponse = {
@@ -66,7 +68,14 @@ const BlogsListingPage: NextPage<BlogsListingPageProps> = async ({ searchParams 
         : [allTab];
     const initialBlogs = blogsResponse.status === ServerActionStatus.SUCCESS ? blogsResponse.data.blogs : [];
     const initialTotalPages = blogsResponse.status === ServerActionStatus.SUCCESS ? blogsResponse.data.pagination.totalPages : 1;
-    const author: Author | undefined = authorId ? initialBlogs[0]?.author : undefined;
+    const author: Author | undefined = authorId
+        ? (
+            (authorResponse && authorResponse.status === ServerActionStatus.SUCCESS
+                ? authorResponse.data.blogs[0]?.author
+                : undefined)
+            || initialBlogs[0]?.author
+        )
+        : undefined;
     const authorName = authorId ? getAuthorDisplayName(author) : undefined;
 
     return (

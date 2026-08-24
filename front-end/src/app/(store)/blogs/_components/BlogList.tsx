@@ -1,7 +1,7 @@
 "use client"
 import { Key } from '@react-types/shared';
 import type { Author, BlogList, BlogResponse } from '@/lib/config/blog.config';
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Card, CardBody, Tab, Tabs } from '@nextui-org/react';
 import { getBlogList, getBlogPostList } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
@@ -80,6 +80,36 @@ const BlogListView: React.FC<BlogListViewProps> = ({
         setOffset(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // Author archive only: land at top. Manual scroll restoration keeps the previous
+    // article scrollY, which clamps to the footer on this shorter page.
+    useLayoutEffect(() => {
+        if (!authorId) return;
+        try {
+            const keys = [
+                `/blogs?authorId=${authorId}`,
+                `/blogs/?authorId=${authorId}`,
+                ROUTES.BLOGS_BY_AUTHOR(authorId),
+            ];
+            Array.from(new Set(keys)).forEach((key) => {
+                sessionStorage.removeItem(`scrollPos_${key}`);
+                sessionStorage.setItem(`skipScrollRestore_${key}`, "true");
+            });
+        } catch {
+            // Ignore storage errors
+        }
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    }, [authorId]);
+
+    // Re-assert top after HistoryProvider's delayed restore window (~500ms).
+    useEffect(() => {
+        if (!authorId) return;
+        const timer = setTimeout(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+        }, 600);
+        return () => clearTimeout(timer);
+    }, [authorId]);
+
     const handleTabChange = (tabKey: Key) => {
         setSelectedTab(tabKey.toString());
         setOffset(1);

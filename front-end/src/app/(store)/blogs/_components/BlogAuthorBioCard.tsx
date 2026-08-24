@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Author } from "@/lib/config/blog.config";
@@ -41,6 +43,15 @@ const BlogAuthorBioCard = ({
       ? ROUTES.BLOGS_BY_AUTHOR(resolvedAuthorId)
       : DEFAULT_AUTHOR_BIO.articlesHref);
 
+  const handleArticlesClick = () => {
+    try {
+      sessionStorage.removeItem(`scrollPos_${resolvedArticlesHref}`);
+      sessionStorage.setItem(`skipScrollRestore_${resolvedArticlesHref}`, "true");
+    } catch {
+      // Ignore storage errors
+    }
+  };
+
   return (
     <aside className="blog-author-bio rounded-xl border border-skin-neutral-100 bg-skin-white p-4 sm:p-5 md:p-6">
       <div className="flex flex-col gap-4 sm:flex-row">
@@ -74,6 +85,8 @@ const BlogAuthorBioCard = ({
             <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-1">
               <Link
                 href={resolvedArticlesHref}
+                scroll
+                onClick={handleArticlesClick}
                 className="text-[13.5px] font-medium text-skin-primary-500 underline"
               >
                 {DEFAULT_AUTHOR_BIO.articlesLabel} {authorName} &rarr;

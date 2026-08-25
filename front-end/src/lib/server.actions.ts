@@ -25,6 +25,7 @@ import {
   ProductDescriptionResponse,
 } from '@/lib/config/product.config';
 import { ReferralStatsResponse } from "./config/referral.config";
+import { NotifyMePayload, NotifyMeResponse } from "./config/notify.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
 import { handleRequest } from "./request.config";
@@ -222,6 +223,18 @@ export const getTestimonialsList = async (canCache: boolean = true): Promise<Ser
     endpoint: API_ROUTES.GET_TESTIMONIALS,
     method: 'GET',
     canCache,
+  });
+};
+
+// notify-me when coming soon product is in stock
+export const notifyMeWhenAvailable = async (
+  productId: number,
+  payload: NotifyMePayload
+): Promise<ServerActionResponse<NotifyMeResponse>> => {
+  return await handleRequest<NotifyMeResponse, NotifyMePayload>({
+    endpoint: API_ROUTES.NOTIFY_ME(productId),
+    payload,
+    method: 'POST',
   });
 };
 

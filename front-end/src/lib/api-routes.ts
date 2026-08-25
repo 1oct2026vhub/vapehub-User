@@ -131,6 +131,7 @@ export const API_ROUTES = {
     GET_DEAL_PRODUCTS: (dealId: number, params?: { limit?: number; offset?: number; product_id?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${params ? `?${toQueryString(params)}` : ''}`),
     GET_PRODUCTS_BY_DEAL_SLUG: (slug: string, params?: Record<string, unknown>) => buildRequestUrl(`/api/deals/slug/${slug}${params ? `?${toQueryString(params)}` : ''}`),
     GET_LINKED_PRODUCTS: (productId: number, params?: { limit?: number; offset?: number; page?: number }) => buildRequestUrl(`/api/product/${productId}/linked-products${params ? `?${toQueryString(params)}` : ''}`),
+    NOTIFY_ME: (productId: number) => buildRequestUrl(`/api/product/${productId}/notify-me`),
     GET_PRODUCT_DESCRIPTION: (productId: number, params?: PRODUCT_DESCRIPTION_QUERY) => {
         const searchParams = new URLSearchParams();
         if (params?.variant_id != null) {

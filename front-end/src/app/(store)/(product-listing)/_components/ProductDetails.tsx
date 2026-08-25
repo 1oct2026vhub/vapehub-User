@@ -1,6 +1,6 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
+import { BenefitIcon, BellIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
 // import Image from 'next/image'
@@ -31,6 +31,8 @@ import {
     buildVariantFirstTitle,
     findVariantDescriptionBySelections,
 } from '@/lib/seo-schema'
+import NotifyMeModal from './NotifyMeModal'
+import { useDisclosure } from '@nextui-org/react'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -179,6 +181,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     const effectivePrice = price > 0 ? price : (regularPrice > 0 ? regularPrice : 0);
     const isDiscontinued = Boolean(product?.is_discontinued || cartEntity?.is_discontinued);
     const isComingSoon = Boolean(product?.is_coming_soon);
+    const { isOpen: isNotifyModalOpen, onOpen: onNotifyModalOpen, onOpenChange: onNotifyModalOpenChange } = useDisclosure();
     
     // Create a set of attribute IDs that are used in variation for filtering
     const variationAttributeIds = useMemo(() => {
@@ -690,8 +693,10 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                         )}
                     </div>
                     <div className='flex items-center justify-between gap-2 text-skin-neutral-500'>
-                        <p className='text-xl md:text-h5 !font-oswald font-bold'>{DEFAULT_CURRENCY_SYMBOL}{effectivePrice}</p>
-                        {mixAndMatchDeal && (
+                        <p className='text-xl md:text-h5 !font-oswald font-bold'>
+                            {isComingSoon ? `${DEFAULT_CURRENCY_SYMBOL}TBC` : `${DEFAULT_CURRENCY_SYMBOL}${effectivePrice}`}
+                        </p>
+                        {mixAndMatchDeal && !isComingSoon && (
                             <>
                                 <Button
                                     size="sm"
@@ -705,7 +710,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             </>
                         )}
                     </div>
-                    {regularPrice > 0 && price > 0 && regularPrice > price && (
+                    {regularPrice > 0 && price > 0 && regularPrice > price && !isComingSoon && (
                         <p className='text-content-2 md:text-title-2 text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
                     )}
                     <div className='space-y-4 max-md:order-4'>
@@ -746,11 +751,38 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                     />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
-                            cartEntity && (stock > 0 ?
+                            !isComingSoon && cartEntity && (stock > 0 ?
                                 <p className='text-content-2 md:text-title-2 font-bold primary-gradient-100'>In stock</p> :
                                 <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>)
                         }
                     </div>
+                    {isComingSoon ? (
+                        <div className='flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center'>
+                            <Button
+                                size="lg"
+                                radius="md"
+                                isDisabled
+                                className="btn w-full sm:w-auto sm:min-w-[140px] shadow-input !rounded-md uppercase font-oswald !text-content-2 md:!text-title-2 !leading-none !font-semibold h-12 !bg-skin-neutral-300 !text-skin-white !opacity-100 cursor-default"
+                            >
+                                Coming soon
+                            </Button>
+                            <Button
+                                size="lg"
+                                radius="md"
+                                color="primary"
+                                className="btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 gap-2"
+                                onPress={onNotifyModalOpen}
+                            >
+                                <BellIcon className="w-5 h-5 shrink-0" />
+                                Email me when available
+                            </Button>
+                            <NotifyMeModal
+                                productId={product.id}
+                                isOpen={isNotifyModalOpen}
+                                onOpenChange={onNotifyModalOpenChange}
+                            />
+                        </div>
+                    ) : (
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
                         <div
                             className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-md !font-bold h-12"
@@ -811,6 +843,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             Add to Cart
                         </Button>
                     </div>
+                    )}
                     {variantSelectionError && <p className='text-skin-red-400 text-sm'>{variantSelectionError}</p>}
                     {error && <p className='text-skin-red-400 text-sm'>{error}</p>}
                 </div>

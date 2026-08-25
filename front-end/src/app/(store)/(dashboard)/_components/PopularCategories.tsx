@@ -41,7 +41,8 @@ const PopularCategories: FunctionComponent = async (): Promise<ReactElement> => 
       const description = popularCategory.description;
       const viewAllHref = `/${slug}`;
 
-      const catResponse = await cachedGetCategoryProducts(slug, { order: "DESC", limit: 10, offset: 0, homepage: 1 });
+      // Omit homepage=1 so listing includes variants.regular_price for sale display
+      const catResponse = await cachedGetCategoryProducts(slug, { order: "DESC", limit: 10, offset: 0 });
       if (catResponse.status !== ServerActionStatus.SUCCESS) {
         return null;
       }

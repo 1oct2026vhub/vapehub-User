@@ -131,7 +131,9 @@ const BrandPage: NextPage<Props> = async ({
       })),
     });
 
-    const brandFaqs = await fetchBrandFaqs(brandProduct.id);
+    const brandFaqs = await fetchBrandFaqs(
+      dynamicPageSlug.entity_id ?? brandProduct.id
+    );
 
     return (
       <>
@@ -153,7 +155,8 @@ const BrandPage: NextPage<Props> = async ({
 export default BrandPage;
  
 const fetchDynamicPageSlug = async (slug: string): Promise<DynamicPageSlugResponse | null> => {
-  const response = await getDynamicPageSlug(slug);
+  // Bypass Data Cache so type_cards_html / additional_text_box / description from admin show promptly.
+  const response = await getDynamicPageSlug(slug, false);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -169,7 +172,7 @@ const fetchBrandProduct = async (slug: string, params: PRODUCT_PAYLOAD) => {
 };
 
 const fetchBrandFaqs = async (brandId: number): Promise<FaqResponse[]> => {
-  const response = await getFaqs("brand", brandId);
+  const response = await getFaqs("brand", brandId, false);
   if (response.status === ServerActionStatus.ERROR) {
     return [];
   }

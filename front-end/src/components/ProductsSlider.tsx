@@ -3,6 +3,7 @@ import React from "react";
 import Slider, { Settings } from "react-slick";
 import ProductCard from "./ProductCard";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
+import { resolveProductCardPrices } from "@/lib/product-card-prices";
 import { isLessThanOneMonth, ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
 import EmptyPlaceholder from "./ui/EmptyPlaceholder";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
@@ -38,6 +39,7 @@ function renderProductCard(
       : product.review_stats
         ? product.review_stats.total_reviews
         : 0;
+  const { price, regularPrice } = resolveProductCardPrices(product);
 
   return (
     <div key={key} className={slideClassName}>
@@ -53,7 +55,8 @@ function renderProductCard(
           product.ProductImages?.[0]?.alt_text ??
           ""
         }
-        price={product?.price}
+        price={price}
+        regularPrice={regularPrice}
         buttonText={product.deals && product.deals.length > 0 ? product.deals[0].name : ""}
         productId={product.id}
         flavors={product.flavor_count ? Number(product.flavor_count) : 0}

@@ -75,6 +75,10 @@ export interface DynamicPageSlugResponse {
     entity_id: number; 
     seo: SeoData | null;
     description?: string;
+    /** CKEditor HTML for category/brand type-card grid (slug-relation). */
+    type_cards_html?: string | null;
+    /** CKEditor HTML for additional rich content (tables/grids); omit/empty hides the section. */
+    additional_text_box?: string | null;
     name?: string;
     deals?: Array<{
         id: number;
@@ -100,6 +104,36 @@ export interface DynamicPageSlugResponse {
         url: string;
         order: number;
     }>;
+    /**
+     * Buying guide CTA from slug-relation (category/brand only).
+     * Missing/disabled → is_enabled: false, empty CTA strings.
+     * Not present on product/deal/blog.
+     */
+    buyingGuide?: {
+        is_enabled?: boolean;
+        cta_prompt?: string;
+        cta_label?: string;
+    } | null;
+    /** Legacy nested guide payload (prefer dedicated buying-guide API). */
+    buying_guide?: {
+        label?: string;
+        title?: string;
+        highlights?: Array<string | { label: string }>;
+        content?: string;
+        contentHtml?: string;
+        image_url?: string;
+        imageUrl?: string;
+        image_alt?: string;
+        imageAlt?: string;
+        defaultTabId?: string;
+        tabs?: Array<{
+            id?: string;
+            label?: string;
+            heading?: string;
+            content?: string;
+            contentHtml?: string;
+        }>;
+    };
 }
 
 export type FlashNewsResponse = FlashNewsItem[];

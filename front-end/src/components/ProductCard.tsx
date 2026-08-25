@@ -14,6 +14,7 @@ interface ProductCardProps {
   altText?: string;
   imageSrc: string;
   price: string;
+  regularPrice?: string;
   buttonText: string;
   productId: number;
   flavors?: number;
@@ -32,6 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   altText,
   imageSrc,
   price,
+  regularPrice,
   buttonText,
   outOfStock,
   // productId,
@@ -142,6 +144,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
       window.removeEventListener('resize', checkTruncation);
     };
   }, [title]);
+
+  const currentPrice = Number(price) || 0;
+  const previousPrice = Number(regularPrice) || 0;
+  const isOnSale = previousPrice > 0 && currentPrice > 0 && previousPrice > currentPrice;
   
   return (
     <Link prefetch={false} href={link} className="block h-full">
@@ -223,10 +229,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
         </div>
-          <div className="flex items-center justify-between gap-2 min-h-8 self-stretch mt-2.5">
-            <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
+          <div className="flex items-center justify-between gap-2 min-h-[40px] md:min-h-8 self-stretch mt-2.5">
+            <div className="flex flex-col justify-center gap-0.5 min-w-0 flex-1 md:flex-none md:flex-row md:items-baseline md:gap-1.5">
+              <p className="text-title-2 md:text-h5 text-skin-neutral-500 font-bold leading-tight">{DEFAULT_CURRENCY_SYMBOL}{price}</p>
+              {isOnSale && (
+                <p className="price-diagonal-strike text-content-1 md:text-title-2 text-skin-neutral-500 opacity-60 font-bold leading-tight w-fit">
+                  {DEFAULT_CURRENCY_SYMBOL}{regularPrice}
+                </p>
+              )}
+            </div>
             {buttonText && (
-              <div className="relative">
+              <div className="relative shrink-0">
                 <Button
                   size="md"
                   radius="md"

@@ -21,7 +21,8 @@ export const MostPopularSalts: React.FC<MostPopularProps> = async ({
   viewAllHref = "#",
   slug,
 }) => {
-  const catResponse = await cachedGetCategoryProducts(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0, homepage: 1 });
+  // Omit homepage=1 so listing includes variants.regular_price for sale display
+  const catResponse = await cachedGetCategoryProducts(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0 });
   if (catResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
   }
@@ -84,7 +85,8 @@ export const MostPopularVapes: React.FC<MostPopularProps> = async ({
   viewAllHref = "#",
   slug,
 }) => {
-  const catResponse = await cachedGetCategoryProducts(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0, homepage: 1 });
+  // Omit homepage=1 so listing includes variants.regular_price for sale display
+  const catResponse = await cachedGetCategoryProducts(slug, { sort_by: "id", order: "DESC", limit: 8, offset: 0 });
   if (catResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
   }
@@ -155,9 +157,10 @@ export const MostPopularPods: React.FC<MostPopularPodsProps> = async ({
   refillableSlug,
 }) => {
   // Fetch products from both categories
+  // Omit homepage=1 so listing includes variants.regular_price for sale display
   const [prefilledResponse, refillableResponse] = await Promise.all([
-    cachedGetCategoryProducts(prefilledSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0, homepage: 1 }),
-    cachedGetCategoryProducts(refillableSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0, homepage: 1 })
+    cachedGetCategoryProducts(prefilledSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0 }),
+    cachedGetCategoryProducts(refillableSlug, { sort_by: "id", order: "DESC", limit: 4, offset: 0 })
   ]);
 
   if (prefilledResponse.status !== ServerActionStatus.SUCCESS && refillableResponse.status !== ServerActionStatus.SUCCESS) {

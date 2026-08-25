@@ -17,11 +17,49 @@ interface TimeStampFields {
 }
 
 // Base interface for author information
-interface Author {
+export interface Author {
     id: number;
     first_name: string | null;
     last_name: string | null;
     email: string;
+    avatar_url?: string | null;
+    role?: string | null;
+    bio?: string | null;
+    archive_url?: string | null;
+    team_url?: string | null;
+}
+
+export interface BlogSourceItem {
+    label: string;
+    href: string;
+    description: string;
+}
+
+export interface BlogPullQuote {
+    body: string;
+    location?: string;
+    source_url?: string;
+    attribution?: string;
+    source_type?: string;
+}
+
+export interface BlogInlineProductCard {
+    location?: string;
+    cta_label?: string;
+    product: {
+        image: string;
+        title: string;
+        blurb?: string;
+        url: string;
+    };
+}
+
+export interface BlogFirstPersonCallout {
+    label?: string;
+    heading: string;
+    body: string;
+    /** @deprecated Placement is via {{firstPersonCallout:n}} placeholders or embedded markers in content */
+    insert_after_paragraph?: number;
 }
 
 // Base interface for blog content
@@ -68,6 +106,10 @@ export interface BlogCategory  {
 export interface BlogByCategoryAndSlugResponse extends BlogContent {
     categories: BlogCategory[];
     tags: unknown[];
+    sources?: BlogSourceItem[];
+    pull_quote?: BlogPullQuote | null;
+    inline_product_card?: BlogInlineProductCard | null;
+    first_person_callouts?: BlogFirstPersonCallout[];
     related_blogs: (BlogContent & {
         categories: (BaseBlogEntity & TimeStampFields)[];
     })[];
@@ -90,5 +132,29 @@ export interface BlogPostListResponse {
 
 export interface BlogList extends BlogContent {
     categories: (BaseBlogEntity & TimeStampFields)[];
+}
+
+export interface RelatedGuidesResponse {
+    guides: BlogList[];
+}
+
+/** Lightweight card from GET /api/product/{id}/related-blogs (no HTML content). */
+export interface ProductRelatedBlogCard {
+    id: number;
+    title: string;
+    slug: string;
+    image_url: string | null;
+    alt_text: string | null;
+    published_at: string;
+    categories: {
+        id: number;
+        name: string;
+        slug: string;
+    }[];
+}
+
+export interface ProductRelatedBlogsResponse {
+    product_id: number;
+    related_blogs: ProductRelatedBlogCard[];
 }
 

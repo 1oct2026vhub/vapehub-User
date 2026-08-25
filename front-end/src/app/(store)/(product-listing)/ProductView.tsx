@@ -6,6 +6,7 @@ import ProductContent from '@/components/ProductContent'
 import FAQSection from '@/components/FAQSection'
 import ProductDetails from './_components/ProductDetails';
 import ProductFeatures from './_components/ProductFeatures';
+import RelatedGuides from './_components/RelatedGuides';
 import RelatedProducts from './_components/RelatedProducts';
 import { ROUTES } from '@/lib/routes';
 import { AttributeProductTerms, AttributeTerms, ProductResponse } from '@/lib/config/product.config';
@@ -72,6 +73,7 @@ const ProductView: FunctionComponent<ProductViewProps> = ({
                     }
                     <ProductContent data={data} />
                     <FAQSection type="product" id={data.product.id} initialFaqs={productFaqs} />
+                    <RelatedGuides currentProductId={data.product.id} />
                     <RelatedProducts viewAllHref={viewAllHref} currentProductId={data.product.id} />
 
                 </main>

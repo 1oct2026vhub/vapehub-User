@@ -100,11 +100,24 @@ export function buildProductSocialMetadata({
 }
 
 const fetchDynamicPageSlug = cache(async (slug: string): Promise<DynamicPageSlugResponse | null> => {
-  const response = await getDynamicPageSlug(slug);
+  const response = await getDynamicPageSlug(slug, false);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
-  return response.data;
+
+  const data = response.data as DynamicPageSlugResponse & Record<string, unknown>;
+  const typeCardsHtml =
+    data?.type_cards_html ??
+    data?.card_type_html ??
+    data?.type_card_html ??
+    null;
+
+  // Normalize alternate API field names onto type_cards_html for the storefront.
+  if (!data?.type_cards_html && typeof typeCardsHtml === "string" && typeCardsHtml.trim()) {
+    return { ...data, type_cards_html: typeCardsHtml };
+  }
+
+  return data;
 });
 
 export const fetchDynamicPageSlugWithFallback = cache(
@@ -142,7 +155,19 @@ export const fetchCategory = async (
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
-  return response.data;
+
+  const data = response.data as CategoryResponseData & Record<string, unknown>;
+  const typeCardsHtml =
+    data?.type_cards_html ??
+    data?.card_type_html ??
+    data?.type_card_html ??
+    null;
+
+  if (!data?.type_cards_html && typeof typeCardsHtml === "string" && typeCardsHtml.trim()) {
+    return { ...data, type_cards_html: typeCardsHtml };
+  }
+
+  return data;
 };
 
 export const fetchProduct = async (id: number, params: PRODUCT_VARIANT_ATTRIBUTE[]): Promise<ProductResponse | null> => {

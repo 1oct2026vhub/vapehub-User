@@ -6,6 +6,7 @@ import SectionHeading from "./ui/SectionHeading";
 import { getFaqs } from "@/lib/server.actions";
 import { FaqResponse } from "@/lib/config/global.config";
 import { ServerActionStatus } from "@/lib/config/app.config";
+import { BUYING_GUIDE_EMBEDDED_SECTION } from "@/app/(store)/(product-listing)/_components/buying-guide-layout";
 import { toast } from "sonner";
 // import Link from "next/link";
 // import { ROUTES } from "@/lib/routes";
@@ -16,6 +17,8 @@ interface FAQProps {
     type: "product" | "brand" | "category" | "variant" | "common" | "blog";
     id: number;
     initialFaqs?: FaqResponse[];
+    /** Adds a centered top divider when placed below another section (e.g. Related Blogs). */
+    embedded?: boolean;
 }
 
 const EMPTY_FAQS: FaqResponse[] = [];
@@ -26,6 +29,7 @@ const FAQSection: React.FC<FAQProps> = ({
     type,
     id,
     initialFaqs = EMPTY_FAQS,
+    embedded = false,
 }) => {
  
     const itemClasses = {
@@ -43,7 +47,10 @@ const FAQSection: React.FC<FAQProps> = ({
           return;
         }
         const fetchFaqs = async () => {
-          const faqs = await getFaqs(type, id);
+          // Category/brand FAQs are CMS-edited; skip Data Cache so admin updates show promptly.
+          // Product/variant/common/blog keep the default cached fetch.
+          const bypassCache = type === "category" || type === "brand";
+          const faqs = await getFaqs(type, id, !bypassCache);
           if (faqs.status === ServerActionStatus.SUCCESS) {
             setFaqs(faqs.data);
           } else {
@@ -59,27 +66,29 @@ const FAQSection: React.FC<FAQProps> = ({
     }
 
     return (
-        <div className="w-full space-y-3 md:space-y-5 xl:space-y-7.5">
-            {/* FAQ Heading & View All */}
-            <div className="flex items-center justify-between w-full">
-                <SectionHeading title={title} />
-                {/* <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} /> */}
+        <div className={embedded ? BUYING_GUIDE_EMBEDDED_SECTION : "w-full"}>
+            <div className="w-full flex flex-col gap-4 md:gap-5">
+                {/* FAQ Heading & View All */}
+                <div className="flex items-center justify-between w-full">
+                    <SectionHeading title={title} />
+                    {/* <ViewAllLink href={viewAllHref + `?type=${type}&id=${id}`} /> */}
+                </div>
+                <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
+                    {faqs.map((faq, index) => (
+                        <AccordionItem
+                            key={index}
+                            aria-label={faq.question}
+                            HeadingComponent="h3"
+                            title={faq.question}
+                        >
+                            <div className='rich-text' dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                        </AccordionItem>
+                    //     <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">
+                    //     {faq.question}
+                    // </Link>
+                    ))}
+                </Accordion>
             </div>
-            <Accordion variant="splitted" className="!px-0" itemClasses={itemClasses} defaultExpandedKeys={["0"]}>
-                {faqs.map((faq, index) => (
-                    <AccordionItem
-                        key={index}
-                        aria-label={faq.question}
-                        HeadingComponent="h3"
-                        title={faq.question}
-                    >
-                        <div className='rich-text' dangerouslySetInnerHTML={{ __html: faq.answer }} />
-                    </AccordionItem>
-                //     <Link href={`${viewAllHref}#faq-${index}`} className="hover:text-skin-primary">
-                //     {faq.question}
-                // </Link>
-                ))}
-            </Accordion>
         </div>
     );
 };

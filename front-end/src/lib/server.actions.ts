@@ -1,10 +1,11 @@
 import { ServerActionResponse, ServerActionStatus } from "./config/app.config";
 import { SignInResponse, VerifyUserEmailResponse, ContactInfo, SocialMedia } from "./config/auth.config";
-import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse } from "./config/blog.config";
+import { BlogByCategoryAndSlugResponse, BlogBySlugResponse, BlogPostListResponse, BlogResponse, ProductRelatedBlogsResponse, RelatedGuidesResponse } from "./config/blog.config";
+import { BuyingGuideApiData } from "./config/buying-guide.config";
 import {  BrandListPayload, BrandListResponse } from "./config/brand.config";
 import { CarouselConfig } from "./config/carousel.config";
 import { CART_GET_PAYLOAD, CartData, StockValidationResponse } from "./config/cart.config";
-import { Category } from "./config/category.config";
+import { Category, RelatedCategoriesApiData } from "./config/category.config";
 import { APPLY_COUPON_PAYLOAD, APPLY_GUEST_COUPON_PAYLOAD, CHECKOUT_PAYLOAD, GUEST_CHECKOUT_AND_ORDER_PAYLOAD, SHOPPING_CART_CHECKOUT_PAYLOAD } from "./config/checkout.config";
 import { AllDealsResponse, CategoriesWithDealsPayload, CategoriesWithDealsResponse, DealsByCategoryResponse, ProductInDeal } from "./config/deal.config";
 import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionResponse, TestimonialResponse, FlashNewsResponse, SeoMetaResponse } from "./config/global.config";
@@ -205,6 +206,19 @@ export const getProductDescription = async (
     method: 'GET',
     canCache: canCache && !hasVariantFilter,
     cacheStrategy: canCache && !hasVariantFilter ? { revalidate: 3600 } : undefined,
+  });
+};
+
+/** Curated related blog cards for PDP — dedicated endpoint, short cache TTL. */
+export const getProductRelatedBlogs = async (
+  productId: number,
+  canCache: boolean = true,
+): Promise<ServerActionResponse<ProductRelatedBlogsResponse>> => {
+  return await handleRequest<ProductRelatedBlogsResponse, unknown>({
+    endpoint: API_ROUTES.GET_PRODUCT_RELATED_BLOGS(productId),
+    method: 'GET',
+    canCache,
+    cacheStrategy: canCache ? { revalidate: 300 } : undefined,
   });
 };
 
@@ -916,6 +930,84 @@ export const getAllDeals = async (payload?: { limit?: number; offset?: number; d
 export const getMoreLikeThis = async (payload: { product_id: number; limit?: number; offset?: number }, canCache: boolean = true): Promise<ServerActionResponse<MoreLikeThisResponse>> => {
     return await handleRequest<MoreLikeThisResponse, unknown>({
         endpoint: API_ROUTES.GET_MORE_LIKE_THIS(payload),
+        method: 'GET',
+        canCache,
+    });
+};
+
+export const getRelatedGuides = async (
+    payload: { product_id: number; limit?: number },
+    canCache: boolean = true,
+): Promise<ServerActionResponse<RelatedGuidesResponse>> => {
+    return await handleRequest<RelatedGuidesResponse, unknown>({
+        endpoint: API_ROUTES.GET_RELATED_GUIDES(payload),
+        method: 'GET',
+        canCache,
+    });
+};
+
+export const getCategoryRelatedGuides = async (
+    payload: { category_id: number; limit?: number },
+    canCache: boolean = true,
+): Promise<ServerActionResponse<RelatedGuidesResponse>> => {
+    return await handleRequest<RelatedGuidesResponse, unknown>({
+        endpoint: API_ROUTES.GET_CATEGORY_RELATED_GUIDES(payload),
+        method: 'GET',
+        canCache,
+    });
+};
+
+/** Public category buying guide by slug — no auth. Null buyingGuide = hide section.
+ * CMS content: default no-store so admin updates show without a 5-minute Data Cache lag.
+ */
+export const getCategoryBuyingGuide = async (
+    slug: string,
+    canCache: boolean = false,
+): Promise<ServerActionResponse<BuyingGuideApiData>> => {
+    return await handleRequest<BuyingGuideApiData, unknown>({
+        endpoint: API_ROUTES.GET_CATEGORY_BUYING_GUIDE(slug),
+        method: 'GET',
+        canCache,
+    });
+};
+
+/** Public related categories by slug — no auth. Empty list = hide the row.
+ * CMS content: default no-store (same freshness as buying guide).
+ */
+export const getCategoryRelatedCategories = async (
+    slug: string,
+    canCache: boolean = false,
+): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
+    return await handleRequest<RelatedCategoriesApiData, unknown>({
+        endpoint: API_ROUTES.GET_CATEGORY_RELATED_CATEGORIES(slug),
+        method: 'GET',
+        canCache,
+    });
+};
+
+/** Public related brands by slug — no auth. Empty list = hide the row.
+ * CMS content: default no-store (same freshness as buying guide).
+ */
+export const getBrandRelatedBrands = async (
+    slug: string,
+    canCache: boolean = false,
+): Promise<ServerActionResponse<RelatedCategoriesApiData>> => {
+    return await handleRequest<RelatedCategoriesApiData, unknown>({
+        endpoint: API_ROUTES.GET_BRAND_RELATED_BRANDS(slug),
+        method: 'GET',
+        canCache,
+    });
+};
+
+/** Public brand buying guide by slug — no auth. Null buyingGuide = hide section.
+ * CMS content: default no-store so admin updates show without a 5-minute Data Cache lag.
+ */
+export const getBrandBuyingGuide = async (
+    slug: string,
+    canCache: boolean = false,
+): Promise<ServerActionResponse<BuyingGuideApiData>> => {
+    return await handleRequest<BuyingGuideApiData, unknown>({
+        endpoint: API_ROUTES.GET_BRAND_BUYING_GUIDE(slug),
         method: 'GET',
         canCache,
     });

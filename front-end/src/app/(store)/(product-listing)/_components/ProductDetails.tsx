@@ -97,7 +97,6 @@ function mergeVariantsById(existing: ProductVariant[], incoming: ProductVariant[
     }
     return Array.from(byId.values());
 }
-
 const ProductDetails: React.FC<ProductViewProps> = ({
     data: initialData,
     selectedVariant: initialSelectedVariant,

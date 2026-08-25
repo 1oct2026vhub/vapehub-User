@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { BenefitIcon, BellIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
-import { Divider, useDisclosure } from '@nextui-org/react'
+import { Divider } from '@nextui-org/react'
 // import Image from 'next/image'
 import BundleProductCard from '@/components/BundleProductCard'
 import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant } from '@/lib/config/product.config'
@@ -38,6 +38,7 @@ import {
     shouldHideVariantSelector,
 } from '@/lib/utils/cart-product-url'
 import NotifyMeModal from './NotifyMeModal'
+import { useDisclosure } from '@nextui-org/react'
 
 type ProductViewProps = {
     data: ProductResponse;

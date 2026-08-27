@@ -1,6 +1,6 @@
 "use client";
 
-import { BellIcon, CloseIcon } from '@/components/Icons';
+import { CloseIcon, NotifyMeBellIcon } from '@/components/Icons';
 import { Form } from '@/components/ui/Form';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import {
@@ -160,7 +160,7 @@ const NotifyMeModal: FunctionComponent<NotifyMeModalProps> = ({
                                         isLoading={notifyForm.formState.isSubmitting}
                                         className="btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 gap-2"
                                     >
-                                        <BellIcon className="w-5 h-5 shrink-0" />
+                                        <NotifyMeBellIcon className="h-[1em] w-[1em] shrink-0" />
                                         Email me when available
                                     </Button>
                                 </form>

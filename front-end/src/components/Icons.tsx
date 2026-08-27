@@ -1140,6 +1140,30 @@ export const BellIcon = (
   )
 };
 
+/** Ringing bell for Coming Soon “Email me when available” — sized to match button text when using em units. */
+export const NotifyMeBellIcon = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      <path d="M4 2C2.8 3.7 2 5.7 2 8" />
+      <path d="M20 2c1.2 1.7 2 3.7 2 6" />
+    </svg>
+  )
+};
+
 export const OrderIcon = (
   props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
 ) => {

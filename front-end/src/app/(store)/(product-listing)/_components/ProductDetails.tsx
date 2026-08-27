@@ -1,6 +1,6 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { BenefitIcon, BellIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
+import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, NotifyMeBellIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
 // import Image from 'next/image'
@@ -773,7 +773,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                                 className="btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 gap-2"
                                 onPress={onNotifyModalOpen}
                             >
-                                <BellIcon className="w-5 h-5 shrink-0" />
+                                <NotifyMeBellIcon className="h-[1em] w-[1em] shrink-0" />
                                 Email me when available
                             </Button>
                             <NotifyMeModal

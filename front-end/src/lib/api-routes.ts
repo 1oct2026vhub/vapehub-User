@@ -112,6 +112,7 @@ export const API_ROUTES = {
     GET_BRAND_BUYING_GUIDE: (slug: string) =>
         buildRequestUrl(`/api/brands/slug/${encodeURIComponent(slug)}/buying-guide`),
     CONTINUE_TO_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/check-stock/${orderId}`),
+    RETRY_PAYMENT: (orderId: number) => buildRequestUrl(`/api/order/retry-payment/${orderId}`),
     GET_TRANSACTION_DETAILS: (transactionId: string) => buildRequestUrl(`/api/order/viva-wallet/payment-details/${transactionId}`),
     GET_SHIPPING_METHODS: buildRequestUrl('/api/shipping-method'),
     GET_SHIPPING_METHODS_DISPLAY: buildRequestUrl('/api/shipping-method/display'),

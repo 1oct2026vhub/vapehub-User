@@ -11,7 +11,7 @@ import { BannerResponse, DynamicPageSlugResponse, FaqResponse, mailSubscriptionR
 import { FooterMenuResponse, HeaderMegaMenuResponse } from "./config/header.config";
 import { LoyaltyPointsRedemptionResponse } from "./config/loyalty-points.config";
 import { NotificationListResponse } from "./config/notification.config";
-import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, SHIPPING_METHOD_DISPLAY, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS } from "./config/order.config";
+import { ORDER_DETAILS_RESPONSE, ORDER_LIST_RESPONSE, ORDER_RESPONSE_DATA, CouponResponse, PLACE_ORDER_PAYLOAD, SHIPPING_METHOD_DATA, SHIPPING_METHOD_DISPLAY, Payment_Validate, REVIEW_ORDER_PAYLOAD, REVIEW_ORDER_RESPONSE, REVIEW_ORDER_DATA, REVIEW_ORDER_PAYLOAD_UPDATE, REVIEWS, WorldPayOrderData } from "./config/order.config";
 import { TRANSACTION_DETAILS_RESPONSE } from "./config/payment.config";
 import { 
   Product, 
@@ -540,6 +540,17 @@ export const checkStockToPayment = async (orderId: number): Promise<ServerAction
     method: 'GET',
   });
 }
+
+/** Retry payment for an existing pending order (path param only — no cart/checkout body). */
+export const retryOrderPayment = async (
+  orderId: number
+): Promise<ServerActionResponse<ORDER_RESPONSE_DATA | WorldPayOrderData>> => {
+  return await handleRequest<ORDER_RESPONSE_DATA | WorldPayOrderData, unknown>({
+    endpoint: API_ROUTES.RETRY_PAYMENT(orderId),
+    payload: {},
+    method: 'POST',
+  });
+};
 // get transaction details
 export const getTransactionDetails = async (transactionId: string): Promise<ServerActionResponse<TRANSACTION_DETAILS_RESPONSE>> => {
   return await handleRequest<TRANSACTION_DETAILS_RESPONSE, unknown>({

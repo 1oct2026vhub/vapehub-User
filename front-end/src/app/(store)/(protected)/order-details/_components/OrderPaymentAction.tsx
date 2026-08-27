@@ -1,7 +1,7 @@
 "use client"
 import { ServerActionStatus } from "@/lib/config/app.config";
-import { useVivaWallet } from "@/lib/hooks/useVivaWallet";
-import { cancelOrderById, checkStockToPayment } from "@/lib/server.actions";
+import { cancelOrderById, checkStockToPayment, retryOrderPayment } from "@/lib/server.actions";
+import { resolvePlaceOrderRedirectUrl } from "@/lib/utils/checkout-order.utils";
 import { Button } from '@nextui-org/button'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@nextui-org/modal'
 import { useRouter } from "next/navigation";
@@ -9,7 +9,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
-    const { initiatePayment } = useVivaWallet();
     const [isLoading, setIsLoading] = useState(false);
     const [isCancelLoading, setIsCancelLoading] = useState(false);
     const { isOpen,
@@ -21,15 +20,37 @@ const OrderPaymentAction: React.FC<{ orderId: number }> = ({ orderId }) => {
     const payNow = async () => {
         try {
             setIsLoading(true);
-            const response = await checkStockToPayment(orderId);
-            if (response.status === ServerActionStatus.SUCCESS) {
-                await initiatePayment({
-                    orderReference: response.data.order_code,
-                });
-            } else {
+
+            const stockResponse = await checkStockToPayment(orderId);
+            if (stockResponse.status !== ServerActionStatus.SUCCESS) {
+                toast.error(stockResponse.message);
+                router.refresh();
+                return;
+            }
+
+            const response = await retryOrderPayment(orderId);
+            if (response.status !== ServerActionStatus.SUCCESS) {
                 toast.error(response.message);
                 router.refresh();
+                return;
             }
+
+            // API may return { worldpay_url } or { data: { worldpay_url } } under success data
+            const payload = response.data;
+            const nested =
+                payload &&
+                typeof payload === 'object' &&
+                'data' in payload
+                    ? (payload as { data: unknown }).data
+                    : payload;
+            const worldpayUrl = resolvePlaceOrderRedirectUrl(nested) ?? resolvePlaceOrderRedirectUrl(payload);
+
+            if (!worldpayUrl) {
+                toast.error('Payment URL missing. Please try again.');
+                return;
+            }
+
+            window.location.href = worldpayUrl;
         } catch (error) {
             console.error('Error initiating payment:', error);
             toast.error('Failed to initiate payment. Please try again.');

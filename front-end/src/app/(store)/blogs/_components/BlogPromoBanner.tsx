@@ -51,7 +51,7 @@ const BlogPromoBanner = ({
 
         <Link
           href={buttonHref}
-          className="btn inline-flex h-11 w-full shrink-0 items-center justify-center bg-skin-red-400 px-5 text-content-1 font-bold uppercase text-skin-white sm:w-auto"
+          className="btn inline-flex h-11 w-full shrink-0 items-center justify-center bg-skin-red-400 px-5 text-content-1 font-bold uppercase !font-oswald text-skin-white sm:w-auto"
         >
           {buttonLabel}
         </Link>

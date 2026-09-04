@@ -1,7 +1,6 @@
 import ViewAllLink from '@/components/ui/ViewAllLink'
 import { Checkbox, Select, SelectItem } from '@nextui-org/react';
 import React, { useState } from 'react'
-import { isLessThanOneMonth } from "@/lib/config/app.config";
 import ProductCard from '@/components/ProductCard';
 import { resolveProductCardPrices } from '@/lib/product-card-prices';
 import Slider, { Settings } from 'react-slick';
@@ -207,7 +206,6 @@ const Pods: React.FC = () => {
                                 flavors={product.Flavors}
                                 link={`/${product.slug}`}
                                 totalPuffs={product?.puff_count ? `${product?.puff_count}`: ""}
-                                isNew={isLessThanOneMonth(product.createdAt) ? "New" : ""}
                             />
                         </div>
                         );

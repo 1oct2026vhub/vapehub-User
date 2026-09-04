@@ -7,7 +7,6 @@ import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
-import { isLessThanOneMonth } from "@/lib/config/app.config";
 import { resolveProductCardPrices } from "@/lib/product-card-prices";
 import { 
   ProductResponseData, 
@@ -351,7 +350,7 @@ const ProductList: FunctionComponent<{
                         productId={product.id}
                         link={`/${product.slug}`}
                         totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
-                        isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
+                        sticker={product.sticker ?? null}
                         isDiscontinued={Boolean(product.is_discontinued)}
                         averageRating={averageRating}
                         totalReviews={totalReviews}

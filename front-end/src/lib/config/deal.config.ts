@@ -1,4 +1,4 @@
-import { Flavor } from "./product.config";
+import { Flavor, ProductSticker } from "./product.config";
 
 export interface Deal {
     id: number;
@@ -109,6 +109,8 @@ export interface ProductInDeal {
     ProductImages: { image_url: string }[];
     out_of_stock?: boolean;
     is_discontinued?: boolean;
+    is_new?: boolean;
+    sticker?: ProductSticker;
 }
 
 export interface CategoriesWithDealsResponse {

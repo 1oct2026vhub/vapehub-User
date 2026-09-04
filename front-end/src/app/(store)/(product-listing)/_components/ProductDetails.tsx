@@ -7,13 +7,14 @@ import { Divider } from '@nextui-org/react'
 import BundleProductCard from '@/components/BundleProductCard'
 import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant } from '@/lib/config/product.config'
 import { ROUTES } from '@/lib/routes'
-import { DEFAULT_CURRENCY_SYMBOL, isLessThanOneMonth } from '@/lib/config/app.config'
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config'
 import Slider, { Settings } from 'react-slick'
 import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
 import ProductVariantFilter from './ProductVariantFilter'
 import NoImage from '@/components/NoImage'
 import CustomImageMagnifier from '@/components/CustomImageMagnifier'
+import ProductCardSticker from '@/components/ProductCardSticker'
 
 // import { REVIEWS } from '@/lib/config/order.config'
 import { ServerActionStatus } from '@/lib/config/app.config'
@@ -604,11 +605,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                                 <span>Discontinued</span>
                             </div>
                         ) : (
-                            product?.created_at && isLessThanOneMonth(product?.created_at) && (
-                                <div className='new-product'>
-                                    <span>New</span>
-                                </div>
-                            )
+                            <ProductCardSticker sticker={product?.sticker ?? null} />
                         )}
 
                     </div>

@@ -138,6 +138,16 @@ export type ProductReviewStats = {
     testimonials: number;
 };
 
+/** Server-computed product card sticker. Null means no sticker configured. */
+export type ProductSticker = {
+    name: string;
+    background_color: string;
+    active_from: string;
+    active_until: string;
+    source: 'manual' | 'auto_new' | 'auto_new_flavours';
+    is_active: boolean;
+} | null;
+
 export interface Product {
     id: number;
     name: string;
@@ -176,6 +186,10 @@ export interface Product {
     createdAt?: string;
     out_of_stock?: boolean;
     is_discontinued?: boolean;
+    /** Legacy flag — still used for filters/queries, not for badge rendering. */
+    is_new?: boolean;
+    /** Prefer this for product-card / PDP badge UI. */
+    sticker?: ProductSticker;
     reviews?: ProductReview[];
     review_stats?: ProductReviewStats;
 }
@@ -344,6 +358,9 @@ export interface ProductViewDetails {
     loyaltyPoints?: LoyaltyPoints | null;
     puff_count?: number | string;
     is_discontinued?: boolean;
+    /** Legacy flag — still used for filters/queries, not for badge rendering. */
+    is_new?: boolean;
+    sticker?: ProductSticker;
     review_stats?: ProductReviewStats;
 };
 

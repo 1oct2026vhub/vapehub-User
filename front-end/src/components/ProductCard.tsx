@@ -8,6 +8,8 @@ import Link from 'next/link';
 import NoImage from './NoImage';
 // import { REVIEWS } from '@/lib/config/order.config';
 import { RatingStarEmpty, RatingStarFilled } from './Icons';
+import ProductCardSticker from './ProductCardSticker';
+import { ProductSticker } from '@/lib/config/product.config';
 
 interface ProductCardProps {
   title: string;
@@ -20,7 +22,7 @@ interface ProductCardProps {
   flavors?: number;
   totalPuffs?: string;
   link: string;
-  isNew?: string;
+  sticker?: ProductSticker;
   isDiscontinued?: boolean;
   averageRating?: number;
   totalReviews?: number;
@@ -39,7 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   flavors,
   totalPuffs,
   link,
-  isNew,
+  sticker = null,
   isDiscontinued = false,
   averageRating = 0,
   totalReviews = 0,
@@ -169,11 +171,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <span>Discontinued</span>
             </div>
           ) : (
-            isNew && (
-              <div className='new-product'>
-                <span>{isNew}</span>
-              </div>
-            )
+            <ProductCardSticker sticker={sticker} />
           )}
 
         </div>

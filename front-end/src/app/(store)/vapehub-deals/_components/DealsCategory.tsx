@@ -1,7 +1,6 @@
 import ViewAllLink from '@/components/ui/ViewAllLink'
 import { Checkbox, Select, SelectItem } from '@nextui-org/react';
 import React, { useEffect, useState } from 'react'
-import { isLessThanOneMonth } from "@/lib/config/app.config";
 import ProductCard from '@/components/ProductCard';
 import Slider, { Settings } from 'react-slick';
 import { CategoryWithDeals, ProductInDeal } from '@/lib/config/deal.config';
@@ -228,7 +227,7 @@ const DealsCategory: React.FC<DealsCategoryProps> = ({ category }) => {
                                         flavors={product.flavor_count ? Number(product.flavor_count) : 0}
                                         link={`/${product.slug}`}
                                         totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
-                                        isNew={isLessThanOneMonth(product.created_at) ? "New" : ""}
+                                        sticker={product.sticker ?? null}
                                         isDiscontinued={Boolean(product.is_discontinued)}
                                         averageRating={averageRating}
                                         totalReviews={totalReviews}

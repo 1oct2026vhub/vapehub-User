@@ -369,9 +369,9 @@ input[type='search'] {
   @apply -bottom-[10px] md:-bottom-[13.5px];
 }
 
-.new-product,
-.product-card-sticker {
-  @apply w-fit max-w-[min(100%,9.5rem)] md:max-w-[min(100%,12rem)] h-5 md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-center items-center px-2;
+/* Original right-side "NEW" ribbon badge */
+.new-product {
+  @apply w-11 h-5 md:w-14 md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-center items-center pl-2;
   flex-shrink: 0;
   border-radius: 10px 10px 0px 10px;
   background: #083122;
@@ -379,22 +379,6 @@ input[type='search'] {
   top: 0px;
   right: -6px;
   line-height: normal;
-  z-index: 1;
-}
-
-.product-card-sticker__label {
-  @apply relative z-[1] truncate;
-}
-
-/* Dynamic-colour fold matching legacy new-before.svg triangle */
-.product-card-sticker__fold {
-  position: absolute;
-  right: -6px;
-  bottom: -7px;
-  width: 6px;
-  height: 7px;
-  clip-path: polygon(0 0, 0 100%, 100% 0);
-  pointer-events: none;
 }
 
 .new-product::after {
@@ -405,8 +389,29 @@ input[type='search'] {
   @apply -bottom-[12px] md:-bottom-[13.5px];
 }
 
-.section-slider .product-card-sticker__fold {
-  bottom: -7px;
+/*
+ * Product sticker = exact mirror of .quantity (puff badge):
+ * same height/padding/fold offsets, opposite corner + new-before fold SVG.
+ */
+.product-card-sticker {
+  @apply h-4 w-fit md:h-6 text-content-3 sm:text-content-2 font-oswald font-semibold uppercase text-skin-white flex justify-start items-center p-1 pl-2 md:px-2;
+  flex-shrink: 0;
+  border-radius: 10px 10px 0px 10px;
+  background: #083122;
+  position: absolute;
+  top: 0px;
+  right: -6px;
+  line-height: normal;
+  z-index: 1;
+}
+
+.product-card-sticker::after {
+  content: var(--sticker-fold, url('/images/new-before.svg'));
+  @apply relative block -right-1 -bottom-[10px] md:-right-2 md:-bottom-[13.5px];
+}
+
+.section-slider .product-card-sticker::after {
+  @apply -bottom-[10px] md:-bottom-[13.5px];
 }
 
 .discontinued-product {

@@ -1,3 +1,4 @@
+import { CSSProperties } from 'react';
 import { ProductSticker } from '@/lib/config/product.config';
 
 export type ProductCardStickerProps = {
@@ -19,31 +20,31 @@ function getContrastingTextColor(hex: string): string {
   return luminance > 0.55 ? '#083122' : '#FFFFFF';
 }
 
+/** Same path as public/images/new-before.svg — right-side ribbon fold. */
+function buildFoldContent(backgroundColor: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="6" height="7" viewBox="0 0 6 7" fill="none"><path d="M0 7L6 0H0V7Z" fill="${backgroundColor}"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
 /**
- * Shared product-card / PDP sticker chip.
- * Trusts server `is_active` — do not recompute date windows on the client.
+ * Shared product-card / PDP sticker.
+ * Mirror of the left `.quantity` puff badge (size + ribbon fold), coloured from API.
  */
 function ProductCardSticker({ sticker }: ProductCardStickerProps) {
   if (sticker?.is_active !== true) {
     return null;
   }
 
-  const textColor = getContrastingTextColor(sticker.background_color);
+  const bg = sticker.background_color;
+  const style = {
+    backgroundColor: bg,
+    color: getContrastingTextColor(bg),
+    '--sticker-fold': buildFoldContent(bg),
+  } as CSSProperties;
 
   return (
-    <span
-      className="product-card-sticker"
-      style={{
-        backgroundColor: sticker.background_color,
-        color: textColor,
-      }}
-    >
-      <span className="product-card-sticker__label">{sticker.name}</span>
-      <span
-        className="product-card-sticker__fold"
-        aria-hidden
-        style={{ backgroundColor: sticker.background_color }}
-      />
+    <span className="product-card-sticker" style={style}>
+      {sticker.name}
     </span>
   );
 }

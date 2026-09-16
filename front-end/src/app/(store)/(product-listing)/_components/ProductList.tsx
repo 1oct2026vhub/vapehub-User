@@ -7,7 +7,7 @@ import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
-import { isLessThanOneMonth } from "@/lib/config/app.config";
+import { getProductNewBadge } from "@/lib/utils/new-in.utils";
 import { resolveProductCardPrices } from "@/lib/product-card-prices";
 import { 
   ProductResponseData, 
@@ -250,6 +250,13 @@ const ProductList: FunctionComponent<{
     if (sortBy === "popularity") {
       return "popularity";
     }
+
+    if (sortBy === "new_in_at") {
+      if (order === "ASC") {
+        return "ASC";
+      }
+      return "DESC";
+    }
     
     // Handle legacy order-only params (for backward compatibility)
     // Latest: order=DESC without sort_by
@@ -282,9 +289,14 @@ const ProductList: FunctionComponent<{
       params.set("sort_by", "price");
       params.set("order", "DESC");
     } else if (sort === "ASC" || sort === "DESC") {
-      // Legacy: Only order param (Latest/Oldest)
-      params.delete("sort_by");
-      params.set("order", sort);
+      const isComingSoonPage = pathname?.includes('/coming-soon') ?? false;
+      if (isComingSoonPage) {
+        params.delete("sort_by");
+        params.set("order", sort);
+      } else {
+        params.set("sort_by", "new_in_at");
+        params.set("order", sort);
+      }
     }
     
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
@@ -352,7 +364,7 @@ const ProductList: FunctionComponent<{
                         productId={product.id}
                         link={`/${product.slug}`}
                         totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
-                        isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
+                        isNew={getProductNewBadge(product)}
                         isDiscontinued={Boolean(product.is_discontinued)}
                         averageRating={averageRating}
                         totalReviews={totalReviews}

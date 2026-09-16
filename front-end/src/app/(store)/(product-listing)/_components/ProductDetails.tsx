@@ -7,7 +7,8 @@ import { Divider } from '@nextui-org/react'
 import BundleProductCard from '@/components/BundleProductCard'
 import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant } from '@/lib/config/product.config'
 import { ROUTES } from '@/lib/routes'
-import { DEFAULT_CURRENCY_SYMBOL, isLessThanOneMonth } from '@/lib/config/app.config'
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config'
+import { getProductNewBadge } from '@/lib/utils/new-in.utils'
 import Slider, { Settings } from 'react-slick'
 import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
@@ -676,7 +677,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                                 <span>Coming Soon</span>
                             </div>
                         ) : (
-                            product?.created_at && isLessThanOneMonth(product?.created_at) && (
+                            getProductNewBadge(product) && (
                                 <div className='new-product'>
                                     <span>New</span>
                                 </div>

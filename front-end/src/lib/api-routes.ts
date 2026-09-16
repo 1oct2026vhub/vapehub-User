@@ -183,7 +183,7 @@ export interface PRODUCT_PAYLOAD {
     brand?: string;
     deal_id?: number;
     variant?: string;
-    sort_by?: 'id' | 'name' | 'price' | 'created_at' | 'stock' | 'popularity';
+    sort_by?: 'id' | 'name' | 'price' | 'created_at' | 'createdAt' | 'new_in_at' | 'stock' | 'popularity';
     order?: 'ASC' | 'DESC';
     limit?: number | string;
     offset?: number | string;

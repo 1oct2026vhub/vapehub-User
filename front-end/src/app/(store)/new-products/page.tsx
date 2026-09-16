@@ -4,7 +4,8 @@ import { AsyncReactElement, ServerActionResponse, ServerActionStatus } from '@/l
 import { REVIEW_ORDER_RESPONSE } from '@/lib/config/order.config';
 import { Product, ProductReview } from '@/lib/config/product.config';
 import { ROUTES } from '@/lib/routes';
-import { getProductList } from '@/lib/server.actions';
+import { getHomeProductList } from '@/lib/server.actions';
+import { toNewInApiParams } from '@/lib/utils/new-in.utils';
 import { toAbsoluteUrl } from '@/lib/seo-schema';
 import { PRODUCT_PAYLOAD } from '@/lib/api-routes';
 import { unstable_noStore } from 'next/cache';
@@ -14,8 +15,8 @@ import { resolveSiteUrl } from '@/lib/site-url';
 
 const BASE_URL = resolveSiteUrl();
 
-/** Same defaults as the page: latest first, new-only list. */
-const NEW_PRODUCTS_DEFAULT_PARAMS = { sort_by: 'id', order: 'DESC', limit: 12, offset: 0, is_new: true, is_coming_soon: false } as const;
+/** Pagination + filters only; GET /api/product/new defaults to new_in_at DESC. */
+const NEW_PRODUCTS_DEFAULT_PARAMS = { limit: 12, offset: 0 } as const;
 /**
  * Shared with generateMetadata so canonical / prev / next match the list request.
  */
@@ -52,7 +53,10 @@ function buildNewProductsListParams(searchParamsData: Record<string, string>): {
     { ...NEW_PRODUCTS_DEFAULT_PARAMS },
   );
 
-  const combinedParams = { ...NEW_PRODUCTS_DEFAULT_PARAMS, ...variantParams, is_new: true, is_coming_soon: false } as PRODUCT_PAYLOAD;
+  const combinedParams = toNewInApiParams({
+    ...NEW_PRODUCTS_DEFAULT_PARAMS,
+    ...variantParams,
+  } as PRODUCT_PAYLOAD);
   return { combinedParams, pageNumber };
 }
 
@@ -65,7 +69,7 @@ export async function generateMetadata({
   const searchParamsData = await searchParams;
   const { combinedParams, pageNumber } = buildNewProductsListParams(searchParamsData);
 
-  const response = await getProductList(combinedParams, false);
+  const response = await getHomeProductList(combinedParams, false);
   if (response.status !== ServerActionStatus.SUCCESS || !response.data) {
     return {
       title: 'New Products | VapeHub',
@@ -115,7 +119,7 @@ const NewProductsPage: NextPage<SearchParams> = async ({ searchParams }): AsyncR
     { label: "New In", href: ROUTES.NEW_PRODUCTS, isActive: true },
   ];
 
-  const response = await getProductList(combinedParams);
+  const response = await getHomeProductList(combinedParams);
   if (response.status === ServerActionStatus.ERROR) {
     return (
       <div className="product-listing-container py-6">

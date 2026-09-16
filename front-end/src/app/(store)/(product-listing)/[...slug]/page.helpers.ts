@@ -17,6 +17,7 @@ import {
 } from "@/lib/config/product.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
 import { PRODUCT_DESCRIPTION_QUERY, PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
+import { normalizeNewestAvailableSort } from "@/lib/utils/new-in.utils";
 import {
   getVariantDescriptionFromProductData,
   resolveDisplayDescription,
@@ -151,7 +152,7 @@ export const fetchCategory = async (
   params: PRODUCT_PAYLOAD,
   canCache: boolean = true,
 ): Promise<CategoryResponseData | null> => {
-  const response = await getProductByCategory(slug, params, canCache);
+  const response = await getProductByCategory(slug, normalizeNewestAvailableSort(params), canCache);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }

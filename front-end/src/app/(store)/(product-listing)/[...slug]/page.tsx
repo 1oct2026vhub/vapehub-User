@@ -4,7 +4,7 @@ import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.confi
 import { redirect, RedirectType } from 'next/navigation';
 import PageNotFound from '@/app/(store)/page-not-found/page';
 import ProductView from "../ProductView";
-import CategoryBlogs from "../../blogs/_components/CategoryBlog";
+import CategoryBlogs, { prepareCategoryBlogPageData } from "../../blogs/_components/CategoryBlog";
 import { DynamicPageSlugResponse, FaqResponse } from "@/lib/config/global.config";
 import { AttributeProductTerms, AttributeTerms, Product, ProductReview } from "@/lib/config/product.config";
 import BlogListView from "../../blogs/_components/BlogList";
@@ -268,10 +268,10 @@ const Page = async ({
       const page = Number.isNaN(pageFromQuery) || pageFromQuery < 1 ? 1 : pageFromQuery;
       const selectedCategoryId = blogs?.id?.toString() ?? "0";
       const [categoriesResponse, blogsResponse] = await Promise.all([
-        getBlogList(),
+        getBlogList(undefined, undefined, false),
         selectedCategoryId === "0"
-          ? getBlogPostList({ limit: 9, page })
-          : getBlogPostList({ categoryId: selectedCategoryId, limit: 9, page }),
+          ? getBlogPostList({ limit: 9, page }, false)
+          : getBlogPostList({ categoryId: selectedCategoryId, limit: 9, page }, false),
       ]);
 
       const allTab = {
@@ -309,8 +309,11 @@ const Page = async ({
       const blogSlug = secondarySlug || primarySlug;
       const categoryBlogs = await fetchBlogByCategoryAndSlug(blogSlug);
       if (!categoryBlogs) {
+        return null;
       }
-      return categoryBlogs && <CategoryBlogs data={categoryBlogs} />;
+
+      const pageData = await prepareCategoryBlogPageData(categoryBlogs);
+      return <CategoryBlogs data={categoryBlogs} {...pageData} />;
     },
     category: async () => {
       // Normalize pagination: use SEO-friendly `page` in the URL, convert to `offset` for the API.

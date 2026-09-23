@@ -657,19 +657,35 @@ export const deleteNotification = async (id: number): Promise<ServerActionRespon
   });
 };
 // get footer menu
+const normalizeFooterMenu = (payload: FooterMenuResponse): FooterMenuResponse => ({
+  ...payload,
+  data: payload.data || [],
+  socialLinks: payload.socialLinks || {},
+  badges: Array.isArray(payload.badges) ? payload.badges : [],
+});
+
 export const getFooterMenu = async (): Promise<FooterMenuResponse> => {
   try {
-  
-    const response = await fetch(API_ROUTES.GET_FOOTER_MENU, {
-      next: { revalidate: 3600 },
+    // CMS-managed footer — skip Data Cache so admin edits show immediately.
+    // Fallback path and response shape stay the same.
+    let response = await fetch(API_ROUTES.GET_FOOTER_MENU, {
+      cache: 'no-store',
     });
-    const data = await response.json();    
-    return data;
+
+    if (!response.ok) {
+      response = await fetch(API_ROUTES.GET_HOME_FOOTER_MENU, {
+        cache: 'no-store',
+      });
+    }
+
+    const data = await response.json();
+    return normalizeFooterMenu(data);
   } catch (error) {
     console.error("Error fetching footer menu:", error);
     return {
       data: [],
       socialLinks: {},
+      badges: [],
       status: ServerActionStatus.ERROR,
       message: error instanceof Error ? error.message : 'Unknown error'
     };

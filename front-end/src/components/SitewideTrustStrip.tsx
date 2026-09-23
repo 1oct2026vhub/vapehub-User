@@ -1,23 +1,38 @@
-import { ServerActionStatus } from "@/lib/config/app.config";
 import {
   SITEWIDE_TRUST_BADGES,
   SITEWIDE_TRUST_STRIP,
+  type SitewideTrustBadge,
 } from "@/lib/config/blog-trust-strip.config";
-import { getTrustpilotReviews } from "@/lib/server.actions";
 import TrustStripCarousel from "@/components/TrustStripCarousel";
+import type { FooterBadge, FooterMenuResponse } from "@/lib/config/header.config";
 
-const SitewideTrustStrip = async () => {
-  const trustResponse = await getTrustpilotReviews();
-  const trustStars =
-    trustResponse.status === ServerActionStatus.SUCCESS
-      ? trustResponse.data?.overallStats?.scoreBreakdown?.stars ?? 4.8
-      : 4.8;
+function resolveBadgeHref(url?: string | null): string | null {
+  const value = url?.trim();
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return value;
+  return value.startsWith("/") ? value : `/${value}`;
+}
 
-  const badges = SITEWIDE_TRUST_BADGES.map((badge) =>
-    badge.category === "REVIEWS"
-      ? { ...badge, value: `Trustpilot ${trustStars.toFixed(1)}★` }
-      : badge,
-  );
+function mapCmsBadges(badges: FooterBadge[]): SitewideTrustBadge[] {
+  return [...badges]
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .filter((badge) => badge.heading && badge.subtitle)
+    .map((badge) => ({
+      id: badge.id,
+      category: badge.subtitle,
+      value: badge.heading,
+      iconUrl: badge.icon_url,
+      href: resolveBadgeHref(badge.url),
+    }));
+}
+
+interface SitewideTrustStripProps {
+  footerMenu: FooterMenuResponse;
+}
+
+const SitewideTrustStrip = ({ footerMenu: footerResponse }: SitewideTrustStripProps) => {
+  const cmsBadges = mapCmsBadges(footerResponse.badges || []);
+  const badges = cmsBadges.length > 0 ? cmsBadges : SITEWIDE_TRUST_BADGES;
 
   return (
     <section

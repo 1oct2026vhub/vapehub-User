@@ -2,15 +2,31 @@ import { AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
 import { Metadata, NextPage } from 'next'
 import BlogListView from './_components/BlogList';
 import { getBlogList, getBlogPostList } from '@/lib/server.actions';
-import type { BlogResponse } from '@/lib/config/blog.config';
+import type { Author, BlogResponse } from '@/lib/config/blog.config';
+import { getAuthorArticlesHeading, getAuthorDisplayName } from '@/lib/config/blog-author-bio.config';
 
-export const metadata: Metadata = {
-    title: "Blogs | VapeHub",
-    description: "",
-};
 type BlogsListingPageProps = {
     searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+const parseSearchParam = (value: string | string[] | undefined, fallback?: string) =>
+    typeof value === "string" ? value : Array.isArray(value) ? value[0] ?? fallback : fallback;
+
+export async function generateMetadata({ searchParams }: BlogsListingPageProps): Promise<Metadata> {
+    const params = await searchParams;
+    const authorId = parseSearchParam(params.authorId);
+    if (!authorId) {
+        return { title: "Blogs | VapeHub", description: "" };
+    }
+    const blogsResponse = await getBlogPostList({ limit: 9, page: 1, authorId });
+    const authorName = blogsResponse.status === ServerActionStatus.SUCCESS
+        ? getAuthorDisplayName(blogsResponse.data.blogs[0]?.author)
+        : "VapeHub";
+    return {
+        title: `${getAuthorArticlesHeading(authorName)} | VapeHub`,
+        description: "",
+    };
+}
 
 const BlogsListingPage: NextPage<BlogsListingPageProps> = async ({ searchParams }): AsyncReactElement => {
     const params = await searchParams;
@@ -24,19 +40,18 @@ const BlogsListingPage: NextPage<BlogsListingPageProps> = async ({ searchParams 
         : Array.isArray(rawPage) ? rawPage[0] : "1";
     const pageFromQuery = Number.parseInt(pageParam ?? "1", 10);
     const page = Number.isNaN(pageFromQuery) || pageFromQuery < 1 ? 1 : pageFromQuery;
-    const rawUserId = params.userId;
-    const userId = typeof rawUserId === "string"
-        ? rawUserId
-        : Array.isArray(rawUserId) ? rawUserId[0] : undefined;
+    const authorId = parseSearchParam(params.authorId);
     const blogListPayload = {
         limit: 9,
         page,
         ...(categoryId !== "0" ? { categoryId } : {}),
-        ...(userId ? { userId } : {}),
+        ...(authorId ? { authorId } : {}),
     };
-    const [categoriesResponse, blogsResponse] = await Promise.all([
+    const authorListPayload = authorId ? { limit: 1, page: 1, authorId } : null;
+    const [categoriesResponse, blogsResponse, authorResponse] = await Promise.all([
         getBlogList(),
         getBlogPostList(blogListPayload),
+        authorListPayload ? getBlogPostList(authorListPayload) : Promise.resolve(null),
     ]);
 
     const allTab: BlogResponse = {
@@ -53,11 +68,22 @@ const BlogsListingPage: NextPage<BlogsListingPageProps> = async ({ searchParams 
         : [allTab];
     const initialBlogs = blogsResponse.status === ServerActionStatus.SUCCESS ? blogsResponse.data.blogs : [];
     const initialTotalPages = blogsResponse.status === ServerActionStatus.SUCCESS ? blogsResponse.data.pagination.totalPages : 1;
+    const author: Author | undefined = authorId
+        ? (
+            (authorResponse && authorResponse.status === ServerActionStatus.SUCCESS
+                ? authorResponse.data.blogs[0]?.author
+                : undefined)
+            || initialBlogs[0]?.author
+        )
+        : undefined;
+    const authorName = authorId ? getAuthorDisplayName(author) : undefined;
 
     return (
         <BlogListView
             selectedId={categoryId}
-            userId={userId}
+            authorId={authorId}
+            authorName={authorName}
+            author={author}
             initialTabs={initialTabs}
             initialBlogs={initialBlogs}
             initialPage={page}

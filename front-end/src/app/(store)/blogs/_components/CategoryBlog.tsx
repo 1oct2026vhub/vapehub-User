@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from "next/cache";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
 import FAQSection from "@/components/FAQSection";
@@ -5,9 +6,8 @@ import { ServerActionStatus } from "@/lib/config/app.config";
 import { BlogByCategoryAndSlugResponse } from "@/lib/config/blog.config";
 import { ROUTES } from "@/lib/routes";
 import { getTrustpilotReviews } from "@/lib/server.actions";
+import { ContinueReadingArticle } from "@/lib/config/blog-continue-reading.config";
 import Image from "next/image";
-import { Suspense } from "react";
-import SuspenseLoader from "@/components/ui/SuspenseLoader";
 import {
   ensureBlogBodySegments,
   extractAndStripBlogSources,
@@ -20,6 +20,7 @@ import {
   prepareBlogHtml,
   processBlogBodyHtml,
   replaceBlogPlaceholders,
+  sanitizeBlogHtmlForRender,
   splitBlogIntroAndBody,
 } from "@/lib/blog-content.utils";
 import BlogArticleBody from "./BlogArticleBody";
@@ -31,8 +32,40 @@ import BlogTableOfContents from "./BlogTableOfContents";
 import BlogTrustSidebar from "./BlogTrustSidebar";
 import { resolveContinueReadingArticles } from "./blog-continue-reading.utils";
 
-interface CategoryBlogsProps {
+export interface CategoryBlogPageData {
+  trustScore: number;
+  trustTotalReviews: number;
+  continueReadingArticles: ContinueReadingArticle[];
+}
+
+interface CategoryBlogsProps extends CategoryBlogPageData {
   data: BlogByCategoryAndSlugResponse;
+}
+
+export async function prepareCategoryBlogPageData(
+  data: BlogByCategoryAndSlugResponse,
+): Promise<CategoryBlogPageData> {
+  noStore();
+  const [trustResponse, continueReadingArticles] = await Promise.all([
+    getTrustpilotReviews(),
+    resolveContinueReadingArticles(data),
+  ]);
+
+  const trustStats =
+    trustResponse.status === ServerActionStatus.SUCCESS
+      ? trustResponse.data?.overallStats
+      : null;
+
+  return {
+    trustScore:
+      trustStats?.scoreBreakdown?.trustScore ??
+      trustStats?.trustScore ??
+      trustStats?.scoreBreakdown?.stars ??
+      trustStats?.averageRating ??
+      4.8,
+    trustTotalReviews: trustStats?.totalReviews ?? 12000,
+    continueReadingArticles,
+  };
 }
 
 const processBlogContent = (html: string): string => {
@@ -44,19 +77,17 @@ const processBlogContent = (html: string): string => {
   });
 };
 
-const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
+const CategoryBlogs = ({
+  data,
+  trustScore,
+  trustTotalReviews,
+  continueReadingArticles,
+}: CategoryBlogsProps) => {
+  noStore();
+
   if (!data) {
     return <EmptyPlaceholder title="Uh, oh!" description="No blogs found" />;
   }
-
-  const trustResponse = await getTrustpilotReviews();
-  const trustStats =
-    trustResponse.status === ServerActionStatus.SUCCESS
-      ? trustResponse.data?.overallStats
-      : null;
-  const trustStars =
-    trustStats?.scoreBreakdown?.stars ?? trustStats?.averageRating ?? 4.8;
-  const trustTotalReviews = trustStats?.totalReviews ?? 12000;
 
   const category = data.categories?.[0];
   const categoryBreadcrumbs = category
@@ -104,8 +135,10 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
     }),
   );
   const { html: bodyWithIds, headings } = injectBlogHeadingIds(processedBody);
+  const safeIntroHtml = introHtml ? sanitizeBlogHtmlForRender(introHtml) : '';
+  const safeBodyWithIds = sanitizeBlogHtmlForRender(bodyWithIds);
   const bodySegments = ensureBlogBodySegments(
-    parseBlogBodySegments(bodyWithIds),
+    parseBlogBodySegments(safeBodyWithIds),
     {
       pullQuote: data.pull_quote,
       inlineProductCard: data.inline_product_card,
@@ -119,8 +152,6 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
     },
   );
   const tocHeadings = headings.length >= 3 ? headings : [];
-
-  const continueReadingArticles = await resolveContinueReadingArticles(data);
 
   return (
     <main className="blog-post-main flex max-w-full min-w-0 flex-col gap-5 px-4 py-5 sm:gap-6 sm:py-7 lg:px-9 xl:gap-10 xl:px-12.5 xl:py-10">
@@ -155,10 +186,10 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
               {data.title ?? "Blogs"}
             </h1>
 
-            {introHtml ? (
+            {safeIntroHtml ? (
               <div
                 className="blog-intro ck-content rich-text w-full max-w-full break-words text-title-2 text-skin-neutral-300"
-                dangerouslySetInnerHTML={{ __html: introHtml }}
+                dangerouslySetInnerHTML={{ __html: safeIntroHtml }}
               />
             ) : null}
 
@@ -183,7 +214,7 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
 
           <aside className="blog:hidden">
             <BlogTrustSidebar
-              stars={trustStars}
+              trustScore={trustScore}
               totalReviews={trustTotalReviews}
               idPrefix="blog-trust-inline"
             />
@@ -192,7 +223,7 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
 
         <aside className="blog-post-rail hidden min-w-0 blog:block">
           <BlogTrustSidebar
-            stars={trustStars}
+            trustScore={trustScore}
             totalReviews={trustTotalReviews}
             idPrefix="blog-trust-rail"
           />
@@ -204,9 +235,7 @@ const CategoryBlogs = async ({ data }: CategoryBlogsProps) => {
           <BlogContinueReading articles={continueReadingArticles} />
         ) : null}
 
-        <Suspense fallback={<SuspenseLoader height="h-40" />}>
-          <FAQSection type="blog" id={data.id} title="Frequently Asked Questions" />
-        </Suspense>
+        <FAQSection type="blog" id={data.id} title="Frequently Asked Questions" />
       </div>
     </main>
   );

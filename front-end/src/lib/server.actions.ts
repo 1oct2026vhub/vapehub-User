@@ -26,10 +26,12 @@ import {
   ProductDescriptionResponse,
 } from '@/lib/config/product.config';
 import { ReferralStatsResponse } from "./config/referral.config";
+import { NotifyMePayload, NotifyMeResponse } from "./config/notify.config";
 import { SignUpFormSchema } from "./config/register.config";
 import { ChangeUserPasswordPayload, USER_ADDRESS_PAYLOAD, USER_ADDRESS_RESPONSE, UpdateUserProfilePayload, UserProfileResponse } from "./config/user.config";
 import { handleRequest } from "./request.config";
 import { API_ROUTES, BLOG_PAYLOAD, PRODUCT_DESCRIPTION_QUERY, PRODUCT_PAYLOAD, PRODUCT_VARIANT_PAYLOAD, WORLDPAY_PAYMENT_PAYLOAD, WORLDPAY_PAYMENT_SUCCESS_RESPONSE, WORLDPAY_PAYMENT_CANCEL_RESPONSE } from '@/lib/api-routes';
+import { normalizeNewestAvailableSort } from '@/lib/utils/new-in.utils';
 
 export const signInAction = async (
     email: string,
@@ -239,6 +241,18 @@ export const getTestimonialsList = async (canCache: boolean = true): Promise<Ser
   });
 };
 
+// notify-me when coming soon product is in stock
+export const notifyMeWhenAvailable = async (
+  productId: number,
+  payload: NotifyMePayload
+): Promise<ServerActionResponse<NotifyMeResponse>> => {
+  return await handleRequest<NotifyMeResponse, NotifyMePayload>({
+    endpoint: API_ROUTES.NOTIFY_ME(productId),
+    payload,
+    method: 'POST',
+  });
+};
+
 // mail subscription api
 export const subscribeMail = async (email: string): Promise<ServerActionResponse<mailSubscriptionResponse>> => {
   return await handleRequest<mailSubscriptionResponse, { email: string }>({
@@ -272,7 +286,7 @@ export const getProductByBrand = async (
   canCache: boolean = true
 ): Promise<ServerActionResponse<BrandByProductResponse>> => {
   return await handleRequest<BrandByProductResponse, unknown>({
-    endpoint: API_ROUTES.GET_BRAND_PRODUCTS_BY_SLUG(slug, params),
+    endpoint: API_ROUTES.GET_BRAND_PRODUCTS_BY_SLUG(slug, normalizeNewestAvailableSort(params)),
     method: 'GET',
     canCache,
   });
@@ -657,19 +671,35 @@ export const deleteNotification = async (id: number): Promise<ServerActionRespon
   });
 };
 // get footer menu
+const normalizeFooterMenu = (payload: FooterMenuResponse): FooterMenuResponse => ({
+  ...payload,
+  data: payload.data || [],
+  socialLinks: payload.socialLinks || {},
+  badges: Array.isArray(payload.badges) ? payload.badges : [],
+});
+
 export const getFooterMenu = async (): Promise<FooterMenuResponse> => {
   try {
-  
-    const response = await fetch(API_ROUTES.GET_FOOTER_MENU, {
-      next: { revalidate: 3600 },
+    // CMS-managed footer — skip Data Cache so admin edits show immediately.
+    // Fallback path and response shape stay the same.
+    let response = await fetch(API_ROUTES.GET_FOOTER_MENU, {
+      cache: 'no-store',
     });
-    const data = await response.json();    
-    return data;
+
+    if (!response.ok) {
+      response = await fetch(API_ROUTES.GET_HOME_FOOTER_MENU, {
+        cache: 'no-store',
+      });
+    }
+
+    const data = await response.json();
+    return normalizeFooterMenu(data);
   } catch (error) {
     console.error("Error fetching footer menu:", error);
     return {
       data: [],
       socialLinks: {},
+      badges: [],
       status: ServerActionStatus.ERROR,
       message: error instanceof Error ? error.message : 'Unknown error'
     };

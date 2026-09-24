@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 import {
   getBlogByCategoryAndSlug,
   getBlogBySlug,
@@ -17,6 +18,7 @@ import {
 } from "@/lib/config/product.config";
 import { BlogByCategoryAndSlugResponse, BlogBySlugResponse } from "@/lib/config/blog.config";
 import { PRODUCT_DESCRIPTION_QUERY, PRODUCT_PAYLOAD, PRODUCT_VARIANT_ATTRIBUTE, PRODUCT_VARIANT_PAYLOAD } from "@/lib/api-routes";
+import { normalizeNewestAvailableSort } from "@/lib/utils/new-in.utils";
 import {
   getVariantDescriptionFromProductData,
   resolveDisplayDescription,
@@ -151,7 +153,7 @@ export const fetchCategory = async (
   params: PRODUCT_PAYLOAD,
   canCache: boolean = true,
 ): Promise<CategoryResponseData | null> => {
-  const response = await getProductByCategory(slug, params, canCache);
+  const response = await getProductByCategory(slug, normalizeNewestAvailableSort(params), canCache);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -222,7 +224,9 @@ export const fetchProductDescriptionData = cache(async (
 });
 
 export const fetchBlogByCategoryAndSlug = async (categorySlug: string): Promise<BlogByCategoryAndSlugResponse | null> => {
-  const response = await getBlogByCategoryAndSlug(categorySlug);
+  // Blog post content is CMS-managed — bypass Data Cache and Full Route Cache so admin edits show immediately.
+  noStore();
+  const response = await getBlogByCategoryAndSlug(categorySlug, false);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }
@@ -230,7 +234,8 @@ export const fetchBlogByCategoryAndSlug = async (categorySlug: string): Promise<
 };
 
 export const fetchBlogBySlug = async (slug: string): Promise<BlogBySlugResponse | null> => {
-  const response = await getBlogBySlug(slug);
+  noStore();
+  const response = await getBlogBySlug(slug, false);
   if (response.status === ServerActionStatus.ERROR) {
     return null;
   }

@@ -125,6 +125,7 @@ export const API_ROUTES = {
     READ_ALL_NOTIFICATIONS: buildRequestUrl('/api/notifications/read-all'),
     DELETE_NOTIFICATION: (id: number) => buildRequestUrl(`/api/notifications/${id}`),
     GET_FOOTER_MENU: buildRequestUrl('/api/footer'),
+    GET_HOME_FOOTER_MENU: buildRequestUrl('/api/home/footer'),
     GET_HEADER_MEGA_MENU: buildRequestUrl('/api/menu'),
     REVIEW_ORDER: buildRequestUrl('/api/review'),
     GET_REVIEW_ORDER: (productId: number, userId: number) => buildRequestUrl(`/api/review?product_id=${productId}&user_id=${userId}&is_visible=true`),
@@ -141,6 +142,7 @@ export const API_ROUTES = {
     GET_DEAL_PRODUCTS: (dealId: number, params?: { limit?: number; offset?: number; product_id?: number }) => buildRequestUrl(`/api/product/deal/${dealId}/products${params ? `?${toQueryString(params)}` : ''}`),
     GET_PRODUCTS_BY_DEAL_SLUG: (slug: string, params?: Record<string, unknown>) => buildRequestUrl(`/api/deals/slug/${slug}${params ? `?${toQueryString(params)}` : ''}`),
     GET_LINKED_PRODUCTS: (productId: number, params?: { limit?: number; offset?: number; page?: number }) => buildRequestUrl(`/api/product/${productId}/linked-products${params ? `?${toQueryString(params)}` : ''}`),
+    NOTIFY_ME: (productId: number) => buildRequestUrl(`/api/product/${productId}/notify-me`),
     GET_PRODUCT_DESCRIPTION: (productId: number, params?: PRODUCT_DESCRIPTION_QUERY) => {
         const searchParams = new URLSearchParams();
         if (params?.variant_id != null) {
@@ -177,11 +179,12 @@ export interface PRODUCT_PAYLOAD {
     keyword?: string;
     price_range?: string;
     is_new?: boolean;
+    is_coming_soon?: boolean;
     categories?: string;
     brand?: string;
     deal_id?: number;
     variant?: string;
-    sort_by?: 'id' | 'name' | 'price' | 'created_at' | 'stock' | 'popularity';
+    sort_by?: 'id' | 'name' | 'price' | 'created_at' | 'createdAt' | 'new_in_at' | 'stock' | 'popularity';
     order?: 'ASC' | 'DESC';
     limit?: number | string;
     offset?: number | string;
@@ -190,7 +193,7 @@ export interface PRODUCT_PAYLOAD {
 }
 export interface BLOG_PAYLOAD {
     categoryId?: string;
-    userId?: string | number;
+    authorId?: string | number;
     limit: number;
     page: number;
 }

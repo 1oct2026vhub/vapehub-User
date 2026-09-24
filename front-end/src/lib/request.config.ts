@@ -117,6 +117,7 @@ export const handleRequest = async <T, G>(
         ? {
             status: ServerActionStatus.SUCCESS,
             data: responseJson.data,
+            message: responseJson.message,
           }
         : {
             status: ServerActionStatus.ERROR,

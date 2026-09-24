@@ -7,7 +7,7 @@ import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
 import { ProductListingActionsMob, ProductListingActionsWeb } from "@/components/ProductListingActions";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
-import { isLessThanOneMonth } from "@/lib/config/app.config";
+import { getProductNewBadge } from "@/lib/utils/new-in.utils";
 import { resolveProductCardPrices } from "@/lib/product-card-prices";
 import { 
   ProductResponseData, 
@@ -229,11 +229,12 @@ const ProductList: FunctionComponent<{
     const order = searchParams.get("order");
     
     // If no params, return default based on page
-    // New Products page defaults to "Latest" (DESC), others default to "popularity"
+    // New Products / Coming Soon default to "Latest" (DESC), others default to "popularity"
     if (!sortBy && !order) {
-      // Check if we're on the new-products page
-      const isNewProductsPage = pathname?.includes('/new-products') ?? false;
-      return isNewProductsPage ? "DESC" : "popularity";
+      const isLatestDefaultPage =
+        (pathname?.includes('/new-products') ?? false) ||
+        (pathname?.includes('/coming-soon') ?? false);
+      return isLatestDefaultPage ? "DESC" : "popularity";
     }
     
     // Handle price sorting
@@ -248,6 +249,13 @@ const ProductList: FunctionComponent<{
     // Handle popularity
     if (sortBy === "popularity") {
       return "popularity";
+    }
+
+    if (sortBy === "new_in_at") {
+      if (order === "ASC") {
+        return "ASC";
+      }
+      return "DESC";
     }
     
     // Handle legacy order-only params (for backward compatibility)
@@ -281,9 +289,14 @@ const ProductList: FunctionComponent<{
       params.set("sort_by", "price");
       params.set("order", "DESC");
     } else if (sort === "ASC" || sort === "DESC") {
-      // Legacy: Only order param (Latest/Oldest)
-      params.delete("sort_by");
-      params.set("order", sort);
+      const isComingSoonPage = pathname?.includes('/coming-soon') ?? false;
+      if (isComingSoonPage) {
+        params.delete("sort_by");
+        params.set("order", sort);
+      } else {
+        params.set("sort_by", "new_in_at");
+        params.set("order", sort);
+      }
     }
     
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
@@ -351,11 +364,12 @@ const ProductList: FunctionComponent<{
                         productId={product.id}
                         link={`/${product.slug}`}
                         totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
-                        isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
+                        isNew={getProductNewBadge(product)}
                         isDiscontinued={Boolean(product.is_discontinued)}
                         averageRating={averageRating}
                         totalReviews={totalReviews}
                         outOfStock={product.out_of_stock}
+                        isComingSoon={Boolean(product.is_coming_soon)}
                       />
                     )
                   })}

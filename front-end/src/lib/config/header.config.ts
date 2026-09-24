@@ -42,6 +42,15 @@ export interface FooterMenu {
   links: FooterMenuLink[];
 }
 // * Footer Menu Response
+export interface FooterBadge {
+  id: number;
+  icon_url: string | null;
+  heading: string;
+  subtitle: string;
+  url: string | null;
+  order: number;
+}
+
 export interface FooterMenuResponse {
   data: FooterMenu[];
   socialLinks: {
@@ -51,6 +60,8 @@ export interface FooterMenuResponse {
     phone_number?: string;
     email?: string;
   };
+  badges?: FooterBadge[];
+  success?: boolean;
   status?: ServerActionStatus;
   message?: string;
 }

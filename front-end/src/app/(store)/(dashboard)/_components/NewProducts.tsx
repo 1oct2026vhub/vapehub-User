@@ -3,7 +3,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import ProductsSlider from "@/components/ProductsSlider";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import EmptyPlaceholder from "@/components/ui/EmptyPlaceholder";
-import { getProductList } from "@/lib/server.actions";
+import { getHomeProductList } from "@/lib/server.actions";
 import { ServerActionStatus, ServerActionResponse } from "@/lib/config/app.config";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
@@ -18,7 +18,7 @@ const NewProducts: React.FC<NewProductsProps> = async ({
   title = "New Products",
   viewAllHref = ROUTES.NEW_PRODUCTS,
 }) => {
-  const productsResponse = await getProductList({ sort_by: "id", order: "DESC", limit: 10, offset: 0 });
+  const productsResponse = await getHomeProductList({ limit: 10, offset: 0 });
   if (productsResponse.status !== ServerActionStatus.SUCCESS) {
     return <EmptyPlaceholder title='Uh, oh!' description='Failed to load products' />;
   }

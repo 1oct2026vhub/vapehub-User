@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Slider, { Settings } from "react-slick";
+import Link from "next/link";
 import type { SitewideTrustBadge } from "@/lib/config/blog-trust-strip.config";
 
 type TrustStripCarouselProps = {
@@ -10,7 +11,7 @@ type TrustStripCarouselProps = {
 
 type BreakpointMode = "mobile" | "tablet" | "desktop" | "wide";
 
-const TrustBadgeIcon = ({ icon }: { icon: SitewideTrustBadge["icon"] }) => {
+const TrustBadgeIcon = ({ icon }: { icon?: SitewideTrustBadge["icon"] }) => {
   switch (icon) {
     case "regulator":
       return (
@@ -99,15 +100,52 @@ const TrustBadgeCard = ({
   category,
   value,
   icon,
-}: SitewideTrustBadge) => (
-  <article className="trust-strip-badge">
-    <div className="trust-strip-badge__icon">
-      <TrustBadgeIcon icon={icon} />
-    </div>
-    <p className="trust-strip-badge__title">{value}</p>
-    <p className="trust-strip-badge__subtitle">{category}</p>
-  </article>
-);
+  iconUrl,
+  href,
+}: SitewideTrustBadge) => {
+  const card = (
+    <article className="trust-strip-badge">
+      <div className="trust-strip-badge__icon">
+        {iconUrl ? (
+          <img src={iconUrl} alt="" />
+        ) : (
+          <TrustBadgeIcon icon={icon} />
+        )}
+      </div>
+      <p className="trust-strip-badge__title">{value}</p>
+      <p className="trust-strip-badge__subtitle">{category}</p>
+    </article>
+  );
+
+  if (!href) {
+    return card;
+  }
+
+  const isExternal = /^https?:\/\//i.test(href);
+
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        className="trust-strip-badge-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {card}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className="trust-strip-badge-link">
+      {card}
+    </Link>
+  );
+};
+
+function badgeKey(badge: SitewideTrustBadge, index: number) {
+  return String(badge.id ?? `${badge.value}-${badge.category}-${index}`);
+}
 
 function getMode(width: number): BreakpointMode {
   if (width < 768) return "mobile";
@@ -187,8 +225,8 @@ const TrustStripCarousel = ({ badges }: TrustStripCarouselProps) => {
   return (
     <>
       <div className="trust-strip-static-fallback">
-        {badges.map((badge) => (
-          <TrustBadgeCard key={badge.category} {...badge} />
+        {badges.map((badge, index) => (
+          <TrustBadgeCard key={badgeKey(badge, index)} {...badge} />
         ))}
       </div>
 
@@ -205,16 +243,16 @@ const TrustStripCarousel = ({ badges }: TrustStripCarouselProps) => {
       >
         {needsCarousel ? (
           <Slider key={`${mode}-${slidesToShow}`} {...settings}>
-            {badges.map((badge) => (
-              <div key={badge.category} className="trust-strip-slide">
+            {badges.map((badge, index) => (
+              <div key={badgeKey(badge, index)} className="trust-strip-slide">
                 <TrustBadgeCard {...badge} />
               </div>
             ))}
           </Slider>
         ) : (
           <div className="trust-strip-row">
-            {badges.map((badge) => (
-              <div key={badge.category} className="trust-strip-slide trust-strip-slide--static">
+            {badges.map((badge, index) => (
+              <div key={badgeKey(badge, index)} className="trust-strip-slide trust-strip-slide--static">
                 <TrustBadgeCard {...badge} />
               </div>
             ))}

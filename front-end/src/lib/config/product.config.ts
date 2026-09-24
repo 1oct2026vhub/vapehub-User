@@ -174,8 +174,11 @@ export interface Product {
     Flavors?: Flavor[];
     puff_count?: number | string;
     createdAt?: string;
+    new_in_at?: string | null;
     out_of_stock?: boolean;
     is_discontinued?: boolean;
+    is_coming_soon?: boolean;
+    is_new?: boolean;
     reviews?: ProductReview[];
     review_stats?: ProductReviewStats;
 }
@@ -336,6 +339,7 @@ export interface ProductViewDetails {
     product_brands: BrandConfig[];
     createdAt: string;
     created_at: string;
+    new_in_at?: string | null;
     primary_image: productAllImages;
     all_images: productAllImages[];
     attribute_terms: AttributeTerms[];
@@ -344,6 +348,8 @@ export interface ProductViewDetails {
     loyaltyPoints?: LoyaltyPoints | null;
     puff_count?: number | string;
     is_discontinued?: boolean;
+    is_coming_soon?: boolean;
+    is_new?: boolean;
     review_stats?: ProductReviewStats;
 };
 

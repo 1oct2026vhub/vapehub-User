@@ -4,7 +4,8 @@ import Slider, { Settings } from "react-slick";
 import ProductCard from "./ProductCard";
 import { Product, ProductResponseData } from "@/lib/config/product.config";
 import { resolveProductCardPrices } from "@/lib/product-card-prices";
-import { isLessThanOneMonth, ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
+import { ServerActionResponse, ServerActionStatus } from "@/lib/config/app.config";
+import { getProductNewBadge } from "@/lib/utils/new-in.utils";
 import EmptyPlaceholder from "./ui/EmptyPlaceholder";
 import { REVIEW_ORDER_RESPONSE } from "@/lib/config/order.config";
 
@@ -62,8 +63,9 @@ function renderProductCard(
         flavors={product.flavor_count ? Number(product.flavor_count) : 0}
         link={`/${product.slug}`}
         totalPuffs={product?.puff_count ? `${product?.puff_count}` : ""}
-        isNew={product.createdAt && isLessThanOneMonth(product.createdAt) ? "New" : ""}
+        isNew={getProductNewBadge(product)}
         isDiscontinued={Boolean(product.is_discontinued)}
+        isComingSoon={Boolean(product.is_coming_soon)}
         averageRating={averageRating}
         totalReviews={totalReviews}
         outOfStock={product.out_of_stock}

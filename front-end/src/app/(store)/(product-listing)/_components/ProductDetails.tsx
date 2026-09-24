@@ -1,13 +1,14 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
+import { BenefitIcon, DealsIcon, DispatchIcon, MinusIcon, NotifyMeBellIcon, PlusIcon, RatingStarEmpty, RatingStarFilled } from '@/components/Icons'
 import { Button } from '@nextui-org/button'
 import { Divider } from '@nextui-org/react'
 // import Image from 'next/image'
 import BundleProductCard from '@/components/BundleProductCard'
 import { AttributeProductTerms, AttributeTerms, productAllImages, ProductResponse, ProductVariant } from '@/lib/config/product.config'
 import { ROUTES } from '@/lib/routes'
-import { DEFAULT_CURRENCY_SYMBOL, isLessThanOneMonth } from '@/lib/config/app.config'
+import { DEFAULT_CURRENCY_SYMBOL } from '@/lib/config/app.config'
+import { getProductNewBadge } from '@/lib/utils/new-in.utils'
 import Slider, { Settings } from 'react-slick'
 import { useCart } from '@/lib/context/CartContext'
 import Link from 'next/link'
@@ -31,6 +32,8 @@ import {
     buildVariantFirstTitle,
     findVariantDescriptionBySelections,
 } from '@/lib/seo-schema'
+import NotifyMeModal from './NotifyMeModal'
+import { useDisclosure } from '@nextui-org/react'
 
 type ProductViewProps = {
     data: ProductResponse;
@@ -178,6 +181,8 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     // When sale price is zero, fall back to regular price for display only
     const effectivePrice = price > 0 ? price : (regularPrice > 0 ? regularPrice : 0);
     const isDiscontinued = Boolean(product?.is_discontinued || cartEntity?.is_discontinued);
+    const isComingSoon = Boolean(product?.is_coming_soon);
+    const { isOpen: isNotifyModalOpen, onOpen: onNotifyModalOpen, onOpenChange: onNotifyModalOpenChange } = useDisclosure();
     
     // Create a set of attribute IDs that are used in variation for filtering
     const variationAttributeIds = useMemo(() => {
@@ -269,7 +274,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
     };
 
     const handleAddToCart = async () => {
-        if (!canAddToCart || !cartEntity || isDiscontinued) {
+        if (!canAddToCart || !cartEntity || isDiscontinued || isComingSoon) {
             // This is a safeguard; the button should be disabled if this is the case.
             return;
         }
@@ -577,6 +582,11 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             This product has been discontinued
                         </p>
                     )}
+                    {!isDiscontinued && isComingSoon && (
+                        <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
+                            This product is coming soon
+                        </p>
+                    )}
                 </div>
                 {/* Title section mobile ends */}
 
@@ -603,8 +613,12 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             <div className="discontinued-product">
                                 <span>Discontinued</span>
                             </div>
+                        ) : isComingSoon ? (
+                            <div className="coming-soon-product">
+                                <span>Coming Soon</span>
+                            </div>
                         ) : (
-                            product?.created_at && isLessThanOneMonth(product?.created_at) && (
+                            getProductNewBadge(product) && (
                                 <div className='new-product'>
                                     <span>New</span>
                                 </div>
@@ -673,10 +687,17 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                                 This product has been discontinued
                             </p>
                         )}
+                        {!isDiscontinued && isComingSoon && (
+                            <p className="text-content-2 md:text-content-1 font-semibold text-skin-neutral-500">
+                                This product is coming soon
+                            </p>
+                        )}
                     </div>
                     <div className='flex items-center justify-between gap-2 text-skin-neutral-500'>
-                        <p className='text-xl md:text-h5 !font-oswald font-bold'>{DEFAULT_CURRENCY_SYMBOL}{effectivePrice}</p>
-                        {mixAndMatchDeal && (
+                        <p className='text-xl md:text-h5 !font-oswald font-bold'>
+                            {isComingSoon ? `${DEFAULT_CURRENCY_SYMBOL}TBC` : `${DEFAULT_CURRENCY_SYMBOL}${effectivePrice}`}
+                        </p>
+                        {mixAndMatchDeal && !isComingSoon && (
                             <>
                                 <Button
                                     size="sm"
@@ -690,7 +711,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             </>
                         )}
                     </div>
-                    {regularPrice > 0 && price > 0 && regularPrice > price && (
+                    {regularPrice > 0 && price > 0 && regularPrice > price && !isComingSoon && (
                         <p className='text-content-2 md:text-title-2 text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
                     )}
                     <div className='space-y-4 max-md:order-4'>
@@ -731,11 +752,38 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                     />
                     <div className='space-y-2 lg:space-y-3.5'>
                         {
-                            cartEntity && (stock > 0 ?
+                            !isComingSoon && cartEntity && (stock > 0 ?
                                 <p className='text-content-2 md:text-title-2 font-bold primary-gradient-100'>In stock</p> :
                                 <p className='text-content-2 md:text-title-2 font-bold text-red-500'>Out of stock</p>)
                         }
                     </div>
+                    {isComingSoon ? (
+                        <div className='flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center'>
+                            <Button
+                                size="lg"
+                                radius="md"
+                                isDisabled
+                                className="btn w-full sm:w-auto sm:min-w-[140px] shadow-input !rounded-md uppercase font-oswald !text-content-2 md:!text-title-2 !leading-none !font-semibold h-12 !bg-skin-neutral-300 !text-skin-white !opacity-100 cursor-default"
+                            >
+                                Coming soon
+                            </Button>
+                            <Button
+                                size="lg"
+                                radius="md"
+                                color="primary"
+                                className="btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 gap-2"
+                                onPress={onNotifyModalOpen}
+                            >
+                                <NotifyMeBellIcon className="h-[1em] w-[1em] shrink-0" />
+                                Email me when available
+                            </Button>
+                            <NotifyMeModal
+                                productId={product.id}
+                                isOpen={isNotifyModalOpen}
+                                onOpenChange={onNotifyModalOpenChange}
+                            />
+                        </div>
+                    ) : (
                     <div className='flex gap-4 md:gap-6 xl:gap-11 items-center'>
                         <div
                             className="flex items-center border-2 bg-skin-white w-fit shadow-base text-title-1 border-skin-neutral-200 !leading-none px-1 rounded-md !font-bold h-12"
@@ -789,13 +837,14 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             radius="md"
                             color="primary"
                             isLoading={isAddingToCart}
-                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || isDiscontinued || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
+                            className={`btn primary-btn w-full shadow-input !rounded-md uppercase font-oswald !text-title-2 md:!text-h5 !leading-none !font-semibold h-12 ${(isAddingToCart || !canAddToCart || isDiscontinued || isComingSoon || quantity <= 0 || quantity > stock) ? '!opacity-50 cursor-not-allowed' : ''}`}
                             onPress={handleAddToCart}
-                            disabled={isAddingToCart || !canAddToCart || isDiscontinued || quantity <= 0 || quantity > stock}
+                            disabled={isAddingToCart || !canAddToCart || isDiscontinued || isComingSoon || quantity <= 0 || quantity > stock}
                         >
                             Add to Cart
                         </Button>
                     </div>
+                    )}
                     {variantSelectionError && <p className='text-skin-red-400 text-sm'>{variantSelectionError}</p>}
                     {error && <p className='text-skin-red-400 text-sm'>{error}</p>}
                 </div>

@@ -82,13 +82,21 @@ const NavigationMenu: React.FC<Props> = ({ menus }): ReactElement => {
   return (
     <div className="hidden lg:block max-w-[1520px] mx-auto">
       <ul className="inline-flex flex-wrap items-center justify-center w-full">
-        {/* Static NEW IN menu item */}
+        {/* Static NEW IN / COMING SOON menu items */}
         <li>
           <Link 
             href={ROUTES.NEW_PRODUCTS} 
             className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold font-oswald hover:text-skin-primary-300 transition-all duration-300 ease-in flex items-center gap-2 relative after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-green-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left"
           >
             NEW IN
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href={ROUTES.COMING_SOON} 
+            className="px-3 rounded-md text-shadow text-lg text-skin-neutral-25 uppercase font-bold font-oswald hover:text-skin-primary-300 transition-all duration-300 ease-in flex items-center gap-2 relative after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-green-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left"
+          >
+            COMING SOON
           </Link>
         </li>
         

@@ -695,7 +695,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                     </div>
                     <div className='flex items-center justify-between gap-2 text-skin-neutral-500'>
                         <p className='text-xl md:text-h5 !font-oswald font-bold'>
-                            {isComingSoon ? `${DEFAULT_CURRENCY_SYMBOL}TBC` : `${DEFAULT_CURRENCY_SYMBOL}${effectivePrice}`}
+                            {`${DEFAULT_CURRENCY_SYMBOL}${effectivePrice}`}
                         </p>
                         {mixAndMatchDeal && !isComingSoon && (
                             <>
@@ -711,7 +711,7 @@ const ProductDetails: React.FC<ProductViewProps> = ({
                             </>
                         )}
                     </div>
-                    {regularPrice > 0 && price > 0 && regularPrice > price && !isComingSoon && (
+                    {regularPrice > 0 && price > 0 && regularPrice > price && (
                         <p className='text-content-2 md:text-title-2 text-skin-neutral-500 line-through opacity-60 font-bold'>{DEFAULT_CURRENCY_SYMBOL}{regularPrice}</p>
                     )}
                     <div className='space-y-4 max-md:order-4'>

@@ -1,6 +1,24 @@
 /** Storefront placeholder for missing / broken type-card images. */
 export const TYPE_CARD_NO_IMAGE_SRC = "/images/type-card-no-image.svg";
 
+/**
+ * Source upload size (admin). Same 1.65:1 ratio as the card image area
+ * (~297×180 CSS px). 891×540 = 3× for sharp retina when CSS scales down.
+ * Keep in sync with admin `TYPE_CARD_IMAGE_WIDTH` / `TYPE_CARD_IMAGE_HEIGHT`.
+ */
+export const TYPE_CARD_SOURCE_WIDTH = 891;
+export const TYPE_CARD_SOURCE_HEIGHT = 540;
+export const TYPE_CARD_SOURCE_ASPECT_RATIO = `${TYPE_CARD_SOURCE_WIDTH}/${TYPE_CARD_SOURCE_HEIGHT}`;
+
+/** Inline style for type-card imgs: fill card width, keep 891×540 frame, never stretch. */
+export const TYPE_CARD_IMG_INLINE_STYLE =
+  `display:block!important;position:static!important;float:none!important;` +
+  `width:100%!important;max-width:100%!important;height:auto!important;` +
+  `aspect-ratio:${TYPE_CARD_SOURCE_ASPECT_RATIO}!important;` +
+  `object-fit:contain!important;object-position:center center!important;` +
+  `image-rendering:auto!important;margin:0 0 14px 0!important;padding:0!important;` +
+  `background:#f1f5f9!important;transform:none!important;`;
+
 const escapeHtmlAttr = (value: string) =>
   value
     .replace(/&/g, "&amp;")
@@ -15,7 +33,8 @@ function buildStorefrontPlaceholderImg(slot: string, alt: string): string {
     `<img class="type-card__img-placeholder type-card__img type-card__img--${safeSlot}"` +
     ` data-type-card-img="${safeSlot}" data-type-card-placeholder="1"` +
     ` src="${TYPE_CARD_NO_IMAGE_SRC}" alt="${safeAlt}"` +
-    ` style="display:block!important;position:static!important;float:none!important;width:100%!important;height:180px!important;object-fit:contain!important;margin:0 0 14px 0!important;background:#f1f5f9;" />`
+    ` width="${TYPE_CARD_SOURCE_WIDTH}" height="${TYPE_CARD_SOURCE_HEIGHT}" decoding="async"` +
+    ` style="${TYPE_CARD_IMG_INLINE_STYLE}" />`
   );
 }
 
@@ -94,6 +113,12 @@ export function ensureTypeCardPlaceholders(html: string): string {
 /**
  * Point admin placeholder paths at the storefront asset and attach an onerror
  * fallback so broken S3/CMS URLs show the "No image" graphic (alt text kept).
+ *
+ * Also prepares type-card images for 891×540 sources:
+ * - Drop CKEditor `image_resized` (can leave small fixed widths that look soft)
+ * - Rewrite legacy 297×180 aspect frames to 891×540 (same ratio, retina source)
+ * - Prefer height:auto + aspect-ratio over fixed px heights so CSS scales down
+ *   high-res uploads into the card slot (never upscales the display area)
  */
 export function normalizeTypeCardsHtml(html: string): string {
   let out = stripEmptyFigures(html);
@@ -105,10 +130,12 @@ export function normalizeTypeCardsHtml(html: string): string {
     TYPE_CARD_NO_IMAGE_SRC,
   );
 
-  // Normalize inline image heights so CMS 150px and storefront 180px don't fight.
-  // Skip additional_text_box (ATB) images — they use their own square aspect ratios.
+  // Embedded CMS CSS + inline styles: legacy 297×180 → 891×540 (identical ratio).
+  out = out.replace(/aspect-ratio\s*:\s*297\s*\/\s*180/gi, `aspect-ratio:${TYPE_CARD_SOURCE_ASPECT_RATIO}`);
+
+  // Normalize type-card (not ATB) inline heights to height:auto + 891×540 frame.
   out = out.replace(
-    /(<img\b[^>]*\bstyle=(["'])[^"'>]*?)height\s*:\s*\d+px([^"'>]*\2)/gi,
+    /(<img\b[^>]*\bstyle=(["'])[^"'>]*?)height\s*:\s*(?:\d+px|auto)([^"'>]*\2)/gi,
     (match, pre: string, _quote: string, post: string) => {
       if (
         /atb-(?:nic|flavour)-card/i.test(match) ||
@@ -116,13 +143,65 @@ export function normalizeTypeCardsHtml(html: string): string {
       ) {
         return match;
       }
-      return `${pre}height:180px${post}`;
+      // Only rewrite known type-card / related-card imgs (ATB/misc HTML shares this helper).
+      if (
+        !/type-card/i.test(match) &&
+        !/data-type-card-img/i.test(match) &&
+        !/vss-related-card/i.test(match)
+      ) {
+        return match;
+      }
+      let next = `${pre}height:auto${post}`;
+      if (!/aspect-ratio\s*:/i.test(next)) {
+        next = next.replace(
+          /height\s*:\s*auto/i,
+          `height:auto;aspect-ratio:${TYPE_CARD_SOURCE_ASPECT_RATIO};object-fit:contain;object-position:center center`,
+        );
+      }
+      return next;
     },
   );
 
   out = out.replace(/<img\b([^>]*?)(\/?)>/gi, (match, attrs: string, slash: string) => {
-    if (/\bonerror\s*=/i.test(attrs)) return match;
-    return `<img${attrs} onerror="this.onerror=null;this.src='${TYPE_CARD_NO_IMAGE_SRC}'"${slash}>`;
+    const isAtb =
+      /atb-(?:nic|flavour)-card/i.test(attrs) ||
+      /data-atb-(?:nic|flavour)-img/i.test(attrs);
+    const isTypeCard =
+      /type-card/i.test(attrs) ||
+      /data-type-card-img/i.test(attrs) ||
+      /vss-related-card/i.test(attrs);
+    let nextAttrs = attrs;
+
+    if (!isAtb && isTypeCard) {
+      // CKEditor ImageResize leftovers fight width:100% / high-res sources.
+      nextAttrs = nextAttrs.replace(
+        /\s*class=(["'])([^"']*)\1/i,
+        (_m: string, q: string, cls: string) => {
+          const cleaned = cls
+            .split(/\s+/)
+            .filter((c) => c && c !== "image_resized")
+            .join(" ");
+          return cleaned ? ` class=${q}${cleaned}${q}` : "";
+        },
+      );
+
+      // Intrinsic size hints for 891×540 uploads (CSS still scales to card width).
+      if (/\bwidth\s*=/i.test(nextAttrs)) {
+        nextAttrs = nextAttrs.replace(/\bwidth\s*=\s*(["']?)\d+\1/i, `width="${TYPE_CARD_SOURCE_WIDTH}"`);
+      } else {
+        nextAttrs += ` width="${TYPE_CARD_SOURCE_WIDTH}"`;
+      }
+      if (/\bheight\s*=/i.test(nextAttrs)) {
+        nextAttrs = nextAttrs.replace(/\bheight\s*=\s*(["']?)\d+\1/i, `height="${TYPE_CARD_SOURCE_HEIGHT}"`);
+      } else {
+        nextAttrs += ` height="${TYPE_CARD_SOURCE_HEIGHT}"`;
+      }
+    }
+
+    if (/\bonerror\s*=/i.test(nextAttrs)) {
+      return nextAttrs === attrs ? match : `<img${nextAttrs}${slash}>`;
+    }
+    return `<img${nextAttrs} onerror="this.onerror=null;this.src='${TYPE_CARD_NO_IMAGE_SRC}'"${slash}>`;
   });
 
   return out;

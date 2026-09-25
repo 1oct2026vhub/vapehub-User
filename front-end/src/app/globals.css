@@ -2397,8 +2397,10 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 
 /*
  * Uniform image slot across all cards.
+ * Frame is 891×540 (same 1.65:1 as legacy 297×180 display area). Admin uploads
+ * 891×540 sources; CSS scales them down into the card width — never stretch.
  * Height applies to <img> only — NOT <figure> (CKEditor wraps uploads in
- * <figure>; giving both height:180px doubled the gap when an empty figure
+ * <figure>; fixing both heights doubled the gap when an empty figure
  * remained after delete).
  */
 .type-cards-html .type-card figure,
@@ -2411,6 +2413,7 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
+  aspect-ratio: 891 / 540 !important;
   margin: 0 0 14px 0 !important;
   padding: 0 !important;
   border: 0 !important;
@@ -2436,11 +2439,13 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   display: block !important;
   width: 100% !important;
   max-width: 100% !important;
-  height: 180px !important;
-  min-height: 180px !important;
-  max-height: 180px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 891 / 540 !important;
   object-fit: contain !important;
-  object-position: center !important;
+  object-position: center center !important;
+  image-rendering: auto !important;
   margin: 0 0 14px 0 !important;
   padding: 0 !important;
   background: #f1f5f9 !important;
@@ -2448,10 +2453,15 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   float: none !important;
 }
 
-/* Figure already has bottom margin — avoid stacking with img margin */
+/* Figure already has bottom margin + aspect frame — img fills the figure */
 .type-cards-html .type-card figure img,
 .type-cards-html .vss-related-card figure img {
   margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  object-position: center center !important;
 }
 
 /*
@@ -2638,13 +2648,15 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   background: transparent !important;
 }
 
-.type-cards-mobile-carousel .type-cards-mobile-slide figure,
-.type-cards-mobile-carousel .type-cards-mobile-slide figure.image {
+.type-cards-mobile-carousel .type-cards-mobile-slide figure:not(.atb-nic-card__media):not(.atb-flavour-card__media),
+.type-cards-mobile-carousel .type-cards-mobile-slide figure.image:not(.atb-nic-card__media):not(.atb-flavour-card__media) {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
+  aspect-ratio: 891 / 540 !important;
   margin: 0 0 14px 0 !important;
   padding: 0 !important;
+  overflow: hidden !important;
 }
 
 .type-cards-mobile-carousel .type-cards-mobile-slide figure:empty,
@@ -2654,18 +2666,23 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   margin: 0 !important;
 }
 
-.type-cards-mobile-carousel .type-cards-mobile-slide img {
-  height: 180px !important;
-  min-height: 180px !important;
-  max-height: 180px !important;
+.type-cards-mobile-carousel .type-cards-mobile-slide .type-card img,
+.type-cards-mobile-carousel .type-cards-mobile-slide .vss-related-card img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 891 / 540 !important;
   object-fit: contain !important;
-  object-position: center !important;
+  object-position: center center !important;
+  image-rendering: auto !important;
   margin: 0 0 14px 0 !important;
   background: #f1f5f9 !important;
   box-sizing: border-box !important;
 }
 
-/* Re-assert after the generic 180px rule so ATB images actually fill */
+/* Re-assert after the generic type-card frame so ATB images actually fill */
 .type-cards-mobile-carousel .atb-nic-card img,
 .type-cards-mobile-carousel .atb-flavour-card img {
   width: 100% !important;
@@ -2680,8 +2697,14 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   background: transparent !important;
 }
 
-.type-cards-mobile-carousel .type-cards-mobile-slide figure img {
+.type-cards-mobile-carousel .type-cards-mobile-slide .type-card figure img,
+.type-cards-mobile-carousel .type-cards-mobile-slide .vss-related-card figure img {
   margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  object-position: center center !important;
 }
 
 /* Custom left / right arrows — overlap card edges like Trustpilot */
@@ -2800,8 +2823,10 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   .type-cards-html--mobile-fallback .vss-related-card figure {
     height: auto !important;
     min-height: 0 !important;
+    aspect-ratio: 891 / 540 !important;
     margin: 0 0 14px 0 !important;
     padding: 0 !important;
+    overflow: hidden !important;
   }
 
   .type-cards-html--mobile-fallback .type-card figure:empty,
@@ -2815,11 +2840,15 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
 
   .type-cards-html--mobile-fallback .type-card img,
   .type-cards-html--mobile-fallback .vss-related-card img {
-    height: 180px !important;
-    min-height: 180px !important;
-    max-height: 180px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: 891 / 540 !important;
     object-fit: contain !important;
-    object-position: center !important;
+    object-position: center center !important;
+    image-rendering: auto !important;
     margin: 0 0 14px 0 !important;
     background: #f1f5f9 !important;
   }
@@ -2827,6 +2856,11 @@ html[data-worldpay-payment-lock='true'] [data-store-site-chrome] {
   .type-cards-html--mobile-fallback .type-card figure img,
   .type-cards-html--mobile-fallback .vss-related-card figure img {
     margin: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    object-position: center center !important;
   }
 }
 

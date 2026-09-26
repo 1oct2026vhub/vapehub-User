@@ -10,6 +10,7 @@ export type ServerActionResponse<T> =
     | {
         status: ServerActionStatus.SUCCESS;
         data: T;
+        message?: string;
     };
 
 // * Enum

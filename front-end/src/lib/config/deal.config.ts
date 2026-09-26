@@ -109,6 +109,7 @@ export interface ProductInDeal {
     ProductImages: { image_url: string }[];
     out_of_stock?: boolean;
     is_discontinued?: boolean;
+    is_coming_soon?: boolean;
 }
 
 export interface CategoriesWithDealsResponse {

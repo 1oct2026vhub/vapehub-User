@@ -8,7 +8,7 @@ import { PRODUCT_LISTING_START_ID, scrollToProductListingStart } from '@/lib/uti
 export const SCROLL_TO_TOP_NEXT_KEY = 'scrollToTopNext';
 
 /** Known listing routes. Category listing is detected by DOM id presence. */
-const PRODUCT_FILTER_PAGE_PATHS = ['/shop', '/new-products', '/product-deals'] as const;
+const PRODUCT_FILTER_PAGE_PATHS = ['/shop', '/new-products', '/coming-soon', '/product-deals'] as const;
 const PRODUCT_FILTER_PAGE_PREFIX = '/brand/';
 
 function isKnownProductFilterPath(pathname: string): boolean {

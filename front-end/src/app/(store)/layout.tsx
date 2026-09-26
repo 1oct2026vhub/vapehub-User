@@ -3,12 +3,12 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import SitewideTrustStrip from "@/components/SitewideTrustStrip";
 // import { PropsWithChildren, ReactElement } from "react"
-import { PropsWithChildren, ReactElement, Suspense } from "react"
+import { PropsWithChildren, ReactElement } from "react"
 import { headers } from "next/headers";
-import { getCategoryList, getFlashNews, getHeaderMegaMenu } from '@/lib/server.actions';
+import { getCategoryList, getFlashNews, getFooterMenu, getHeaderMegaMenu } from '@/lib/server.actions';
 import { ServerActionStatus } from '@/lib/config/app.config';
 import { FlashNewsItem } from '@/lib/config/global.config';
-import { HeaderMegaMenuResponse } from '@/lib/config/header.config';
+import { FooterMenuResponse, HeaderMegaMenuResponse } from '@/lib/config/header.config';
 import HistoryProvider from "@/components/HistoryProvider";
 import NormalizeInternalLinks from "@/components/NormalizeInternalLinks";
 import { resolveSiteUrl } from "@/lib/site-url";
@@ -27,10 +27,11 @@ export async function generateMetadata(): Promise<Metadata> {
 const StoreRootLayout = async ({
   children,
 }: Readonly<PropsWithChildren>): Promise<ReactElement> => {
-  const [megaMenuResult, categoryListResult, flashNewsResult] = await Promise.allSettled([
+  const [megaMenuResult, categoryListResult, flashNewsResult, footerMenuResult] = await Promise.allSettled([
     getHeaderMegaMenu(),
     getCategoryList(),
     getFlashNews(true),
+    getFooterMenu(),
   ]);
 
   const megaMenu: HeaderMegaMenuResponse =
@@ -53,27 +54,28 @@ const StoreRootLayout = async ({
     flashNews = flashNewsResult.value.data;
   }
 
+  const footerMenu: FooterMenuResponse =
+    footerMenuResult.status === 'fulfilled'
+      ? footerMenuResult.value
+      : {
+          data: [],
+          socialLinks: {},
+          badges: [],
+          status: ServerActionStatus.ERROR,
+          message: 'Footer menu unavailable',
+        };
+
   return (
     <div className="flex flex-col min-h-screen">
       <NormalizeInternalLinks />
       <Header megaMenu={megaMenu} flashNews={flashNews} />
-      <Suspense fallback={
-        <div className="w-full max-w-[1520px] mx-auto">
+      <HistoryProvider>
+        <div className="w-full max-w-[1520px] mx-auto flex-1">
           {children}
         </div>
-      }>
-        <HistoryProvider>
-          <div className="w-full max-w-[1520px] mx-auto">
-            {children}
-          </div>
-        </HistoryProvider>
-      </Suspense>
-      <Suspense fallback={null}>
-        <SitewideTrustStrip />
-      </Suspense>
-      <Suspense fallback={<div className="w-full max-w-[1520px] mx-auto" />}>
-        <Footer />
-      </Suspense>
+      </HistoryProvider>
+      <SitewideTrustStrip footerMenu={footerMenu} />
+      <Footer footerMenu={footerMenu} />
     </div>
   )
 }

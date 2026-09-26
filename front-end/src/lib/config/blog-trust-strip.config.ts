@@ -6,9 +6,12 @@ export type TrustBadgeIcon =
   | "age";
 
 export interface SitewideTrustBadge {
+  id?: number | string;
   category: string;
   value: string;
-  icon: TrustBadgeIcon;
+  icon?: TrustBadgeIcon;
+  iconUrl?: string | null;
+  href?: string | null;
 }
 
 export const SITEWIDE_TRUST_STRIP = {

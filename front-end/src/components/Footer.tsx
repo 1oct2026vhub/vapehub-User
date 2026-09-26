@@ -1,17 +1,18 @@
-import React, { Suspense } from 'react';
+import React, { ReactElement, Suspense } from 'react';
 import Logo from './ui/Logo';
 import { FacebookIcon, InstagramIcon, TwitterIcon } from './Icons';
 import Link from 'next/link';
-import { getFooterMenu } from '@/lib/server.actions';
-import { AsyncReactElement, ServerActionStatus } from '@/lib/config/app.config';
+import { ServerActionStatus } from '@/lib/config/app.config';
 import FooterMobile from './FooterMobile';
-import { FooterMenu, FooterMenuLink } from '@/lib/config/header.config';
+import { FooterMenu, FooterMenuLink, FooterMenuResponse } from '@/lib/config/header.config';
 import SuspenseLoader from './ui/SuspenseLoader';
 import Subscription from '@/app/(store)/(dashboard)/_components/Subscription';
 
-const Footer = async (): AsyncReactElement => {
-  const footerMenuResponse = await getFooterMenu();   
+interface FooterProps {
+  footerMenu: FooterMenuResponse;
+}
 
+const Footer = ({ footerMenu: footerMenuResponse }: FooterProps): ReactElement => {
   if (footerMenuResponse.status === ServerActionStatus.ERROR) {
     return <div>{footerMenuResponse.message}</div>;
   }

@@ -44,11 +44,14 @@ async function fetchCategoryBasedContinueReading(
   blog: BlogByCategoryAndSlugResponse,
 ): Promise<ContinueReadingArticle[]> {
   const categoryId = blog.categories?.[0]?.id;
-  const response = await getBlogPostList({
-    ...(categoryId ? { categoryId: String(categoryId) } : {}),
-    limit: 4,
-    page: 1,
-  });
+  const response = await getBlogPostList(
+    {
+      ...(categoryId ? { categoryId: String(categoryId) } : {}),
+      limit: 4,
+      page: 1,
+    },
+    false,
+  );
 
   if (response.status !== ServerActionStatus.SUCCESS) {
     return [];

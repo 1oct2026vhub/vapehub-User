@@ -1,7 +1,7 @@
 "use client";
 import { usePathname, useSearchParams } from 'next/navigation';
 import type { ReadonlyURLSearchParams } from 'next/navigation';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { PRODUCT_LISTING_START_ID, scrollToProductListingStart } from '@/lib/utils/scrollToTop';
 
 /** Key used to skip scroll restore when user explicitly changed page/filter/sort (e.g. pagination). */
@@ -35,7 +35,31 @@ export function setScrollToTopOnNextNavigation(): void {
   }
 }
 
-function HistoryProvider({ children }: { children: React.ReactNode }) {
+/** trailingSlash: true may store keys as `/blogs?x` or `/blogs/?x`. */
+function withTrailingSlashKeyVariants(pageKey: string): string[] {
+  const q = pageKey.indexOf('?');
+  const path = q === -1 ? pageKey : pageKey.slice(0, q);
+  const query = q === -1 ? '' : pageKey.slice(q);
+  const withSlash = path.endsWith('/') ? path : `${path}/`;
+  const withoutSlash = path !== '/' && path.endsWith('/') ? path.slice(0, -1) : path;
+  return Array.from(new Set([pageKey, `${withSlash}${query}`, `${withoutSlash}${query}`]));
+}
+
+function readSessionFlag(prefix: string, pageKey: string): string | null {
+  for (const key of withTrailingSlashKeyVariants(pageKey)) {
+    const value = sessionStorage.getItem(`${prefix}${key}`);
+    if (value != null) return value;
+  }
+  return null;
+}
+
+function removeSessionKeys(prefix: string, pageKey: string): void {
+  withTrailingSlashKeyVariants(pageKey).forEach((key) => {
+    sessionStorage.removeItem(`${prefix}${key}`);
+  });
+}
+
+function HistoryScrollManager() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isRestoringRef = useRef(false);
@@ -56,6 +80,23 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
       isFilterContextRef.current = isKnownProductFilterPath(pathname) || hasListingSearchParams(searchParams);
     }
   }, [pageKey, pathname, searchParams]);
+
+  // Before paint: honor explicit “scroll to top” navigations (e.g. author articles link).
+  // With history.scrollRestoration = 'manual', client navigations keep the previous scrollY.
+  // From a deep article scroll that lands on a shorter page, that looks like the footer.
+  useLayoutEffect(() => {
+    if (isFilterContextRef.current) return;
+    try {
+      const skipHome = pathname === '/' && sessionStorage.getItem('skipScrollRestore_/');
+      const skipPage = readSessionFlag('skipScrollRestore_', pageKey);
+      if (!skipHome && !skipPage) return;
+      isRestoringRef.current = true;
+      removeSessionKeys('scrollPos_', pageKey);
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    } catch {
+      // Ignore storage errors
+    }
+  }, [pageKey, pathname]);
 
   // Save scroll position to sessionStorage (throttled) – skip on product filter pages (new-products, shop, brand, category, deal)
   useEffect(() => {
@@ -156,7 +197,17 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        const savedPosition = sessionStorage.getItem(`scrollPos_${pageKey}`);
+        // Explicit “scroll to top” navigations (e.g. author articles link). Do not restore a saved
+        // position, and do not keep the previous page’s scrollY (manual restoration leaves it in place).
+        // Keep the flag until delayed restore attempts finish so they cannot re-apply a saved offset.
+        const skipRestorePage = readSessionFlag('skipScrollRestore_', pageKey);
+        if (skipRestorePage) {
+          removeSessionKeys('scrollPos_', pageKey);
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+          return;
+        }
+
+        const savedPosition = readSessionFlag('scrollPos_', pageKey);
         if (savedPosition) {
           const position = parseInt(savedPosition, 10);
           if (!isNaN(position) && position > 0) {
@@ -194,6 +245,11 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
       setTimeout(() => restoreScroll(), 300),
       setTimeout(() => {
         restoreScroll();
+        try {
+          removeSessionKeys('skipScrollRestore_', pageKey);
+        } catch {
+          // Ignore storage errors
+        }
         isRestoringRef.current = false;
       }, 500)
     ];
@@ -203,7 +259,18 @@ function HistoryProvider({ children }: { children: React.ReactNode }) {
     };
   }, [pageKey, pathname]);
 
-  return <>{children}</>;
+  return null;
+}
+
+function HistoryProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <Suspense fallback={null}>
+        <HistoryScrollManager />
+      </Suspense>
+      {children}
+    </>
+  );
 }
 
 export default HistoryProvider;
